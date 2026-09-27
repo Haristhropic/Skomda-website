@@ -15,6 +15,7 @@ export interface PageHeroSectionProps {
   titleHighlight?: string;
   titleSuffix?: string;
   titleHighlightColor?: string;
+  showAccentBar?: boolean;
   description: string;
   ctaText?: string;
   ctaHref?: string;
@@ -24,6 +25,15 @@ export interface PageHeroSectionProps {
   bgShape?: string;
   imagePosition?: "left" | "right";
   isIntegratedArtwork?: boolean;
+  imageContainerClassName?: string;
+  imageClassName?: string;
+  imageColSpan?: string;
+  textColSpan?: string;
+  sectionPaddingClassName?: string;
+  gridAlignmentClassName?: string;
+  textJustifyClassName?: string;
+  titleClassName?: string;
+  titleHighlightClassName?: string;
 }
 
 export default function PageHeroSection({
@@ -32,6 +42,7 @@ export default function PageHeroSection({
   titleHighlight = "",
   titleSuffix = "",
   titleHighlightColor = "text-[#e7000b]",
+  showAccentBar = true,
   description,
   ctaText = "Jelajahi",
   ctaHref,
@@ -41,8 +52,21 @@ export default function PageHeroSection({
   bgShape,
   imagePosition = "right",
   isIntegratedArtwork = true,
+  imageContainerClassName,
+  imageClassName = "",
+  imageColSpan,
+  textColSpan,
+  sectionPaddingClassName,
+  gridAlignmentClassName,
+  textJustifyClassName,
+  titleClassName,
+  titleHighlightClassName,
 }: PageHeroSectionProps) {
   const isImageRight = imagePosition === "right";
+  const resolvedImageColSpan =
+    imageColSpan || (isIntegratedArtwork ? "lg:col-span-6" : "lg:col-span-5");
+  const resolvedTextColSpan =
+    textColSpan || (isIntegratedArtwork ? "lg:col-span-6" : "lg:col-span-7");
 
   const handleScrollToHash = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
     if (hash.startsWith("#")) {
@@ -88,26 +112,39 @@ export default function PageHeroSection({
   );
 
   return (
-    <section className="relative w-full pt-32 sm:pt-36 lg:pt-40 pb-16 lg:pb-20 bg-[#f8f9fb] overflow-hidden">
+    <section
+      className={`relative w-full ${
+        sectionPaddingClassName || "pt-32 sm:pt-36 lg:pt-40 pb-16 lg:pb-24"
+      } bg-[#f8f9fb] overflow-hidden`}
+    >
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 items-center">
+        <div
+          className={`grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 ${
+            gridAlignmentClassName || "items-center"
+          }`}
+        >
           
           {/* Visual Artwork Column */}
           <motion.div
             initial={{ opacity: 0, x: isImageRight ? 30 : -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className={`${isIntegratedArtwork ? "lg:col-span-6" : "lg:col-span-5"} flex justify-center ${
-              isImageRight ? "lg:justify-end order-2" : "lg:justify-start order-2 lg:order-1"
+            className={`${resolvedImageColSpan} flex items-center justify-center ${
+              isImageRight ? "order-2" : "order-2 lg:order-1"
             }`}
           >
             {isIntegratedArtwork || !bgShape ? (
-              <div className="relative w-full max-w-[480px] sm:max-w-[540px] lg:max-w-[580px] aspect-[16/10] select-none flex items-center justify-center">
+              <div
+                className={`relative select-none flex items-center justify-center ${
+                  imageContainerClassName ||
+                  "w-full max-w-[480px] sm:max-w-[520px] lg:max-w-[540px] aspect-[1.12/1]"
+                }`}
+              >
                 <Image
                   src={studentImage}
                   alt={studentAlt}
                   fill
-                  className="object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.08)]"
+                  className={`object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.08)] ${imageClassName}`}
                   priority
                   sizes="(max-width: 768px) 90vw, (max-width: 1024px) 50vw, 580px"
                 />
@@ -145,14 +182,14 @@ export default function PageHeroSection({
             initial={{ opacity: 0, x: isImageRight ? -30 : 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-            className={`${isIntegratedArtwork ? "lg:col-span-6" : "lg:col-span-7"} flex flex-col items-start ${
-              isImageRight ? "order-1" : "order-1 lg:order-2"
-            }`}
+            className={`${resolvedTextColSpan} flex flex-col items-start ${
+              textJustifyClassName || "justify-center"
+            } ${isImageRight ? "order-1" : "order-1 lg:order-2"}`}
           >
             {/* Breadcrumb Navigation */}
             <nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-2 mb-5 text-xs sm:text-sm font-jakarta text-[#64748b] flex-wrap"
+              className="flex items-center gap-2 mb-4 sm:mb-5 text-xs sm:text-sm font-jakarta text-[#64748b] flex-wrap"
             >
               <Link href="/" className="hover:text-[#bc0c11] transition-colors">
                 Beranda
@@ -189,18 +226,27 @@ export default function PageHeroSection({
             </nav>
 
             {/* Title */}
-            <div className="relative mb-5">
-              <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[52px] xl:text-[56px] leading-tight sm:leading-[1.2] lg:leading-[1.18] xl:leading-[1.16] tracking-tight text-[#101828]">
+            <div className="relative mb-5 sm:mb-6">
+              <h1
+                className={`font-jakarta font-bold leading-tight sm:leading-[1.2] lg:leading-[1.18] tracking-tight text-[#101828] ${
+                  titleClassName || "text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px]"
+                }`}
+              >
                 {titlePrefix && <span className="text-[#101828]">{titlePrefix} </span>}
                 {titleHighlight && (
-                  <span className={titleHighlightColor}>{titleHighlight}</span>
+                  <span className={`${titleHighlightColor} ${titleHighlightClassName || ""}`}>
+                    {titleHighlight}
+                  </span>
                 )}
                 {titleSuffix && <span className="text-[#101828]"> {titleSuffix}</span>}
               </h1>
+              {showAccentBar && (
+                <div className="mt-3.5 h-[3px] w-14 bg-[#bc0c11] rounded-full" />
+              )}
             </div>
 
             {/* Description */}
-            <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed max-w-2xl mb-8 font-normal">
+            <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed max-w-xl lg:max-w-2xl mb-7 sm:mb-8 font-normal">
               {description}
             </p>
 

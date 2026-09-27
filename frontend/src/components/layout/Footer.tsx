@@ -5,6 +5,44 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 
+const LOMBA_LOGOS = [
+  {
+    name: "Jagoan Hosting Innovation Competition 2026",
+    src: "/images/lomba/logo-jhic.png",
+    width: 1600,
+    height: 972,
+    className: "h-10 sm:h-12 w-auto object-contain",
+  },
+  {
+    name: "Jagoan Hosting",
+    src: "/images/lomba/logo-jagoan-hosting.png",
+    width: 1600,
+    height: 503,
+    className: "h-7 sm:h-8 w-auto object-contain",
+  },
+  {
+    name: "Kementerian Komunikasi dan Digital (KOMDIGI)",
+    src: "/images/lomba/logo-komdigi.png",
+    width: 994,
+    height: 720,
+    className: "h-9 sm:h-10 w-auto object-contain",
+  },
+  {
+    name: "Garuda Spark Innovation Hub",
+    src: "/images/lomba/logo-garuda-spark.png",
+    width: 1600,
+    height: 873,
+    className: "h-8 sm:h-9 w-auto object-contain",
+  },
+  {
+    name: "Ngalup.co",
+    src: "/images/lomba/logo-ngalup.png",
+    width: 1600,
+    height: 253,
+    className: "h-5 sm:h-6 w-auto object-contain",
+  },
+];
+
 export default function Footer() {
   const { t } = useLanguage();
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -203,11 +241,6 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-
-            {/* Copyright */}
-            <p className="font-jakarta text-xs text-[#4a5565] pt-4">
-              {t("footer.rights")}
-            </p>
           </div>
 
           {/* Column 2: Menu Utama & Aplikasi Siswa (Col span 3) */}
@@ -251,7 +284,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 3: Berita Sekolah & Pengunjung (Col span 2) */}
+          {/* Column 3: Berita Sekolah (Col span 2) */}
           <div className="lg:col-span-2 flex flex-col gap-4">
             <div>
               <h3 className="font-jakarta font-bold text-base sm:text-[17px] text-[#101828] mb-2">
@@ -269,17 +302,6 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            <div>
-              <h3 className="font-jakarta font-bold text-base sm:text-[17px] text-[#101828] mb-2">
-                {t("footer.visitors")}
-              </h3>
-              <div className="flex flex-col gap-1 font-jakarta text-xs text-[#364153]">
-                <p>{t("footer.today")} <span className="font-semibold text-[#101828]">30</span></p>
-                <p>{t("footer.thisMonth")} <span className="font-semibold text-[#101828]">1.405</span></p>
-                <p>{t("footer.thisYear")} <span className="font-semibold text-[#101828]">40.125</span></p>
-              </div>
             </div>
           </div>
 
@@ -335,6 +357,38 @@ export default function Footer() {
             </div>
           </div>
 
+        </div>
+
+        {/* Lomba & Mitra Kolaborasi Section */}
+        <div className="mt-14 pt-8 border-t border-slate-200/80">
+          {/* Logos Row - directly spanning left to right, no animation */}
+          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-6 sm:gap-8 md:gap-10 w-full">
+            {LOMBA_LOGOS.map((logo, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-center"
+                title={logo.name}
+              >
+                <Image
+                  src={logo.src}
+                  alt={logo.name}
+                  width={logo.width}
+                  height={logo.height}
+                  className={logo.className}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom Bar: Copyright & School Tagline */}
+          <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#4a5565]">
+            <p className="font-jakarta text-center sm:text-left">
+              {t("footer.rights")}
+            </p>
+            <p className="font-jakarta text-[11px] text-slate-400 text-center sm:text-right">
+              SMK Telkom Sidoarjo - The Real School of Future Digital Talents
+            </p>
+          </div>
         </div>
       </div>
     </footer>

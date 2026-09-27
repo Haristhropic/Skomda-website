@@ -78,10 +78,13 @@ export default function PrestasiHeroSection() {
               </span>
             </nav>
 
-            {/* Main Heading from */}
-            <h1 className="font-jakarta font-bold text-4xl sm:text-5xl lg:text-[58px] leading-[1.15] tracking-tight text-[#101828] mb-4">
-              {isEn ? "Achievements" : "Prestasi"}
-            </h1>
+            {/* Main Heading */}
+            <div className="relative mb-5 sm:mb-6">
+              <h1 className="font-jakarta font-bold text-4xl sm:text-5xl lg:text-[58px] leading-[1.15] tracking-tight text-[#101828]">
+                {isEn ? "Achievements" : "Prestasi"}
+              </h1>
+              <div className="mt-3.5 h-[3px] w-14 bg-[#bc0c11] rounded-full" />
+            </div>
 
             {/* Description Paragraph from */}
             <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed max-w-xl mb-8">

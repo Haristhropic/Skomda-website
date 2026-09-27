@@ -52,6 +52,7 @@ export default function DigitalTalentClient() {
         titleHighlight="Talent"
         titleSuffix="Program"
         titleHighlightColor="text-[#e7000b]"
+        showAccentBar={true}
         description="Digital Talent Program merupakan inisiatif unggulan SMK Telkom Sidoarjo untuk membekali siswa dengan keahlian teknologi masa depan melalui model pembelajaran khusus setiap pekan. Siswa mendalami salah satu dari sembilan bidang spesialisasi digital, mengerjakan studi kasus nyata, dan membangun portofolio profesional yang siap bersaing di industri global."
         studentImage="/images/program/digital-talent/hero-student-digital-talent.png"
         studentAlt="Digital Talent Program SMK Telkom Sidoarjo"
@@ -59,6 +60,8 @@ export default function DigitalTalentClient() {
         ctaHref="#spesialisasi-dtp"
         imagePosition="right"
         isIntegratedArtwork={true}
+        imageContainerClassName="w-full max-w-[440px] sm:max-w-[480px] lg:max-w-[520px] aspect-[1326/1186]"
+        imageClassName="drop-shadow-xl"
       />
 
       {/* ─── 2. Background & Weekly Learning Model ─── */}

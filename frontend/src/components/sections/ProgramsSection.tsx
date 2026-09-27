@@ -24,10 +24,10 @@ export default function ProgramsSection() {
           </p>
 
           {/* Segmented Pill Tabs with Animated Sliding Pill */}
-          <div className="mt-8 relative inline-flex h-[52px] w-[340px] items-center rounded-full bg-white p-1 shadow-sm border border-gray-200/60 overflow-hidden">
+          <div className="mt-8 relative inline-flex h-[52px] w-[340px] items-center rounded-full bg-white p-1 border border-gray-200/60 overflow-hidden">
             {/* Smooth CSS sliding pill indicator */}
             <div
-              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-[#bc0c11] shadow-sm transition-transform duration-300 ease-out pointer-events-none ${
+              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-[#bc0c11] transition-transform duration-300 ease-out pointer-events-none ${
                 activeTab === "SIJA" ? "left-1 translate-x-0" : "left-1 translate-x-[calc(100%+0px)]"
               }`}
             />
@@ -71,72 +71,17 @@ export default function ProgramsSection() {
         {/* Tab Content: SIJA */}
         {activeTab === "SIJA" && (
           <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            {/* Left Column: Student Image with Double Frames 67:112, 104:463, 105:467, 105:468) */}
+            {/* Left Column: Student Character & Graphic Shape */}
             <div className="lg:col-span-5 flex items-center justify-center relative">
-              <div className="relative flex items-center justify-center" data-node-id="67:112">
-
-                {/* 1. Outer Dashed Border Frame */}
-                <div
-                  className="absolute -left-4 -top-4 sm:-left-5 sm:-top-5 h-[370px] sm:h-[400px] lg:h-[430px] w-[290px] sm:w-[320px] lg:w-[340px] border-2 border-dashed border-[#787878]/60 pointer-events-none"
-                  style={{ borderRadius: "55px 0 55px 0" }}
-                  data-node-id="67:100"
+              <div className="relative w-full max-w-[340px] sm:max-w-[380px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
+                <Image
+                  src="/images/program/profil-jurusan/jurusan-sija-character.png"
+                  alt="Siswi SIJA SMK Telkom Sidoarjo"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 420px"
+                  className="object-contain drop-shadow-2xl"
                 />
-
-                {/* 2. Inner Solid Red Curved Frame */}
-                <div
-                  className="relative h-[370px] sm:h-[400px] lg:h-[430px] w-[290px] sm:w-[320px] lg:w-[340px] overflow-hidden bg-[#bc0c11] shadow-xl"
-                  style={{ borderRadius: "190px 0 190px 0" }}
-                  data-node-id="67:103"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#990a0e] to-[#bc0c11] opacity-90" />
-                </div>
-
-                {/* 3. Student Photo - SIJA precisely height-matched to TJAT */}
-                <div
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[470px] w-[314px] pointer-events-none flex items-end justify-center overflow-visible"
-                  data-name="student-sija"
-                >
-                  <Image
-                    src="/images/program/profil-jurusan/student-sija.png"
-                    alt="Siswa SIJA SMK Telkom Sidoarjo"
-                    fill
-                    sizes="(max-width: 640px) 300px, 314px"
-                    className="object-contain object-bottom drop-shadow-2xl"
-                  />
-                </div>
-
-                {/* 4. Floating Code Badge Top-Right 105:467) */}
-                <div
-                  className="absolute top-8 -right-3 sm:-right-4 z-20 flex size-[52px] items-center justify-center rounded-[12px] bg-white/95 shadow-[0px_3px_10px_rgba(0,0,0,0.12)] backdrop-blur-sm transition-transform hover:scale-110"
-                  data-node-id="105:467"
-                >
-                  <div className="relative size-[30px]" data-node-id="105:465" data-name="ph:code-fill">
-                    <Image
-                      src="/images/common/icons/ph-code-fill.svg"
-                      alt="Code icon"
-                      fill
-                      sizes="30px"
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-
-                {/* 5. Floating Code Badge Bottom-Left 105:468) */}
-                <div
-                  className="absolute bottom-20 -left-3 sm:-left-4 z-20 flex size-[52px] items-center justify-center rounded-[12px] bg-white/95 shadow-[0px_3px_10px_rgba(0,0,0,0.12)] backdrop-blur-sm transition-transform hover:scale-110"
-                  data-node-id="105:468"
-                >
-                  <div className="relative size-[30px]" data-name="ph:code-fill">
-                    <Image
-                      src="/images/common/icons/ph-code-fill.svg"
-                      alt="Code icon"
-                      fill
-                      sizes="30px"
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-
               </div>
             </div>
 
@@ -157,7 +102,7 @@ export default function ProgramsSection() {
                 {[
                   {
                     title: "Software Development",
-                    desc: "Belajar membuat aplikasi web, mobile, dan desktop yang fungsional dan modern.",
+                    desc: "Pengembangan aplikasi web, mobile, dan desktop yang responsif dengan arsitektur modern serta integrasi API.",
                     icon: (
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                         <polyline points="16 18 22 12 16 6" />
@@ -167,7 +112,7 @@ export default function ProgramsSection() {
                   },
                   {
                     title: "Database & Cloud Computing",
-                    desc: "Belajar membuat aplikasi web, mobile, dan desktop yang fungsional dan modern.",
+                    desc: "Pengelolaan basis data relasional dan NoSQL serta implementasi server berbasis teknologi cloud computing.",
                     icon: (
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                         <ellipse cx="12" cy="5" rx="9" ry="3" />
@@ -178,7 +123,7 @@ export default function ProgramsSection() {
                   },
                   {
                     title: "Networking & Cybersecurity",
-                    desc: "Belajar membuat aplikasi web, mobile, dan desktop yang fungsional dan modern.",
+                    desc: "Konfigurasi infrastruktur jaringan komputer, routing, switching, dan proteksi sistem dari ancaman siber.",
                     icon: (
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -247,61 +192,17 @@ export default function ProgramsSection() {
         {/* Tab Content: TJAT */}
         {activeTab === "TJAT" && (
           <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            {/* Left Column: Student Image with Double Frames */}
+            {/* Left Column: Student Character & Graphic Shape */}
             <div className="lg:col-span-5 flex items-center justify-center relative">
-              <div className="relative flex items-center justify-center">
-
-                {/* 1. Outer Dashed Border Frame */}
-                <div
-                  className="absolute -left-4 -top-4 sm:-left-5 sm:-top-5 h-[370px] sm:h-[400px] lg:h-[430px] w-[290px] sm:w-[320px] lg:w-[340px] border-2 border-dashed border-[#787878]/60 pointer-events-none"
-                  style={{ borderRadius: "55px 0 55px 0" }}
+              <div className="relative w-full max-w-[340px] sm:max-w-[380px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
+                <Image
+                  src="/images/program/profil-jurusan/jurusan-tjat-curved.png"
+                  alt="Siswa TJAT SMK Telkom Sidoarjo"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 420px"
+                  className="object-contain drop-shadow-2xl"
                 />
-
-                {/* 2. Inner Solid Red Curved Frame */}
-                <div
-                  className="relative h-[370px] sm:h-[400px] lg:h-[430px] w-[290px] sm:w-[320px] lg:w-[340px] overflow-hidden bg-[#bc0c11] shadow-xl"
-                  style={{ borderRadius: "190px 0 190px 0" }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[#990a0e] to-[#bc0c11] opacity-90" />
-                </div>
-
-                {/* 3. Student Photo - TJAT */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[470px] w-[314px] pointer-events-none flex items-end justify-center overflow-visible">
-                  <Image
-                    src="/images/home/hero/image5.png"
-                    alt="Siswi TJAT SMK Telkom Sidoarjo"
-                    fill
-                    sizes="(max-width: 640px) 300px, 314px"
-                    className="object-contain object-bottom drop-shadow-2xl"
-                  />
-                </div>
-
-                {/* 4. Floating Badge Top-Right */}
-                <div className="absolute top-8 -right-3 sm:-right-4 z-20 flex size-[52px] items-center justify-center rounded-[12px] bg-white/95 shadow-[0px_3px_10px_rgba(0,0,0,0.12)] backdrop-blur-sm transition-transform hover:scale-110">
-                  <div className="relative size-[30px]">
-                    <Image
-                      src="/images/common/icons/ph-code-fill.svg"
-                      alt="Code icon"
-                      fill
-                      sizes="30px"
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-
-                {/* 5. Floating Badge Bottom-Left */}
-                <div className="absolute bottom-20 -left-3 sm:-left-4 z-20 flex size-[52px] items-center justify-center rounded-[12px] bg-white/95 shadow-[0px_3px_10px_rgba(0,0,0,0.12)] backdrop-blur-sm transition-transform hover:scale-110">
-                  <div className="relative size-[30px]">
-                    <Image
-                      src="/images/common/icons/ph-code-fill.svg"
-                      alt="Code icon"
-                      fill
-                      sizes="30px"
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
-
               </div>
             </div>
 

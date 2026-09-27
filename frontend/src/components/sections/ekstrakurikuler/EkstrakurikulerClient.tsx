@@ -55,8 +55,10 @@ export default function EkstrakurikulerClient() {
           { label: t("nav.programs", "Program"), href: "/program/profil-jurusan" },
           { label: t("ekstrakurikuler.breadcrumb", "Ekstrakurikuler"), href: "/program/ekstrakurikuler" },
         ]}
+        titlePrefix="Program"
         titleHighlight="Ekstrakurikuler"
-        titleHighlightColor="text-[#101828]"
+        titleHighlightColor="text-[#e7000b]"
+        showAccentBar={true}
         description="SMK Telkom Sidoarjo menyediakan beragam pilihan ekstrakurikuler yang mencakup bidang kepemimpinan, olahraga, seni budaya, riset ilmiah, hingga teknologi dan robotika. Seluruh kegiatan dirancang untuk menyalurkan minat dan bakat siswa, melatih karakter kepemimpinan, serta mengukir prestasi gemilang di tingkat regional maupun nasional."
         studentImage="/images/program/ekstrakurikuler/hero-student-ekskul.png"
         studentAlt="Ekstrakurikuler SMK Telkom Sidoarjo"
@@ -64,6 +66,8 @@ export default function EkstrakurikulerClient() {
         ctaHref="#daftar-ekskul"
         imagePosition="right"
         isIntegratedArtwork={true}
+        imageContainerClassName="w-full max-w-[440px] sm:max-w-[480px] lg:max-w-[520px] aspect-[1326/1186]"
+        imageClassName="drop-shadow-xl"
       />
 
       {/* Main Catalog Section */}

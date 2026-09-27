@@ -27,29 +27,15 @@ export default function ProfilHeroSection() {
             transition={{ duration: 0.7, ease: "easeOut" }}
             className="lg:col-span-5 flex justify-center lg:justify-start order-2 lg:order-1"
           >
-            <div className="relative w-full max-w-[460px] aspect-[500/470] select-none">
-              
-              {/* Background Geometric Arches */}
-              <div className="absolute left-0 top-[17.23%] w-[99.6%] h-[83%] pointer-events-none z-0">
-                <Image
-                  src="/images/tentang-kami/profil-sekolah/hero-bg-shapes.svg"
-                  alt=""
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-
-              {/* Student Portrait */}
-              <div className="absolute left-[26.6%] top-0 w-[62.4%] h-[99.57%] z-10">
-                <Image
-                  src="/images/tentang-kami/profil-sekolah/profil-hero-student.png"
-                  alt="Siswi SMK Telkom Sidoarjo"
-                  fill
-                  className="object-contain object-bottom drop-shadow-md"
-                  priority
-                />
-              </div>
+            <div className="relative w-full max-w-[360px] sm:max-w-[400px] aspect-[1122/1402] select-none flex items-center justify-center">
+              <Image
+                src="/images/tentang-kami/profil-sekolah/profil-hero-character.png"
+                alt="Siswi SMK Telkom Sidoarjo"
+                fill
+                priority
+                sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 420px"
+                className="object-contain drop-shadow-xl"
+              />
             </div>
           </motion.div>
 

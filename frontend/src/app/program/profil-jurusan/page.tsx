@@ -26,7 +26,7 @@ export const metadata: Metadata = {
       "Profil Jurusan Unggulan SMK Telkom Sidoarjo: SIJA & TJAT berstandar industri.",
     images: [
       {
-        url: "/images/program/profil-jurusan/student-sija.png",
+        url: "/images/program/profil-jurusan/jurusan-sija-character.png",
         width: 800,
         height: 600,
         alt: "Profil Jurusan SMK Telkom Sidoarjo",

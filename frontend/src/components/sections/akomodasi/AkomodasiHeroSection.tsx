@@ -21,6 +21,7 @@ export default function AkomodasiHeroSection() {
       ctaHref="#biaya-hidup"
       imagePosition="right"
       isIntegratedArtwork={true}
+      sectionPaddingClassName="pt-28 sm:pt-32 lg:pt-30 pb-16 lg:pb-24"
     />
   );
 }

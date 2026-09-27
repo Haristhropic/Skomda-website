@@ -70,7 +70,7 @@ const jurusanContent: Record<JurusanKey, JurusanData> = {
       "A forward-looking IT competency within Computer and Informatics Engineering introduced in 2017/2018 for a comprehensive Four (4) Year vocational program, tailored to equip students with enterprise cloud, cybersecurity, and software skills.",
     durationId: "Masa pendidikan 4 tahun",
     durationEn: "4-Year Education Program",
-    studentImage: "/images/program/profil-jurusan/student-sija.png",
+    studentImage: "/images/program/profil-jurusan/jurusan-sija-character.png",
     studentAlt: "Siswi SIJA SMK Telkom Sidoarjo",
     badgeIcon: "/images/common/icons/ph-code-fill.svg",
     subjects: [
@@ -105,8 +105,8 @@ const jurusanContent: Record<JurusanKey, JurusanData> = {
       "A flagship vocational program focused on wave transmission, fiber optic fusion splicing and installation, cellular and wireless network engineering, and integrated telecommunication infrastructure adhering to Telkom Group standards.",
     durationId: "Masa pendidikan 3 tahun",
     durationEn: "3-Year Education Program",
-    studentImage: "/images/home/hero/image5.png",
-    studentAlt: "Siswi TJAT SMK Telkom Sidoarjo",
+    studentImage: "/images/program/profil-jurusan/jurusan-tjat-curved.png",
+    studentAlt: "Siswa TJAT SMK Telkom Sidoarjo",
     badgeIcon: "/images/program/profil-jurusan/icon-tjat.svg",
     subjects: [
       { nameId: "Jaringan Fiber Optic", nameEn: "Fiber Optic Networks", icon: Cable },
@@ -242,33 +242,17 @@ export default function MembangunKompetensiSection() {
           {/* Main Jurusan Showcase Box */}
           <div className="my-12">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-              {/* Left: Student Image with Signature Double Curved Frame */}
+              {/* Left: Student Character & Graphic Shape */}
               <div className="lg:col-span-5 flex items-center justify-center relative">
-                <div className="relative flex items-center justify-center">
-                  {/* 1. Outer Dashed Border Frame */}
-                  <div
-                    className="absolute -left-4 -top-4 sm:-left-5 sm:-top-5 h-[370px] sm:h-[400px] lg:h-[430px] w-[290px] sm:w-[320px] lg:w-[340px] border-2 border-dashed border-[#787878]/60 pointer-events-none"
-                    style={{ borderRadius: "55px 0 55px 0" }}
+                <div className="relative w-full max-w-[340px] sm:max-w-[380px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
+                  <Image
+                    src={current.studentImage}
+                    alt={current.studentAlt}
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                    priority
+                    sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 420px"
                   />
-
-                  {/* 2. Inner Solid Red Curved Frame */}
-                  <div
-                    className="relative h-[370px] sm:h-[400px] lg:h-[430px] w-[290px] sm:w-[320px] lg:w-[340px] overflow-hidden bg-[#bc0c11] shadow-xl"
-                    style={{ borderRadius: "190px 0 190px 0" }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-tr from-[#990a0e] to-[#bc0c11] opacity-90" />
-                  </div>
-
-                  {/* 3. Student Photo */}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[450px] sm:h-[470px] w-[314px] sm:w-[330px] pointer-events-none flex items-end justify-center overflow-visible">
-                    <Image
-                      src={current.studentImage}
-                      alt={current.studentAlt}
-                      fill
-                      className="object-contain object-bottom drop-shadow-2xl"
-                      priority
-                    />
-                  </div>
                 </div>
               </div>
 

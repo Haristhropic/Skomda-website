@@ -25,6 +25,9 @@ const config: Config = {
       maxWidth: {
         "8xl": "1280px",
       },
+      spacing: {
+        "30": "7.5rem",
+      },
       boxShadow: {
         header: "0px 20px 25px -5px rgba(0,0,0,0.1), 0px 10px 10px -5px rgba(0,0,0,0.04)",
         "card-cta": "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",

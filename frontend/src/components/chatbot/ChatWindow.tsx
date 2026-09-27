@@ -53,47 +53,18 @@ const INITIAL_WELCOME: Message = {
   timestamp: "Baru saja",
 };
 
-// High-Fidelity LLM Thinking State with soundwave equalizer and progressive reasoning phases
+// Minimalist Typing Indicator Dots
 function ThinkingState() {
-  const [phaseIdx, setPhaseIdx] = useState(0);
-  const phases = [
-    "Menganalisis pertanyaan...",
-    "Membaca arsip resmi SKOMDA...",
-    "Merangkai jawaban terbaik...",
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPhaseIdx((prev) => (prev + 1) % phases.length);
-    }, 1500);
-    return () => clearInterval(interval);
-  }, [phases.length]);
-
   return (
-    <div className="flex flex-col gap-2.5 py-1 px-0.5 min-w-[210px]">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="flex size-6 items-center justify-center rounded-lg bg-red-100/90 text-[#bc0c11]">
-            <Sparkles className="size-3.5 animate-pulse" />
-          </div>
-          <span className="text-xs font-semibold text-slate-700 tracking-tight">
-            {phases[phaseIdx]}
-          </span>
-        </div>
-
-        {/* Soundwave Equalizer Bars */}
-        <div className="flex items-center gap-0.5 h-4 px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200/80">
-          <span className="w-1 bg-[#bc0c11] rounded-full animate-soundwave-1" />
-          <span className="w-1 bg-[#bc0c11] rounded-full animate-soundwave-2" />
-          <span className="w-1 bg-[#bc0c11] rounded-full animate-soundwave-3" />
-          <span className="w-1 bg-[#bc0c11] rounded-full animate-soundwave-4" />
-        </div>
-      </div>
-
-      {/* Dynamic shimmer line */}
-      <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden border border-slate-200/60">
-        <div className="h-full rounded-full animate-shimmer-wave w-full" />
-      </div>
+    <div
+      role="status"
+      aria-label="Sedang memproses respons"
+      className="flex items-center gap-1.5 py-1.5 px-0.5"
+    >
+      <span className="size-2 rounded-full bg-slate-400 animate-typing-dot-1" />
+      <span className="size-2 rounded-full bg-slate-400 animate-typing-dot-2" />
+      <span className="size-2 rounded-full bg-slate-400 animate-typing-dot-3" />
+      <span className="sr-only">Sedang memproses jawaban...</span>
     </div>
   );
 }
@@ -493,20 +464,12 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       className="relative flex flex-col w-full h-[100dvh] sm:w-[440px] sm:h-[600px] sm:max-h-[88vh] rounded-none sm:rounded-2xl bg-white border-0 sm:border border-slate-200/90 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
     >
       {/* Header Panel */}
-      <header className="relative flex items-center justify-between px-4 py-3.5 bg-[#bc0c11] text-white select-none shrink-0 pt-[max(0.875rem,env(safe-area-inset-top))] rounded-t-none sm:rounded-t-2xl">
-        <div className="flex items-center gap-3">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/15 backdrop-blur-xs border border-white/20">
-            <School className="size-5 text-white" />
-          </div>
-          <div>
-            <h2 id="chatbot-heading" className="font-jakarta font-bold text-sm tracking-tight leading-tight text-white">
-              Skomda Assistant
-            </h2>
-            <p className="font-jakarta text-[11px] text-red-100 flex items-center gap-1.5 mt-0.5">
-              <span className="size-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
-              Aktif
-            </p>
-          </div>
+      <header className="relative flex items-center justify-between px-4 py-3 bg-[#bc0c11] text-white select-none shrink-0 pt-[max(0.875rem,env(safe-area-inset-top))] rounded-t-none sm:rounded-t-2xl shadow-xs">
+        <div className="flex items-center gap-2.5">
+          <Bot className="size-5 text-white shrink-0" aria-hidden="true" />
+          <h2 id="chatbot-heading" className="font-jakarta font-semibold text-sm tracking-tight text-white leading-none">
+            Skomda Assistant
+          </h2>
         </div>
 
         {/* Header Control Buttons */}
@@ -583,8 +546,8 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             }`}
           >
             {msg.role === "assistant" && (
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#bc0c11]/10 text-[#bc0c11] mt-1 border border-[#bc0c11]/15 shadow-2xs">
-                <Bot className="size-4" />
+              <div className="shrink-0 text-[#bc0c11] mt-1" aria-hidden="true">
+                <Bot className="size-5" />
               </div>
             )}
 
@@ -674,8 +637,8 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             </div>
 
             {msg.role === "user" && (
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-slate-700 mt-1 shadow-2xs">
-                <User className="size-4" />
+              <div className="shrink-0 text-slate-400 mt-1" aria-hidden="true">
+                <User className="size-5" />
               </div>
             )}
           </div>
