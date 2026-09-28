@@ -36,20 +36,17 @@ interface Message {
 }
 
 const QUICK_PROMPTS = [
+  "Apa saja pilar Program BMW di SMK Telkom Sidoarjo?",
+  "Sebutkan jalur dan sertifikasi Digital Talent Program (DTP)!",
   "Apa perbedaan jurusan SIJA (4 tahun) dan TJAT (3 tahun)?",
   "Berapa estimasi biaya hidup dan sewa kos di sekitar sekolah?",
-  "Bagaimana alur pendaftaran PPDB 2026/2027?",
-  "Sertifikasi internasional apa saja yang didapatkan siswa?",
 ];
-
-const SKOMDA_PROMPT_PREFIX =
-  "[PANDUAN ASISTEN RESMI SKOMDA: Berikan jawaban yang LENGKAP, DETAIL, MENDALAM, dan TERSTRUKTUR RAPI menggunakan poin-poin penjelasan rinci yang informatif dan mudah dipahami. Langsung mulai jawaban pada inti topik tanpa pengulangan salam basa-basi dan tanpa penutup template panjang. Gunakan data resmi SKOMDA: Jurusan SIJA (4 tahun: Full-Stack web/mobile, Cloud AWS/GCP, Cybersecurity, IoT, sertifikasi industri AWS Academy & BNSP), Jurusan TJAT (3 tahun: Fiber Optic FTTH/FTTx, Transmisi Seluler 4G/5G, Jaringan ISP), Kampus Jl. Pahlawan No. 27 Sekardangan Sidoarjo, Kontak WA Humas resmi 0811-3021-919, tautan brosur /unduh-informasi. Jika ditanya biaya yang belum tertera resmi, arahkan ke Panitia PPDB tanpa mengarang angka].\n\nPertanyaan: ";
 
 const INITIAL_WELCOME: Message = {
   id: "welcome-1",
   role: "assistant",
   content:
-    "Halo! Saya **Skomda AI Assistant**, asisten virtual cerdas resmi SMK Telkom Sidoarjo.\n\nAda yang bisa saya bantu seputar jurusan SIJA & TJAT, alur PPDB 2026/2027, fasilitas laboratorium, rekomendasi kos, atau program unggulan sekolah?",
+    "Halo! Saya **Skomda AI Assistant**, asisten virtual resmi SMK Telkom Sidoarjo.\n\nAda yang bisa saya bantu seputar program BMW (Bekerja, Melanjutkan, Wirausaha), Digital Talent Program (DTP), jurusan SIJA & TJAT, alur PPDB 2026/2027, atau rekomendasi kos?",
   timestamp: "Baru saja",
 };
 
@@ -206,7 +203,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
 
     setTimeout(() => scrollToBottom(true), 50);
 
-    const promptPayload = query.startsWith("[PANDUAN") ? query : `${SKOMDA_PROMPT_PREFIX}${query}`;
+    const promptPayload = query.trim();
 
     try {
       const historyPayload = messages
@@ -240,7 +237,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             message: promptPayload,
             history: historyPayload,
             stream: true,
-            model: "groq",
+            model: "gemini-3.8-flash",
           }),
         });
       } catch (cloudErr) {
@@ -259,7 +256,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
               message: promptPayload,
               history: historyPayload,
               stream: true,
-              model: "groq",
+              model: "gemini-3.8-flash",
             }),
           });
         } catch (localErr) {

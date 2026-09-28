@@ -110,15 +110,12 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		return
 	}
 
-	if req.Model == "" {
-		req.Model = "groq"
+	if req.Model == "" || req.Model == "groq" || req.Model == "gemini" {
+		req.Model = "gemini-3.8-flash"
 	}
 
-	// Injeksi instruksi asisten resmi SKOMDA jika belum ada
+	// Kirim pesan murni pengguna tanpa polusi prefix agar RAG retrieval & instruction-following akurat
 	processedMessage := trimmedMessage
-	if !strings.Contains(trimmedMessage, "[PANDUAN") {
-		processedMessage = "[PANDUAN ASISTEN RESMI SKOMDA: Berikan jawaban yang LENGKAP, DETAIL, MENDALAM, dan TERSTRUKTUR RAPI menggunakan poin-poin penjelasan rinci yang informatif dan mudah dipahami. Langsung mulai jawaban pada inti topik tanpa pengulangan salam basa-basi dan tanpa penutup template panjang. Gunakan data resmi SKOMDA: Jurusan SIJA (4 tahun: Full-Stack web/mobile, Cloud AWS/GCP, Cybersecurity, IoT, sertifikasi industri AWS Academy & BNSP), Jurusan TJAT (3 tahun: Fiber Optic FTTH/FTTx, Transmisi Seluler 4G/5G, Jaringan ISP), Kampus Jl. Pahlawan No. 27 Sekardangan Sidoarjo, Kontak WA Humas resmi 0811-3021-919, tautan brosur /unduh-informasi. Jika ditanya biaya yang belum tertera resmi, arahkan ke Panitia PPDB tanpa mengarang angka].\n\nPertanyaan: " + trimmedMessage
-	}
 
 	// 3. Siapkan request ke NexusRouter Gateway
 	nexusURL := strings.TrimRight(cfg.NexusRouterURL, "/") + "/api/v1/skomda/chat"
