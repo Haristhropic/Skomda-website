@@ -45,7 +45,7 @@ export default function BkkKerjasamaSection() {
     }
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
   }, [modalOpen]);
 
@@ -145,11 +145,11 @@ export default function BkkKerjasamaSection() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-recruiter-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs"
           onClick={() => setModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-lg bg-white rounded-[28px] border border-gray-200/90 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
+            className="relative w-full max-w-lg bg-white rounded-[28px] border border-gray-200/90 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}

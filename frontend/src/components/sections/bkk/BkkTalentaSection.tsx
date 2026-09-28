@@ -23,7 +23,7 @@ export default function BkkTalentaSection() {
     }
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "";
     };
   }, [selectedTalent]);
 
@@ -127,11 +127,11 @@ export default function BkkTalentaSection() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-talent-name"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs"
           onClick={() => setSelectedTalent(null)}
         >
           <div
-            className="relative w-full max-w-lg bg-white rounded-[28px] border-2 border-dashed border-[#d1d5dc] p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="relative w-full max-w-lg bg-white rounded-[28px] border-2 border-dashed border-[#d1d5dc] p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}

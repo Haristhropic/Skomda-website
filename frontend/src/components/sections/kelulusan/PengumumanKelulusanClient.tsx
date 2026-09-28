@@ -77,7 +77,7 @@ export default function PengumumanKelulusanClient() {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory]);
 
-  // Handle ESC key to close modal
+  // Handle ESC key to close modal & lock body scroll
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -86,8 +86,12 @@ export default function PengumumanKelulusanClient() {
     };
     if (selectedAlumni) {
       window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     }
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
   }, [selectedAlumni]);
 
   // Pagination calculation
@@ -348,21 +352,18 @@ export default function PengumumanKelulusanClient() {
       {/* ── 3. Modal SKL Digital Pop-up (Minimalist & Professional) ── */}
       <AnimatePresence>
         {selectedAlumni && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/75 backdrop-blur-sm"
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/70 backdrop-blur-xs"
             onClick={() => setSelectedAlumni(null)}
             role="dialog"
             aria-modal="true"
             aria-label={`SKL ${selectedAlumni.name}`}
           >
             <motion.div
-              initial={{ scale: 0.94, opacity: 0, y: 12 }}
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.94, opacity: 0, y: 12 }}
-              transition={{ type: "spring", damping: 25, stiffness: 320 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               className="relative max-w-xl w-full bg-white rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 shadow-2xl flex flex-col border border-gray-200/90 overflow-hidden max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
@@ -441,7 +442,7 @@ export default function PengumumanKelulusanClient() {
                 </button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </>

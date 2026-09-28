@@ -30,32 +30,31 @@ export default function TefaProductDetailModal({
     if (isOpen) {
       document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleKeyDown);
-    } else {
-      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen || !product) return null;
-
   return (
     <AnimatePresence>
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="detail-modal-title"
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
-          className="relative w-full max-w-2xl bg-white rounded-[28px] overflow-hidden shadow-2xl border border-gray-200/90 max-h-[90vh] flex flex-col"
+      {isOpen && product && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="detail-modal-title"
+          onClick={onClose}
         >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="relative w-full max-w-2xl bg-white rounded-[28px] overflow-hidden shadow-2xl border border-gray-200/90 max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
           {/* Close Button */}
           <button
             type="button"
@@ -190,6 +189,7 @@ export default function TefaProductDetailModal({
           </div>
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 }

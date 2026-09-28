@@ -8,11 +8,11 @@ export default function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative w-full bg-[#f3f4f6] overflow-hidden pt-[124px] sm:pt-[136px] xl:pt-0 pb-12 sm:pb-16 xl:pb-0 xl:h-[630px] 2xl:h-[660px] xl:mb-12 2xl:mb-14">
+    <section className="relative w-full bg-[#f3f4f6] overflow-hidden pt-[138px] sm:pt-[150px] xl:pt-0 pb-12 sm:pb-16 xl:pb-0 xl:h-[645px] 2xl:h-[675px] xl:mb-12 2xl:mb-14">
       <div className="relative mx-auto w-full max-w-lg xl:max-w-[1280px] h-full px-4 sm:px-6 lg:px-8 xl:px-0">
         
         {/* ── Left Text Block ── */}
-        <div className="relative z-10 flex flex-col items-start max-w-lg xl:absolute xl:left-8 2xl:left-8 xl:top-[135px] 2xl:top-[142px] xl:w-[420px]">
+        <div className="relative z-10 flex flex-col items-start max-w-lg xl:absolute xl:left-8 2xl:left-8 xl:top-[152px] 2xl:top-[160px] xl:w-[420px]">
           {/* Welcome label */}
           <p className="font-jakarta text-[14px] sm:text-[17px] xl:text-[18px] leading-snug xl:leading-[28px]">
             <span className="font-normal text-[#4a5565]">{t("hero.welcome")} </span>
@@ -67,7 +67,7 @@ export default function HeroSection() {
         </div>
 
         {/* ── Student Hero Image (Figma Redesign Node 484:4) ── */}
-        <div className="relative z-10 mt-4 sm:mt-5 mb-[-24px] sm:mb-[-32px] xl:mb-0 xl:mt-0 xl:absolute xl:right-0 xl:top-[78px] 2xl:top-[72px] xl:w-[720px] 2xl:w-[770px] xl:h-[455px] 2xl:h-[485px] pointer-events-none flex items-end justify-center xl:justify-end">
+        <div className="relative z-10 mt-4 sm:mt-5 mb-[-24px] sm:mb-[-32px] xl:mb-0 xl:mt-0 xl:absolute xl:right-0 xl:top-[95px] 2xl:top-[90px] xl:w-[720px] 2xl:w-[770px] xl:h-[455px] 2xl:h-[485px] pointer-events-none flex items-end justify-center xl:justify-end">
           <div className="relative w-full max-w-[500px] sm:max-w-[560px] xl:max-w-none aspect-[1672/941] xl:h-full">
             <Image
               src="/images/home/hero/hero-students-group.png"
