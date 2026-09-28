@@ -112,12 +112,12 @@ export default function Ts21FrameworkSection() {
           </p>
         </motion.div>
 
-        {/* 3 Pillars Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        {/* 3 Pillars: Mobile Horizontal Scroll & Desktop Grid */}
+        <div dir="ltr" className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
           {frameworkPillars.map((pillar) => (
             <div
               key={pillar.number}
-              className="group relative rounded-[28px] bg-white p-7 sm:p-9 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[28px] bg-white p-6 sm:p-9 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
             >
               <div>
                 {/* Card Top */}

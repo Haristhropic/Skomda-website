@@ -228,7 +228,7 @@ export default function K3SopLabsSection() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
+        <div className="flex overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10 scrollbar-none overscroll-x-contain">
           {labsData.map((lab) => {
             const isActive = activeTab === lab.id;
             return (
@@ -236,7 +236,7 @@ export default function K3SopLabsSection() {
                 key={lab.id}
                 type="button"
                 onClick={() => setActiveTab(lab.id)}
-                className={`inline-flex items-center gap-2 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer ${
+                className={`inline-flex items-center gap-2 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 ${
                   isActive
                     ? "bg-[#bc0c11] text-white shadow-xs"
                     : "bg-white text-[#4a5565] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"

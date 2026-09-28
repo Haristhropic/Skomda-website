@@ -147,8 +147,8 @@ export default function TefaCatalogSection({
             </p>
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white border-2 border-dashed border-[#d1d5dc] shadow-xs overflow-x-auto scrollbar-none shrink-0">
+          {/* Category Filter Pills - Consistent with Berita & Ekskul filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain shrink-0 max-w-full">
             {categories.map((cat) => {
               const isActive = activeFilter === cat.value;
               return (
@@ -156,10 +156,10 @@ export default function TefaCatalogSection({
                   key={cat.value}
                   type="button"
                   onClick={() => setActiveFilter(cat.value)}
-                  className={`h-[34px] px-4 rounded-lg text-xs sm:text-sm font-semibold font-jakarta transition-all whitespace-nowrap cursor-pointer select-none ${
+                  className={`shrink-0 rounded-full px-5 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer select-none ${
                     isActive
                       ? "bg-[#bc0c11] text-white shadow-xs"
-                      : "text-[#4a5565] hover:text-[#bc0c11] font-medium"
+                      : "bg-white text-[#4a5565] border border-gray-200/90 hover:border-[#bc0c11] hover:text-[#bc0c11]"
                   }`}
                 >
                   {cat.label}
@@ -169,18 +169,19 @@ export default function TefaCatalogSection({
           </div>
         </div>
 
-        {/* 4 Cards Grid - Simple, smooth fade on filter change without weird layout jumping */}
+        {/* 4 Cards: Mobile Horizontal Scroll & Desktop Grid */}
         <motion.div
           key={activeFilter}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          dir="ltr"
+          className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none"
         >
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="group relative rounded-[25px] bg-white overflow-hidden shadow-[0px_4px_12px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] flex flex-col"
+              className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[25px] bg-white overflow-hidden shadow-[0px_4px_12px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] flex flex-col"
             >
                 {/* Thumbnail */}
                 <div className="relative w-full h-[155px] overflow-hidden bg-gray-100">

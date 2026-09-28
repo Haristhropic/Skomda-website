@@ -93,7 +93,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="w-full bg-white border-t border-[#e5e7eb] pt-16 pb-12 text-[#364153]">
+    <footer className="w-full bg-white border-t border-[#e5e7eb] pt-12 sm:pt-16 pb-8 sm:pb-12 text-[#364153]">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12">
 
@@ -360,9 +360,9 @@ export default function Footer() {
         </div>
 
         {/* Lomba & Mitra Kolaborasi Section */}
-        <div className="mt-14 pt-8 border-t border-slate-200/80">
+        <div className="mt-10 sm:mt-14 pt-6 sm:pt-8 border-t border-slate-200/80">
           {/* Logos Row - directly spanning left to right, no animation */}
-          <div className="flex flex-wrap items-center justify-center sm:justify-between gap-6 sm:gap-8 md:gap-10 w-full">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:justify-between w-full">
             {LOMBA_LOGOS.map((logo, idx) => (
               <div
                 key={idx}
@@ -381,7 +381,7 @@ export default function Footer() {
           </div>
 
           {/* Bottom Bar: Copyright & School Tagline */}
-          <div className="mt-8 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#4a5565]">
+          <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs text-[#4a5565]">
             <p className="font-jakarta text-center sm:text-left">
               {t("footer.rights")}
             </p>

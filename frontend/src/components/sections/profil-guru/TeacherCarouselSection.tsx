@@ -93,8 +93,41 @@ export default function TeacherCarouselSection({
           )}
         </div>
 
-        {/* Carousel Content */}
-        <div className="relative min-h-[380px]">
+        {/* Mobile View: Horizontal Scrollable Cards with Snap */}
+        <div className="sm:hidden">
+          <div dir="ltr" className="flex justify-start overflow-x-auto pb-4 pt-1 -mx-4 px-4 gap-4 snap-x snap-proximity scroll-pl-4 overscroll-x-contain scrollbar-none">
+            {items.map((teacher, idx) => (
+              <div
+                key={`mobile-${teacher.name}-${idx}`}
+                className="w-[235px] shrink-0 snap-start relative h-[345px] rounded-[20px] bg-white p-3 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xs"
+              >
+                {/* Photo Canvas */}
+                <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
+                  <Image
+                    src={teacher.image}
+                    alt={teacher.name}
+                    fill
+                    className="object-cover object-top"
+                    sizes="235px"
+                  />
+                </div>
+
+                {/* Floating Info Box */}
+                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-[12px] p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.08)] border border-gray-100/90 z-10">
+                  <h3 className="font-jakarta font-bold text-[14px] text-[#101828] leading-snug line-clamp-2">
+                    {teacher.name}
+                  </h3>
+                  <p className="font-jakarta text-[12px] text-[#4a5565] leading-relaxed line-clamp-2 mt-0.5 font-normal">
+                    {teacher.role}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop View: Paginated Grid Carousel */}
+        <div className="hidden sm:block relative min-h-[380px]">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentPage}
@@ -104,7 +137,7 @@ export default function TeacherCarouselSection({
               animate="center"
               exit="exit"
               transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7 justify-center"
+              className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-7 justify-center"
             >
               {currentItems.map((teacher, idx) => (
                 <div
@@ -118,7 +151,7 @@ export default function TeacherCarouselSection({
                       alt={teacher.name}
                       fill
                       className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      sizes="(max-width: 1024px) 50vw, 25vw"
                     />
                   </div>
 
@@ -137,9 +170,9 @@ export default function TeacherCarouselSection({
           </AnimatePresence>
         </div>
 
-        {/* Carousel Controls (Prev, Dots, Next) */}
+        {/* Carousel Controls (Desktop Only) */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-12 pt-4 max-w-4xl mx-auto">
+          <div className="hidden sm:flex items-center justify-between mt-12 pt-4 max-w-4xl mx-auto">
             
             {/* Prev Button */}
             <button

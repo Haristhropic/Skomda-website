@@ -169,7 +169,7 @@ export default function BkkPeluangSection() {
             </div>
 
             {/* Filter Pills (Segmented Pill Container) */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-white border-2 border-dashed border-[#d1d5dc] shadow-xs overflow-x-auto scrollbar-none">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-white border-2 border-dashed border-[#d1d5dc] shadow-xs overflow-x-auto scrollbar-none overscroll-x-contain max-w-full">
               {filterOptions.map((filter) => {
                 const isActive = activeFilter === filter;
                 return (

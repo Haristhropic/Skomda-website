@@ -145,8 +145,8 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
             )}
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {/* Category Filter Pills - Full-bleed horizontal slide on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
             {NEWS_CATEGORIES.map((cat) => {
               const isActive = selectedCategory === cat;
               const displayCat = cat === "Semua" && isEn ? "All" : cat;

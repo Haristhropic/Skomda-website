@@ -6,10 +6,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "SMK Telkom Sidoarjo",
   description:
-    "Wadah pengembangan minat, bakat, dan kepemimpinan siswa melalui 18+ pilihan cabang ekstrakurikuler di bidang teknologi, olahraga, dan seni budaya di SMK Telkom Sidoarjo.",
+    "Wadah pengembangan minat, bakat, dan kepemimpinan siswa melalui 18 pilihan cabang ekstrakurikuler di bidang teknologi, olahraga, dan seni budaya di SMK Telkom Sidoarjo.",
   openGraph: {
     title: "SMK Telkom Sidoarjo",
-    description: "18+ Ekstrakurikuler Unggulan SMK Telkom Sidoarjo untuk mengasah bakat dan potensi siswa.",
+    description: "18 Cabang Ekstrakurikuler Unggulan SMK Telkom Sidoarjo untuk mengasah bakat dan potensi siswa.",
     images: [
       {
         url: "/images/program/ekstrakurikuler/hero-student-guitar.png",

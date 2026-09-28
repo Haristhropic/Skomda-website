@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Search, X } from "lucide-react";
 import { motion } from "framer-motion";
@@ -13,6 +13,7 @@ export default function FasilitasClient() {
   const { t } = useLanguage();
   const [items, setItems] = useState<FasilitasItem[]>(FASILITAS_LIST);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -50,6 +51,18 @@ export default function FasilitasClient() {
       );
     });
   }, [searchQuery, items]);
+
+  // Ensure horizontal scroll always starts at the leftmost position (card 1)
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      el.scrollLeft = 0;
+      const raf = requestAnimationFrame(() => {
+        el.scrollLeft = 0;
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [filteredItems]);
 
   return (
     <>
@@ -110,7 +123,7 @@ export default function FasilitasClient() {
             </div>
           </div>
 
-          {/* Facilities Grid */}
+          {/* Facilities Grid & Mobile Horizontal Scroll */}
           {filteredItems.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
@@ -125,40 +138,44 @@ export default function FasilitasClient() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-              {filteredItems.map((facility) => (
-                <motion.div
-                  key={facility.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="group bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-                >
-                  {/* Image */}
-                  <div className="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
-                    <Image
-                      src={facility.image}
-                      alt={facility.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
+              <div
+                ref={scrollContainerRef}
+                dir="ltr"
+                className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none"
+              >
+                {filteredItems.map((facility) => (
+                  <motion.div
+                    key={facility.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  >
+                    {/* Image */}
+                    <div className="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                      <Image
+                        src={facility.image}
+                        alt={facility.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 768px) 84vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
 
-                  {/* Body */}
-                  <div className="p-5 sm:p-6 flex-1 flex flex-col">
-                    <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">
-                      {facility.name}
-                    </h3>
-                    <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed">
-                      {facility.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
+                    {/* Body */}
+                    <div className="p-5 sm:p-6 flex-1 flex flex-col">
+                      <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">
+                        {facility.name}
+                      </h3>
+                      <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed">
+                        {facility.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
         </div>
       </section>
     </>

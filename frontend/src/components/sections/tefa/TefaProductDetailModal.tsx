@@ -149,11 +149,11 @@ export default function TefaProductDetailModal({
           </div>
 
           {/* Action Bar Sticky at Bottom */}
-          <div className="px-6 sm:px-8 py-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-4 shrink-0 bg-white">
+          <div className="p-4 sm:px-8 sm:py-4 border-t border-dashed border-gray-200 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-4 shrink-0 bg-white">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 rounded-full border border-gray-300 text-sm font-jakarta font-medium text-[#4a5565] hover:bg-gray-50 hover:border-gray-400 transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 rounded-full border border-gray-300 text-sm font-jakarta font-medium text-[#4a5565] hover:bg-gray-50 hover:border-gray-400 transition-colors cursor-pointer text-center"
             >
               {isEn ? "Back" : "Kembali"}
             </button>
@@ -161,13 +161,13 @@ export default function TefaProductDetailModal({
             <Link
               href={`/tefa/request?service=${encodeURIComponent(product.title)}`}
               onClick={onClose}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-3 px-7 py-3 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white text-base font-jakarta font-medium transition-all active:scale-[0.98] cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 sm:gap-3 px-6 sm:px-7 py-3 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white text-sm sm:text-[15px] font-jakarta font-medium transition-all active:scale-[0.98] cursor-pointer text-center"
               style={{
                 boxShadow:
                   "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
               }}
             >
-              <span className="text-[15px] leading-none whitespace-nowrap">
+              <span className="leading-none whitespace-normal sm:whitespace-nowrap">
                 {isEn ? "Consult This Service" : "Konsultasikan Layanan Ini"}
               </span>
               <svg
@@ -175,7 +175,7 @@ export default function TefaProductDetailModal({
                 height="18"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="transition-transform duration-300 group-hover:translate-x-1"
+                className="transition-transform duration-300 group-hover:translate-x-1 shrink-0"
               >
                 <path
                   d="M5 12H19M19 12L12 5M19 12L12 19"

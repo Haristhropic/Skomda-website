@@ -98,12 +98,12 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
   return (
     <section
       id="informasi"
-      className="w-full bg-[#f3f4f6] pt-4 sm:pt-6 lg:pt-8 pb-16 sm:pb-20 lg:pb-28 scroll-mt-24"
+      className="w-full bg-[#f3f4f6] pt-8 sm:pt-12 lg:pt-8 pb-12 sm:pb-20 lg:pb-28 scroll-mt-24"
     >
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {/* 1. Header */}
         {showTitle && (
-          <div className="flex flex-col items-center text-center gap-[9px] mb-6 sm:mb-8 lg:mb-10">
+          <div className="flex flex-col items-center text-center gap-2 sm:gap-[9px] mb-5 sm:mb-8 lg:mb-10">
             <div className="flex flex-col items-center gap-1 sm:gap-2 w-full">
               <h2 className="font-jakarta font-bold text-2xl sm:text-[32px] leading-tight sm:leading-[40px] text-[#101828]">
                 {t("news.title1")}
@@ -192,7 +192,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                   {filteredNews.length} Berita
                 </span>
               </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0">
+              <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
                 {NEWS_CATEGORIES.map((cat) => {
                   const isActive = activeCategory === cat;
                   return (
@@ -326,7 +326,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center sm:justify-between w-full pt-4">
+              <div className="flex items-center justify-center sm:justify-between gap-2 w-full pt-4">
                 {/* Previous Page Button */}
                 <div className="p-[10px]" data-node-id="125:461">
                   <button

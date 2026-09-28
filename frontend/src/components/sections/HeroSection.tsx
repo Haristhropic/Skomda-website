@@ -8,7 +8,7 @@ export default function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative w-full bg-[#f3f4f6] overflow-hidden pt-[138px] sm:pt-[150px] xl:pt-0 pb-12 sm:pb-16 xl:pb-0 xl:h-[645px] 2xl:h-[675px] xl:mb-12 2xl:mb-14">
+    <section className="relative w-full bg-[#f3f4f6] overflow-hidden pt-[120px] sm:pt-[140px] xl:pt-0 pb-10 sm:pb-16 xl:pb-0 xl:h-[645px] 2xl:h-[675px] xl:mb-12 2xl:mb-14">
       <div className="relative mx-auto w-full max-w-lg xl:max-w-[1280px] h-full px-4 sm:px-6 lg:px-8 xl:px-0">
         
         {/* ── Left Text Block ── */}
@@ -67,7 +67,7 @@ export default function HeroSection() {
         </div>
 
         {/* ── Student Hero Image (Figma Redesign Node 484:4) ── */}
-        <div className="relative z-10 mt-4 sm:mt-5 mb-[-24px] sm:mb-[-32px] xl:mb-0 xl:mt-0 xl:absolute xl:right-0 xl:top-[95px] 2xl:top-[90px] xl:w-[720px] 2xl:w-[770px] xl:h-[455px] 2xl:h-[485px] pointer-events-none flex items-end justify-center xl:justify-end">
+        <div className="relative z-10 mt-3 sm:mt-5 mb-[-20px] sm:mb-[-32px] xl:mb-0 xl:mt-0 xl:absolute xl:right-0 xl:top-[95px] 2xl:top-[90px] xl:w-[720px] 2xl:w-[770px] xl:h-[455px] 2xl:h-[485px] pointer-events-none flex items-end justify-center xl:justify-end">
           <div className="relative w-full max-w-[500px] sm:max-w-[560px] xl:max-w-none aspect-[1672/941] xl:h-full">
             <Image
               src="/images/home/hero/hero-students-group.png"
@@ -82,23 +82,23 @@ export default function HeroSection() {
         </div>
 
         {/* ── Mobile Stats Bar (<1280px) ── */}
-        <div className="relative z-20 -mt-6 sm:-mt-8 w-full rounded-full bg-gradient-to-r from-[#bc0c11] to-[#990a0e] px-4 py-3.5 sm:px-6 sm:py-4 text-white xl:hidden">
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
-            <div>
-              <span className="font-jakarta font-bold text-xl sm:text-2xl">2</span>
-              <p className="font-poppins text-[11px] sm:text-xs text-white/80 mt-0.5">
+        <div className="relative z-20 -mt-4 sm:-mt-8 w-full rounded-2xl sm:rounded-full bg-gradient-to-r from-[#bc0c11] to-[#990a0e] px-3.5 py-4 sm:px-8 sm:py-5 text-white shadow-xl shadow-red-950/20 border border-white/10 xl:hidden">
+          <div className="grid grid-cols-3 gap-1 sm:gap-4 text-center items-center">
+            <div className="flex flex-col items-center justify-center px-1">
+              <span className="font-jakarta font-bold text-xl sm:text-2xl leading-none">2</span>
+              <p className="font-poppins text-[10.5px] sm:text-xs text-white/90 mt-1 leading-tight font-medium">
                 {t("hero.programCount")}
               </p>
             </div>
-            <div className="border-x border-white/20">
-              <span className="font-jakarta font-bold text-xl sm:text-2xl">840+</span>
-              <p className="font-poppins text-[11px] sm:text-xs text-white/80 mt-0.5">
+            <div className="flex flex-col items-center justify-center border-x border-white/20 px-1.5 sm:px-3">
+              <span className="font-jakarta font-bold text-xl sm:text-2xl leading-none">840+</span>
+              <p className="font-poppins text-[10.5px] sm:text-xs text-white/90 mt-1 leading-tight font-medium">
                 {t("hero.studentsCount")}
               </p>
             </div>
-            <div>
-              <span className="font-jakarta font-bold text-xl sm:text-2xl">1372+</span>
-              <p className="font-poppins text-[11px] sm:text-xs text-white/80 mt-0.5">
+            <div className="flex flex-col items-center justify-center px-1">
+              <span className="font-jakarta font-bold text-xl sm:text-2xl leading-none">1372+</span>
+              <p className="font-poppins text-[10.5px] sm:text-xs text-white/90 mt-1 leading-tight font-medium">
                 {t("hero.alumniCount")}
               </p>
             </div>

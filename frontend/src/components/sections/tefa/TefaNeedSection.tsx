@@ -143,7 +143,7 @@ export default function TefaNeedSection({
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full lg:w-1/2 relative min-h-[380px] sm:min-h-[460px] lg:min-h-0 flex flex-col justify-end"
+          className="w-full lg:w-1/2 relative min-h-[440px] sm:min-h-[480px] lg:min-h-0 flex flex-col justify-end overflow-hidden"
         >
           {/* Building Photo with integrated dark grey banner filling right half */}
           <div className="absolute inset-0 select-none">
@@ -158,13 +158,13 @@ export default function TefaNeedSection({
           </div>
 
           {/* Overlay Text Content sitting seamlessly over the dark banner area */}
-          <div className="relative z-10 w-full h-[32%] min-h-[140px] sm:min-h-[160px] lg:min-h-[180px] flex flex-col justify-center pl-6 sm:pl-[24%] lg:pl-[22%] xl:pl-[20%] pr-6 sm:pr-8 lg:pr-10 xl:pr-14">
+          <div className="relative z-10 w-full flex flex-col justify-end lg:justify-center h-auto lg:h-[32%] lg:min-h-[180px] pt-14 pb-7 sm:pb-8 lg:py-0 pl-6 sm:pl-[20%] lg:pl-[22%] xl:pl-[20%] pr-6 sm:pr-8 lg:pr-10 xl:pr-14 bg-gradient-to-t from-[#16181d] via-[#16181d]/85 to-transparent lg:bg-none">
             <h4 className="font-jakarta font-bold text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] text-white leading-[1.25] mb-0 max-w-[360px] sm:max-w-[440px] lg:max-w-[480px] tracking-tight">
               {t("tefa.buildingCardTitle")}
             </h4>
             {/* Red Accent Line */}
-            <div className="w-24 sm:w-36 h-[3.5px] bg-[#bc0c11] rounded-full my-2.5 sm:my-3" />
-            <p className="font-jakarta text-sm sm:text-base text-gray-200/95 font-normal leading-relaxed max-w-[340px] sm:max-w-[420px] lg:max-w-[460px]">
+            <div className="w-20 sm:w-28 lg:w-36 h-[3px] sm:h-[3.5px] bg-[#bc0c11] rounded-full my-2 sm:my-2.5 lg:my-3" />
+            <p className="font-jakarta text-xs sm:text-sm lg:text-base text-gray-200/95 font-normal leading-relaxed max-w-[340px] sm:max-w-[420px] lg:max-w-[460px]">
               {t("tefa.buildingCardDesc")}
             </p>
           </div>

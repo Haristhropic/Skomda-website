@@ -63,11 +63,11 @@ export default function WhyChooseUsSection() {
   const { t } = useLanguage();
 
   return (
-    <section id="keunggulan" className="w-full bg-[#f3f4f6] py-20 lg:py-24 scroll-mt-24">
+    <section id="keunggulan" className="w-full bg-[#f3f4f6] py-14 sm:py-20 lg:py-24 scroll-mt-24">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
 
         {/* Header Row 67:126 & 67:140) */}
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between mb-12">
+        <div className="flex flex-col gap-5 sm:gap-6 sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-12">
           <div className="flex flex-col gap-1">
             <h2 className="font-jakarta font-bold text-3xl sm:text-[36px] leading-[40px] text-[#101828]">
               {t("why.title1")}

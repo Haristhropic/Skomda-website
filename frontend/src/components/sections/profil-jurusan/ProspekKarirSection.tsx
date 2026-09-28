@@ -296,11 +296,11 @@ export default function ProspekKarirSection() {
           </div>
 
           {/* 3 Pillars Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div dir="ltr" className="flex justify-start overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 gap-5 sm:gap-6 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
             {bmwData.map((bmw) => (
               <div
                 key={bmw.letter}
-                className="group relative rounded-[24px] bg-white p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-xl hover:-translate-y-1"
+                className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-xl hover:-translate-y-1"
               >
                 <div>
                   {/* Top: Unboxed Icon on Left & Large Subtle Letter on Right */}

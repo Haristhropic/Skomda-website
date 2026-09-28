@@ -167,7 +167,7 @@ export default function DigitalTalentClient() {
             </div>
           </div>
 
-          {/* Specializations Grid */}
+          {/* Specializations Grid & Mobile Horizontal Scroll */}
           {filteredSpecs.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
@@ -182,14 +182,20 @@ export default function DigitalTalentClient() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-              {filteredSpecs.map((item) => (
-                <DtpSpecializationCard
-                  key={item.id}
-                  item={item}
-                  onSelect={setSelectedSpec}
-                />
-              ))}
+            <div>
+              <div dir="ltr" className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
+                {filteredSpecs.map((item) => (
+                  <div
+                    key={item.id}
+                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none"
+                  >
+                    <DtpSpecializationCard
+                      item={item}
+                      onSelect={setSelectedSpec}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -199,7 +205,7 @@ export default function DigitalTalentClient() {
       <section className="py-16 sm:py-24 bg-[#f8f9fb]">
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
-          <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
             <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828] mb-4">
               Contoh Proyek Kolaborasi Industri
             </h2>
@@ -209,11 +215,11 @@ export default function DigitalTalentClient() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div dir="ltr" className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
             {DTP_COLLABORATION_PROJECTS.slice(0, 6).map((proj) => (
               <div
                 key={proj.id}
-                className="group rounded-[24px] bg-white p-6 sm:p-7 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between"
+                className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] bg-white p-6 sm:p-7 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between"
               >
                 <div>
                   <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">

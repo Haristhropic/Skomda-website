@@ -16,7 +16,19 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
       className="relative w-full py-20 lg:py-28 bg-white border-y border-gray-200/60 overflow-hidden scroll-mt-24"
     >
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        {/* Mobile-Only Heading (Appears before photo on mobile) */}
+        <div className="lg:hidden text-center sm:text-left w-full mb-6">
+          <p className="font-jakarta text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#4a5565] mb-1.5">
+            {lang === "EN" ? "Principal of" : "Kepala Sekolah"}{" "}
+            <span className="text-[#bc0c11]">SMK Telkom Sidoarjo</span>
+          </p>
+          <h2 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828] leading-tight tracking-tight">
+            {kepalaSekolah.name}
+          </h2>
+          <div className="mt-2.5 h-1 w-12 rounded-full bg-[#bc0c11] mx-auto sm:mx-0" />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
 
           {/* Left: Photo Frame */}
           <motion.div
@@ -26,7 +38,7 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="lg:col-span-5 flex justify-center lg:justify-start"
           >
-            <div className="w-full max-w-[420px] aspect-[448/560] relative rounded-[20px] border-2 border-dashed border-[#d1d5dc] p-3 bg-white shadow-sm overflow-hidden group hover:border-[#bc0c11] transition-colors">
+            <div className="w-full max-w-[340px] sm:max-w-[420px] aspect-[448/560] relative rounded-[20px] border-2 border-dashed border-[#d1d5dc] p-3 bg-white shadow-sm overflow-hidden group hover:border-[#bc0c11] transition-colors">
               <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
                 <Image
                   src={kepalaSekolah.image}
@@ -48,16 +60,17 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
             transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
             className="lg:col-span-7 flex flex-col items-start text-left"
           >
-            {/* Eyebrow */}
-            <p className="font-jakarta text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#4a5565] mb-2">
-              {lang === "EN" ? "Principal of" : "Kepala Sekolah"}{" "}
-              <span className="text-[#bc0c11]">SMK Telkom Sidoarjo</span>
-            </p>
+            {/* Eyebrow & Name (Desktop only, since on mobile it is placed at the top) */}
+            <div className="hidden lg:block">
+              <p className="font-jakarta text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#4a5565] mb-2">
+                {lang === "EN" ? "Principal of" : "Kepala Sekolah"}{" "}
+                <span className="text-[#bc0c11]">SMK Telkom Sidoarjo</span>
+              </p>
 
-            {/* Name */}
-            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] text-[#101828] leading-tight mb-4 tracking-tight">
-              {kepalaSekolah.name}
-            </h2>
+              <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] text-[#101828] leading-tight mb-4 tracking-tight">
+                {kepalaSekolah.name}
+              </h2>
+            </div>
 
             {/* Bio */}
             <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed mb-8 max-w-2xl">

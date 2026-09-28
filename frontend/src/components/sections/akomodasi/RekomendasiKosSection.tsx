@@ -169,13 +169,13 @@ export default function RekomendasiKosSection() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap gap-2 scrollbar-none overscroll-x-contain">
             {categoryList.map((cat) => (
               <button
                 key={cat.key}
                 type="button"
                 onClick={() => setActiveCategory(cat.key)}
-                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer ${
+                className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 ${
                   activeCategory === cat.key
                     ? "bg-[#bc0c11] text-white shadow-sm"
                     : "bg-white text-[#4a5565] border border-gray-200 hover:border-[#bc0c11] hover:text-[#bc0c11]"
@@ -187,18 +187,19 @@ export default function RekomendasiKosSection() {
           </div>
         </div>
 
-        {/* Accommodation Grid */}
+        {/* Accommodation Grid & Mobile Horizontal Scroll */}
         <motion.div
           key={activeCategory}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          dir="ltr"
+          className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none"
         >
           {filteredItems.map((item) => (
             <div
               key={item.id}
-              className="group relative h-full rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative h-full rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
             >
               <div className="flex flex-col gap-4">
                 {/* Header: Category + Name + Location */}

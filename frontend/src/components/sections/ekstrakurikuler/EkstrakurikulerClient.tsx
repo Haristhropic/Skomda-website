@@ -111,7 +111,7 @@ export default function EkstrakurikulerClient() {
             </div>
           </div>
 
-          {/* Ekstrakurikuler Grid */}
+          {/* Ekstrakurikuler Grid & Mobile Horizontal Scroll */}
           {filteredItems.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
@@ -126,18 +126,18 @@ export default function EkstrakurikulerClient() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-              {filteredItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="group bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-                >
-                  {/* Header or Image (No Category Span Tag) */}
-                  {item.image ? (
+              <div dir="ltr" className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
+                {filteredItems.map((item, index) => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                  >
+                    {/* Header or Image (No Category Span Tag) */}
+                    {item.image ? (
                     <div className="relative w-full aspect-[16/10] bg-gray-900 overflow-hidden">
                       <Image
                         src={item.image}
@@ -172,8 +172,8 @@ export default function EkstrakurikulerClient() {
                   </div>
                 </motion.div>
               ))}
-            </div>
-          )}
+              </div>
+            )}
 
         </div>
       </section>

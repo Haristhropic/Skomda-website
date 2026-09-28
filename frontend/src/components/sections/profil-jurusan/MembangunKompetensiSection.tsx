@@ -240,37 +240,37 @@ export default function MembangunKompetensiSection() {
           transition={{ duration: 0.2 }}
         >
           {/* Main Jurusan Showcase Box */}
-          <div className="my-12">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-              {/* Left: Student Character & Graphic Shape */}
-              <div className="lg:col-span-5 flex items-center justify-center relative">
-                <div className="relative w-full max-w-[340px] sm:max-w-[380px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
+          <div className="my-8 sm:my-12">
+            <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-14 lg:items-center">
+              {/* 1. Title (mobile: order 1, desktop: right col row 1) */}
+              <div className="order-1 lg:col-span-7 lg:col-start-6 lg:row-start-1">
+                <h3 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-[40px] leading-[1.18] tracking-tight text-center lg:text-left">
+                  <span className="text-[#bc0c11] block">{isEn ? current.titleRedEn : current.titleRedId}</span>
+                  <span className="text-[#101828] block">{isEn ? current.titleBlackEn : current.titleBlackId}</span>
+                </h3>
+              </div>
+
+              {/* 2. Student Character (mobile: order 2 right below title, desktop: left col spanning all rows) */}
+              <div className="order-2 lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:row-span-3 flex items-center justify-center relative my-2 lg:my-0">
+                <div className="relative w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
                   <Image
                     src={current.studentImage}
                     alt={current.studentAlt}
                     fill
                     className="object-contain drop-shadow-2xl"
                     priority
-                    sizes="(max-width: 640px) 340px, (max-width: 1024px) 380px, 420px"
+                    sizes="(max-width: 640px) 260px, (max-width: 1024px) 320px, 420px"
                   />
                 </div>
               </div>
 
-              {/* Right: Detailed Info */}
-              <div className="lg:col-span-7 flex flex-col items-start">
-                {/* Title: Red on Top, Black Below */}
-                <h3 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-[40px] leading-[1.18] tracking-tight">
-                  <span className="text-[#bc0c11] block">{isEn ? current.titleRedEn : current.titleRedId}</span>
-                  <span className="text-[#101828] block">{isEn ? current.titleBlackEn : current.titleBlackId}</span>
-                </h3>
-
-                {/* Description Paragraph */}
-                <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mt-5 mb-5">
+              {/* 3. Description & Duration Badge (mobile: order 3, desktop: right col row 2) */}
+              <div className="order-3 lg:col-span-7 lg:col-start-6 lg:row-start-2 flex flex-col items-center lg:items-start text-center lg:text-left">
+                <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mb-5">
                   {isEn ? current.descriptionEn : current.descriptionId}
                 </p>
 
-                {/* Duration Badge */}
-                <div className="pt-2">
+                <div>
                   <span className="inline-flex items-center gap-2 rounded-full border border-gray-200/90 bg-gray-50/80 px-3.5 py-1.5 font-jakarta text-xs sm:text-sm font-semibold text-[#101828] shadow-2xs">
                     <Clock className="size-4 text-[#bc0c11]" strokeWidth={2} />
                     <span>{isEn ? current.durationEn : current.durationId}</span>
@@ -281,8 +281,8 @@ export default function MembangunKompetensiSection() {
           </div>
 
           {/* "Apa saja yang di pelajari?" Section */}
-          <div className="mt-20 pt-10 border-t border-gray-100">
-            <div className="text-center mb-10">
+          <div className="mt-12 sm:mt-20 pt-8 sm:pt-10 border-t border-gray-100">
+            <div className="text-center mb-6 sm:mb-10">
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828]">
                 {isEn ? (
                   <>
@@ -296,22 +296,22 @@ export default function MembangunKompetensiSection() {
               </h3>
             </div>
 
-            {/* Subjects Grid with Dashed Border Cards & Minimalist Professional Icons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {/* Subjects Grid with Dashed Border Cards: 2-Cols Compact on Mobile, 3-4 Cols on Desktop */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
               {current.subjects.map((sub, idx) => {
                 const IconComponent = sub.icon;
                 return (
                   <div
                     key={`${activeJurusan}-${idx}-${sub.nameId}`}
-                    className="group relative min-h-[76px] rounded-[20px] bg-white p-4 flex items-center gap-3.5 border-2 border-dashed border-[#d1d5dc] transition-all duration-200 hover:border-[#bc0c11] hover:shadow-xs"
+                    className="group relative min-h-[96px] sm:min-h-[76px] rounded-[16px] sm:rounded-[20px] bg-white p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3.5 border-2 border-dashed border-[#d1d5dc] transition-all duration-200 hover:border-[#bc0c11] hover:shadow-xs justify-between sm:justify-start"
                   >
                     {/* Minimalist Red Icon Container */}
-                    <div className="flex size-10 items-center justify-center rounded-xl bg-[#bc0c11]/10 text-[#bc0c11] group-hover:bg-[#bc0c11] group-hover:text-white transition-all duration-200 shrink-0">
-                      <IconComponent className="size-5 transition-colors" />
+                    <div className="flex size-8 sm:size-10 items-center justify-center rounded-lg sm:rounded-xl bg-[#bc0c11]/10 text-[#bc0c11] group-hover:bg-[#bc0c11] group-hover:text-white transition-all duration-200 shrink-0">
+                      <IconComponent className="size-4 sm:size-5 transition-colors" />
                     </div>
 
                     {/* Subject Name */}
-                    <p className="font-jakarta font-semibold text-xs sm:text-sm text-[#101828] group-hover:text-[#bc0c11] transition-colors leading-snug">
+                    <p className="font-jakarta font-semibold text-[11px] sm:text-sm text-[#101828] group-hover:text-[#bc0c11] transition-colors leading-snug line-clamp-3 sm:line-clamp-none">
                       {isEn ? sub.nameEn : sub.nameId}
                     </p>
                   </div>

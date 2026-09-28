@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
@@ -15,6 +15,7 @@ export default function PrestasiClient() {
   const [prestasiItems, setPrestasiItems] = useState<PrestasiItem[]>(PRESTASI_LIST);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeModalItem, setActiveModalItem] = useState<PrestasiItem | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -59,6 +60,18 @@ export default function PrestasiClient() {
       );
     });
   }, [searchQuery, prestasiItems]);
+
+  // Ensure horizontal scroll always starts at the leftmost position (card 1)
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (el) {
+      el.scrollLeft = 0;
+      const raf = requestAnimationFrame(() => {
+        el.scrollLeft = 0;
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [filteredItems]);
 
   return (
     <div className="w-full">
@@ -125,7 +138,7 @@ export default function PrestasiClient() {
             </div>
           </div>
 
-          {/* Prestasi Grid */}
+          {/* Prestasi Grid & Mobile Horizontal Scroll */}
           {filteredItems.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
@@ -143,14 +156,24 @@ export default function PrestasiClient() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-              {filteredItems.map((item) => (
-                <PrestasiCard
-                  key={item.id}
-                  item={item}
-                  onSelect={setActiveModalItem}
-                />
-              ))}
+            <div>
+              <div
+                ref={scrollContainerRef}
+                dir="ltr"
+                className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none"
+              >
+                {filteredItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none"
+                  >
+                    <PrestasiCard
+                      item={item}
+                      onSelect={setActiveModalItem}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -157,8 +157,8 @@ export default function PpdbLearningJourneySection() {
           </div>
         </motion.div>
 
-        {/* Year Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 items-stretch">
+        {/* Year Cards: Mobile Horizontal Scroll & Desktop Grid */}
+        <div dir="ltr" className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 items-stretch snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
           {YEARS.map((year, idx) => (
             <motion.div
               key={year.id}
@@ -166,7 +166,7 @@ export default function PpdbLearningJourneySection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
-              className="flex flex-col h-full"
+              className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none flex flex-col h-full"
             >
               <div className="h-full bg-white rounded-[20px] sm:rounded-[24px] border border-gray-200/80 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col">
 

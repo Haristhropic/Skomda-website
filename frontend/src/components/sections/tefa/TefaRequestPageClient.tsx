@@ -179,56 +179,56 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
               </div>
             </div>
 
-            {/* Student Collage with tilted red card and floating quote (Mepet / Flush to footer) */}
-            <div className="relative w-full max-w-[500px] h-[480px] sm:h-[560px] lg:h-[620px] flex items-end justify-center sm:justify-start mt-auto mb-0">
+            {/* Desktop Student Collage (Flush to footer in the left column) */}
+            <div className="hidden lg:flex relative w-full max-w-[500px] h-[620px] items-end justify-start mt-auto mb-0">
               {/* Decorative Concentric Rings */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none -translate-y-4">
-                <div className="w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] rounded-full border border-red-200/50" />
-                <div className="w-[440px] h-[440px] sm:w-[520px] sm:h-[520px] rounded-full border border-dashed border-red-200/35 absolute" />
+                <div className="w-[420px] h-[420px] rounded-full border border-red-200/50" />
+                <div className="w-[520px] h-[520px] rounded-full border border-dashed border-red-200/35 absolute" />
               </div>
 
               {/* Angled Red Rectangle / Card */}
-              <div className="absolute w-[260px] h-[330px] sm:w-[320px] sm:h-[400px] bg-[#bc0c11] rounded-[32px] sm:rounded-[42px] -rotate-12 shadow-2xl shadow-red-950/25 bottom-0 left-4 sm:left-8" />
+              <div className="absolute w-[320px] h-[400px] bg-[#bc0c11] rounded-[42px] -rotate-12 shadow-2xl shadow-red-950/25 bottom-0 left-8" />
 
-              {/* Student Cutout Image (Exact from - bottom rests directly on footer) */}
-              <div className="relative z-10 w-[300px] sm:w-[380px] lg:w-[430px] h-[460px] sm:h-[540px] lg:h-[600px] flex items-end">
+              {/* Student Cutout Image (rests directly on footer) */}
+              <div className="relative z-10 w-[430px] h-[600px] flex items-end">
                 <Image
                   src="/images/tefa/request-student-thinking.png"
                   alt="Siswa Teaching Factory SMK Telkom Sidoarjo"
                   fill
                   priority
-                  sizes="(max-width: 640px) 300px, (max-width: 1024px) 380px, 430px"
+                  sizes="430px"
                   className="object-contain object-bottom select-none pointer-events-none"
                 />
               </div>
 
-              {/* Floating Quote Card */}
+              {/* Floating Quote Card - Positioned in the upper right, away from face */}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.25 }}
-                className="absolute right-0 sm:-right-4 top-16 sm:top-24 z-20 bg-white rounded-[24px] p-5 sm:p-6 shadow-xl border border-gray-100/90 max-w-[200px] sm:max-w-[230px]"
+                className="absolute -right-4 top-20 z-20 bg-white rounded-[24px] p-5 shadow-xl border border-gray-100/90 max-w-[220px]"
               >
                 <Quote
-                  className="size-6 text-[#bc0c11] fill-[#bc0c11] mb-2 shrink-0"
+                  className="size-5 text-[#bc0c11] fill-[#bc0c11] mb-2 shrink-0"
                   aria-hidden="true"
                 />
-                <p className="font-jakarta font-bold text-xs sm:text-sm text-[#101828] leading-snug">
+                <p className="font-jakarta font-bold text-xs text-[#101828] leading-snug">
                   {isEn
                     ? "Great ideas always start with a single request!"
                     : "Ide besar selalu berawal dari satu permintaan, lho!"}
                 </p>
-                <div className="w-10 h-1 bg-[#bc0c11] rounded-full mt-3" />
+                <div className="w-10 h-1 bg-[#bc0c11] rounded-full mt-2.5" />
               </motion.div>
             </div>
           </motion.div>
 
-          {/* Right Column: 3 Students Graphic + Form Card (Has bottom padding above footer) */}
+          {/* Right Column: 3 Students Graphic + Form Card */}
           <motion.div
             initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-            className="lg:col-span-7 w-full flex flex-col items-center pb-16 sm:pb-20 lg:pb-28"
+            className="lg:col-span-7 w-full flex flex-col items-center pb-8 sm:pb-12 lg:pb-28"
           >
             {/* Top 3 Students Image from (node 278:407: 3 students in batik looking at tablet) */}
             <div className="relative w-full max-w-[460px] sm:max-w-[500px] h-[260px] sm:h-[320px] -mb-10 sm:-mb-14 z-0 pointer-events-none select-none">
@@ -480,6 +480,52 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
               )}
             </div>
           </motion.div>
+        </div>
+
+        {/* Mobile Student Collage (Resting flush above the footer at the bottom of the page) */}
+        <div className="block lg:hidden w-full flex justify-center mt-6 -mb-1 select-none">
+          <div className="relative w-full max-w-[360px] sm:max-w-[440px] h-[400px] sm:h-[480px] flex items-end justify-center">
+            {/* Decorative Concentric Rings */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none -translate-y-4">
+              <div className="w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] rounded-full border border-red-200/50" />
+              <div className="w-[360px] h-[360px] sm:w-[460px] sm:h-[460px] rounded-full border border-dashed border-red-200/35 absolute" />
+            </div>
+
+            {/* Angled Red Rectangle / Card */}
+            <div className="absolute w-[220px] h-[270px] sm:w-[280px] sm:h-[340px] bg-[#bc0c11] rounded-[28px] sm:rounded-[36px] -rotate-12 shadow-2xl shadow-red-950/25 bottom-0 left-4 sm:left-8" />
+
+            {/* Student Cutout Image (rests flush on footer) */}
+            <div className="relative z-10 w-[260px] sm:w-[340px] h-[390px] sm:h-[470px] flex items-end">
+              <Image
+                src="/images/tefa/request-student-thinking.png"
+                alt="Siswa Teaching Factory SMK Telkom Sidoarjo"
+                fill
+                priority
+                sizes="(max-width: 640px) 260px, 340px"
+                className="object-contain object-bottom select-none pointer-events-none"
+              />
+            </div>
+
+            {/* Floating Quote Card - Positioned in the upper right away from the face */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="absolute right-0 sm:right-2 top-2 sm:top-8 z-20 bg-white rounded-[18px] sm:rounded-[22px] p-3 sm:p-4 shadow-xl border border-gray-100/90 max-w-[155px] sm:max-w-[185px]"
+            >
+              <Quote
+                className="size-4 text-[#bc0c11] fill-[#bc0c11] mb-1.5 shrink-0"
+                aria-hidden="true"
+              />
+              <p className="font-jakarta font-bold text-[10.5px] sm:text-xs text-[#101828] leading-snug">
+                {isEn
+                  ? "Great ideas always start with a single request!"
+                  : "Ide besar selalu berawal dari satu permintaan, lho!"}
+              </p>
+              <div className="w-8 h-1 bg-[#bc0c11] rounded-full mt-2" />
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>

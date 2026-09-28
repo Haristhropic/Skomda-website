@@ -152,20 +152,20 @@ export default function TefaHeroSection({
           </motion.div>
 
           {/* Right Column: Visual Artwork Collage */}
-          <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end select-none">
-            <div className="relative w-full max-w-[500px] sm:max-w-[540px] h-[450px] sm:h-[490px]">
+          <div className="lg:col-span-6 relative flex items-center justify-center lg:justify-end select-none mt-6 lg:mt-0">
+            <div className="relative w-full max-w-[340px] sm:max-w-[500px] lg:max-w-[540px] h-[360px] sm:h-[450px] lg:h-[490px]">
               {/* Layer 1: Gray Card Backdrop */}
               <div
-                className="absolute top-6 sm:top-8 left-8 sm:left-10 w-[72%] sm:w-[74%] h-[175px] sm:h-[190px] rounded-[24px] bg-[#dfdfe0] z-0"
+                className="absolute top-4 sm:top-8 left-4 sm:left-10 w-[72%] sm:w-[74%] h-[140px] sm:h-[190px] rounded-[20px] sm:rounded-[24px] bg-[#dfdfe0] z-0"
                 aria-hidden="true"
               />
 
               {/* Layer 2: Right Light Gray Card with Stylized Motto */}
               <div
-                className="absolute top-20 sm:top-24 -right-6 sm:-right-12 w-[58%] sm:w-[60%] h-[165px] sm:h-[185px] rounded-[22px] bg-[#ebebeb] z-10 flex flex-col justify-center pl-28 sm:pl-32 pr-3 select-none pointer-events-none shadow-xs"
+                className="absolute top-14 sm:top-24 -right-2 sm:-right-8 lg:-right-12 w-[58%] sm:w-[60%] h-[130px] sm:h-[185px] rounded-[18px] sm:rounded-[22px] bg-[#ebebeb] z-10 flex flex-col justify-center pl-16 sm:pl-28 lg:pl-32 pr-2 sm:pr-3 select-none pointer-events-none shadow-xs"
               >
                 <div
-                  className="text-[#4e4e4e] text-[17px] sm:text-[20px] leading-[28px] sm:leading-[34px] -rotate-2"
+                  className="text-[#4e4e4e] text-[15px] sm:text-[20px] leading-[22px] sm:leading-[34px] -rotate-2"
                   style={{
                     fontFamily:
                       "'Papyrus', 'Bradley Hand', 'Chilanka', cursive, sans-serif",
@@ -179,18 +179,18 @@ export default function TefaHeroSection({
 
               {/* Layer 3: Solid Telkom Red Card behind student */}
               <div
-                className="absolute bottom-0 left-[14%] sm:left-[15%] w-[58%] sm:w-[56%] h-[320px] sm:h-[350px] rounded-t-[36px] sm:rounded-t-[40px] bg-[#bc0c11] z-10 shadow-sm"
+                className="absolute bottom-0 left-[14%] sm:left-[15%] w-[58%] sm:w-[56%] h-[260px] sm:h-[350px] rounded-t-[28px] sm:rounded-t-[40px] bg-[#bc0c11] z-10 shadow-sm"
                 aria-hidden="true"
               />
 
               {/* Layer 4: Student Cutout Photo */}
-              <div className="absolute bottom-0 left-[5%] sm:left-[6%] w-[70%] sm:w-[68%] h-[435px] sm:h-[480px] z-20 pointer-events-none flex items-end justify-center">
+              <div className="absolute bottom-0 left-[5%] sm:left-[6%] w-[70%] sm:w-[68%] h-[350px] sm:h-[480px] z-20 pointer-events-none flex items-end justify-center">
                 <div className="relative w-full h-full">
                   <Image
                     src="/images/tefa/tefa-hero-student.png"
                     alt="Siswa Teaching Factory SMK Telkom Sidoarjo"
                     fill
-                    sizes="(max-width: 640px) 320px, 360px"
+                    sizes="(max-width: 640px) 300px, (max-width: 1024px) 380px, 480px"
                     className="object-contain object-bottom drop-shadow-sm"
                     priority
                   />
@@ -199,11 +199,11 @@ export default function TefaHeroSection({
 
               {/* Layer 5: Left Floating White Card */}
               <div
-                className="absolute top-36 sm:top-40 -left-2 sm:-left-4 bg-white rounded-[20px] p-3.5 sm:p-4 shadow-[0_12px_28px_-6px_rgba(0,0,0,0.12)] border border-gray-100 z-30 max-w-[155px] sm:max-w-[170px]"
+                className="absolute top-28 sm:top-40 -left-1 sm:-left-4 bg-white rounded-[16px] sm:rounded-[20px] p-2.5 sm:p-4 shadow-[0_12px_28px_-6px_rgba(0,0,0,0.12)] border border-gray-100 z-30 max-w-[130px] sm:max-w-[170px]"
               >
                 {/* Red Pill Bar */}
                 <div className="w-[21px] h-[3px] bg-[#bc0c11] rounded-[10px] mb-2" />
-                <p className="font-jakarta font-semibold text-xs sm:text-[13px] text-[#364153] leading-[18px] mb-1.5">
+                <p className="font-jakarta font-semibold text-[11px] sm:text-[13px] text-[#364153] leading-[16px] sm:leading-[18px] mb-1">
                   {t("tefa.studentBadge")}
                 </p>
                 <span className="font-jakarta font-medium text-[8px] sm:text-[9px] text-[#686868] uppercase tracking-wider block">

@@ -60,11 +60,11 @@ export default function BkkTalentaSection() {
         </div>
 
         {/* 3 Uniform Talent Cards Grid styled with K3 dashed border */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7 items-stretch">
+        <div dir="ltr" className="flex justify-start overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7 items-stretch snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
           {TALENTA_SKOMDA_ITEMS.map((talent) => (
             <div
               key={talent.id}
-              className="bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-5 sm:p-6 flex flex-row items-center gap-4 sm:gap-5 hover:shadow-md hover:border-[#bc0c11] transition-all duration-300 group h-full justify-between"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-5 sm:p-6 flex flex-row items-center gap-4 sm:gap-5 hover:shadow-md hover:border-[#bc0c11] transition-all duration-300 group h-full justify-between"
             >
               {/* Left: Student Photo */}
               <div className="relative w-24 sm:w-28 h-32 sm:h-36 rounded-2xl overflow-hidden bg-gray-50 shrink-0 border border-gray-100">
