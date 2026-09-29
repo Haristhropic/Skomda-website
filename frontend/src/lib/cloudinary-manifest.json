@@ -1300,5 +1300,11 @@
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790652719/skomda/tentang-kami/fasilitas/fasilitas-gedung-smk.png",
     "format": "png",
     "bytes": 272056
+  },
+  "program/ekstrakurikuler/ekskul-english-club.jpg": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-english-club",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790653993/skomda/program/ekstrakurikuler/ekskul-english-club.jpg",
+    "format": "jpg",
+    "bytes": 322876
   }
 }

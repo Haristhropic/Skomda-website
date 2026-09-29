@@ -147,25 +147,27 @@ export default function TefaCatalogSection({
             </p>
           </div>
 
-          {/* Category Filter Pills - Consistent with Berita & Ekskul filters */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain shrink-0 max-w-full">
-            {categories.map((cat) => {
-              const isActive = activeFilter === cat.value;
-              return (
-                <button
-                  key={cat.value}
-                  type="button"
-                  onClick={() => setActiveFilter(cat.value)}
-                  className={`shrink-0 rounded-full px-5 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer select-none ${
-                    isActive
-                      ? "bg-[#bc0c11] text-white shadow-xs"
-                      : "bg-white text-[#4a5565] border border-gray-200/90 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
+          {/* Category Filter Pills - Full-bleed on mobile, aligned on desktop */}
+          <div className="w-full md:w-auto">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 scrollbar-none overscroll-x-contain">
+              {categories.map((cat) => {
+                const isActive = activeFilter === cat.value;
+                return (
+                  <button
+                    key={cat.value}
+                    type="button"
+                    onClick={() => setActiveFilter(cat.value)}
+                    className={`shrink-0 rounded-full px-5 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer select-none ${
+                      isActive
+                        ? "bg-[#bc0c11] text-white shadow-xs"
+                        : "bg-white text-[#4a5565] border border-gray-200/90 hover:border-[#bc0c11] hover:text-[#bc0c11]"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 

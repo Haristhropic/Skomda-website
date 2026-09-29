@@ -94,6 +94,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Akademik & Bahasa",
     description:
       "Kegiatan untuk meningkatkan kemampuan berbahasa Inggris melalui latihan percakapan, vocabulary, speaking, dan aktivitas lainnya yang menggunakan bahasa Inggris.",
+    image: "/images/program/ekstrakurikuler/ekskul-english-club.jpg",
   },
   {
     id: "e-sport",
