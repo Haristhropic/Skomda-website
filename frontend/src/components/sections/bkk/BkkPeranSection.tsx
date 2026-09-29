@@ -93,11 +93,8 @@ export default function BkkPeranSection() {
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-dashed border-gray-200 font-jakarta text-xs text-gray-500 font-medium flex items-center justify-between">
+              <div className="pt-4 border-t border-dashed border-gray-200 font-jakarta text-xs text-gray-500 font-medium">
                 <span>{item.detail}</span>
-                <span className="text-[#bc0c11] font-semibold group-hover:translate-x-0.5 transition-transform">
-                  &rarr;
-                </span>
               </div>
             </div>
           ))}

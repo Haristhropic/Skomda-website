@@ -11,19 +11,21 @@ export default function BkkAlumniJourneySection() {
   const isEn = language === "en";
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const currentStory = ALUMNI_STORIES_ITEMS[currentIndex];
+  const totalStories = ALUMNI_STORIES_ITEMS.length;
+  const safeIndex = totalStories > 0 ? ((currentIndex % totalStories) + totalStories) % totalStories : 0;
+  const currentStory = ALUMNI_STORIES_ITEMS[safeIndex];
 
   const handlePrev = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? ALUMNI_STORIES_ITEMS.length - 1 : prev - 1
-    );
+    if (totalStories === 0) return;
+    setCurrentIndex((prev) => (prev === 0 ? totalStories - 1 : prev - 1));
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? ALUMNI_STORIES_ITEMS.length - 1 : prev + 1
-    );
+    if (totalStories === 0) return;
+    setCurrentIndex((prev) => (prev >= totalStories - 1 ? 0 : prev + 1));
   };
+
+  if (!currentStory || totalStories === 0) return null;
 
   return (
     <section className="relative w-full py-16 sm:py-20 lg:py-24 bg-[#f9fafb] border-t border-gray-200/60 overflow-hidden scroll-mt-24">
@@ -50,10 +52,10 @@ export default function BkkAlumniJourneySection() {
 
             <div className="flex items-center gap-2 text-xs font-jakarta text-gray-400">
               <span className="font-bold text-[#bc0c11]">
-                {String(currentIndex + 1).padStart(2, "0")}
+                {String(safeIndex + 1).padStart(2, "0")}
               </span>
               <span>/</span>
-              <span>{String(ALUMNI_STORIES_ITEMS.length).padStart(2, "0")}</span>
+              <span>{String(totalStories).padStart(2, "0")}</span>
               <span className="ml-2">{isEn ? "Alumni Stories" : "Kisah Inspirasi"}</span>
             </div>
           </div>

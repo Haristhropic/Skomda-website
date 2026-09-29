@@ -427,16 +427,6 @@
     "closeHint": "Close",
     "escHint": "ESC"
   },
-  "profilGuru": {
-    "breadcrumb": "Faculty Profile",
-    "heroTitle1": "Educators &",
-    "heroTitle2": "Teaching Faculty",
-    "heroDesc": "Profiles of dedicated professional educators and staff with expertise in Information and Communication Technology at SMK Telkom Sidoarjo.",
-    "heroCta": "View Faculty Team",
-    "wakilTitle": "Vice Principals",
-    "guruTitle": "Vocational & General Subject Teachers",
-    "staffTitle": "Administrative Staff & Personnel"
-  },
   "k3": {
     "commitmentBadge": "SKOMDA SAFETY COMMITMENT",
     "commitmentTitle": "4 Pillars of OSH Culture in Vocational Education",

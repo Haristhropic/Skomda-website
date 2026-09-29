@@ -130,63 +130,74 @@ export default function BkkPeluangSection() {
     <section id="peluang-karier" className="relative w-full py-16 sm:py-20 lg:py-24 bg-[#f9fafb] border-t border-gray-200/60 overflow-hidden scroll-mt-24">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header with Search & Filter Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
-          <div>
-            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828] mb-2">
-              {isEn ? (
-                <>
-                  Latest <span className="text-[#bc0c11]">Career Opportunities</span>
-                </>
-              ) : (
-                <>
-                  Peluang <span className="text-[#bc0c11]">Karier Terbaru</span>
-                </>
-              )}
-            </h2>
+        {/* Section Header */}
+        <div className="mb-8 sm:mb-10">
+          <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828] mb-2">
+            {isEn ? (
+              <>
+                Latest <span className="text-[#bc0c11]">Career Opportunities</span>
+              </>
+            ) : (
+              <>
+                Peluang <span className="text-[#bc0c11]">Karier Terbaru</span>
+              </>
+            )}
+          </h2>
 
-            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-3" />
+          <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-3" />
 
-            <p className="font-jakarta text-sm sm:text-base text-[#4a5565]">
-              {isEn
-                ? "Find verified career openings and industrial internships matching your vocational competencies."
-                : "Temukan kesempatan karier dan magang industri terverifikasi yang sesuai dengan kompetensi keahlianmu."}
-            </p>
+          <p className="font-jakarta text-sm sm:text-base text-[#4a5565] max-w-3xl leading-relaxed">
+            {isEn
+              ? "Find verified career openings and industrial internships matching your vocational competencies."
+              : "Temukan kesempatan karier dan magang industri terverifikasi yang sesuai dengan kompetensi keahlianmu."}
+          </p>
+        </div>
+
+        {/* ─── Search & Category Filters (Consistent with Site Standards) ─── */}
+        <div className="mb-10 flex flex-col gap-4">
+          {/* Full-Width Clean Search Box */}
+          <div className="relative w-full">
+            <div className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <Search className="size-5" />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={isEn ? "Search position, company, or location..." : "Cari posisi, perusahaan, atau lokasi..."}
+              className="w-full rounded-full bg-white pl-14 sm:pl-16 pr-12 sm:pr-14 py-3.5 sm:py-4 text-sm sm:text-base font-jakarta text-[#101828] placeholder-gray-400 border border-gray-200/90 focus:border-[#bc0c11] focus:outline-none shadow-xs transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
+                aria-label={isEn ? "Clear search" : "Hapus pencarian"}
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
           </div>
 
-          {/* Search Input & Filter Tabs Container */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
-            {/* Search Input Box */}
-            <div className="relative w-full sm:w-64 md:w-72">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={isEn ? "Search position or company..." : "Cari posisi atau perusahaan..."}
-                className="w-full h-[42px] pl-10 pr-4 rounded-xl border-2 border-dashed border-[#d1d5dc] bg-white text-sm font-jakarta text-[#101828] placeholder-gray-400 focus:outline-none focus:border-[#bc0c11] transition-all shadow-xs"
-              />
-              <Search className="size-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            {/* Filter Pills (Segmented Pill Container) */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-white border-2 border-dashed border-[#d1d5dc] shadow-xs overflow-x-auto scrollbar-none overscroll-x-contain max-w-full">
-              {filterOptions.map((filter) => {
-                const isActive = activeFilter === filter;
-                return (
-                  <button
-                    key={filter}
-                    onClick={() => setActiveFilter(filter)}
-                    className={`h-[32px] px-3.5 rounded-lg text-xs sm:text-sm font-jakarta transition-all whitespace-nowrap cursor-pointer ${
-                      isActive
-                        ? "bg-[#bc0c11] text-white font-semibold shadow-xs"
-                        : "text-[#4a5565] hover:text-[#bc0c11] font-medium"
-                    }`}
-                  >
-                    {filter}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Category Filter Pills - Full-bleed horizontal slide on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
+            {filterOptions.map((filter) => {
+              const isActive = activeFilter === filter;
+              return (
+                <button
+                  key={filter}
+                  type="button"
+                  onClick={() => setActiveFilter(filter)}
+                  className={`shrink-0 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer select-none ${
+                    isActive
+                      ? "bg-[#bc0c11] text-white shadow-xs"
+                      : "bg-white text-[#4a5565] border border-gray-200/90 hover:border-[#bc0c11] hover:text-[#bc0c11]"
+                  }`}
+                >
+                  {filter}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -316,13 +327,14 @@ export default function BkkPeluangSection() {
                   : "Coba ubah kata kunci pencarian atau pilih filter kategori lainnya."}
               </p>
               <button
+                type="button"
                 onClick={() => {
                   setActiveFilter(isEn ? "All" : "Semua");
                   setSearchQuery("");
                 }}
-                className="inline-flex items-center justify-center px-5 py-2 rounded-xl bg-gray-100 text-xs font-jakarta font-semibold text-[#101828] hover:bg-gray-200 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer shadow-xs"
               >
-                {isEn ? "Reset Filters" : "Reset Filter"}
+                <span>{isEn ? "Reset Search" : "Atur Ulang Pencarian"}</span>
               </button>
             </div>
           )}

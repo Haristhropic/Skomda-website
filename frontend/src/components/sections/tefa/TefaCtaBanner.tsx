@@ -25,14 +25,6 @@ export default function TefaCtaBanner({ onRequestProject }: TefaCtaBannerProps) 
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 lg:gap-12 relative z-10">
             {/* Left Column: Heading & Description */}
             <div className="max-w-2xl">
-              {/* Eyebrow with Signature Bar */}
-              <div className="flex items-center gap-2.5 mb-3">
-                <div className="h-1 w-10 sm:w-12 rounded-full bg-white" />
-                <span className="font-jakarta font-bold text-xs sm:text-sm tracking-wider uppercase text-white">
-                  {t("tefa.ctaEyebrow")}
-                </span>
-              </div>
-
               {/* Headline */}
               <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] leading-tight text-white mb-3 tracking-tight">
                 {t("tefa.ctaTitle")}
