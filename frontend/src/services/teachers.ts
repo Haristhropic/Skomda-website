@@ -36,7 +36,10 @@ export async function getTeachers(category?: string): Promise<TeacherItem[]> {
     if (res.ok) {
       const json = await res.json();
       if (Array.isArray(json.data) && json.data.length > 0) {
-        return json.data;
+        return json.data.map((t: TeacherItem) => ({
+          ...t,
+          image: t.image ? t.image.replace(/(\/profil-guru\/[^/]+)/g, (match) => match.replace(/\s+/g, "-")) : t.image,
+        }));
       }
     }
     return [];

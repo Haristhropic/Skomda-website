@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import { Check } from "lucide-react";
 
 export default function TefaAboutSection() {
   const { lang, language } = useLanguage();
@@ -20,35 +21,67 @@ export default function TefaAboutSection() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="lg:col-span-6 flex flex-col items-start"
           >
-            {/* Red Accent Bar & Tagline */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-[3px] w-10 rounded-full bg-[#bc0c11]" />
-              <span className="text-base sm:text-lg lg:text-[22px] font-bold uppercase tracking-wide text-[#bc0c11] font-jakarta">
-                {isEn ? "ABOUT TEFA" : "TENTANG TEFA"}
-              </span>
-            </div>
 
             {/* Section Heading */}
-            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[48px] leading-[1.18] tracking-tight text-[#101828] mb-6">
+            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] leading-tight tracking-tight text-[#101828] mb-3">
               {isEn ? (
                 <>
-                  Building Competency, <br />
-                  <span>Delivering Real Impacts</span>
+                  Building Competencies,{" "}
+                  <span className="text-[#bc0c11]">Delivering Real Impact</span>
                 </>
               ) : (
                 <>
-                  Membentuk Kompetensi, <br />
-                  <span>Menghasilkan Karya Nyata</span>
+                  Membentuk Kompetensi,{" "}
+                  <span className="text-[#bc0c11]">Menghasilkan Karya Nyata</span>
                 </>
               )}
             </h2>
 
+            {/* Signature Red Accent Bar */}
+            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+
             {/* Body Description */}
-            <p className="font-jakarta text-base sm:text-lg lg:text-[20px] text-[#4a5565] leading-relaxed lg:leading-[29px] max-w-xl font-normal">
+            <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-xl mb-6 font-normal">
               {isEn
-                ? "TEFA at SMK Telkom Sidoarjo bridges education and industry. Students do not just learn theory, but engage directly in production processes, real-world projects, and collaboration with industry partners."
-                : "TEFA di SMK Telkom Sidoarjo menjadi jembatan antara dunia pendidikan dan industri. Siswa tidak hanya belajar teori, tetapi juga terlibat langsung dalam proses produksi, proyek nyata, dan kolaborasi dengan mitra industri."}
+                ? "Teaching Factory (TEFA) at SMK Telkom Sidoarjo bridges education and industry. Students do not just learn theory, but engage directly in real-world production workflows, enterprise projects, and commercial collaboration with certified industry partners."
+                : "Teaching Factory (TEFA) di SMK Telkom Sidoarjo menjadi jembatan antara dunia pendidikan dan industri. Siswa tidak hanya belajar teori, tetapi juga terlibat langsung dalam alur produksi nyata, proyek industri, dan kolaborasi komersial bersama mitra profesional."}
             </p>
+
+            {/* Highlights List */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 w-full max-w-xl">
+              <div className="flex items-center gap-2.5">
+                <div className="size-5 rounded-full bg-[#bc0c11]/10 flex items-center justify-center shrink-0">
+                  <Check className="size-3 text-[#bc0c11]" strokeWidth={2.5} />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-[#101828] font-jakarta">
+                  {isEn ? "Industry Standard Workflow" : "Alur Kerja Standar Industri"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="size-5 rounded-full bg-[#bc0c11]/10 flex items-center justify-center shrink-0">
+                  <Check className="size-3 text-[#bc0c11]" strokeWidth={2.5} />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-[#101828] font-jakarta">
+                  {isEn ? "Real Commercial Projects" : "Proyek Riil & Komersial"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="size-5 rounded-full bg-[#bc0c11]/10 flex items-center justify-center shrink-0">
+                  <Check className="size-3 text-[#bc0c11]" strokeWidth={2.5} />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-[#101828] font-jakarta">
+                  {isEn ? "Mentored by Practitioners" : "Bimbingan Praktisi Ahli"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <div className="size-5 rounded-full bg-[#bc0c11]/10 flex items-center justify-center shrink-0">
+                  <Check className="size-3 text-[#bc0c11]" strokeWidth={2.5} />
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-[#101828] font-jakarta">
+                  {isEn ? "Ready-to-Use Solutions" : "Solusi Digital Siap Pakai"}
+                </span>
+              </div>
+            </div>
           </motion.div>
 
           {/* Right Column: Building Image & Overlapping Quote Card nodes 216:9, 216:12, 216:14, 216:15) */}

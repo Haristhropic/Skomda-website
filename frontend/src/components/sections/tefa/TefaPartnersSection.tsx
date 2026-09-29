@@ -49,7 +49,7 @@ export default function TefaPartnersSection() {
   const isEn = lang === "EN" || language === "en";
 
   return (
-    <section className="relative w-full py-20 lg:py-28 overflow-hidden bg-[#f3f4f6]">
+    <section className="relative w-full py-16 sm:py-20 lg:py-24 overflow-hidden bg-[#f3f4f6]">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           {/* Left Column: Heading, Description & CTA */}
@@ -60,24 +60,19 @@ export default function TefaPartnersSection() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-6 flex flex-col items-start"
           >
-            {/* Standard Red Accent Bar & Tag */}
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="h-[3px] w-10 rounded-full bg-[#bc0c11]" />
-              <span className="text-xs font-bold uppercase tracking-wider text-[#bc0c11] font-jakarta">
-                {isEn ? "INDUSTRY PARTNERS" : "MITRA INDUSTRI"}
-              </span>
-            </div>
-
             {/* Section Heading */}
-            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-[#101828] mb-5">
+            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] leading-tight tracking-tight text-[#101828] mb-3">
               {isEn ? "Collaboration with " : "Kolaborasi untuk "}
               <span className="text-[#bc0c11]">
-                {isEn ? "Industry" : "Industri"}
+                {isEn ? "Industrial World" : "Dunia Industri"}
               </span>
             </h2>
 
+            {/* Signature Red Accent Bar */}
+            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+
             {/* Body Description */}
-            <p className="font-jakarta text-base sm:text-lg text-[#4a5565] leading-relaxed max-w-xl mb-8">
+            <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-xl mb-8 font-normal">
               {isEn
                 ? "TEFA at SMK Telkom Sidoarjo is supported by diverse industry partners across sectors. This collaboration is tangible proof that our students' work is recognized and applied in the professional world."
                 : "TEFA di SMK Telkom Sidoarjo didukung oleh berbagai mitra industri dari berbagai sektor. Kolaborasi ini menjadi bukti nyata bahwa karya siswa kami diakui dan dimanfaatkan di dunia kerja."}
@@ -87,7 +82,7 @@ export default function TefaPartnersSection() {
             <div>
               <Link
                 href="/tentang-kami/hub-industri"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer"
+                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 min-h-[48px] text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer select-none"
                 style={{
                   boxShadow:
                     "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
@@ -101,7 +96,7 @@ export default function TefaPartnersSection() {
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="transition-transform duration-300 group-hover:translate-x-1"
+                  className="transition-transform duration-300 group-hover:translate-x-1 shrink-0"
                   aria-hidden="true"
                 >
                   <path

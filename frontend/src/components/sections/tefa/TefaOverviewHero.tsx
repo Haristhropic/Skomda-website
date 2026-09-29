@@ -11,17 +11,17 @@ export default function TefaOverviewHero() {
     <PageHeroSection
       breadcrumbs={[
         {
-          label: isEn ? "About Us" : "Tentang Kami",
-          href: "/tentang-kami/profil-sekolah",
+          label: "Teaching Factory",
+          href: "/tefa",
         },
         {
           label: "Overview",
-          href: "/tefa",
+          href: "/tefa/overview",
         },
       ]}
       titlePrefix="Teaching"
       titleHighlight="Factory"
-      titleHighlightColor="text-[#c10007]"
+      titleHighlightColor="text-[#bc0c11]"
       description={
         isEn
           ? "Teaching Factory at SMK Telkom Sidoarjo bridges vocational education with industrial standards. Students engage directly in real-world software development, network infrastructure services, and commercial digital solutions under professional supervision."

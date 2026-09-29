@@ -183,11 +183,10 @@ export default function MembangunKompetensiSection() {
             <button
               type="button"
               onClick={() => setActiveJurusan("SIJA")}
-              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${
-                activeJurusan === "SIJA"
+              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${activeJurusan === "SIJA"
                   ? "text-white font-semibold"
                   : "text-[#364153] hover:text-[#bc0c11]"
-              }`}
+                }`}
             >
               {activeJurusan === "SIJA" && (
                 <motion.div
@@ -207,11 +206,10 @@ export default function MembangunKompetensiSection() {
             <button
               type="button"
               onClick={() => setActiveJurusan("TJAT")}
-              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${
-                activeJurusan === "TJAT"
+              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${activeJurusan === "TJAT"
                   ? "text-white font-semibold"
                   : "text-[#364153] hover:text-[#bc0c11]"
-              }`}
+                }`}
             >
               {activeJurusan === "TJAT" && (
                 <motion.div
@@ -240,38 +238,73 @@ export default function MembangunKompetensiSection() {
           transition={{ duration: 0.2 }}
         >
           {/* Main Jurusan Showcase Box */}
-          <div className="my-8 sm:my-12">
-            <div className="flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-14 lg:items-center">
-              {/* 1. Title (mobile: order 1, desktop: right col row 1) */}
-              <div className="order-1 lg:col-span-7 lg:col-start-6 lg:row-start-1">
-                <h3 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-[40px] leading-[1.18] tracking-tight text-center lg:text-left">
-                  <span className="text-[#bc0c11] block">{isEn ? current.titleRedEn : current.titleRedId}</span>
-                  <span className="text-[#101828] block">{isEn ? current.titleBlackEn : current.titleBlackId}</span>
-                </h3>
+          <div className="mt-6 sm:mt-10 mb-12 sm:mb-16">
+            {/* Mobile Layout (< lg): Title -> Student -> Description & Badge */}
+            <div className="flex flex-col items-center text-center lg:hidden">
+              {/* Title */}
+              <h3 className="font-jakarta font-bold text-2xl sm:text-3xl leading-[1.2] tracking-tight">
+                <span className="text-[#bc0c11] block">{isEn ? current.titleRedEn : current.titleRedId}</span>
+                <span className="text-[#101828] block">{isEn ? current.titleBlackEn : current.titleBlackId}</span>
+              </h3>
+
+              {/* Student Character Image */}
+              <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-[446/557] my-6 flex items-center justify-center">
+                <Image
+                  src={current.studentImage}
+                  alt={current.studentAlt}
+                  fill
+                  className="object-contain drop-shadow-2xl"
+                  priority
+                  sizes="(max-width: 640px) 280px, 320px"
+                />
               </div>
 
-              {/* 2. Student Character (mobile: order 2 right below title, desktop: left col spanning all rows) */}
-              <div className="order-2 lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:row-span-3 flex items-center justify-center relative my-2 lg:my-0">
-                <div className="relative w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
+              {/* Description */}
+              <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mb-5">
+                {isEn ? current.descriptionEn : current.descriptionId}
+              </p>
+
+              {/* Duration Badge */}
+              <div>
+                <span className="inline-flex items-center gap-2 rounded-full border border-gray-200/90 bg-gray-50/80 px-3.5 py-1.5 font-jakarta text-xs sm:text-sm font-semibold text-[#101828] shadow-2xs">
+                  <Clock className="size-4 text-[#bc0c11]" strokeWidth={2} />
+                  <span>{isEn ? current.durationEn : current.durationId}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Desktop Layout (>= lg): Balanced 2-Column Showcase */}
+            <div className="hidden lg:grid lg:grid-cols-12 lg:gap-10 xl:gap-14 items-center">
+              {/* Left Column: Student Character */}
+              <div className="lg:col-span-5 flex items-center justify-center">
+                <div className="relative w-full max-w-[360px] xl:max-w-[400px] aspect-[446/557] flex items-center justify-center">
                   <Image
                     src={current.studentImage}
                     alt={current.studentAlt}
                     fill
                     className="object-contain drop-shadow-2xl"
                     priority
-                    sizes="(max-width: 640px) 260px, (max-width: 1024px) 320px, 420px"
+                    sizes="(max-width: 1280px) 360px, 400px"
                   />
                 </div>
               </div>
 
-              {/* 3. Description & Duration Badge (mobile: order 3, desktop: right col row 2) */}
-              <div className="order-3 lg:col-span-7 lg:col-start-6 lg:row-start-2 flex flex-col items-center lg:items-start text-center lg:text-left">
-                <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mb-5">
+              {/* Right Column: Information & Details */}
+              <div className="lg:col-span-7 flex flex-col items-start text-left">
+                {/* Main Department Title */}
+                <h3 className="font-jakarta font-bold text-3xl xl:text-[38px] text-[#101828] leading-[1.2] tracking-tight">
+                  <span className="text-[#bc0c11] block mb-1">{isEn ? current.titleRedEn : current.titleRedId}</span>
+                  <span className="text-[#101828] block">{isEn ? current.titleBlackEn : current.titleBlackId}</span>
+                </h3>
+
+                {/* Description Paragraph */}
+                <p className="font-jakarta text-base text-[#4a5565] leading-relaxed mt-4 mb-6 max-w-xl">
                   {isEn ? current.descriptionEn : current.descriptionId}
                 </p>
 
+                {/* Duration Badge */}
                 <div>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-gray-200/90 bg-gray-50/80 px-3.5 py-1.5 font-jakarta text-xs sm:text-sm font-semibold text-[#101828] shadow-2xs">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-gray-200/90 bg-gray-50/80 px-4 py-2 font-jakarta text-sm font-semibold text-[#101828] shadow-2xs">
                     <Clock className="size-4 text-[#bc0c11]" strokeWidth={2} />
                     <span>{isEn ? current.durationEn : current.durationId}</span>
                   </span>
@@ -280,7 +313,7 @@ export default function MembangunKompetensiSection() {
             </div>
           </div>
 
-          {/* "Apa saja yang di pelajari?" Section */}
+          {/* "Apa saja yang dipelajari?" Section */}
           <div className="mt-12 sm:mt-20 pt-8 sm:pt-10 border-t border-gray-100">
             <div className="text-center mb-6 sm:mb-10">
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828]">
@@ -290,7 +323,7 @@ export default function MembangunKompetensiSection() {
                   </>
                 ) : (
                   <>
-                    Apa saja yang <span className="text-[#bc0c11]">di pelajari?</span>
+                    Apa saja yang <span className="text-[#bc0c11]">dipelajari?</span>
                   </>
                 )}
               </h3>

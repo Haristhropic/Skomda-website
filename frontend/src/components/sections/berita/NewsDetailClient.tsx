@@ -145,7 +145,7 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
                 href="/berita"
                 className="text-sm font-semibold text-[#bc0c11] hover:underline"
               >
-                {isEn ? "View All →" : "Lihat Semua →"}
+                {isEn ? "View All" : "Lihat Semua"}
               </Link>
             </div>
 
