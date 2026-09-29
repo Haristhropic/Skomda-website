@@ -22,6 +22,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Bela Negara & Kepemimpinan",
     description:
       "Kegiatan untuk melatih kedisiplinan, kemandirian, kerja sama, dan tanggung jawab siswa melalui kegiatan kepramukaan dan aktivitas kelompok.",
+    image: "/images/program/ekstrakurikuler/ekskul-pramuka.png",
   },
   {
     id: "paskibra",
@@ -29,6 +30,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Bela Negara & Kepemimpinan",
     description:
       "Kegiatan yang berfokus pada latihan baris-berbaris, tata upacara, kedisiplinan, kekompakan, dan pembentukan sikap tanggung jawab.",
+    image: "/images/program/ekstrakurikuler/ekskul-paskibra.png",
   },
   {
     id: "kir",
@@ -36,6 +38,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Akademik & Bahasa",
     description:
       "Kegiatan bagi siswa yang tertarik dengan penelitian dan pengembangan ide. Siswa dapat belajar mencari informasi, menyusun karya ilmiah, melakukan percobaan, dan mempresentasikan hasilnya.",
+    image: "/images/program/ekstrakurikuler/ekskul-kir.png",
   },
   {
     id: "pmr",
@@ -43,6 +46,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Bela Negara & Kepemimpinan",
     description:
       "Kegiatan yang mengenalkan siswa pada dasar-dasar pertolongan pertama, kesehatan, serta kepedulian terhadap lingkungan dan sesama.",
+    image: "/images/program/ekstrakurikuler/ekskul-pmr.png",
   },
   {
     id: "voli",
@@ -50,6 +54,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Olahraga & Bela Diri",
     description:
       "Kegiatan olahraga yang melatih kemampuan dasar permainan voli, kebugaran, kerja sama tim, dan sportivitas melalui latihan bersama.",
+    image: "/images/program/ekstrakurikuler/ekskul-voli.png",
   },
   {
     id: "futsal",
@@ -57,6 +62,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Olahraga & Bela Diri",
     description:
       "Kegiatan olahraga yang menjadi wadah bagi siswa untuk bermain dan mengembangkan kemampuan futsal. Latihan meliputi teknik dasar, permainan tim, serta menjaga kebugaran.",
+    image: "/images/program/ekstrakurikuler/ekskul-futsal.png",
   },
   {
     id: "bdi",
@@ -64,6 +70,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Bela Negara & Kepemimpinan",
     description:
       "Kegiatan yang menjadi wadah siswa untuk mengikuti aktivitas keislaman di sekolah, seperti kajian, kegiatan keagamaan, dan peringatan hari besar Islam.",
+    image: "/images/program/ekstrakurikuler/ekskul-bdi.png",
   },
   {
     id: "basket",
@@ -71,6 +78,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Olahraga & Bela Diri",
     description:
       "Kegiatan olahraga untuk siswa yang memiliki minat pada permainan basket. Latihan mencakup teknik dasar, permainan tim, kebugaran, dan sportivitas.",
+    image: "/images/program/ekstrakurikuler/ekskul-basket.png",
   },
   {
     id: "musik",
@@ -78,6 +86,7 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Seni & Kreativitas",
     description:
       "Wadah bagi siswa yang memiliki minat di bidang musik untuk berlatih vokal maupun alat musik, mengembangkan kreativitas, dan berpartisipasi dalam kegiatan atau acara sekolah.",
+    image: "/images/program/ekstrakurikuler/ekskul-musik.png",
   },
   {
     id: "english-club",
@@ -100,5 +109,6 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     category: "Olahraga & Bela Diri",
     description:
       "Kegiatan bela diri yang melatih teknik dasar pencak silat, kebugaran, kedisiplinan, dan pengendalian diri melalui latihan rutin.",
+    image: "/images/program/ekstrakurikuler/ekskul-silat.png",
   },
 ];

@@ -1162,5 +1162,143 @@
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1789135304/skomda/trial-class/school-3d.png",
     "format": "png",
     "bytes": 230698
+  },
+  "program/ekstrakurikuler/ekskul-basket.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-basket",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647057/skomda/program/ekstrakurikuler/ekskul-basket.png",
+    "format": "png",
+    "bytes": 2087920
+  },
+  "program/ekstrakurikuler/ekskul-bdi.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-bdi",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647060/skomda/program/ekstrakurikuler/ekskul-bdi.png",
+    "format": "png",
+    "bytes": 2209660
+  },
+  "program/ekstrakurikuler/ekskul-futsal.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-futsal",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647061/skomda/program/ekstrakurikuler/ekskul-futsal.png",
+    "format": "png",
+    "bytes": 1874230
+  },
+  "program/ekstrakurikuler/ekskul-kir.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-kir",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647063/skomda/program/ekstrakurikuler/ekskul-kir.png",
+    "format": "png",
+    "bytes": 1715289
+  },
+  "program/ekstrakurikuler/ekskul-musik.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-musik",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647064/skomda/program/ekstrakurikuler/ekskul-musik.png",
+    "format": "png",
+    "bytes": 1146569
+  },
+  "program/ekstrakurikuler/ekskul-paskibra.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-paskibra",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647066/skomda/program/ekstrakurikuler/ekskul-paskibra.png",
+    "format": "png",
+    "bytes": 1771390
+  },
+  "program/ekstrakurikuler/ekskul-pmr.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-pmr",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647067/skomda/program/ekstrakurikuler/ekskul-pmr.png",
+    "format": "png",
+    "bytes": 813814
+  },
+  "program/ekstrakurikuler/ekskul-pramuka.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-pramuka",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647068/skomda/program/ekstrakurikuler/ekskul-pramuka.png",
+    "format": "png",
+    "bytes": 1112105
+  },
+  "program/ekstrakurikuler/ekskul-silat.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-silat",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647069/skomda/program/ekstrakurikuler/ekskul-silat.png",
+    "format": "png",
+    "bytes": 1198971
+  },
+  "program/ekstrakurikuler/ekskul-voli.png": {
+    "public_id": "skomda/program/ekstrakurikuler/ekskul-voli",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647070/skomda/program/ekstrakurikuler/ekskul-voli.png",
+    "format": "png",
+    "bytes": 1922330
+  },
+  "tentang-kami/fasilitas/fasilitas-aula.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-aula",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647072/skomda/tentang-kami/fasilitas/fasilitas-aula.png",
+    "format": "png",
+    "bytes": 582460
+  },
+  "tentang-kami/fasilitas/fasilitas-kantin.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-kantin",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647074/skomda/tentang-kami/fasilitas/fasilitas-kantin.png",
+    "format": "png",
+    "bytes": 1958666
+  },
+  "tentang-kami/fasilitas/fasilitas-lab-komputer.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-lab-komputer",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647075/skomda/tentang-kami/fasilitas/fasilitas-lab-komputer.png",
+    "format": "png",
+    "bytes": 1329920
+  },
+  "tentang-kami/fasilitas/fasilitas-lapangan-basket.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-lapangan-basket",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647076/skomda/tentang-kami/fasilitas/fasilitas-lapangan-basket.png",
+    "format": "png",
+    "bytes": 1695169
+  },
+  "tentang-kami/fasilitas/fasilitas-lapangan-utama.jpg": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-lapangan-utama",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647078/skomda/tentang-kami/fasilitas/fasilitas-lapangan-utama.jpg",
+    "format": "jpg",
+    "bytes": 189381
+  },
+  "tentang-kami/fasilitas/fasilitas-outdoor-class.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-outdoor-class",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647079/skomda/tentang-kami/fasilitas/fasilitas-outdoor-class.png",
+    "format": "png",
+    "bytes": 263783
+  },
+  "tentang-kami/fasilitas/fasilitas-perpustakaan.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-perpustakaan",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647080/skomda/tentang-kami/fasilitas/fasilitas-perpustakaan.png",
+    "format": "png",
+    "bytes": 2033468
+  },
+  "tentang-kami/fasilitas/fasilitas-ruang-kelas.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-ruang-kelas",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647081/skomda/tentang-kami/fasilitas/fasilitas-ruang-kelas.png",
+    "format": "png",
+    "bytes": 851879
+  },
+  "tentang-kami/fasilitas/fasilitas-smc.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-smc",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647082/skomda/tentang-kami/fasilitas/fasilitas-smc.png",
+    "format": "png",
+    "bytes": 898801
+  },
+  "tentang-kami/fasilitas/fasilitas-uks.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-uks",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790647083/skomda/tentang-kami/fasilitas/fasilitas-uks.png",
+    "format": "png",
+    "bytes": 1661742
+  },
+  "tentang-kami/fasilitas/fasilitas-gedung-utama.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-gedung-utama",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790649527/skomda/tentang-kami/fasilitas/fasilitas-gedung-utama.png",
+    "format": "png",
+    "bytes": 297130
+  },
+  "tentang-kami/fasilitas/fasilitas-gedung-sekolah.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-gedung-sekolah",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790651032/skomda/tentang-kami/fasilitas/fasilitas-gedung-sekolah.png",
+    "format": "png",
+    "bytes": 297130
+  },
+  "tentang-kami/fasilitas/fasilitas-gedung-smk.png": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-gedung-smk",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790652719/skomda/tentang-kami/fasilitas/fasilitas-gedung-smk.png",
+    "format": "png",
+    "bytes": 272056
   }
 }
