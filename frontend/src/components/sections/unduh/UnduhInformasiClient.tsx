@@ -368,7 +368,7 @@ export default function UnduhInformasiClient() {
                   <button
                     type="button"
                     onClick={() => setPreviewDoc(doc)}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-gray-100 hover:bg-[#bc0c11]/10 text-[#101828] hover:text-[#bc0c11] py-2.5 px-4 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-gray-100 hover:bg-[#bc0c11]/10 text-[#101828] hover:text-[#bc0c11] py-2.5 px-4 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
                   >
                     <Eye className="size-4" />
                     <span>{t("unduh.view")}</span>
@@ -377,9 +377,13 @@ export default function UnduhInformasiClient() {
                   <a
                     href={doc.fileUrl}
                     download
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white py-2.5 px-4 text-xs sm:text-sm font-semibold font-jakarta shadow-xs transition-all duration-200 cursor-pointer"
+                    className="group flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white py-2.5 px-4 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
+                    style={{
+                      boxShadow:
+                        "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                    }}
                   >
-                    <Download className="size-4" />
+                    <Download className="size-4 transition-transform duration-200 group-hover:translate-y-0.5" />
                     <span>{t("unduh.download")}</span>
                   </a>
                 </div>
@@ -399,7 +403,11 @@ export default function UnduhInformasiClient() {
                 setSearchQuery("");
                 setSelectedCategory(lang === "EN" ? "All" : "Semua");
               }}
-              className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer shadow-xs"
+              className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
+              style={{
+                boxShadow:
+                  "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+              }}
             >
               <span>{lang === "EN" ? "Reset Search" : "Reset Pencarian"}</span>
             </button>
@@ -453,7 +461,7 @@ export default function UnduhInformasiClient() {
                         <button
                           type="button"
                           onClick={() => setPreviewDoc(doc)}
-                          className="inline-flex items-center gap-1 rounded-md bg-gray-100 hover:bg-[#bc0c11]/10 text-[#101828] hover:text-[#bc0c11] px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 hover:bg-[#bc0c11]/10 text-[#101828] hover:text-[#bc0c11] px-3.5 py-1.5 text-xs font-semibold font-jakarta transition-all duration-200 active:scale-95 cursor-pointer"
                         >
                           <Eye className="size-3.5" />
                           <span>{t("unduh.view")}</span>
@@ -461,9 +469,13 @@ export default function UnduhInformasiClient() {
                         <a
                           href={doc.fileUrl}
                           download
-                          className="inline-flex items-center gap-1 rounded-md bg-[#bc0c11] hover:bg-[#990a0e] text-white px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
+                          className="group inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-3.5 py-1.5 text-xs font-semibold font-jakarta transition-all duration-200 active:scale-95 cursor-pointer"
+                          style={{
+                            boxShadow:
+                              "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                          }}
                         >
-                          <Download className="size-3.5" />
+                          <Download className="size-3.5 transition-transform duration-200 group-hover:translate-y-0.5" />
                           <span>{t("unduh.download")}</span>
                         </a>
                       </div>
@@ -505,26 +517,31 @@ export default function UnduhInformasiClient() {
                     href={previewDoc.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-[#101828] px-3.5 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-colors cursor-pointer"
-                    title="Buka di tab baru"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-[#101828] px-3.5 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.98] cursor-pointer"
+                    title={lang === "EN" ? "Open in new tab" : "Buka di tab baru"}
                   >
                     <ExternalLink className="size-4" />
-                    <span className="hidden sm:inline">Buka Tab Baru</span>
+                    <span className="hidden sm:inline">{lang === "EN" ? "New Tab" : "Buka Tab Baru"}</span>
                   </a>
 
                   <a
                     href={previewDoc.fileUrl}
                     download
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-4 py-2 text-xs sm:text-sm font-semibold font-jakarta shadow-xs transition-colors cursor-pointer"
+                    className="group inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-4 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
+                    style={{
+                      boxShadow:
+                        "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                    }}
                   >
-                    <Download className="size-4" />
-                    <span className="hidden sm:inline">Unduh PDF</span>
+                    <Download className="size-4 transition-transform duration-200 group-hover:translate-y-0.5" />
+                    <span className="hidden sm:inline">{t("unduh.download")}</span>
                   </a>
 
                   <button
+                    type="button"
                     onClick={() => setPreviewDoc(null)}
-                    className="size-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
-                    aria-label="Tutup preview"
+                    className="size-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-all duration-200 active:scale-95 cursor-pointer"
+                    aria-label={lang === "EN" ? "Close preview" : "Tutup pratinjau"}
                   >
                     <X className="size-5" />
                   </button>

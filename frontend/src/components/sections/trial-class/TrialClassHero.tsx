@@ -72,11 +72,11 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
               )}
             </p>
 
-            <div>
+            <div className="flex flex-wrap items-center gap-3.5">
               <button
                 type="button"
                 onClick={handleScrollToEvent}
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 min-h-[48px] text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer shadow-card-cta"
+                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 min-h-[48px] text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.97] cursor-pointer shadow-card-cta"
                 style={{
                   boxShadow:
                     "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
@@ -102,6 +102,16 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                   />
                 </svg>
               </button>
+
+              <Link
+                href="/trial-class/virtual-class"
+                className="inline-flex items-center gap-2 rounded-full bg-white border border-gray-200 hover:border-[#bc0c11] hover:text-[#bc0c11] text-[#364153] px-6 py-3.5 min-h-[48px] text-sm font-jakarta font-semibold transition-all duration-200 active:scale-[0.98] shadow-2xs cursor-pointer"
+              >
+                <span>{t("virtualClass.breadcrumb", "Virtual Class")}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </Link>
             </div>
           </motion.div>
 

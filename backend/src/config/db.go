@@ -27,7 +27,7 @@ func InitDB(cfg Config) *gorm.DB {
 		}
 	} else {
 		log.Println("info: DATABASE_URL tidak di-set. Menggunakan SQLite (smktelkom_dev.db) fallback untuk local dev.")
-		log.Println("catatan: Untuk production, silakan setup Supabase/Neon dan tambahkan DATABASE_URL ke .env")
+		log.Println("catatan: Untuk production, silakan setup Supabase dan tambahkan DATABASE_URL ke .env")
 		DB, err = gorm.Open(sqlite.Open("file:smktelkom_dev.db?cache=shared"), &gorm.Config{})
 	}
 

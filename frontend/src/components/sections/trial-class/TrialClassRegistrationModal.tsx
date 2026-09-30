@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -92,10 +94,15 @@ export default function TrialClassRegistrationModal({
     if (!fullName || !schoolOrigin || !whatsapp) return;
 
     setIsSubmitting(true);
-    // Simulate submission
+    // Simulate submission & save to session
     setTimeout(() => {
       const code = "TC-" + Math.floor(100000 + Math.random() * 900000);
       setTicketCode(code);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("trial_pass_code", code);
+        sessionStorage.setItem("trial_pass_name", fullName);
+        sessionStorage.setItem("trial_pass_major", major);
+      }
       setIsSubmitting(false);
       setIsSuccess(true);
     }, 800);
@@ -402,12 +409,28 @@ export default function TrialClassRegistrationModal({
                   </span>
                 </div>
 
-                <button
-                  onClick={handleReset}
-                  className="w-full py-2.5 rounded-full bg-[#101828] text-white font-jakarta font-semibold text-sm hover:bg-gray-800 transition-all cursor-pointer"
-                >
-                  {t("trialClassPage.close", "Tutup")}
-                </button>
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href={`/trial-class/virtual-class?ticket=${encodeURIComponent(ticketCode)}&name=${encodeURIComponent(fullName)}&major=${encodeURIComponent(major)}`}
+                    onClick={handleReset}
+                    className="w-full py-3.5 px-6 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white font-jakarta font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all duration-200 active:scale-[0.97] cursor-pointer"
+                    style={{
+                      boxShadow:
+                        "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                    }}
+                  >
+                    <span>{t("trialClassPage.enterVirtualClass", "Masuk ke Virtual Class Sekarang")}</span>
+                    <ArrowRight className="size-4.5" />
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="w-full py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-jakarta font-semibold text-xs sm:text-sm transition-all duration-200 active:scale-95 cursor-pointer"
+                  >
+                    {t("trialClassPage.close", "Tutup")}
+                  </button>
+                </div>
               </motion.div>
             )}
           </motion.div>

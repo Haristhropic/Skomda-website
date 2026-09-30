@@ -92,7 +92,7 @@ export default function PpdbFaqSection() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-3 rounded-full bg-[#bc0c11] px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#990a0e] shadow-card-cta font-jakarta cursor-pointer active:scale-[0.98]"
                 >
-                  <span>{isEn ? "Chat Admission on WhatsApp" : "Hubungi WhatsApp Panitia"}</span>
+                  <span>{isEn ? "Chat Admission on WhatsApp" : "Chat Panitia PPDB"}</span>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                     <path
                       d="M5 12H19M19 12L12 5M19 12L12 19"
