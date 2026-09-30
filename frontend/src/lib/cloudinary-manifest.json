@@ -131,12 +131,6 @@
     "format": "jpg",
     "bytes": 938909
   },
-  "home/hero/hero-students-group.png": {
-    "public_id": "skomda/home/hero/hero-students-group",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790518543/skomda/home/hero/hero-students-group.png",
-    "format": "png",
-    "bytes": 2479442
-  },
   "home/hero/image1.png": {
     "public_id": "skomda/home/hero/image1",
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788959413/skomda/home/hero/image1.png",
@@ -521,12 +515,6 @@
     "format": "png",
     "bytes": 1427238
   },
-  "program/ekstrakurikuler/hero-student-guitar.png": {
-    "public_id": "skomda/program/ekstrakurikuler/hero-student-guitar",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788962949/skomda/program/ekstrakurikuler/hero-student-guitar.png",
-    "format": "png",
-    "bytes": 467816
-  },
   "program/profil-jurusan/hero-jurusan-student.png": {
     "public_id": "skomda/program/profil-jurusan/hero-jurusan-student",
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790395169/skomda/program/profil-jurusan/hero-jurusan-student.png",
@@ -556,48 +544,6 @@
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788960265/skomda/program/ts21/ts21-framework.png",
     "format": "png",
     "bytes": 241523
-  },
-  "students/student-batik-confident.png": {
-    "public_id": "skomda/students/student-batik-confident",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788960293/skomda/students/student-batik-confident.png",
-    "format": "png",
-    "bytes": 8412530
-  },
-  "students/student-batik-greeting.png": {
-    "public_id": "skomda/students/student-batik-greeting",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788960532/skomda/students/student-batik-greeting.png",
-    "format": "png",
-    "bytes": 7823696
-  },
-  "students/student-batik-point-side.png": {
-    "public_id": "skomda/students/student-batik-point-side",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788960927/skomda/students/student-batik-point-side.png",
-    "format": "png",
-    "bytes": 8534908
-  },
-  "students/student-batik-presenting.png": {
-    "public_id": "skomda/students/student-batik-presenting",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788961359/skomda/students/student-batik-presenting.png",
-    "format": "png",
-    "bytes": 10423434
-  },
-  "students/student-blazer-smile.png": {
-    "public_id": "skomda/students/student-blazer-smile",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788961461/skomda/students/student-blazer-smile.png",
-    "format": "png",
-    "bytes": 1670708
-  },
-  "students/student-blazer-standing.png": {
-    "public_id": "skomda/students/student-blazer-standing",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788961466/skomda/students/student-blazer-standing.png",
-    "format": "png",
-    "bytes": 993436
-  },
-  "students/student-guitar.png": {
-    "public_id": "skomda/students/student-guitar",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788963061/skomda/students/student-guitar.png",
-    "format": "png",
-    "bytes": 467816
   },
   "tefa/prod-company-profile.png": {
     "public_id": "skomda/tefa/prod-company-profile",
@@ -671,18 +617,6 @@
     "format": "png",
     "bytes": 1855264
   },
-  "tentang-kami/fasilitas/fasilitas-gedung-utama.jpg": {
-    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-gedung-utama",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790063615/skomda/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
-    "format": "jpg",
-    "bytes": 189381
-  },
-  "tentang-kami/fasilitas/fasilitas-outdoor-class.jpg": {
-    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-outdoor-class",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790063616/skomda/tentang-kami/fasilitas/fasilitas-outdoor-class.jpg",
-    "format": "jpg",
-    "bytes": 212675
-  },
   "tentang-kami/fasilitas/fasilitas-rps.jpg": {
     "public_id": "skomda/tentang-kami/fasilitas/fasilitas-rps",
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790063617/skomda/tentang-kami/fasilitas/fasilitas-rps.jpg",
@@ -700,12 +634,6 @@
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790395176/skomda/tentang-kami/hub-industri/hero-student-hub-industri.png",
     "format": "png",
     "bytes": 1417272
-  },
-  "tentang-kami/hub-industri/hub-industri-hero.jpg": {
-    "public_id": "skomda/tentang-kami/hub-industri/hub-industri-hero",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1788961612/skomda/tentang-kami/hub-industri/hub-industri-hero.jpg",
-    "format": "jpg",
-    "bytes": 937297
   },
   "tentang-kami/prestasi/hero-prestasi-lks.png": {
     "public_id": "skomda/tentang-kami/prestasi/hero-prestasi-lks",
@@ -1283,18 +1211,6 @@
     "format": "png",
     "bytes": 1661742
   },
-  "tentang-kami/fasilitas/fasilitas-gedung-utama.png": {
-    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-gedung-utama",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790649527/skomda/tentang-kami/fasilitas/fasilitas-gedung-utama.png",
-    "format": "png",
-    "bytes": 297130
-  },
-  "tentang-kami/fasilitas/fasilitas-gedung-sekolah.png": {
-    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-gedung-sekolah",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790651032/skomda/tentang-kami/fasilitas/fasilitas-gedung-sekolah.png",
-    "format": "png",
-    "bytes": 297130
-  },
   "tentang-kami/fasilitas/fasilitas-gedung-smk.png": {
     "public_id": "skomda/tentang-kami/fasilitas/fasilitas-gedung-smk",
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790652719/skomda/tentang-kami/fasilitas/fasilitas-gedung-smk.png",
@@ -1306,5 +1222,113 @@
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790653993/skomda/program/ekstrakurikuler/ekskul-english-club.jpg",
     "format": "jpg",
     "bytes": 322876
+  },
+  "home/hero/home-hero-students.png": {
+    "public_id": "skomda/home/hero/home-hero-students",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790751995/skomda/home/hero/home-hero-students.png",
+    "format": "png",
+    "bytes": 2642190
+  },
+  "tentang-kami/fasilitas/fasilitas-lab-ai.jpg": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-lab-ai",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790751997/skomda/tentang-kami/fasilitas/fasilitas-lab-ai.jpg",
+    "format": "jpg",
+    "bytes": 198137
+  },
+  "tentang-kami/fasilitas/fasilitas-lab-fiber-optic.jpg": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-lab-fiber-optic",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790751998/skomda/tentang-kami/fasilitas/fasilitas-lab-fiber-optic.jpg",
+    "format": "jpg",
+    "bytes": 232470
+  },
+  "tentang-kami/fasilitas/fasilitas-lab-iot.jpg": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-lab-iot",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790751999/skomda/tentang-kami/fasilitas/fasilitas-lab-iot.jpg",
+    "format": "jpg",
+    "bytes": 222940
+  },
+  "tentang-kami/fasilitas/fasilitas-lab-jaringan.jpg": {
+    "public_id": "skomda/tentang-kami/fasilitas/fasilitas-lab-jaringan",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752000/skomda/tentang-kami/fasilitas/fasilitas-lab-jaringan.jpg",
+    "format": "jpg",
+    "bytes": 183564
+  },
+  "trial-class/calendar-3d-icon.png": {
+    "public_id": "skomda/trial-class/calendar-3d-icon",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752002/skomda/trial-class/calendar-3d-icon.png",
+    "format": "png",
+    "bytes": 917930
+  },
+  "trial-class/dtp-artificial-intelligence.png": {
+    "public_id": "skomda/trial-class/dtp-artificial-intelligence",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752004/skomda/trial-class/dtp-artificial-intelligence.png",
+    "format": "png",
+    "bytes": 695570
+  },
+  "trial-class/dtp-cloud-engineer.png": {
+    "public_id": "skomda/trial-class/dtp-cloud-engineer",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752005/skomda/trial-class/dtp-cloud-engineer.png",
+    "format": "png",
+    "bytes": 453836
+  },
+  "trial-class/dtp-cyber-security.png": {
+    "public_id": "skomda/trial-class/dtp-cyber-security",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752006/skomda/trial-class/dtp-cyber-security.png",
+    "format": "png",
+    "bytes": 643379
+  },
+  "trial-class/dtp-digital-marketing.png": {
+    "public_id": "skomda/trial-class/dtp-digital-marketing",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752008/skomda/trial-class/dtp-digital-marketing.png",
+    "format": "png",
+    "bytes": 644706
+  },
+  "trial-class/dtp-iot.png": {
+    "public_id": "skomda/trial-class/dtp-iot",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752009/skomda/trial-class/dtp-iot.png",
+    "format": "png",
+    "bytes": 576502
+  },
+  "trial-class/dtp-network-admin.png": {
+    "public_id": "skomda/trial-class/dtp-network-admin",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752011/skomda/trial-class/dtp-network-admin.png",
+    "format": "png",
+    "bytes": 618082
+  },
+  "trial-class/dtp-network-infrastructure.png": {
+    "public_id": "skomda/trial-class/dtp-network-infrastructure",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752013/skomda/trial-class/dtp-network-infrastructure.png",
+    "format": "png",
+    "bytes": 602035
+  },
+  "trial-class/dtp-software-developer.png": {
+    "public_id": "skomda/trial-class/dtp-software-developer",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752014/skomda/trial-class/dtp-software-developer.png",
+    "format": "png",
+    "bytes": 461426
+  },
+  "trial-class/dtp-visual-designer.png": {
+    "public_id": "skomda/trial-class/dtp-visual-designer",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752015/skomda/trial-class/dtp-visual-designer.png",
+    "format": "png",
+    "bytes": 341787
+  },
+  "trial-class/quiz-badge-icon.png": {
+    "public_id": "skomda/trial-class/quiz-badge-icon",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752016/skomda/trial-class/quiz-badge-icon.png",
+    "format": "png",
+    "bytes": 650589
+  },
+  "trial-class/school-building-banner.png": {
+    "public_id": "skomda/trial-class/school-building-banner",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752017/skomda/trial-class/school-building-banner.png",
+    "format": "png",
+    "bytes": 306674
+  },
+  "trial-class/virtual-hero-students.png": {
+    "public_id": "skomda/trial-class/virtual-hero-students",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752020/skomda/trial-class/virtual-hero-students.png",
+    "format": "png",
+    "bytes": 2388355
   }
 }

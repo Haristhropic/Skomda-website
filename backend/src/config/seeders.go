@@ -706,21 +706,12 @@ func SeedEkskulIfEmpty(db *gorm.DB) {
 
 // SeedFasilitasIfEmpty memasukkan 16 data fasilitas & sarana prasarana resmi dari frontend/src/data/fasilitasData.ts
 func SeedFasilitasIfEmpty(db *gorm.DB) {
-	var count int64
-	db.Model(&models.Fasilitas{}).Count(&count)
-	if count >= 16 {
-		return
-	}
-	if count > 0 {
-		db.Exec("DELETE FROM fasilitas")
-	}
-
 	fasilitasList := []models.Fasilitas{
 		{
 			Name:        "Ruang Kelas Modern",
 			Category:    "Ruang Belajar & RPS",
 			Description: "Ruang kelas berstandar internasional yang dirancang ergonomis untuk mendukung interaksi pembelajaran aktif dan kolaboratif antar siswa dan guru.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-ruang-kelas.png",
 			Features:    "Air Conditioner (AC) Full, Smart TV 55 Inch Interaktif, Meja & Kursi Single Seat Ergonomis, Dedicated High-Speed Wi-Fi",
 			Capacity:    "Smart Class",
 			OrderIndex:  1,
@@ -738,7 +729,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Aula / Graha Hall Videotron",
 			Category:    "Sarana Umum & Olahraga",
 			Description: "Aula serbaguna megah dengan kapasitas besar, sound system auditorium, dan layar videotron besar untuk seminar kebekerjaan, wisuda, dan acara nasional.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-aula.png",
 			Features:    "Layar Videotron Panggung LED Luas, Kapasitas Ratusan Audiens, Audio Visual & Tata Suara Studio, Panggung Teatrikal & Presentasi",
 			Capacity:    "Layar Videotron",
 			OrderIndex:  3,
@@ -747,7 +738,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Laboratorium Telekomunikasi & Fiber Optic (FO)",
 			Category:    "Laboratorium Kejuruan",
 			Description: "Laboratorium spesialisasi TJAT dengan perangkat industri fiber optic mutakhir untuk pelatihan penyambungan fiber, pengukuran optical power, dan desain FTTH.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-rps.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-lab-fiber-optic.jpg",
 			Features:    "Optical Fusion Splicer, Optical Time Domain Reflectometer (OTDR), Optical Power Meter (OPM), Miniature Tiang & ODP Distribusi",
 			Capacity:    "FTTH & Fusion Splicer",
 			OrderIndex:  4,
@@ -756,7 +747,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Laboratorium Artificial Intelligence (AI)",
 			Category:    "Laboratorium Kejuruan",
 			Description: "Fasilitas riset komputasi AI bagi siswa dan guru untuk eksplorasi machine learning, computer vision, generative AI, dan video storytelling.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-outdoor-class.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-lab-ai.jpg",
 			Features:    "High Performance GPU Workstations, AI Model Training Frameworks, Interactive Display Monitor, Server Akses AI Terpusat",
 			Capacity:    "High-End AI Workstation",
 			OrderIndex:  5,
@@ -765,7 +756,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Laboratorium Internet of Things (IoT)",
 			Category:    "Laboratorium Kejuruan",
 			Description: "Dua ruang laboratorium IoT terintegrasi untuk prototipe mikrokontroler, sensor cerdas, otomatisasi smart home/smart school, dan sistem telemetri.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-rps.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-lab-iot.jpg",
 			Features:    "2 Ruang Praktik IoT Khusus, Sensor & Actuator Industrial Kits, Development Boards (ESP32, Arduino, STM32), Platform IoT Cloud & Dashboard",
 			Capacity:    "2 Ruang Khusus IoT",
 			OrderIndex:  6,
@@ -774,7 +765,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Laboratorium Jaringan Komputer & Cyber Security",
 			Category:    "Laboratorium Kejuruan",
 			Description: "Laboratorium simulasi enterprise network dengan rackmount server, routerboard MikroTik, switch Cisco, serta infrastruktur network defense.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-rps.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-lab-jaringan.jpg",
 			Features:    "Server Rackmount & Patch Panel, Perangkat Cisco & Router MikroTik, Simulasi Topologi Enterprise, Tools Analisis Keamanan Jaringan",
 			Capacity:    "Enterprise Network Rack",
 			OrderIndex:  7,
@@ -783,7 +774,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Laboratorium Komputer & Rekayasa Perangkat Lunak",
 			Category:    "Laboratorium Kejuruan",
 			Description: "Laboratorium komputasi berkapasitas besar untuk pengembangan software web, aplikasi mobile, database management system, dan cloud computing.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-lab-komputer.png",
 			Features:    "PC Spesifikasi Tinggi Core i5/i7, Koneksi LAN Gigabit Berkecepatan Tinggi, IDE & Compiler Software Development Lengkap, Ruang Sejuk Ber-AC",
 			Capacity:    "Dedicated Coding Studio",
 			OrderIndex:  8,
@@ -792,7 +783,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Outdoor Class & Eco Learning Zone",
 			Category:    "Ruang Belajar & RPS",
 			Description: "Area pembelajaran luar ruang bernuansa asri dan hijau untuk diskusi santai, brainstorming kelompok, dan pengenalan konsep belajar terbuka.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-outdoor-class.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-outdoor-class.png",
 			Features:    "Suasana Terbuka & Hijau, Meja Diskusi Kolaboratif, Akses Wi-Fi Outdoor, Zona Diskusi Santai",
 			Capacity:    "Area Belajar Hijau",
 			OrderIndex:  9,
@@ -801,7 +792,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Kantin Cashless SKOMDA",
 			Category:    "Sarana Umum & Olahraga",
 			Description: "Area pujasera sekolah yang higienis dengan sistem pembayaran 100% non-tunai (QRIS & tap card) untuk kenyamanan dan literasi keuangan digital.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-kantin.png",
 			Features:    "Transaksi Digital Cashless / QRIS, Menu Sehat, Higienis, & Terkurasi, Area Makan Luas dan Bersih, Tempat Duduk Komunal",
 			Capacity:    "100% Non-Tunai",
 			OrderIndex:  10,
@@ -810,7 +801,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Lapangan Olahraga Utama",
 			Category:    "Sarana Umum & Olahraga",
 			Description: "Lapangan multifungsi berstandar untuk upacara bendera, apel kedisiplinan, parade kegiatan siswa, serta olahraga futsal dan voli.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-lapangan-utama.jpg",
 			Features:    "Lapangan Luas Beraspal Halus & Marka Jelas, Tiang Bendera Upacara Resmi, Gawang Futsal & Net Voli, Penerangan Lapangan",
 			Capacity:    "Multifungsi",
 			OrderIndex:  11,
@@ -819,7 +810,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Lapangan Basket Standar",
 			Category:    "Sarana Umum & Olahraga",
 			Description: "Fasilitas olahraga basket dengan lantai lapangan yang terawat baik dan ring kokoh untuk latihan rutin ekstrakurikuler serta turnamen internal.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-lapangan-basket.png",
 			Features:    "Ring Basket Standar Nasional, Area Pembatas Lapangan Nyaman, Pencahayaan Olahraga Sore/Malam, Tribun Penonton Ringan",
 			Capacity:    "Standar Pertandingan",
 			OrderIndex:  12,
@@ -828,7 +819,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Perpustakaan & Digital Resource Center",
 			Category:    "Sarana Umum & Olahraga",
 			Description: "Pusat literasi dengan ribuan koleksi buku teks teknologi, fiksi, jurnal ilmiah, serta workstation akses e-library bagi seluruh civitas akademika.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-perpustakaan.png",
 			Features:    "Koleksi Buku TI & Telekomunikasi Lengkap, Katalog & Peminjaman E-Library, Area Membaca Tenang & Ber-AC, Terminal Akses Internet Siswa",
 			Capacity:    "E-Library & Literasi",
 			OrderIndex:  13,
@@ -837,7 +828,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Ruang Usaha Kesehatan Sekolah (UKS)",
 			Category:    "Sarana Umum & Olahraga",
 			Description: "Fasilitas pertolongan pertama pada kesehatan siswa dan warga sekolah yang dilengkapi tempat tidur medis dan obat-obatan standar P3K.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-uks.png",
 			Features:    "Tempat Tidur Pasien Nyaman, Peralatan & Kotak Obat P3K Standar Medis, Petugas PMR & Pembina UKS, Lingkungan Bersih dan Steril",
 			Capacity:    "Pertolongan Pertama",
 			OrderIndex:  14,
@@ -846,7 +837,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "SMC (Student Media Center)",
 			Category:    "Ruang Belajar & RPS",
 			Description: "Pusat koordinasi media, podcast sekolah, dokumentasi visual, dan kreasi konten publikasi kegiatan SMK Telkom Sidoarjo.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-outdoor-class.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-smc.png",
 			Features:    "Perangkat Studio Audio & Podcast, Kamera & Perlengkapan Sinematografi, Lighting & Backdrop Green Screen, Editing Station",
 			Capacity:    "Media Studio",
 			OrderIndex:  15,
@@ -855,7 +846,7 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 			Name:        "Gedung Kampus SMK Telkom Sidoarjo",
 			Category:    "Sarana Umum & Olahraga",
 			Description: "Kompleks bangunan representatif berarsitektur modern di bawah naungan Yayasan Pendidikan Telkom yang asri, aman, dan berlokasi strategis di Sidoarjo.",
-			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
+			Image:       "/images/tentang-kami/fasilitas/fasilitas-gedung-smk.png",
 			Features:    "Keamanan 24 Jam & CCTV Terpadu, Area Parkir Luas & Tertata, Akses Jalan Utama Strategis, Standar K3 & Jalur Evakuasi Kebakaran",
 			Capacity:    "Kampus Modern",
 			OrderIndex:  16,
@@ -863,9 +854,21 @@ func SeedFasilitasIfEmpty(db *gorm.DB) {
 	}
 
 	for _, f := range fasilitasList {
-		db.Create(&f)
+		var existing models.Fasilitas
+		if err := db.Where("name = ?", f.Name).First(&existing).Error; err == nil {
+			db.Model(&existing).Updates(map[string]interface{}{
+				"image":       f.Image,
+				"category":    f.Category,
+				"description": f.Description,
+				"features":    f.Features,
+				"capacity":    f.Capacity,
+				"order_index": f.OrderIndex,
+			})
+		} else {
+			db.Create(&f)
+		}
 	}
-	log.Println("berhasil seed 16 sarana fasilitas resmi ke database.")
+	log.Println("berhasil sinkronisasi 16 sarana fasilitas resmi ke database.")
 }
 
 // SeedBKKIfEmpty memasukkan 5 lowongan kerja riil, 9 mitra industri resmi, dan 2 testimoni alumni dari frontend/src/data/bkkData.ts

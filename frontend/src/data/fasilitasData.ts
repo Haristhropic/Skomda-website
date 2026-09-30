@@ -53,7 +53,7 @@ export const FASILITAS_LIST: FasilitasItem[] = [
     description:
       "Laboratorium praktikum jurusan TJAT untuk belajar penyambungan kabel fiber optik, pengukuran redaman jaringan, dan instalasi jaringan telekomunikasi.",
     specs: ["Fusion Splicer", "OTDR dan Optical Power Meter", "Kabel dan Aksesoris Fiber Optic", "Trainer Jaringan Akses"],
-    image: "/images/tentang-kami/fasilitas/fasilitas-rps.jpg",
+    image: "/images/tentang-kami/fasilitas/fasilitas-lab-fiber-optic.jpg",
     badge: "Praktik TJAT",
   },
   {
@@ -63,7 +63,7 @@ export const FASILITAS_LIST: FasilitasItem[] = [
     description:
       "Ruangan komputer khusus untuk pembelajaran dan eksperimen kecerdasan buatan, pemodelan data, serta pemrograman tingkat lanjut.",
     specs: ["Komputer Spesifikasi Tinggi", "Perangkat Display Presentasi", "Akses Jaringan Lokal dan Internet", "Software Pembelajaran AI"],
-    image: "/images/tentang-kami/fasilitas/fasilitas-outdoor-class.png",
+    image: "/images/tentang-kami/fasilitas/fasilitas-lab-ai.jpg",
     badge: "Riset & Komputasi",
   },
   {
@@ -73,7 +73,7 @@ export const FASILITAS_LIST: FasilitasItem[] = [
     description:
       "Ruang praktik untuk merakit dan menguji rangkaian mikrokontroler, modul sensor elektronika, serta pemrograman perangkat cerdas IoT.",
     specs: ["Modul Mikrokontroler (Arduino, ESP32)", "Set Sensor dan Aktuator", "Peralatan Solder dan Perakitan", "Workstation Pengujian"],
-    image: "/images/tentang-kami/fasilitas/fasilitas-rps.jpg",
+    image: "/images/tentang-kami/fasilitas/fasilitas-lab-iot.jpg",
     badge: "Praktik IoT",
   },
   {
@@ -83,7 +83,7 @@ export const FASILITAS_LIST: FasilitasItem[] = [
     description:
       "Laboratorium praktikum untuk simulasi konfigurasi jaringan, pengaturan router, switch, server lokal, dan perakitan kabel jaringan LAN.",
     specs: ["Router dan Switch Jaringan", "Rack Server Praktik", "Perangkat Komputer Lab", "Kabel UTP dan Crimping Tools"],
-    image: "/images/tentang-kami/fasilitas/fasilitas-rps.jpg",
+    image: "/images/tentang-kami/fasilitas/fasilitas-lab-jaringan.jpg",
     badge: "Praktik Jaringan",
   },
   {

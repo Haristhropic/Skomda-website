@@ -21,15 +21,25 @@ export default function FasilitasClient() {
       .then((data) => {
         if (isMounted && data && data.length > 0) {
           setItems(
-            data.map((f) => ({
-              id: String(f.id),
-              name: f.name,
-              category: (f.category || "Sarana Umum & Olahraga") as any,
-              description: f.description || "",
-              specs: f.features ? f.features.split(",").map((s) => s.trim()) : [],
-              image: f.image || "/images/tentang-kami/fasilitas/fasilitas-gedung-utama.jpg",
-              badge: f.capacity || "Kampus Modern",
-            }))
+            data.map((f) => {
+              // Find matching item from FASILITAS_LIST to get the exact high-fidelity image asset
+              const matchedLocal = FASILITAS_LIST.find((item) =>
+                item.id === String(f.id) ||
+                item.name.toLowerCase() === f.name.toLowerCase() ||
+                f.name.toLowerCase().includes(item.name.toLowerCase()) ||
+                item.name.toLowerCase().includes(f.name.toLowerCase())
+              );
+
+              return {
+                id: String(f.id),
+                name: f.name,
+                category: (f.category || matchedLocal?.category || "Sarana Umum & Olahraga") as any,
+                description: f.description || matchedLocal?.description || "",
+                specs: f.features ? f.features.split(",").map((s) => s.trim()) : (matchedLocal?.specs || []),
+                image: matchedLocal?.image || f.image || "/images/tentang-kami/fasilitas/fasilitas-gedung-smk.png",
+                badge: f.capacity || matchedLocal?.badge || "Kampus Modern",
+              };
+            })
           );
         }
       })
