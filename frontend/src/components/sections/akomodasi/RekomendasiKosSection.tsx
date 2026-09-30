@@ -254,7 +254,11 @@ export default function RekomendasiKosSection() {
                   )}.`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] px-4 py-2 text-xs font-semibold text-white transition-all duration-200 shadow-xs hover:shadow-sm font-jakarta shrink-0 active:scale-95"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] px-4 py-2 text-xs font-medium text-white transition-all duration-200 font-jakarta shrink-0 active:scale-[0.98] cursor-pointer"
+                  style={{
+                    boxShadow:
+                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                  }}
                 >
                   <span>{isEn ? "Contact" : "Hubungi"}</span>
                   <svg

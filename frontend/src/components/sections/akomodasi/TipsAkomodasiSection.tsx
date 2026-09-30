@@ -67,10 +67,14 @@ export default function TipsAkomodasiSection() {
                   href="https://wa.me/6281234567899?text=Halo%20Admin%20Kesiswaan%20SMK%20Telkom%20Sidoarjo,%20saya%20calon%20wali%20murid/siswa%20ingin%20berkonsultasi%20mengenai%20rekomendasi%20akomodasi%20kos/asrama."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-[#bc0c11] px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#990a0e] shadow-card-cta font-jakarta cursor-pointer active:scale-[0.98]"
+                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] font-jakarta cursor-pointer"
+                  style={{
+                    boxShadow:
+                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                  }}
                 >
                   <span>{isEn ? "Chat Student Affairs on WhatsApp" : "Chat WhatsApp Kesiswaan"}</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="transition-transform duration-300 group-hover:translate-x-1">
                     <path
                       d="M5 12H19M19 12L12 5M19 12L12 19"
                       stroke="white"

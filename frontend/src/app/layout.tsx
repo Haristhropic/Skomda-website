@@ -34,6 +34,7 @@ export const metadata: Metadata = {
 import { LanguageProvider } from "@/context/LanguageContext";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
 import SkomdaChatWidget from "@/components/chatbot/SkomdaChatWidget";
+import ScrollToTop from "@/components/common/ScrollToTop";
 
 export default function RootLayout({
   children,
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body className="font-jakarta antialiased bg-[#f3f4f6] text-[#101828] overflow-x-hidden">
         <LanguageProvider>
           <AdminAuthProvider>
+            <ScrollToTop />
             {children}
             {/* Floating AI Chatbot Widget (Skomda Intelligence via NexusRouter) */}
             <SkomdaChatWidget />

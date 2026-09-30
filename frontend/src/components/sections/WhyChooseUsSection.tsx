@@ -80,7 +80,7 @@ export default function WhyChooseUsSection() {
           {/* CTA Daftar Sekarang Button 67:140) */}
           <div className="shrink-0">
             <Link
-              href="#ppdb"
+              href="/ppdb"
               className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-[#990a0e] active:scale-[0.98]"
               style={{
                 boxShadow:
@@ -165,10 +165,10 @@ export default function WhyChooseUsSection() {
               <div
                 key={card.id}
                 data-node-id={card.id}
-                className="group relative rounded-[25px] bg-white px-6 sm:px-7 py-6 shadow-[0px_4px_4.5px_rgba(0,0,0,0.08)] flex items-center gap-4 sm:gap-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] min-h-[120px]"
+                className="relative rounded-[25px] bg-white px-6 sm:px-7 py-6 shadow-[0px_4px_4.5px_rgba(0,0,0,0.08)] flex items-center gap-4 sm:gap-5 border-2 border-dashed border-[#d1d5dc] min-h-[120px]"
               >
                 {/* Light pink/red circle icon 67:145) */}
-                <div className="flex size-[64px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-[#ffebed] p-3 transition-transform duration-300 group-hover:scale-105">
+                <div className="flex size-[64px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-[#ffebed] p-3">
                   <div className="relative size-[36px] sm:size-[40px]">
                     <Image
                       src={card.iconSrc}

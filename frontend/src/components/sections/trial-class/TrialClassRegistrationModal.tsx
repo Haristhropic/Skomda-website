@@ -340,7 +340,11 @@ export default function TrialClassRegistrationModal({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-3 rounded-full bg-[#bc0c11] text-white font-jakarta font-semibold text-sm hover:bg-[#990a0e] shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+                      className="w-full py-3.5 px-6 rounded-full bg-[#bc0c11] text-white font-jakarta font-medium text-sm sm:text-base hover:bg-[#990a0e] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.98] cursor-pointer"
+                      style={{
+                        boxShadow:
+                          "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                      }}
                     >
                       {isSubmitting ? (
                         <>
@@ -413,7 +417,7 @@ export default function TrialClassRegistrationModal({
                   <Link
                     href={`/trial-class/virtual-class?ticket=${encodeURIComponent(ticketCode)}&name=${encodeURIComponent(fullName)}&major=${encodeURIComponent(major)}`}
                     onClick={handleReset}
-                    className="w-full py-3.5 px-6 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white font-jakarta font-bold text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all duration-200 active:scale-[0.97] cursor-pointer"
+                    className="w-full py-3.5 px-6 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white font-jakarta font-medium text-sm sm:text-base flex items-center justify-center gap-2.5 transition-all duration-200 active:scale-[0.98] cursor-pointer"
                     style={{
                       boxShadow:
                         "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",

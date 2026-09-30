@@ -1,4 +1,3 @@
-import path from "path";
 import os from "os";
 import type { NextConfig } from "next";
 
@@ -26,9 +25,6 @@ function getLocalDevOrigins(): string[] {
 }
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: path.resolve(__dirname, ".."),
-  },
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },

@@ -161,9 +161,6 @@ export default function Ts21FrameworkSection() {
         <div className="rounded-[28px] bg-[#f9fafb] p-8 sm:p-10 border-2 border-dashed border-[#d1d5dc]">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             <div className="md:col-span-8 flex flex-col gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#bc0c11] font-jakarta">
-                {isEn ? "Tiered Curriculum Structure" : "Struktur Kurikulum Berlapis"}
-              </span>
               <h3 className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828]">
                 {isEn ? "Balance of Attitude, Knowledge, and Skills" : "Keseimbangan Attitude, Knowledge, dan Skill"}
               </h3>

@@ -97,7 +97,11 @@ export default function BkkKerjasamaSection() {
               <div className="flex flex-wrap items-center gap-3.5">
                 <button
                   onClick={() => setModalOpen(true)}
-                  className="group inline-flex items-center gap-2 rounded-full bg-[#bc0c11] px-7 py-3 text-sm font-jakarta font-bold text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] shadow-card-cta cursor-pointer"
+                  className="group inline-flex items-center gap-2 rounded-full bg-[#bc0c11] px-7 py-3 text-[15px] font-jakarta font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer"
+                  style={{
+                    boxShadow:
+                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                  }}
                 >
                   <span>{isEn ? "Post a Job" : "Pasang Lowongan"}</span>
                   <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
@@ -314,7 +318,11 @@ export default function BkkKerjasamaSection() {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-full bg-[#bc0c11] font-bold text-white hover:bg-[#990a0e] transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 group"
+                      className="w-full py-3 rounded-full bg-[#bc0c11] font-medium text-sm sm:text-base text-white hover:bg-[#990a0e] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group active:scale-[0.98]"
+                      style={{
+                        boxShadow:
+                          "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                      }}
                     >
                       <span>{isEn ? "Submit Vacancy Details" : "Kirim Kebutuhan Lowongan"}</span>
                       <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />

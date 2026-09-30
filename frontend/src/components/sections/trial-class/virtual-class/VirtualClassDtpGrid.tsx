@@ -84,16 +84,16 @@ export default function VirtualClassDtpGrid({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25, delay: idx * 0.03 }}
                   onClick={() => handleSelect(item)}
-                  className="group relative bg-[#fffefe] hover:bg-white rounded-[16px] border border-[#e5e5e5] p-4 sm:p-5 shadow-[0px_2px_6px_0px_rgba(0,0,0,0.06)] hover:shadow-lg hover:border-[#bc0c11]/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.99]"
+                  className="group relative bg-white rounded-[14px] border border-gray-100/80 p-4 sm:p-5 shadow-[0px_2px_8px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] hover:border-gray-200 transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.99]"
                 >
                   {/* Left: Icon & Text Info */}
                   <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div className="relative size-12 sm:size-14 shrink-0 rounded-xl bg-red-50/50 p-1.5 flex items-center justify-center border border-red-100 group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative size-11 sm:size-12 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
                       <Image
                         src={item.icon}
                         alt={item.title}
-                        width={52}
-                        height={52}
+                        width={48}
+                        height={48}
                         className="object-contain"
                         unoptimized
                       />
@@ -103,15 +103,15 @@ export default function VirtualClassDtpGrid({
                       <h3 className="font-jakarta font-bold text-sm sm:text-base text-[#101828] group-hover:text-[#bc0c11] transition-colors truncate">
                         {item.title}
                       </h3>
-                      <p className="font-jakarta text-xs text-[#444748] mt-0.5 line-clamp-2 leading-relaxed">
+                      <p className="font-jakarta text-xs text-[#6a7282] mt-0.5 line-clamp-2 leading-relaxed">
                         {item.desc}
                       </p>
                     </div>
                   </div>
 
                   {/* Right: Action Arrow */}
-                  <div className="size-8 sm:size-9 rounded-full bg-gray-50 group-hover:bg-red-50 text-[#bc0c11] flex items-center justify-center shrink-0 transition-colors duration-200">
-                    <ArrowRight className="size-4 sm:size-4.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                  <div className="size-7 rounded-full border border-gray-200 group-hover:border-gray-300 text-[#6a7282] group-hover:text-[#bc0c11] flex items-center justify-center shrink-0 transition-all duration-200">
+                    <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </div>
                 </motion.div>
               ))}
@@ -152,58 +152,53 @@ export default function VirtualClassDtpGrid({
                     <div
                       key={item.id}
                       onClick={() => handleSelect(item)}
-                      className={`group relative rounded-[16px] p-3.5 sm:p-4 transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 ${
+                      className={`group relative rounded-[12px] p-3 sm:p-3.5 transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 ${
                         isActive
-                          ? "bg-[rgba(188,12,17,0.08)] border-2 border-[#bc0c11] shadow-xs"
-                          : "bg-[#fffefe] hover:bg-white border border-[#e5e5e5] hover:border-gray-300 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.04)]"
+                          ? "bg-[#f8f8f8] border border-gray-200 shadow-[inset_2px_2px_5px_rgba(0,0,0,0.07),inset_-1px_-1px_3px_rgba(255,255,255,0.9)]"
+                          : "bg-white border border-gray-100 hover:border-gray-200 shadow-[0px_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0px_2px_8px_rgba(0,0,0,0.08)]"
                       }`}
                     >
+                      {/* Active red accent bar on the left edge */}
+                      {isActive && (
+                        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-full bg-[#bc0c11]" />
+                      )}
+
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div
-                          className={`relative size-11 sm:size-12 shrink-0 rounded-xl p-1 flex items-center justify-center transition-colors ${
-                            isActive
-                              ? "bg-white border border-red-200"
-                              : "bg-red-50/40 border border-red-50"
-                          }`}
-                        >
+                        <div className="relative size-10 sm:size-11 shrink-0 flex items-center justify-center">
                           <Image
                             src={item.icon}
                             alt={item.title}
-                            width={44}
-                            height={44}
-                            className="object-contain"
+                            width={40}
+                            height={40}
+                            className={`object-contain transition-opacity ${isActive ? "opacity-100" : "opacity-75 group-hover:opacity-100"}`}
                             unoptimized
                           />
                         </div>
 
                         <div className="min-w-0 flex-1">
                           <h4
-                            className={`font-jakarta font-bold text-sm truncate leading-tight ${
+                            className={`font-jakarta font-semibold text-sm leading-normal pb-0.5 truncate ${
                               isActive
                                 ? "text-[#bc0c11]"
-                                : "text-[#101828] group-hover:text-[#bc0c11]"
+                                : "text-[#364153] group-hover:text-[#101828]"
                             }`}
                           >
                             {item.title}
                           </h4>
-                          <p className="font-jakarta text-[11px] sm:text-xs text-[#444748] mt-0.5 line-clamp-1">
+                          <p className="font-jakarta text-[11px] text-[#6a7282] mt-0.5 line-clamp-1">
                             {item.desc}
                           </p>
                         </div>
                       </div>
 
                       <div
-                        className={`size-7 sm:size-8 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                        className={`size-6 rounded-full flex items-center justify-center shrink-0 transition-colors ${
                           isActive
-                            ? "bg-[#bc0c11] text-white"
-                            : "bg-gray-50 group-hover:bg-red-50 text-[#bc0c11]"
+                            ? "text-[#bc0c11]"
+                            : "text-gray-400 group-hover:text-[#364153]"
                         }`}
                       >
-                        {isActive ? (
-                          <ChevronRight className="size-4" />
-                        ) : (
-                          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-                        )}
+                        <ChevronRight className="size-3.5" />
                       </div>
                     </div>
                   );

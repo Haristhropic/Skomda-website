@@ -114,28 +114,6 @@ export default function Ts21MetodeSection() {
             </div>
           ))}
         </div>
-
-        {/* Komunitas Belajar & Ekosistem Sinergi Banner */}
-        <div className="rounded-[28px] bg-white p-8 sm:p-10 border-2 border-dashed border-[#d1d5dc]">
-          <div className="flex items-start gap-4">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[#bc0c11] text-white shadow-xs">
-              <Users className="size-6" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#bc0c11] font-jakarta">
-                {isEn ? "Collaborative Synergy" : "Sinergi Kolaboratif"}
-              </span>
-              <h3 className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828] mt-1">
-                {isEn ? "Integrated Learning Community" : "Komunitas Belajar Terpadu"}
-              </h3>
-              <p className="font-jakarta text-xs sm:text-sm text-[#4a5565] leading-relaxed mt-2 max-w-3xl">
-                {isEn
-                  ? "The TS.21 curriculum thrives on active, sustained synergy between the school, Telkom Education Foundation (YPT), educators, students, and industry professionals."
-                  : "Kurikulum TS.21 bergerak aktif melalui sinergi berkelanjutan antara sekolah, Yayasan Pendidikan Telkom (BPK YPT), guru pembina, peserta didik, serta diperkuat oleh nara sumber dan praktisi profesional industri."}
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

@@ -175,7 +175,7 @@ export default function DtpDetailModal({
                   {item.careerProspects.map((career, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold font-jakarta bg-gray-100 text-[#101828] border border-gray-200"
+                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-[#d1d5dc]"
                     >
                       {career}
                     </span>
@@ -195,7 +195,7 @@ export default function DtpDetailModal({
                   {item.tools.map((tool, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold font-jakarta bg-[#bc0c11]/10 text-[#bc0c11] border border-[#bc0c11]/20"
+                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-[#d1d5dc]"
                     >
                       {tool}
                     </span>
@@ -209,9 +209,13 @@ export default function DtpDetailModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="min-h-[44px] px-6 py-2.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer shadow-xs"
+                className="group inline-flex items-center gap-2.5 rounded-full bg-[#bc0c11] px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer font-jakarta"
+                style={{
+                  boxShadow:
+                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                }}
               >
-                Tutup Informasi
+                <span className="leading-none whitespace-nowrap">Tutup Informasi</span>
               </button>
             </div>
           </motion.div>

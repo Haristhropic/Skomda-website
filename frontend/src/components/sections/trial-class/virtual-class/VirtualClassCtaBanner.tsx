@@ -54,7 +54,7 @@ export default function VirtualClassCtaBanner() {
           <div className="shrink-0 w-full sm:w-auto">
             <Link
               href="/ppdb"
-              className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] px-7 py-3.5 text-sm sm:text-base font-jakarta font-bold text-white transition-all duration-200 active:scale-[0.97] cursor-pointer"
+              className="group inline-flex w-full sm:w-auto items-center justify-center gap-2.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] px-7 py-3.5 text-sm sm:text-base font-jakarta font-medium text-white transition-all duration-300 active:scale-[0.98] cursor-pointer"
               style={{
                 boxShadow:
                   "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",

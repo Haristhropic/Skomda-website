@@ -97,51 +97,53 @@ export default function PpdbAlurSection() {
 
           {/* Right Column: Timeline & 4 Steps (7 Cols) */}
           <div className="lg:col-span-7 relative pb-16 sm:pb-20 lg:pb-24 flex flex-col justify-center">
-            
-            {/* Desktop continuous vertical connecting line */}
-            <div
-              className="hidden sm:block absolute left-3 top-8 bottom-12 w-0.5 bg-gray-200"
-              aria-hidden="true"
-            />
+            <div className="relative">
+              {/* Continuous vertical timeline track connecting all nodes with balanced extension below Step 04 */}
+              <div
+                className="absolute top-3.5 bottom-3 left-0 w-6 sm:w-7 flex justify-center pointer-events-none"
+                aria-hidden="true"
+              >
+                <div className="w-0.5 bg-gray-200 h-full" />
+              </div>
 
-            <div className="flex flex-col gap-8 sm:gap-10">
-              {STEPS.map((step, idx) => (
-                <motion.div
-                  key={step.number}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
-                  className="relative flex items-start gap-5 sm:gap-7"
-                >
-                  {/* Step Indicator Node (Concentric Red Circle) */}
-                  <div className="relative z-10 shrink-0 mt-2">
-                    <div className="size-6 sm:size-6.5 rounded-full border-2 border-[#bc0c11] bg-white flex items-center justify-center shadow-xs">
-                      <div className="size-2 sm:size-2.5 rounded-full bg-[#bc0c11]" />
+              <div className="flex flex-col gap-8 sm:gap-10">
+                {STEPS.map((step, idx) => (
+                  <motion.div
+                    key={step.number}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: idx * 0.1, ease: "easeOut" }}
+                    className="relative flex items-start gap-5 sm:gap-7"
+                  >
+                    {/* Step Indicator Node (Concentric Red Circle) */}
+                    <div className="relative z-10 shrink-0 w-6 sm:w-7 flex items-center justify-center mt-1.5">
+                      <div className="size-6 sm:size-7 rounded-full border-2 border-[#bc0c11] bg-white flex items-center justify-center shadow-xs shrink-0">
+                        <div className="size-2 sm:size-2.5 rounded-full bg-[#bc0c11]" />
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Step Number + Content */}
-                  <div className="flex-1 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
-                    {/* Big Red Step Number */}
-                    <span className="font-jakarta font-bold text-4xl sm:text-[44px] text-[#bc0c11] leading-none shrink-0 sm:w-16">
-                      {step.number}
-                    </span>
+                    {/* Step Number + Content */}
+                    <div className="flex-1 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 pb-2">
+                      {/* Big Red Step Number */}
+                      <span className="font-jakarta font-bold text-4xl sm:text-[44px] text-[#bc0c11] leading-none shrink-0 sm:w-16">
+                        {step.number}
+                      </span>
 
-                    {/* Step Title & Description */}
-                    <div className="flex-1">
-                      <h3 className="font-jakarta font-bold text-2xl sm:text-[28px] text-[#101828] leading-tight mb-2">
-                        {isEn ? step.titleEn : step.titleId}
-                      </h3>
-                      <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-lg">
-                        {isEn ? step.descEn : step.descId}
-                      </p>
+                      {/* Step Title & Description */}
+                      <div className="flex-1">
+                        <h3 className="font-jakarta font-bold text-2xl sm:text-[28px] text-[#101828] leading-tight mb-2">
+                          {isEn ? step.titleEn : step.titleId}
+                        </h3>
+                        <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-lg">
+                          {isEn ? step.descEn : step.descId}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
             </div>
-
           </div>
 
         </div>

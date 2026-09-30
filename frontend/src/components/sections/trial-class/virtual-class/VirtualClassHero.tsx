@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Clock, UserCheck } from "lucide-react";
+import { Clock, UserCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -19,26 +19,8 @@ export default function VirtualClassHero({
   const isEn = lang === "EN";
 
   return (
-    <section className="relative w-full overflow-hidden pt-28 sm:pt-32 lg:pt-36 pb-12 sm:pb-16 bg-[#f3f4f6]">
+    <section className="relative w-full overflow-hidden pt-32 sm:pt-36 lg:pt-36 pb-12 sm:pb-16 bg-[#f3f4f6]">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav
-          aria-label="Breadcrumb"
-          className="mb-6 sm:mb-8 flex items-center gap-2 text-xs sm:text-sm font-jakarta text-[#6a7282]"
-        >
-          <Link href="/" className="hover:text-[#bc0c11] transition-colors font-medium">
-            {t("nav.home", "Beranda")}
-          </Link>
-          <ChevronRight className="size-3.5 text-gray-400 shrink-0" />
-          <Link href="/trial-class" className="hover:text-[#bc0c11] transition-colors font-medium">
-            Trial Class
-          </Link>
-          <ChevronRight className="size-3.5 text-gray-400 shrink-0" />
-          <span className="text-[#101828] font-semibold">
-            {t("virtualClass.breadcrumb", "Virtual Class")}
-          </span>
-        </nav>
-
         {/* Personalized Welcome Banner if registered */}
         {ticketCode && (
           <motion.div
@@ -80,6 +62,54 @@ export default function VirtualClassHero({
             transition={{ duration: 0.5 }}
             className="lg:col-span-7 flex flex-col items-start"
           >
+            {/* Breadcrumb Path - aligned and directly connected to the hero title */}
+            <nav
+              aria-label="Breadcrumb"
+              className="flex items-center gap-2 mb-3 sm:mb-4 text-xs sm:text-sm font-jakarta text-[#4a5565] flex-wrap"
+            >
+              <Link href="/" className="hover:text-[#bc0c11] transition-colors">
+                {t("nav.home", "Beranda")}
+              </Link>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="text-[#4a5565] shrink-0"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 12L10 8L6 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <Link href="/trial-class" className="hover:text-[#bc0c11] transition-colors">
+                Trial Class
+              </Link>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="text-[#4a5565] shrink-0"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6 12L10 8L6 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className="font-medium text-[#101828]" aria-current="page">
+                {t("virtualClass.breadcrumb", "Virtual Class")}
+              </span>
+            </nav>
+
             <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] xl:text-[44px] leading-tight text-[#101828] tracking-tight">
               {t("virtualClass.heroTitle1", "Rasakan Pengalaman Belajar di")}{" "}
               <span className="text-[#bc0c11]">
@@ -94,27 +124,27 @@ export default function VirtualClassHero({
               )}
             </p>
 
-            {/* Schedule Info Chip (Date & Time) */}
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4 font-jakarta text-xs sm:text-sm text-[#364153]">
-              <div className="inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2.5 shadow-2xs border border-gray-200/80">
+            {/* Schedule Info (Flat, minimal — no pill wrappers) */}
+            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-jakarta text-sm text-[#364153]">
+              <div className="inline-flex items-center gap-2">
                 <Image
                   src="/images/trial-class/calendar-3d-icon.png"
-                  alt="Calendar"
-                  width={20}
-                  height={20}
-                  className="object-contain"
+                  alt="Tanggal"
+                  width={18}
+                  height={18}
+                  className="object-contain opacity-70"
                   unoptimized
                 />
-                <span className="font-semibold text-[#101828]">
+                <span className="font-medium text-[#364153]">
                   {t("virtualClass.eventDate", "Minggu, 30 Oktober 2026")}
                 </span>
               </div>
 
-              <div className="hidden sm:block h-4 w-px bg-gray-300" />
+              <span className="text-gray-300 font-light select-none">|</span>
 
-              <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 shadow-2xs border border-gray-200/80">
-                <Clock className="size-4 text-[#bc0c11]" />
-                <span className="font-semibold text-[#101828]">
+              <div className="inline-flex items-center gap-2">
+                <Clock className="size-4 text-[#364153] opacity-60" />
+                <span className="font-medium text-[#364153]">
                   {t("virtualClass.eventTime", "09.00 - 12.30 WIB")}
                 </span>
               </div>

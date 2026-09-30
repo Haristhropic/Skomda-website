@@ -216,7 +216,11 @@ export default function BkkTalentaSection() {
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#bc0c11] text-xs sm:text-sm font-jakarta font-bold text-white hover:bg-[#990a0e] transition-colors shadow-sm"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#bc0c11] text-xs sm:text-sm font-jakarta font-medium text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] cursor-pointer"
+                style={{
+                  boxShadow:
+                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                }}
               >
                 <span>{isEn ? "Contact Talent via BKK" : "Hubungi Talenta via BKK"}</span>
                 <Send className="size-3.5" />

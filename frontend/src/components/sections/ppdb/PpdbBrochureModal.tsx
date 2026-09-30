@@ -109,7 +109,11 @@ export default function PpdbBrochureModal({
                 <a
                   href={fileUrl}
                   download
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-4 py-2 text-xs sm:text-sm font-semibold font-jakarta shadow-xs transition-colors min-h-[44px] cursor-pointer"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-5 py-2.5 text-xs sm:text-sm font-medium font-jakarta transition-all duration-200 min-h-[44px] cursor-pointer active:scale-[0.98]"
+                  style={{
+                    boxShadow:
+                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                  }}
                   title={isEn ? "Download PDF" : "Unduh PDF"}
                 >
                   <Download className="size-4" />

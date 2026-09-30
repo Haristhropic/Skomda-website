@@ -20,7 +20,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
   };
 
   return (
-    <section className="relative w-full pt-28 sm:pt-32 lg:pt-36 pb-12 sm:pb-16 overflow-hidden">
+    <section className="relative w-full pt-24 sm:pt-28 lg:pt-28 pb-12 sm:pb-16 overflow-hidden">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {/* Top Hero Row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
@@ -254,7 +254,11 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                 <button
                   type="button"
                   onClick={onOpenRegister}
-                  className="w-full sm:w-auto lg:w-[200px] group inline-flex items-center justify-center gap-2.5 px-6 py-3 min-h-[46px] rounded-full bg-[#bc0c11] text-white font-jakarta font-semibold text-sm sm:text-base hover:bg-[#990a0e] shadow-md hover:shadow-lg transition-all active:scale-[0.98] cursor-pointer"
+                  className="w-full sm:w-auto lg:w-[200px] group inline-flex items-center justify-center gap-2.5 px-6 py-3 min-h-[46px] rounded-full bg-[#bc0c11] text-white font-jakarta font-medium text-sm sm:text-base hover:bg-[#990a0e] transition-all duration-300 active:scale-[0.98] cursor-pointer"
+                  style={{
+                    boxShadow:
+                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                  }}
                 >
                   <span className="whitespace-nowrap">{t("trialClassPage.registerNow", "Daftar Sekarang")}</span>
                   <svg

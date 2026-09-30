@@ -49,6 +49,27 @@ export default function ProfilHeroSection() {
             {/* Breadcrumbs */}
             <div className="flex items-center gap-2 mb-4 text-sm font-jakarta">
               <Link
+                href="/"
+                className="text-[#4a5565] hover:text-[#bc0c11] transition-colors"
+              >
+                {t("nav.home", "Beranda")}
+              </Link>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 16 16"
+                fill="none"
+                className="text-[#4a5565] shrink-0"
+              >
+                <path
+                  d="M6 12L10 8L6 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <Link
                 href="/tentang-kami/profil-sekolah"
                 className="text-[#4a5565] hover:text-[#bc0c11] transition-colors"
               >
@@ -71,6 +92,7 @@ export default function ProfilHeroSection() {
               </svg>
               <span className="font-medium text-[#101828]">{t("profilSekolah.breadcrumb", "Profil Sekolah")}</span>
             </div>
+
 
             {/* Main Heading */}
             <div className="relative mb-6">

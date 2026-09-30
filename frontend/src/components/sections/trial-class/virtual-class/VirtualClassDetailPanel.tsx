@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Clock, CheckCircle2, XCircle, RotateCcw, ExternalLink, Sparkles, Award } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, RotateCcw, ExternalLink, Sparkles, ArrowLeft } from "lucide-react";
 import { VirtualClassDtpItem } from "@/data/virtualClassData";
 
 interface VirtualClassDetailPanelProps {
@@ -45,39 +45,27 @@ export default function VirtualClassDetailPanel({
 
   return (
     <div className="w-full bg-white border border-[#dfdfe0] rounded-[16px] p-5 sm:p-7 lg:p-8 drop-shadow-[0px_1px_2px_rgba(0,0,0,0.25)] flex flex-col gap-6 transition-all duration-300">
-      {/* ─── Top Header: Back Button, Title, and Duration Badge ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-100">
-        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+      {/* ─── Top Header: Back Button (Kotak Kecil), Title, and Duration Badge ─── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-gray-100">
+        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
           <button
             type="button"
             onClick={onBack}
             aria-label="Kembali ke semua program"
-            className="group flex items-center justify-center size-10 sm:size-11 rounded-xl bg-gray-50 hover:bg-red-50 text-[#bc0c11] border border-gray-200/80 hover:border-red-200 transition-all duration-200 shrink-0 cursor-pointer active:scale-95"
+            className="size-9 sm:size-10 rounded-[10px] border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-[#364153] hover:text-[#101828] flex items-center justify-center shrink-0 transition-all duration-150 cursor-pointer shadow-xs active:scale-95"
           >
-            <svg
-              className="size-5 transition-transform duration-200 group-hover:-translate-x-1"
-              viewBox="0 0 42 39"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M32 19.5H10M19.625 10L10 19.5L19.625 29" />
-            </svg>
+            <ArrowLeft className="size-4.5" />
           </button>
 
-          <h2 className="font-jakarta font-bold text-xl sm:text-2xl lg:text-[28px] text-[#101828] truncate leading-tight">
+          <h2 className="font-jakarta font-bold text-xl sm:text-2xl lg:text-[28px] text-[#101828] leading-normal pb-0.5 truncate">
             {item.title}
           </h2>
         </div>
 
         {/* Duration Badge */}
-        <div className="self-start sm:self-auto inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f3f4f6] text-[#364153] border border-gray-200/90 shrink-0">
-          <Clock className="size-4 text-[#4a5565]" />
-          <span className="font-jakarta font-semibold text-xs sm:text-sm text-[#364153]">
-            {item.duration}
-          </span>
+        <div className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f3f4f6] text-[#364153] border border-gray-200/90 shrink-0 font-jakarta text-xs sm:text-sm font-semibold">
+          <Clock className="size-3.5 text-[#4a5565]" />
+          <span>{item.duration}</span>
         </div>
       </div>
 
@@ -132,31 +120,18 @@ export default function VirtualClassDetailPanel({
         <p className="font-jakarta text-sm sm:text-base text-[#364153] leading-relaxed">
           {item.lessonDesc}
         </p>
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-[#bc0c11] bg-red-50 px-2.5 py-1 rounded-md border border-red-100">
-            Mentor: {item.mentor}
-          </span>
-          {item.topics.map((t, idx) => (
-            <span
-              key={idx}
-              className="text-xs text-gray-600 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-200/70"
-            >
-              • {t}
-            </span>
-          ))}
-        </div>
       </div>
 
       {/* ─── Interactive Quiz Box: "Yuk, Cek Pemahamanmu!" ─── */}
-      <div className="bg-white border-2 border-[#dfdfe0] rounded-[16px] p-5 sm:p-6 lg:p-7 shadow-sm flex flex-col gap-4">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 lg:p-7 shadow-sm flex flex-col gap-4">
         {/* Quiz Header */}
         <div className="flex items-center gap-3.5">
-          <div className="size-12 sm:size-14 rounded-full bg-[rgba(188,12,17,0.1)] flex items-center justify-center shrink-0 border border-red-100">
+          <div className="size-10 sm:size-12 flex items-center justify-center shrink-0">
             <Image
               src="/images/trial-class/quiz-badge-icon.png"
               alt="Quiz Badge"
-              width={34}
-              height={34}
+              width={40}
+              height={40}
               className="object-contain"
             />
           </div>
@@ -177,27 +152,37 @@ export default function VirtualClassDetailPanel({
           </p>
         </div>
 
-        {/* Multiple Choice Options */}
+        {/* Multiple Choice Options - Minimalist & Professional */}
         <div className="flex flex-col gap-2.5">
           {item.quiz.options.map((optionText, optIdx) => {
             const isSelected = selectedOption === optIdx;
             const isOptionCorrect = optIdx === item.quiz.correctIndex;
+            const optionLetter = String.fromCharCode(65 + optIdx); // A, B, C, D
 
-            let rowClasses = "bg-white border-[#dfdfe0] hover:border-gray-400 hover:bg-gray-50/50";
-            let radioClasses = "border-gray-300 bg-white";
+            // Clean minimalist & professional styling without any neon
+            let containerStyles = "bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50/50 text-[#364153]";
+            let badgeStyles = "bg-gray-100 text-[#4a5565]";
+            let radioBorder = "border-gray-300";
+            let textStyles = "text-[#364153]";
 
-            if (isSelected) {
-              rowClasses = "bg-red-50/40 border-[#bc0c11] shadow-xs";
-              radioClasses = "border-[#bc0c11] bg-white";
+            if (isSelected && !hasCheckedAnswer) {
+              containerStyles = "bg-red-50/20 border border-[#bc0c11]/60 text-[#101828]";
+              badgeStyles = "bg-[#bc0c11] text-white";
+              radioBorder = "border-[#bc0c11]";
+              textStyles = "text-[#101828] font-medium";
             }
 
             if (hasCheckedAnswer) {
               if (isOptionCorrect) {
-                rowClasses = "bg-emerald-50 border-emerald-500 text-emerald-950 font-medium";
-                radioClasses = "border-emerald-600 bg-emerald-600 text-white";
+                containerStyles = "bg-emerald-50/60 border border-emerald-500 text-emerald-950";
+                badgeStyles = "bg-emerald-600 text-white";
+                radioBorder = "border-emerald-500";
+                textStyles = "text-emerald-950 font-medium";
               } else if (isSelected && !isOptionCorrect) {
-                rowClasses = "bg-rose-50 border-rose-400 text-rose-950";
-                radioClasses = "border-rose-500 bg-rose-500 text-white";
+                containerStyles = "bg-rose-50/60 border border-rose-400 text-rose-950";
+                badgeStyles = "bg-rose-600 text-white";
+                radioBorder = "border-rose-400";
+                textStyles = "text-rose-950 font-medium";
               }
             }
 
@@ -212,27 +197,34 @@ export default function VirtualClassDetailPanel({
                     setHasCheckedAnswer(false);
                   }
                 }}
-                className={`w-full text-left rounded-[8px] border px-4 py-3 flex items-center gap-3.5 transition-all duration-200 cursor-pointer ${rowClasses}`}
+                className={`w-full text-left rounded-xl px-4 py-3 flex items-center justify-between gap-3.5 transition-colors duration-150 cursor-pointer ${containerStyles}`}
               >
-                {/* Radio Indicator */}
-                <div
-                  className={`size-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${radioClasses}`}
-                >
-                  {hasCheckedAnswer ? (
-                    isOptionCorrect ? (
-                      <CheckCircle2 className="size-3.5 text-white" />
-                    ) : isSelected ? (
-                      <XCircle className="size-3.5 text-white" />
-                    ) : null
-                  ) : isSelected ? (
-                    <div className="size-2.5 rounded-full bg-[#bc0c11]" />
-                  ) : null}
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  {/* Option Badge (A, B, C, D) */}
+                  <div className={`w-8 h-8 rounded-lg font-jakarta font-bold text-xs flex items-center justify-center shrink-0 ${badgeStyles}`}>
+                    {optionLetter}
+                  </div>
+
+                  {/* Option Text */}
+                  <span className={`font-jakarta text-xs sm:text-sm leading-relaxed ${textStyles}`}>
+                    {optionText}
+                  </span>
                 </div>
 
-                {/* Option Text */}
-                <span className="font-jakarta text-xs sm:text-sm text-[#364153] leading-relaxed">
-                  {optionText}
-                </span>
+                {/* State Indicator */}
+                <div className="shrink-0 flex items-center justify-center">
+                  {hasCheckedAnswer && isOptionCorrect ? (
+                    <CheckCircle2 className="size-5 text-emerald-600" />
+                  ) : hasCheckedAnswer && isSelected && !isOptionCorrect ? (
+                    <XCircle className="size-5 text-rose-500" />
+                  ) : (
+                    <div className={`size-4.5 w-[18px] h-[18px] rounded-full border flex items-center justify-center bg-white ${radioBorder}`}>
+                      {isSelected && (
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#bc0c11]" />
+                      )}
+                    </div>
+                  )}
+                </div>
               </button>
             );
           })}
@@ -245,7 +237,13 @@ export default function VirtualClassDetailPanel({
               type="button"
               disabled={selectedOption === null}
               onClick={handleCheckAnswer}
-              className="w-full sm:w-auto self-start px-6 py-2.5 rounded-xl font-jakarta font-bold text-sm text-white bg-[#bc0c11] hover:bg-[#a00a0e] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0px_4px_12px_rgba(188,12,17,0.25)] active:scale-98 cursor-pointer"
+              className="w-full sm:w-auto self-start px-6 py-2.5 rounded-full font-jakarta font-medium text-sm text-white bg-[#bc0c11] hover:bg-[#990a0e] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98] cursor-pointer"
+              style={{
+                boxShadow:
+                  selectedOption !== null
+                    ? "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)"
+                    : undefined,
+              }}
             >
               Periksa Jawaban
             </button>
@@ -289,14 +287,14 @@ export default function VirtualClassDetailPanel({
                   <button
                     type="button"
                     onClick={handleResetQuiz}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-jakarta font-semibold text-xs transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-jakarta font-medium text-xs transition-all duration-200 active:scale-[0.98] cursor-pointer"
                   >
                     <RotateCcw className="size-3.5" />
                     <span>Coba Lagi</span>
                   </button>
                 ) : (
                   <>
-                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-100/90 text-emerald-800 font-jakarta font-bold text-xs">
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-100/90 text-emerald-800 font-jakarta font-semibold text-xs">
                       <Sparkles className="size-3.5 text-emerald-600" />
                       <span>Modul {item.title} Selesai</span>
                     </div>
@@ -305,7 +303,11 @@ export default function VirtualClassDetailPanel({
                       <button
                         type="button"
                         onClick={onNextClass}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#bc0c11] hover:bg-[#a00a0e] text-white font-jakarta font-bold text-xs shadow-sm transition-all cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white font-jakarta font-medium text-xs transition-all duration-200 cursor-pointer active:scale-[0.98]"
+                        style={{
+                          boxShadow:
+                            "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                        }}
                       >
                         <span>Materi Berikutnya</span>
                         <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

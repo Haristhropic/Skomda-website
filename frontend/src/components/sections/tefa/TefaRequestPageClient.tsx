@@ -266,7 +266,11 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
                   <button
                     type="button"
                     onClick={() => setIsSent(false)}
-                    className="mt-6 px-6 py-2.5 rounded-full bg-[#bc0c11] text-white text-sm font-semibold font-jakarta hover:bg-[#990a0e] transition-colors"
+                    className="mt-6 px-6 py-2.5 rounded-full bg-[#bc0c11] text-white text-sm font-medium font-jakarta hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] cursor-pointer"
+                    style={{
+                      boxShadow:
+                        "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                    }}
                   >
                     {isEn ? "Send Another Request" : "Kirim Request Lain"}
                   </button>

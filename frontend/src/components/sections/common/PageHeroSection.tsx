@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -63,6 +64,11 @@ export default function PageHeroSection({
   titleHighlightClassName,
 }: PageHeroSectionProps) {
   const isImageRight = imagePosition === "right";
+
+  // Scroll to top on mount so navigating between pages always starts at the top
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
   const resolvedImageColSpan =
     imageColSpan || (isIntegratedArtwork ? "lg:col-span-6" : "lg:col-span-5");
   const resolvedTextColSpan =
@@ -114,7 +120,7 @@ export default function PageHeroSection({
   return (
     <section
       className={`relative w-full ${
-        sectionPaddingClassName || "pt-32 sm:pt-36 lg:pt-40 pb-16 lg:pb-24"
+        sectionPaddingClassName || "pt-24 sm:pt-28 lg:pt-28 pb-16 lg:pb-24"
       } bg-[#f8f9fb] overflow-hidden`}
     >
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">

@@ -13,7 +13,7 @@ export default function PpdbHeroSection({ onOpenBrochure }: PpdbHeroSectionProps
   const { isEn } = useLanguage();
 
   return (
-    <section className="relative w-full pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-44 lg:pb-28 bg-[#f3f4f6] overflow-hidden">
+    <section className="relative w-full pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-36 lg:pb-24 bg-[#f3f4f6] overflow-hidden">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
 

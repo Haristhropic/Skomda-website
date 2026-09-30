@@ -41,7 +41,7 @@ export default function K3EmergencySection() {
         "k3.p3kDesc",
         "Kotak Pertolongan Pertama tersedia di setiap lantai dan ruang instruktur, didukung ruang UKS dengan petugas siap siaga."
       ),
-      location: isEn ? "Ground Floor Building A (Beside Lobby)" : "Gedung A Lantai 1 (Samping Lobi)",
+      location: isEn ? "Ground Floor Building A" : "Gedung A Lantai 1",
     },
     {
       id: "evacuation",

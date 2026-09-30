@@ -13,6 +13,10 @@ export default function PpdbClient() {
   const [activeBrochure, setActiveBrochure] = useState<DocumentItem | null>(null);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
+
+  useEffect(() => {
     let isMounted = true;
     getActiveBrochure()
       .then((data) => {

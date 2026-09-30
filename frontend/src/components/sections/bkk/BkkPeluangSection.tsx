@@ -484,7 +484,7 @@ export default function BkkPeluangSection() {
             <div className="pt-4 border-t border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
               <button
                 onClick={() => copyEmail(selectedJob.applyEmail)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-xs sm:text-sm font-jakarta font-semibold text-[#4a5565] hover:border-[#bc0c11] hover:text-[#bc0c11] transition-colors cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-xs sm:text-sm font-jakarta font-medium text-[#4a5565] hover:border-[#bc0c11] hover:text-[#bc0c11] transition-all duration-200 active:scale-[0.98] cursor-pointer"
               >
                 <span>
                   {copied
@@ -500,7 +500,11 @@ export default function BkkPeluangSection() {
 
               <a
                 href={`mailto:${selectedJob.applyEmail}?subject=Lamaran%20Posisi%20${encodeURIComponent(selectedJob.title)}%20-%20Alumni%20SMK%20Telkom%20Sidoarjo`}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#bc0c11] text-xs sm:text-sm font-jakarta font-bold text-white hover:bg-[#990a0e] transition-colors shadow-sm cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#bc0c11] text-xs sm:text-sm font-jakarta font-medium text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] cursor-pointer"
+                style={{
+                  boxShadow:
+                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
+                }}
               >
                 <span>{isEn ? "Submit Application / CV" : "Kirim Lamaran / CV"}</span>
                 <Send className="size-4" />
