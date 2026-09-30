@@ -4,7 +4,7 @@ import Footer from "@/components/layout/Footer";
 import PpdbClient from "@/components/sections/ppdb/PpdbClient";
 
 export const metadata: Metadata = {
-  title: "PPDB | SMK Telkom Sidoarjo",
+  title: "Pendaftaran Siswa Baru (PPDB)",
   description:
     "Daftar sekarang ke SMK Telkom Sidoarjo. Ikuti alur pendaftaran PPDB resmi untuk jurusan SIJA (4 Tahun), TJKT (3 Tahun), dan RPL. Mulai perjalanan digital vokasionalmu bersama kami.",
   keywords: [
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "Alur Pendaftaran SMK",
   ],
   openGraph: {
-    title: "PPDB | SMK Telkom Sidoarjo",
+    title: "Pendaftaran Siswa Baru (PPDB)",
     description:
       "Daftar sekarang ke SMK Telkom Sidoarjo. Ikuti alur pendaftaran PPDB resmi dan mulai perjalanan digital vokasionalmu.",
     url: "https://smktelkom-sda.sch.id/ppdb",

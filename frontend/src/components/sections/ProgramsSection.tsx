@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
 
 export default function ProgramsSection() {
   const { t, isEn } = useLanguage();
@@ -93,7 +94,7 @@ export default function ProgramsSection() {
             <div className="order-2 lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:row-span-4 flex items-center justify-center">
               <div className="relative w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
                 <Image
-                  src="/images/program/profil-jurusan/jurusan-sija-character.png"
+                  src={getCloudinaryUrl("/images/program/profil-jurusan/jurusan-sija-character.png", { width: 840, quality: "auto:good" })}
                   alt="Siswi SIJA SMK Telkom Sidoarjo"
                   fill
                   priority
@@ -227,7 +228,7 @@ export default function ProgramsSection() {
             <div className="order-2 lg:col-span-5 lg:col-start-1 lg:row-start-1 lg:row-span-4 flex items-center justify-center">
               <div className="relative w-full max-w-[260px] sm:max-w-[320px] lg:max-w-[420px] aspect-[446/557] flex items-center justify-center">
                 <Image
-                  src="/images/program/profil-jurusan/jurusan-tjat-curved.png"
+                  src={getCloudinaryUrl("/images/program/profil-jurusan/jurusan-tjat-curved.png", { width: 840, quality: "auto:good" })}
                   alt="Siswa TJAT SMK Telkom Sidoarjo"
                   fill
                   priority

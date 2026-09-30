@@ -4,11 +4,11 @@ import DigitalTalentClient from "@/components/sections/digital-talent/DigitalTal
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Digital Talent Program (DTP)",
   description:
     "Program percepatan talenta digital SMK Telkom Sidoarjo melalui sertifikasi internasional Cisco, Mikrotik, BNSP, serta pembinaan intensif cloud & software development.",
   openGraph: {
-    title: "SMK Telkom Sidoarjo",
+    title: "Digital Talent Program (DTP)",
     description: "Pembekalan talenta digital berstandar industri internasional di SMK Telkom Sidoarjo.",
     images: [
       {

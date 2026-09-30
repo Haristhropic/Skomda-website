@@ -4,7 +4,7 @@ import Footer from "@/components/layout/Footer";
 import TrialClassClient from "@/components/sections/trial-class/TrialClassClient";
 
 export const metadata: Metadata = {
-  title: "Trial Class | SMK Telkom Sidoarjo",
+  title: "Trial Class",
   description:
     "Ikuti Virtual Class untuk merasakan langsung suasana belajar di SMK Telkom Sidoarjo, mengenal metode pembelajaran: semuanya dari mana saja.",
   keywords: [
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "SMK Telkom Sidoarjo",
   ],
   openGraph: {
-    title: "Trial Class | SMK Telkom Sidoarjo",
+    title: "Trial Class",
     description:
       "Ikuti Virtual Class untuk merasakan langsung suasana belajar di SMK Telkom Sidoarjo, mengenal metode pembelajaran: semuanya dari mana saja.",
     url: "https://smktelkom-sda.sch.id/trial-class",

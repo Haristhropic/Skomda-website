@@ -8,7 +8,7 @@ import KeunggulanSertifikasiSection from "@/components/sections/profil-jurusan/K
 import ProspekKarirSection from "@/components/sections/profil-jurusan/ProspekKarirSection";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Program Keahlian SIJA & TJAT",
   description:
     "Profil Jurusan Unggulan SMK Telkom Sidoarjo: Sistem Informasi Jaringan dan Aplikasi (SIJA) dan Teknik Jaringan Akses Telekomunikasi (TJAT). Kurikulum relevan industri dan sertifikasi internasional.",
   keywords: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "Sertifikasi BNSP Mikrotik Cisco Skomda",
   ],
   openGraph: {
-    title: "SMK Telkom Sidoarjo",
+    title: "Program Keahlian SIJA & TJAT",
     description:
       "Profil Jurusan Unggulan SMK Telkom Sidoarjo: SIJA & TJAT berstandar industri.",
     images: [

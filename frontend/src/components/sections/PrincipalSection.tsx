@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
 
 export default function PrincipalSection() {
   const { t } = useLanguage();
@@ -81,7 +82,7 @@ export default function PrincipalSection() {
               >
                 <div className="relative w-full h-full scale-[1.10] origin-bottom">
                   <Image
-                    src="/images/home/kepsek.png"
+                    src={getCloudinaryUrl("/images/home/kepsek.png", { width: 600, quality: "auto:good" })}
                     alt="Abror S.Hum., M.Pd. - Kepala Sekolah SMK Telkom Sidoarjo"
                     fill
                     sizes="(max-width: 640px) 240px, (max-width: 1024px) 300px, 400px"

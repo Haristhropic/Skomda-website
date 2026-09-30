@@ -7,7 +7,7 @@ import AkreditasiSection from "@/components/sections/profil/AkreditasiSection";
 import StrukturOrganisasiSection from "@/components/sections/profil/StrukturOrganisasiSection";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Profil Sekolah & Visi Misi",
   description:
     "SMK Telkom Sidoarjo adalah SMK Teknologi dan Informatika di bawah Yayasan Pendidikan Telkom berakreditasi A (Unggul) dan ISO 21001:2018. Menghasilkan lulusan tangguh, berakhlak, dan berwawasan digital.",
   keywords: [
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "SMK IT Jawa Timur",
   ],
   openGraph: {
-    title: "SMK Telkom Sidoarjo",
+    title: "Profil Sekolah & Visi Misi",
     description:
       "SMK Telkom Sidoarjo adalah SMK Teknologi dan Informatika di bawah Yayasan Pendidikan Telkom berakreditasi A (Unggul) dan ISO 21001:2018.",
     images: [

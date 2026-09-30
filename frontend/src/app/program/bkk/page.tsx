@@ -10,11 +10,11 @@ import BkkKerjasamaSection from "@/components/sections/bkk/BkkKerjasamaSection";
 import BkkMitraSection from "@/components/sections/bkk/BkkMitraSection";
 
 export const metadata: Metadata = {
-  title: "Bursa Kerja Khusus (BKK) - SMK Telkom Sidoarjo",
+  title: "Bursa Kerja Khusus (BKK)",
   description:
     "Bursa Kerja Khusus (BKK) SMK Telkom Sidoarjo menghubungkan siswa dan alumni SIJA serta TJAT dengan peluang kerja, magang industri, dan kemitraan perusahaan terkemuka.",
   openGraph: {
-    title: "Bursa Kerja Khusus (BKK) - SMK Telkom Sidoarjo",
+    title: "Bursa Kerja Khusus (BKK)",
     description:
       "Pusat karier, lowongan kerja, magang industri, dan penyaluran talenta vokasi SMK Telkom Sidoarjo.",
     images: [

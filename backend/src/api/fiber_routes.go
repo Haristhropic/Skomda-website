@@ -642,7 +642,14 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		// Fallback simpan lokal jika koneksi Cloudinary offline
 		ext := filepath.Ext(fileHeader.Filename)
 		uniqueName := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), slugify(strings.TrimSuffix(fileHeader.Filename, ext)), ext)
-		localDir := "../frontend/public/uploads"
+		localDir := os.Getenv("UPLOAD_DIR")
+		if localDir == "" {
+			if _, err := os.Stat("../frontend/public"); err == nil {
+				localDir = "../frontend/public/uploads"
+			} else {
+				localDir = "./uploads"
+			}
+		}
 		_ = os.MkdirAll(localDir, 0755)
 		destPath := filepath.Join(localDir, uniqueName)
 		if err := c.SaveFile(fileHeader, destPath); err != nil {
@@ -730,7 +737,14 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			cleanBase = "dokumen"
 		}
 		uniqueName := fmt.Sprintf("%s-%d%s", cleanBase, time.Now().Unix(), ext)
-		localDir := "../frontend/public/documents"
+		localDir := os.Getenv("DOCUMENTS_DIR")
+		if localDir == "" {
+			if _, err := os.Stat("../frontend/public"); err == nil {
+				localDir = "../frontend/public/documents"
+			} else {
+				localDir = "./documents"
+			}
+		}
 		_ = os.MkdirAll(localDir, 0755)
 		destPath := filepath.Join(localDir, uniqueName)
 		if err := c.SaveFile(fileHeader, destPath); err != nil {

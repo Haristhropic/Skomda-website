@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
 
 export default function HeroSection() {
   const { t } = useLanguage();
@@ -67,10 +68,10 @@ export default function HeroSection() {
         </div>
 
         {/* ── Student Hero Image (Figma Redesign Node 551:6) ── */}
-        <div className="relative z-10 mt-3 sm:mt-5 mb-[-20px] sm:mb-[-32px] xl:mb-0 xl:mt-0 xl:absolute xl:right-0 xl:bottom-[160px] 2xl:bottom-[165px] xl:w-[720px] 2xl:w-[770px] xl:h-[455px] 2xl:h-[485px] pointer-events-none flex items-end justify-center xl:justify-end">
+        <div className="relative z-10 mt-3 sm:mt-5 mb-[-20px] sm:mb-[-32px] xl:mb-0 xl:mt-0 xl:absolute xl:right-0 xl:bottom-[115px] 2xl:bottom-[118px] xl:w-[720px] 2xl:w-[770px] xl:h-[455px] 2xl:h-[485px] pointer-events-none flex items-end justify-center xl:justify-end">
           <div className="relative w-full max-w-[500px] sm:max-w-[560px] xl:max-w-none aspect-[1774/887] xl:h-full">
             <Image
-              src="/images/home/hero/home-hero-students.png"
+              src={getCloudinaryUrl("/images/home/hero/home-hero-students.png", { width: 1400, quality: "auto:good" })}
               alt="Siswa-Siswi SMK Telkom Sidoarjo"
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 560px, 770px"

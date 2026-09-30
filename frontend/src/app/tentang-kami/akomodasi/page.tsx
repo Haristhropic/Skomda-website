@@ -7,7 +7,7 @@ import RekomendasiKosSection from "@/components/sections/akomodasi/RekomendasiKo
 import TipsAkomodasiSection from "@/components/sections/akomodasi/TipsAkomodasiSection";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Akomodasi & Rekomendasi Kos Siswa",
   description:
     "Informasi akomodasi dan estimasi biaya hidup siswa SMK Telkom Sidoarjo secara transparan. Rekomendasi kos, asrama, dan kontrakan aman dan nyaman di sekitar kampus.",
   keywords: [
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "Kos Putri Sidoarjo Kota",
   ],
   openGraph: {
-    title: "SMK Telkom Sidoarjo",
+    title: "Akomodasi & Rekomendasi Kos Siswa",
     description:
       "Informasi akomodasi dan estimasi biaya hidup siswa SMK Telkom Sidoarjo secara transparan.",
     images: [

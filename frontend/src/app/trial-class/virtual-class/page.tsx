@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import VirtualClassPageClient from "@/components/sections/trial-class/virtual-class/VirtualClassPageClient";
 
 export const metadata: Metadata = {
-  title: "Virtual Class - Digital Talent Program | SMK Telkom Sidoarjo",
+  title: "Virtual Class - Digital Talent Program",
   description:
     "Jelajahi Digital Talent Program (DTP) SMK Telkom Sidoarjo melalui sesi interaktif Virtual Class, 9 bidang peminatan IT unggulan, dan pengalaman belajar digital langsung.",
   keywords: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "IoT SMK Telkom",
   ],
   openGraph: {
-    title: "Virtual Class - Digital Talent Program | SMK Telkom Sidoarjo",
+    title: "Virtual Class - Digital Talent Program",
     description:
       "Jelajahi Digital Talent Program (DTP) SMK Telkom Sidoarjo melalui sesi interaktif Virtual Class, 9 bidang peminatan IT unggulan, dan pengalaman belajar digital langsung.",
     url: "https://smktelkom-sda.sch.id/trial-class/virtual-class",

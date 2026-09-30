@@ -4,11 +4,11 @@ import PrestasiClient from "@/components/sections/prestasi/PrestasiClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Prestasi & Rekam Jejak Juara",
   description:
     "Daftar prestasi dan rekam jejak juara siswa SMK Telkom Sidoarjo di tingkat regional, nasional, dan internasional di bidang teknologi informasi dan kompetensi vokasi.",
   openGraph: {
-    title: "SMK Telkom Sidoarjo",
+    title: "Prestasi & Rekam Jejak Juara",
     description: "Rekam jejak juara dan penghargaan siswa SMK Telkom Sidoarjo.",
     images: [
       {

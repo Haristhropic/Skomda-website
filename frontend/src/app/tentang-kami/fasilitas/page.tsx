@@ -4,7 +4,7 @@ import FasilitasClient from "@/components/sections/fasilitas/FasilitasClient";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Fasilitas & Sarana Prasarana",
   description:
     "Fasilitas lengkap dan modern berstandar industri di SMK Telkom Sidoarjo: laboratorium jaringan fiber optik, lab komputer canggih, studio multimedia, dan sarana olahraga representatif.",
   openGraph: {

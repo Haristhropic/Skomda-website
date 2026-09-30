@@ -4,7 +4,7 @@ import Footer from "@/components/layout/Footer";
 import TefaOverviewClient from "@/components/sections/tefa/TefaOverviewClient";
 
 export const metadata: Metadata = {
-  title: "Teaching Factory (TeFa) | SMK Telkom Sidoarjo",
+  title: "Teaching Factory (TeFa)",
   description:
     "Teaching Factory (TEFA) SMK Telkom Sidoarjo adalah konsep pembelajaran berbasis produksi yang menggabungkan kompetensi siswa dengan kebutuhan industri untuk menghasilkan karya nyata berkualitas.",
   keywords: [
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "PBL SMK Telkom Sidoarjo",
   ],
   openGraph: {
-    title: "Teaching Factory (TeFa) | SMK Telkom Sidoarjo",
+    title: "Teaching Factory (TeFa)",
     description:
       "Konsep pembelajaran berbasis produksi yang menggabungkan kompetensi siswa dengan kebutuhan industri untuk menghasilkan karya nyata.",
     images: [

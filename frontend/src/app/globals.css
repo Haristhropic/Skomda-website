@@ -214,3 +214,23 @@ textarea.custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-size: 200% 100%;
   animation: shimmerWave 2.2s linear infinite;
 }
+
+@layer components {
+  /* Standarisasi Tombol Publik (Pill Shape) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 font-jakarta font-semibold rounded-full bg-[#bc0c11] text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bc0c11] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 font-jakarta font-medium rounded-full bg-white text-[#101828] border border-gray-200/90 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 active:scale-[0.98] shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bc0c11] focus-visible:ring-offset-2 cursor-pointer;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 font-jakarta font-semibold rounded-full bg-transparent text-[#bc0c11] border-2 border-[#bc0c11] hover:bg-[#bc0c11] hover:text-white transition-all duration-200 active:scale-[0.98] cursor-pointer;
+  }
+
+  /* Standarisasi Tombol Admin / Form (Rounded-XL) */
+  .btn-admin {
+    @apply inline-flex items-center justify-center gap-2 font-jakarta font-semibold rounded-xl bg-[#bc0c11] text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bc0c11] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
+  }
+}

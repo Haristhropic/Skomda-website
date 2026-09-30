@@ -6,7 +6,7 @@ import BeritaPageClient from "@/components/sections/berita/BeritaPageClient";
 import { getNewsList } from "@/services/news";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Berita & Agenda Terkini",
   description:
     "Portal Berita & Informasi Terkini SMK Telkom Sidoarjo: Kegiatan sekolah, prestasi siswa, kemitraan industri, dan perkembangan teknologi.",
   keywords: [

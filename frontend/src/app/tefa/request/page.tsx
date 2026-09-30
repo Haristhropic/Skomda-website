@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import TefaRequestPageClient from "@/components/sections/tefa/TefaRequestPageClient";
 
 export const metadata: Metadata = {
-  title: "Request Project Teaching Factory (TeFa) | SMK Telkom Sidoarjo",
+  title: "Ajukan Project TeFa",
   description:
     "Ajukan konsultasi dan kebutuhan proyek digital Anda bersama tim Teaching Factory SMK Telkom Sidoarjo.",
   keywords: [

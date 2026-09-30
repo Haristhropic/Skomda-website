@@ -99,17 +99,17 @@ export default function DocumentUploadField({
       formData.append("file", file);
       formData.append("folder", folder);
 
-      // Coba upload lewat Next.js API route terlebih dahulu
-      let uploadRes = await fetch("/api/upload/document", {
+      // Prioritaskan upload ke Go backend API (Cloudinary Raw Storage)
+      let uploadRes = await fetch(`${API_BASE_URL}/upload/document`, {
         method: "POST",
+        credentials: "include",
         body: formData,
       });
 
-      // Jika gagal atau tidak tersedia, fallback ke Go backend API
+      // Jika backend belum aktif atau offline di lingkungan lokal, fallback ke Next.js API route
       if (!uploadRes.ok) {
-        uploadRes = await fetch(`${API_BASE_URL}/upload/document`, {
+        uploadRes = await fetch("/api/upload/document", {
           method: "POST",
-          credentials: "include",
           body: formData,
         });
       }

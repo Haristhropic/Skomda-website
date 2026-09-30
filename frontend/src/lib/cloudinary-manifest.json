@@ -521,12 +521,6 @@
     "format": "png",
     "bytes": 1396609
   },
-  "program/profil-jurusan/jurusan-sija-character.png": {
-    "public_id": "skomda/program/profil-jurusan/jurusan-sija-character",
-    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790518549/skomda/program/profil-jurusan/jurusan-sija-character.png",
-    "format": "png",
-    "bytes": 1708544
-  },
   "program/profil-jurusan/jurusan-tjat-curved.png": {
     "public_id": "skomda/program/profil-jurusan/jurusan-tjat-curved",
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790518551/skomda/program/profil-jurusan/jurusan-tjat-curved.png",
@@ -1330,5 +1324,11 @@
     "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752020/skomda/trial-class/virtual-hero-students.png",
     "format": "png",
     "bytes": 2388355
+  },
+  "program/profil-jurusan/jurusan-sija-character.png": {
+    "public_id": "skomda/program/profil-jurusan/jurusan-sija-character",
+    "secure_url": "https://res.cloudinary.com/pyrugvo3/image/upload/v1790752701/skomda/program/profil-jurusan/jurusan-sija-character.png",
+    "format": "png",
+    "bytes": 1441936
   }
 }

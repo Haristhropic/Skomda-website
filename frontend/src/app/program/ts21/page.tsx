@@ -7,7 +7,7 @@ import Ts21MetodeSection from "@/components/sections/ts21/Ts21MetodeSection";
 import Ts21EnablerSection from "@/components/sections/ts21/Ts21EnablerSection";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Kurikulum & Program Unggulan TS.21",
   description:
     "Program TS.21 SMK Telkom Sidoarjo: Kurikulum unggulan berbasis Kompetensi Abad 21, Blended Learning, Project-Based, dan Studio Classroom menuju Sekolah 4.0.",
   keywords: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "Digital Enabler Skomda",
   ],
   openGraph: {
-    title: "SMK Telkom Sidoarjo",
+    title: "Kurikulum & Program Unggulan TS.21",
     description:
       "Program TS.21 SMK Telkom Sidoarjo: Langkah Menuju Sekolah 4.0 Berstandar Global.",
   },

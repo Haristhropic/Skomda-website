@@ -21,8 +21,15 @@ export interface CloudinaryTransformOptions {
   dpr?: number | "auto";
 }
 
+import manifestData from "./cloudinary-manifest.json";
+
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "";
 const CLOUDINARY_BASE = "https://res.cloudinary.com";
+
+const manifest = manifestData as Record<
+  string,
+  { public_id: string; secure_url: string; format?: string }
+>;
 
 /**
  * Membentuk URL Cloudinary teroptimasi dari path atau public_id gambar.
@@ -40,7 +47,7 @@ export function getCloudinaryUrl(
     return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   }
 
-  // 2. URL absolut eksternal non-Cloudinary dikembalikan langsung
+  // 2. Jika URL absolut eksternal non-Cloudinary, kembalikan langsung
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
     if (!imagePath.includes("res.cloudinary.com")) {
       return imagePath;
@@ -52,16 +59,25 @@ export function getCloudinaryUrl(
     return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   }
 
-  // 4. Bersihkan path lokal (hapus leading slash atau prefix '/images/')
-  let cleanId = imagePath.replace(/^\/+/, "");
-  if (cleanId.startsWith("images/")) {
-    cleanId = cleanId.replace(/^images\//, "skomda/");
-  } else if (!cleanId.startsWith("skomda/")) {
-    cleanId = `skomda/${cleanId}`;
-  }
+  // 4. Periksa apakah aset terdaftar di manifest hasil sinkronisasi
+  const relKey = imagePath.replace(/^\/+/, "").replace(/^images\//, "");
+  const manifestItem = manifest[relKey];
 
-  // Hapus ekstensi jika format auto digunakan
-  const cleanIdWithoutExt = cleanId.replace(/\.(png|jpe?g|webp|gif)$/i, "");
+  let targetPublicId = "";
+  if (manifestItem && manifestItem.public_id) {
+    targetPublicId = manifestItem.public_id;
+  } else if (imagePath.includes("res.cloudinary.com")) {
+    // Jika sudah berupa URL Cloudinary (misal dari database admin)
+    const match = imagePath.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z]+)?$/);
+    if (match && match[1]) {
+      targetPublicId = match[1];
+    } else {
+      return imagePath;
+    }
+  } else {
+    // Fallback: Jika tidak ada di manifest dan belum di cloud, gunakan path lokal agar tidak 404
+    return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+  }
 
   // 5. Susun parameter transformasi
   const transforms: string[] = [];
@@ -81,7 +97,7 @@ export function getCloudinaryUrl(
 
   const transformStr = transforms.join(",");
 
-  return `${CLOUDINARY_BASE}/${CLOUD_NAME}/image/upload/${transformStr}/${cleanIdWithoutExt}`;
+  return `${CLOUDINARY_BASE}/${CLOUD_NAME}/image/upload/${transformStr}/${targetPublicId}`;
 }
 
 /**

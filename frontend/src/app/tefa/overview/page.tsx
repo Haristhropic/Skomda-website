@@ -4,7 +4,7 @@ import Footer from "@/components/layout/Footer";
 import TefaOverviewClient from "@/components/sections/tefa/TefaOverviewClient";
 
 export const metadata: Metadata = {
-  title: "Overview Teaching Factory (TeFa) | SMK Telkom Sidoarjo",
+  title: "Overview Teaching Factory (TeFa)",
   description:
     "Teaching Factory (TEFA) SMK Telkom Sidoarjo adalah konsep pembelajaran berbasis produksi yang menggabungkan kompetensi siswa dengan kebutuhan industri.",
 };

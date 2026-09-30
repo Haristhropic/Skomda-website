@@ -4,7 +4,7 @@ import ProfilGuruClient from "@/components/sections/profil-guru/ProfilGuruClient
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Profil Guru & Tenaga Kependidikan",
   description:
     "Profil tenaga pengajar dan staf profesional berdedikasi dengan keahlian di bidang Teknologi Informasi dan Komunikasi di SMK Telkom Sidoarjo.",
   openGraph: {

@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import PageHeroSection from "@/components/sections/common/PageHeroSection";
 import { FASILITAS_LIST, FasilitasItem } from "@/data/fasilitasData";
 import { getFasilitasList } from "@/services/fasilitas";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
 
 export default function FasilitasClient() {
   const { t, isEn } = useLanguage();
@@ -171,7 +172,7 @@ export default function FasilitasClient() {
                     {/* Image */}
                     <div className="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
                       <Image
-                        src={facility.image}
+                        src={getCloudinaryUrl(facility.image, { width: 720, quality: "auto:good" })}
                         alt={facility.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"

@@ -11,6 +11,7 @@ import {
   getNewsList,
 } from "@/services/news";
 import { useLanguage } from "@/context/LanguageContext";
+import { getNewsImageUrl } from "@/lib/cloudinary";
 
 interface NewsSectionProps {
   showTitle?: boolean;
@@ -255,7 +256,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                       data-node-id="123:82"
                     >
                       <Image
-                        src={item.image || "/images/berita/news-thumb-1.png"}
+                        src={getNewsImageUrl(item.image || "/images/berita/news-thumb-1.png")}
                         alt={item.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"

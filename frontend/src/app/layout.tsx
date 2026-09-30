@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://smktelkom-sda.sch.id"),
   title: {
     default: "SMK Telkom Sidoarjo",
-    template: "SMK Telkom Sidoarjo",
+    template: "%s - SMK Telkom Sidoarjo",
   },
   description:
     "Selamat datang di SMK Telkom Sidoarjo. Membentuk generasi unggul yang siap berkarya, berinovasi, dan berdampak di era digital.",

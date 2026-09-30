@@ -4,11 +4,11 @@ import PenerapanK3Client from "@/components/sections/k3/PenerapanK3Client";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Penerapan K3 Lingkungan Sekolah - SMK Telkom Sidoarjo",
+  title: "Penerapan K3 Lingkungan Sekolah",
   description:
     "Standar Keselamatan dan Kesehatan Kerja (K3) di lingkungan bengkel praktikum, laboratorium jaringan fiber optik, dan sarana sekolah di SMK Telkom Sidoarjo.",
   openGraph: {
-    title: "Penerapan K3 Lingkungan Sekolah - SMK Telkom Sidoarjo",
+    title: "Penerapan K3 Lingkungan Sekolah",
     description: "Standar Keselamatan dan Kesehatan Kerja (K3) di SMK Telkom Sidoarjo.",
     images: [
       {

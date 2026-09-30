@@ -16,16 +16,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!news) {
     return {
-      title: "SMK Telkom Sidoarjo",
+      title: "Berita Tidak Ditemukan",
       description: "Halaman berita yang Anda cari tidak ditemukan di SMK Telkom Sidoarjo.",
     };
   }
 
   return {
-    title: "SMK Telkom Sidoarjo",
+    title: news.title,
     description: news.summary || news.title,
     openGraph: {
-      title: "SMK Telkom Sidoarjo",
+      title: news.title,
       description: news.summary,
       images: [news.image || "/images/berita/news-thumb-1.png"],
     },

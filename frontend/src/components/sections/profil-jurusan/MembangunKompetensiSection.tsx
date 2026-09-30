@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
 import {
   BookOpen,
   Globe2,
@@ -250,7 +251,7 @@ export default function MembangunKompetensiSection() {
               {/* Student Character Image */}
               <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-[446/557] my-6 flex items-center justify-center">
                 <Image
-                  src={current.studentImage}
+                  src={getCloudinaryUrl(current.studentImage, { width: 640, quality: "auto:good" })}
                   alt={current.studentAlt}
                   fill
                   className="object-contain drop-shadow-2xl"
@@ -279,7 +280,7 @@ export default function MembangunKompetensiSection() {
               <div className="lg:col-span-5 flex items-center justify-center">
                 <div className="relative w-full max-w-[360px] xl:max-w-[400px] aspect-[446/557] flex items-center justify-center">
                   <Image
-                    src={current.studentImage}
+                    src={getCloudinaryUrl(current.studentImage, { width: 800, quality: "auto:good" })}
                     alt={current.studentAlt}
                     fill
                     className="object-contain drop-shadow-2xl"

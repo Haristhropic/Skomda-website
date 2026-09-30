@@ -7,7 +7,7 @@ import SkemaKerjasamaSection from "@/components/sections/hub-industri/SkemaKerja
 import AlurKerjasamaSection from "@/components/sections/hub-industri/AlurKerjasamaSection";
 
 export const metadata: Metadata = {
-  title: "SMK Telkom Sidoarjo",
+  title: "Hubungan Industri & Mitra Strategis",
   description:
     "Kemitraan strategis SMK Telkom Sidoarjo dengan 10+ perusahaan teknologi dan telekomunikasi. Program PKL, sinkronisasi kurikulum, sertifikasi industri, dan rekrutmen langsung untuk lulusan siap kerja.",
   keywords: [
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     "Sertifikasi Industri Sidoarjo",
   ],
   openGraph: {
-    title: "SMK Telkom Sidoarjo",
+    title: "Hubungan Industri & Mitra Strategis",
     description:
       "Kemitraan strategis SMK Telkom Sidoarjo dengan 10+ perusahaan teknologi dan telekomunikasi terkemuka.",
     images: [

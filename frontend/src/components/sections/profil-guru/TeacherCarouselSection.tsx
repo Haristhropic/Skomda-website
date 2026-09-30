@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { TeacherItem } from "@/data/teachers";
 import { useLanguage } from "@/context/LanguageContext";
+import { getTeacherPhotoUrl } from "@/lib/cloudinary";
 
 interface TeacherCarouselSectionProps {
   title: string;
@@ -104,7 +105,7 @@ export default function TeacherCarouselSection({
                 {/* Photo Canvas */}
                 <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
                   <Image
-                    src={teacher.image}
+                    src={getTeacherPhotoUrl(teacher.image, 300, 380)}
                     alt={teacher.name}
                     fill
                     className="object-cover object-top"
@@ -147,7 +148,7 @@ export default function TeacherCarouselSection({
                   {/* Photo Canvas */}
                   <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
                     <Image
-                      src={teacher.image}
+                      src={getTeacherPhotoUrl(teacher.image, 400, 500)}
                       alt={teacher.name}
                       fill
                       className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
