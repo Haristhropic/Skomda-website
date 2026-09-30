@@ -102,11 +102,9 @@ export default function TefaPillarsSection() {
                 className="group relative rounded-[20px] bg-white p-6 sm:p-7 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md flex flex-col justify-between"
               >
                 <div>
-                  {/* Top Row: Icon Container & Number */}
+                  {/* Top Row: Icon & Number */}
                   <div className="flex items-center justify-between mb-6">
-                    <div className="size-12 rounded-xl bg-[#bc0c11]/10 text-[#bc0c11] flex items-center justify-center group-hover:bg-[#bc0c11] group-hover:text-white transition-all duration-300 shrink-0">
-                      <Icon className="size-6 transition-colors" />
-                    </div>
+                    <Icon className="size-7 text-[#bc0c11] group-hover:text-[#990a0e] transition-colors duration-300 shrink-0" />
                     <span className="font-jakarta font-extrabold text-2xl text-gray-200 group-hover:text-[#bc0c11]/30 transition-colors select-none">
                       {item.number}
                     </span>

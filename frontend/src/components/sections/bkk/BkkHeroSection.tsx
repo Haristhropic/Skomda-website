@@ -10,20 +10,20 @@ export default function BkkHeroSection() {
     <PageHeroSection
       breadcrumbs={[
         { label: t("nav.programs", "Program"), href: "/program/profil-jurusan" },
-        { label: "BKK", href: "/program/bkk" },
+        { label: t("bkk.breadcrumb", "BKK"), href: "/program/bkk" },
       ]}
-      titlePrefix="Bursa Kerja"
-      titleHighlight="Khusus (BKK)"
+      titlePrefix={t("bkk.heroTitle1", "Bursa Kerja")}
+      titleHighlight={t("bkk.heroTitle2", "Khusus (BKK)")}
       titleHighlightColor="text-[#e7000b]"
       titleHighlightClassName="whitespace-nowrap"
       titleClassName="text-3xl sm:text-4xl lg:text-[38px] xl:text-[44px]"
       textColSpan="lg:col-span-7"
       imageColSpan="lg:col-span-5"
       showAccentBar={true}
-      description="Bursa Kerja Khusus (BKK) SMK Telkom Sidoarjo hadir sebagai pusat layanan karier terpadu yang menghubungkan siswa dan alumni langsung dengan dunia kerja. Kami memfasilitasi akses lowongan kerja terverifikasi, pelatihan kesiapan kerja seperti simulasi wawancara dan penyusunan portofolio, hingga penyaluran kerja ke puluhan mitra industri terpercaya."
+      description={t("bkk.heroDesc")}
       studentImage="/images/program/bkk/hero-student-bkk.png"
-      studentAlt="Bursa Kerja Khusus SMK Telkom Sidoarjo"
-      ctaText="Jelajahi"
+      studentAlt={`${t("bkk.breadcrumb", "Bursa Kerja Khusus")} SMK Telkom Sidoarjo`}
+      ctaText={t("bkk.heroCta", "Jelajahi")}
       ctaHref="#peluang-karier"
       imagePosition="right"
       isIntegratedArtwork={true}

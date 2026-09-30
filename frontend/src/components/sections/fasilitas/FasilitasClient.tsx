@@ -10,7 +10,7 @@ import { FASILITAS_LIST, FasilitasItem } from "@/data/fasilitasData";
 import { getFasilitasList } from "@/services/fasilitas";
 
 export default function FasilitasClient() {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
   const [items, setItems] = useState<FasilitasItem[]>(FASILITAS_LIST);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -69,17 +69,18 @@ export default function FasilitasClient() {
       <PageHeroSection
         breadcrumbs={[
           { label: t("nav.aboutUs", "Tentang Kami"), href: "/tentang-kami/profil-sekolah" },
-          { label: "Fasilitas", href: "/tentang-kami/fasilitas" },
+          { label: t("fasilitas.breadcrumb", "Fasilitas"), href: "/tentang-kami/fasilitas" },
         ]}
-        titleHighlight="Fasilitas"
+        titleHighlight={t("fasilitas.breadcrumb", "Fasilitas")}
         titleHighlightColor="text-[#101828]"
-        description="Untuk mendukung pembelajaran kejuruan yang optimal, SMK Telkom Sidoarjo dilengkapi fasilitas modern berstandar industri. Mulai dari Gedung Ruang Praktik Siswa (RPS) dua lantai, ruang kelas ber-AC dengan layar interaktif, hingga laboratorium komputer dan jaringan serat optik yang siap menunjang praktik teknologi siswa setiap hari."
+        description={t("fasilitas.heroDesc")}
         studentImage="/images/tentang-kami/fasilitas/hero-fasilitas-terpadu.png"
-        studentAlt="Fasilitas SMK Telkom Sidoarjo"
-        ctaText="Jelajahi"
+        studentAlt={`${t("fasilitas.breadcrumb", "Fasilitas")} SMK Telkom Sidoarjo`}
+        ctaText={t("fasilitas.heroCta", "Jelajahi")}
         ctaHref="#daftar-fasilitas"
         imagePosition="right"
         isIntegratedArtwork={true}
+        imageContainerClassName="w-full max-w-[520px] sm:max-w-[580px] lg:max-w-[620px] aspect-[1.12/1]"
         sectionPaddingClassName="pt-28 sm:pt-32 lg:pt-30 pb-16 lg:pb-24"
       />
 
@@ -89,11 +90,11 @@ export default function FasilitasClient() {
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828] mb-4">
-              Laboratorium &amp; Sarana Prasarana Terpadu
+              {t("fasilitas.sectionTitle", "Laboratorium & Sarana Prasarana Terpadu")}
             </h2>
             <div className="mx-auto h-1 w-16 rounded-full bg-[#bc0c11] mb-4" />
             <p className="font-jakarta text-base text-[#4a5565] leading-relaxed">
-              Mulai dari laboratorium kejuruan tingkat lanjut hingga lingkungan belajar luar ruang yang asri, seluruh sarana dirancang demi kenyamanan dan kesiapan kerja siswa.
+              {t("fasilitas.sectionDesc", "Mulai dari laboratorium kejuruan tingkat lanjut hingga lingkungan belajar luar ruang yang asri, seluruh sarana dirancang demi kenyamanan dan kesiapan kerja siswa.")}
             </p>
           </div>
 
@@ -107,7 +108,7 @@ export default function FasilitasClient() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari fasilitas sekolah..."
+                placeholder={isEn ? "Search school facilities..." : "Cari fasilitas sekolah..."}
                 className="w-full rounded-full bg-white pl-14 sm:pl-16 pr-12 sm:pr-14 py-3.5 sm:py-4 text-sm sm:text-base font-jakarta text-[#101828] placeholder-gray-400 border border-gray-200/90 focus:border-[#bc0c11] focus:outline-none shadow-xs transition-all"
               />
               {searchQuery && (
@@ -115,7 +116,7 @@ export default function FasilitasClient() {
                   type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
-                  aria-label="Hapus pencarian"
+                  aria-label={isEn ? "Clear search" : "Hapus pencarian"}
                 >
                   <X className="size-3.5" />
                 </button>
@@ -127,7 +128,8 @@ export default function FasilitasClient() {
           {filteredItems.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
-                Tidak ada fasilitas yang sesuai dengan pencarian &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
+                {isEn ? "No facilities match your search " : "Tidak ada fasilitas yang sesuai dengan pencarian "}
+                &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
               </p>
               <button
                 type="button"
@@ -138,7 +140,7 @@ export default function FasilitasClient() {
                     "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
                 }}
               >
-                <span>Atur Ulang Pencarian</span>
+                <span>{isEn ? "Reset Search" : "Atur Ulang Pencarian"}</span>
               </button>
             </div>
           ) : (

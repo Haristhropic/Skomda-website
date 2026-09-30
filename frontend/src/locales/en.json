@@ -2,7 +2,8 @@
   "common": {
     "home": "Home",
     "programs": "Programs",
-    "about": "About Us"
+    "about": "About Us",
+    "explore": "Explore"
   },
   "nav": {
     "home": "Home",
@@ -366,12 +367,32 @@
   },
   "digitalTalent": {
     "breadcrumb": "Digital Talent",
-    "heroTitle1": "Digital Talent",
-    "heroTitle2": "Program (DTP)",
-    "heroDesc": "A strategic initiative by SMK Telkom Sidoarjo to equip every student with cutting-edge tech proficiencies, global certifications, and rapid career entry in the digital industry.",
-    "heroCta": "Discover Program",
+    "heroTitle1": "Digital",
+    "heroTitle2": "Talent",
+    "heroTitleSuffix": "Program",
+    "heroDesc": "The Digital Talent Program is SMK Telkom Sidoarjo's flagship initiative equipping students with future technology skills through dedicated weekly learning sessions. Students specialize in one of nine digital tracks, tackle real-world case studies, and build professional portfolios ready for global industry standards.",
+    "heroCta": "Explore",
     "sectionTitle": "Industry Digital Talent Incubation Tracks",
-    "sectionDesc": "Covers specialized tracks in Cloud Computing, Full-Stack Web Engineering, Cyber Security, Fiber Optic Systems, and Internet of Things (IoT)."
+    "sectionDesc": "Covers specialized tracks in Cloud Computing, Full-Stack Web Development, Cyber Security, Fiber Optic Systems, and Internet of Things (IoT).",
+    "worldChangedTitle": "The Job Market Has 100% Changed",
+    "worldChangedDesc": "Graduates once solely focused on finding jobs. Today, industry demands a real combination: Skill, Portfolio, Experience, and Attitude.",
+    "everyDay": "Every",
+    "focusTitle": "Learning Focus:",
+    "catalogTitle": "DTP Specialization Tracks",
+    "catalogDesc": "Formed from internship project analyses, partner industry requirements, and national vocational competition targets.",
+    "searchPlaceholder": "Search specializations, skills, or tools...",
+    "emptySearch": "No specializations matched your search for",
+    "resetSearch": "Reset Search",
+    "collabTitle": "Industry Collaboration Projects",
+    "collabDesc": "DTP participants do not study in isolation. Various specializations unite in integrated projects at enterprise and municipal scale.",
+    "fieldsInvolved": "Fields Involved:",
+    "curriculumDetails": "Curriculum Details",
+    "specDescription": "Specialization Overview",
+    "coreSkills": "Core Skills",
+    "supportingSkills": "Supporting Competencies",
+    "careerProspects": "Career Prospects",
+    "toolsTitle": "Industry Tools & Software",
+    "closeDetails": "Close Details"
   },
   "ts21": {
     "breadcrumb": "TS21 Program",

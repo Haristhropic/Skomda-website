@@ -10,16 +10,16 @@ export default function HubIndustriHeroSection() {
     <PageHeroSection
       breadcrumbs={[
         { label: t("nav.aboutUs", "Tentang Kami"), href: "/tentang-kami/profil-sekolah" },
-        { label: "Hubungan Industri", href: "/tentang-kami/hub-industri" },
+        { label: t("hubIndustri.breadcrumb", "Hubungan Industri"), href: "/tentang-kami/hub-industri" },
       ]}
-      titlePrefix="Hubungan"
-      titleHighlight="Industri"
+      titlePrefix={t("hubIndustri.heroTitle1", "Hubungan")}
+      titleHighlight={t("hubIndustri.heroTitle2", "Industri")}
       titleHighlightColor="text-[#e7000b]"
       showAccentBar={true}
-      description="SMK Telkom Sidoarjo menjalin kemitraan strategis dengan puluhan perusahaan terkemuka di bidang teknologi informasi, telekomunikasi, dan industri kreatif. Kolaborasi ini mencakup sinkronisasi kurikulum, program magang industri bersertifikat, hingga rekrutmen langsung untuk memastikan lulusan memiliki kompetensi yang relevan dengan kebutuhan dunia kerja."
+      description={t("hubIndustri.heroDesc")}
       studentImage="/images/tentang-kami/hub-industri/hero-student-hub-industri.png"
-      studentAlt="Hubungan Industri SMK Telkom Sidoarjo"
-      ctaText="Jelajahi"
+      studentAlt={`${t("hubIndustri.breadcrumb", "Hubungan Industri")} SMK Telkom Sidoarjo`}
+      ctaText={t("hubIndustri.heroCta", "Jelajahi")}
       ctaHref="#mitra-industri"
       imagePosition="right"
       isIntegratedArtwork={true}

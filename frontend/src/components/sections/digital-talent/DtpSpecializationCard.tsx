@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
+
+import { useLanguage } from "@/context/LanguageContext";
 import { DtpSpecialization } from "@/data/dtpData";
 
 interface DtpSpecializationCardProps {
@@ -23,6 +25,7 @@ export default function DtpSpecializationCard({
   item,
   onSelect,
 }: DtpSpecializationCardProps) {
+  const { t } = useLanguage();
   const renderCategoryIcon = () => {
     switch (item.id) {
       case "software-developer":
@@ -84,7 +87,7 @@ export default function DtpSpecializationCard({
           }}
           className="min-h-[44px] inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#bc0c11] group-hover:translate-x-1 transition-transform cursor-pointer"
         >
-          <span>Detail Kurikulum</span>
+          <span>{t("digitalTalent.curriculumDetails", "Detail Kurikulum")}</span>
           <ArrowRight className="size-4" />
         </button>
       </div>

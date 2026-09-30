@@ -10,14 +10,14 @@ export default function AkomodasiHeroSection() {
     <PageHeroSection
       breadcrumbs={[
         { label: t("nav.aboutUs", "Tentang Kami"), href: "/tentang-kami/profil-sekolah" },
-        { label: "Akomodasi", href: "/tentang-kami/akomodasi" },
+        { label: t("akomodasi.breadcrumb", "Akomodasi"), href: "/tentang-kami/akomodasi" },
       ]}
-      titleHighlight="Akomodasi"
+      titleHighlight={t("akomodasi.heroTitle1", "Akomodasi")}
       titleHighlightColor="text-[#101828]"
-      description="SMK Telkom Sidoarjo menyediakan informasi akomodasi dan biaya hidup untuk membantu siswa merencanakan kebutuhan selama bersekolah. Tersedia rekomendasi kos dan kontrakan di sekitar sekolah agar siswa dapat tinggal dengan nyaman, praktis, dan tetap fokus belajar."
+      description={t("akomodasi.heroDesc")}
       studentImage="/images/tentang-kami/akomodasi/hero-student-akomodasi.png"
-      studentAlt="Akomodasi Siswa SMK Telkom Sidoarjo"
-      ctaText="Jelajahi"
+      studentAlt={`${t("akomodasi.breadcrumb", "Akomodasi")} SMK Telkom Sidoarjo`}
+      ctaText={t("akomodasi.heroCta", "Jelajahi")}
       ctaHref="#biaya-hidup"
       imagePosition="right"
       isIntegratedArtwork={true}

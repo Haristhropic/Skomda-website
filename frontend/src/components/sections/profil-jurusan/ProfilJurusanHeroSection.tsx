@@ -10,16 +10,16 @@ export default function ProfilJurusanHeroSection() {
     <PageHeroSection
       breadcrumbs={[
         { label: t("nav.programs", "Program"), href: "/program/profil-jurusan" },
-        { label: "Profil Jurusan", href: "/program/profil-jurusan" },
+        { label: t("profilJurusan.breadcrumb", "Profil Jurusan"), href: "/program/profil-jurusan" },
       ]}
-      titlePrefix="Profil"
-      titleHighlight="Jurusan"
+      titlePrefix={t("profilJurusan.heroTitle1", "Profil")}
+      titleHighlight={t("profilJurusan.heroTitle2", "Jurusan")}
       titleHighlightColor="text-[#e7000b]"
       showAccentBar={true}
-      description="SMK Telkom Sidoarjo menghadirkan dua program keahlian unggulan masa depan: Sistem Informatika, Jaringan, dan Aplikasi (SIJA) serta Teknik Jaringan Akses Telekomunikasi (TJAT). Dengan kurikulum berbasis industri dan sertifikasi internasional, siswa dibimbing menguasai keahlian jaringan tingkat lanjut, rekayasa perangkat lunak, hingga infrastruktur telekomunikasi modern."
+      description={t("profilJurusan.heroDesc")}
       studentImage="/images/program/profil-jurusan/hero-jurusan-student.png"
-      studentAlt="Profil Jurusan SMK Telkom Sidoarjo"
-      ctaText="Jelajahi"
+      studentAlt={`${t("profilJurusan.breadcrumb", "Profil Jurusan")} SMK Telkom Sidoarjo`}
+      ctaText={t("profilJurusan.heroCta", "Jelajahi")}
       ctaHref="#kompetensi"
       imagePosition="right"
       isIntegratedArtwork={true}

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 export interface BreadcrumbItem {
   label: string;
@@ -63,7 +64,9 @@ export default function PageHeroSection({
   titleClassName,
   titleHighlightClassName,
 }: PageHeroSectionProps) {
+  const { t } = useLanguage();
   const isImageRight = imagePosition === "right";
+  const displayCtaText = ctaText || t("common.explore", "Jelajahi");
 
   // Scroll to top on mount so navigating between pages always starts at the top
   useEffect(() => {
@@ -96,7 +99,7 @@ export default function PageHeroSection({
   const ctaButtonInner = (
     <>
       <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
-        {ctaText}
+        {displayCtaText}
       </span>
       <svg
         width="18"
@@ -198,7 +201,7 @@ export default function PageHeroSection({
               className="flex items-center gap-2 mb-4 sm:mb-5 text-xs sm:text-sm font-jakarta text-[#64748b] flex-wrap"
             >
               <Link href="/" className="hover:text-[#bc0c11] transition-colors">
-                Beranda
+                {t("nav.home", "Beranda")}
               </Link>
               {breadcrumbs.map((crumb, idx) => (
                 <span key={crumb.href + idx} className="flex items-center gap-2">

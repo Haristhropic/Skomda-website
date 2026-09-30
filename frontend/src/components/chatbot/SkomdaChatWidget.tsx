@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { MessageSquare } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Dynamically import the heavy ChatWindow (includes react-markdown & streaming LLM logic)
 // Only downloaded when user opens the chatbot or hovers the launcher button
@@ -13,6 +14,7 @@ const ChatWindow = dynamic(() => import("./ChatWindow"), {
 });
 
 export default function SkomdaChatWidget() {
+  const { isEn } = useLanguage();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [hasOpened, setHasOpened] = useState(false);
@@ -55,7 +57,7 @@ export default function SkomdaChatWidget() {
 
   return (
     <aside
-      aria-label="Asisten Virtual SMK Telkom Sidoarjo"
+      aria-label={isEn ? "SMK Telkom Sidoarjo Virtual Assistant" : "Asisten Virtual SMK Telkom Sidoarjo"}
       className={`fixed z-50 ${
         isOpen
           ? "inset-0 sm:inset-auto sm:bottom-5 sm:right-5 flex items-end sm:items-auto justify-center sm:justify-end"
@@ -68,7 +70,7 @@ export default function SkomdaChatWidget() {
           onClick={handleOpen}
           onMouseEnter={handlePreload}
           onFocus={handlePreload}
-          aria-label="Buka Chatbot Asisten Virtual SMK Telkom Sidoarjo"
+          aria-label={isEn ? "Open SMK Telkom Sidoarjo Virtual Assistant" : "Buka Chatbot Asisten Virtual SMK Telkom Sidoarjo"}
           className="group relative flex size-14 items-center justify-center rounded-full bg-[#bc0c11] text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-[#990a0e] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#bc0c11] active:scale-95 cursor-pointer"
         >
           <div className="relative flex items-center justify-center">
@@ -80,7 +82,7 @@ export default function SkomdaChatWidget() {
           </div>
           {/* Hover Tooltip Label */}
           <span className="pointer-events-none absolute right-16 hidden whitespace-nowrap rounded-lg bg-[#101828] px-3 py-1.5 font-jakarta text-xs font-medium text-white shadow-md transition-opacity duration-200 sm:block opacity-0 group-hover:opacity-100">
-            Tanya Info Sekolah
+            {isEn ? "Ask School Info" : "Tanya Info Sekolah"}
           </span>
         </button>
       )}

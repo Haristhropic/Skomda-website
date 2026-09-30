@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { DtpSpecialization } from "@/data/dtpData";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface DtpDetailModalProps {
   item: DtpSpecialization | null;
@@ -31,6 +32,7 @@ export default function DtpDetailModal({
   isOpen,
   onClose,
 }: DtpDetailModalProps) {
+  const { t, isEn } = useLanguage();
   // Close on Escape key & Lock body scroll
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -106,7 +108,7 @@ export default function DtpDetailModal({
                 type="button"
                 onClick={onClose}
                 className="size-9 sm:size-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                aria-label="Tutup modal"
+                aria-label={isEn ? "Close modal" : "Tutup modal"}
               >
                 <X className="size-5" />
               </button>
@@ -117,7 +119,7 @@ export default function DtpDetailModal({
               {/* Deskripsi Lengkap */}
               <div>
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-jakarta">
-                  Deskripsi Spesialisasi
+                  {t("digitalTalent.specDescription", "Deskripsi Spesialisasi")}
                 </h4>
                 <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
                   {item.fullDesc}
@@ -131,7 +133,7 @@ export default function DtpDetailModal({
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="size-4 text-[#bc0c11]" />
                     <h5 className="font-jakarta font-bold text-sm text-[#101828]">
-                      Core Skills (Keahlian Utama)
+                      {t("digitalTalent.coreSkills", "Core Skills (Keahlian Utama)")}
                     </h5>
                   </div>
                   <ul className="space-y-2">
@@ -149,7 +151,7 @@ export default function DtpDetailModal({
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="size-4 text-[#bc0c11]" />
                     <h5 className="font-jakarta font-bold text-sm text-[#101828]">
-                      Kompetensi Pendukung
+                      {t("digitalTalent.supportingSkills", "Kompetensi Pendukung")}
                     </h5>
                   </div>
                   <ul className="space-y-2">
@@ -168,7 +170,7 @@ export default function DtpDetailModal({
                 <div className="flex items-center gap-2 mb-3">
                   <Briefcase className="size-4 text-[#bc0c11]" />
                   <h5 className="font-jakarta font-bold text-sm text-[#101828]">
-                    Peluang &amp; Prospek Karir
+                    {t("digitalTalent.careerProspects", "Peluang & Prospek Karir")}
                   </h5>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -188,7 +190,7 @@ export default function DtpDetailModal({
                 <div className="flex items-center gap-2 mb-3">
                   <Wrench className="size-4 text-[#bc0c11]" />
                   <h5 className="font-jakarta font-bold text-sm text-[#101828]">
-                    Tools &amp; Software Industri
+                    {t("digitalTalent.toolsTitle", "Tools & Software Industri")}
                   </h5>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -215,7 +217,7 @@ export default function DtpDetailModal({
                     "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
                 }}
               >
-                <span className="leading-none whitespace-nowrap">Tutup Informasi</span>
+                <span className="leading-none whitespace-nowrap">{t("digitalTalent.closeDetails", "Tutup Informasi")}</span>
               </button>
             </div>
           </motion.div>

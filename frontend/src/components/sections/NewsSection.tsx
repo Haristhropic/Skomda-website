@@ -17,13 +17,31 @@ interface NewsSectionProps {
 }
 
 export default function NewsSection({ showTitle = true }: NewsSectionProps) {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
   const [newsData, setNewsData] = useState<NewsItem[]>(MOCK_NEWS);
   const [activeCategory, setActiveCategory] = useState<NewsCategory>("Semua");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const itemsPerPage = 6;
+
+  const getCategoryLabel = (cat: NewsCategory) => {
+    if (!isEn) return cat;
+    switch (cat) {
+      case "Semua":
+        return "All";
+      case "Prestasi":
+        return "Achievements";
+      case "Kegiatan Sekolah":
+        return "School Activities";
+      case "Pengumuman":
+        return "Announcements";
+      case "Artikel & Edukasi":
+        return "Articles & Education";
+      default:
+        return cat;
+    }
+  };
 
   // Fetch live news from API when activeCategory changes
   useEffect(() => {
@@ -150,7 +168,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                           : "text-[#364153] hover:text-[#bc0c11] hover:bg-white/80 active:bg-gray-100"
                       }`}
                     >
-                      <span className="truncate pr-2">{cat}</span>
+                      <span className="truncate pr-2">{getCategoryLabel(cat)}</span>
                       <span
                         className={`shrink-0 transition-opacity duration-150 ${
                           isActive
@@ -186,10 +204,10 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
             <div className="lg:hidden w-full">
               <div className="flex items-center justify-between mb-3 px-1">
                 <h3 className="font-jakarta font-bold text-lg text-[#101828]">
-                  Kategori Berita
+                  {isEn ? "News Categories" : "Kategori Berita"}
                 </h3>
                 <span className="text-xs text-[#4b5563] font-medium">
-                  {filteredNews.length} Berita
+                  {filteredNews.length} {isEn ? "Articles" : "Berita"}
                 </span>
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
@@ -206,7 +224,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                           : "bg-white text-[#364153] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
                       }`}
                     >
-                      <span>{cat}</span>
+                      <span>{getCategoryLabel(cat)}</span>
                     </button>
                   );
                 })}
@@ -315,10 +333,12 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
               ) : (
                 <div className="col-span-full bg-white rounded-2xl p-12 text-center border border-gray-100">
                   <p className="font-jakarta font-semibold text-[#364153] text-base mb-1">
-                    Belum ada berita untuk kategori ini.
+                    {isEn ? "No news found in this category." : "Belum ada berita untuk kategori ini."}
                   </p>
                   <p className="text-sm text-[#6a7282]">
-                    Silakan pilih kategori lain atau kembali ke kategori Semua.
+                    {isEn
+                      ? "Please select another category or return to All."
+                      : "Silakan pilih kategori lain atau kembali ke kategori Semua."}
                   </p>
                 </div>
               )}

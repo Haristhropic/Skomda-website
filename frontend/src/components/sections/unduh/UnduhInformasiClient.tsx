@@ -112,15 +112,15 @@ export const DOWNLOAD_DOCUMENTS: DownloadDoc[] = [
   },
 ];
 
-const CATEGORIES = [
-  "Semua",
-  "Brosur PPDB",
-  "Sertifikasi & Akreditasi",
-  "Regulasi & Standar",
-] as const;
+const CATEGORY_OPTIONS = [
+  { key: "Semua", id: "Semua", en: "All" },
+  { key: "Brosur PPDB", id: "Brosur PPDB", en: "PPDB Brochure" },
+  { key: "Sertifikasi & Akreditasi", id: "Sertifikasi & Akreditasi", en: "Certifications & Accreditation" },
+  { key: "Regulasi & Standar", id: "Regulasi & Standar", en: "Regulations & Standards" },
+];
 
 export default function UnduhInformasiClient() {
-  const { lang, t } = useLanguage();
+  const { lang, isEn, t } = useLanguage();
   const [docsList, setDocsList] = useState<DownloadDoc[]>(DOWNLOAD_DOCUMENTS);
   const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -192,13 +192,6 @@ export default function UnduhInformasiClient() {
     };
   }, []);
 
-  const categories = useMemo(() => [
-    lang === "EN" ? "All" : "Semua",
-    "Brosur PPDB",
-    "Sertifikasi & Akreditasi",
-    "Regulasi & Standar",
-  ], [lang]);
-
   // Close modal on Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -216,7 +209,7 @@ export default function UnduhInformasiClient() {
 
   const filteredDocs = useMemo(() => {
     let list = [...docsList];
-    if (selectedCategory !== "Semua" && selectedCategory !== "All") {
+    if (selectedCategory !== "Semua") {
       list = list.filter((d) => d.category === selectedCategory);
     }
     if (searchQuery.trim() !== "") {
@@ -286,20 +279,21 @@ export default function UnduhInformasiClient() {
 
           {/* Category Chips - Full-bleed horizontal slide on mobile */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
-            {categories.map((cat) => {
-              const isActive = selectedCategory === cat;
+            {CATEGORY_OPTIONS.map((cat) => {
+              const isActive = selectedCategory === cat.key;
+              const label = isEn ? cat.en : cat.id;
               return (
                 <button
-                  key={cat}
+                  key={cat.key}
                   type="button"
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => setSelectedCategory(cat.key)}
                   className={`shrink-0 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "bg-[#bc0c11] text-white shadow-xs"
                       : "bg-white text-[#4a5565] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
                   }`}
                 >
-                  {cat}
+                  {label}
                 </button>
               );
             })}
@@ -394,14 +388,14 @@ export default function UnduhInformasiClient() {
           /* Empty Search State */
           <div className="py-16 text-center">
             <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
-              {lang === "EN" ? "No documents match your search " : "Tidak ada dokumen yang sesuai dengan pencarian "}
+              {isEn ? "No documents match your search " : "Tidak ada dokumen yang sesuai dengan pencarian "}
               &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
             </p>
             <button
               type="button"
               onClick={() => {
                 setSearchQuery("");
-                setSelectedCategory(lang === "EN" ? "All" : "Semua");
+                setSelectedCategory("Semua");
               }}
               className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
               style={{
@@ -409,7 +403,7 @@ export default function UnduhInformasiClient() {
                   "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
               }}
             >
-              <span>{lang === "EN" ? "Reset Search" : "Reset Pencarian"}</span>
+              <span>{isEn ? "Reset Search" : "Reset Pencarian"}</span>
             </button>
           </div>
         )}
@@ -560,9 +554,9 @@ export default function UnduhInformasiClient() {
               {/* Modal Footer Info */}
               <div className="mt-3 pt-2.5 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between text-xs font-jakarta text-[#6a7282] gap-2">
                 <div className="flex items-center gap-2">
-                  <span>Ukuran: <strong className="text-[#101828]">{previewDoc.fileSize}</strong></span>
+                  <span>{isEn ? "Size:" : "Ukuran:"} <strong className="text-[#101828]">{previewDoc.fileSize}</strong></span>
                   <span className="text-gray-300">•</span>
-                  <span>Jumlah: <strong className="text-[#101828]">{previewDoc.pageCount} Halaman</strong></span>
+                  <span>{isEn ? "Pages:" : "Jumlah:"} <strong className="text-[#101828]">{previewDoc.pageCount} {isEn ? "Pages" : "Halaman"}</strong></span>
                 </div>
                 <a
                   href={previewDoc.fileUrl}
@@ -570,7 +564,7 @@ export default function UnduhInformasiClient() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-[#bc0c11] font-bold hover:underline shrink-0"
                 >
-                  <span>Buka Layar Penuh</span>
+                  <span>{isEn ? "Open Fullscreen" : "Buka Layar Penuh"}</span>
                   <ExternalLink className="size-3.5" />
                 </a>
               </div>

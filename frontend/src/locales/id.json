@@ -2,7 +2,8 @@
   "common": {
     "home": "Beranda",
     "programs": "Program",
-    "about": "Tentang Kami"
+    "about": "Tentang Kami",
+    "explore": "Jelajahi"
   },
   "nav": {
     "home": "Beranda",
@@ -366,12 +367,32 @@
   },
   "digitalTalent": {
     "breadcrumb": "Digital Talent",
-    "heroTitle1": "Program",
-    "heroTitle2": "Digital Talent",
-    "heroDesc": "Inisiatif strategis SMK Telkom Sidoarjo untuk membekali setiap siswa dengan kompetensi teknologi terdepan, sertifikasi keahlian berstandar global, serta kesiapan karier langsung di industri digital.",
-    "heroCta": "Pelajari Program",
+    "heroTitle1": "Digital",
+    "heroTitle2": "Talent",
+    "heroTitleSuffix": "Program",
+    "heroDesc": "Digital Talent Program merupakan inisiatif unggulan SMK Telkom Sidoarjo untuk membekali siswa dengan keahlian teknologi masa depan melalui model pembelajaran khusus setiap pekan. Siswa mendalami salah satu dari sembilan bidang spesialisasi digital, mengerjakan studi kasus nyata, dan membangun portofolio profesional yang siap bersaing di industri global.",
+    "heroCta": "Jelajahi",
     "sectionTitle": "Jalur Pembinaan Talenta Digital Industri",
-    "sectionDesc": "Program pembinaan mencakup Cloud Computing, Full-Stack Web Development, Cyber Security, Fiber Optic Network Engineering, dan IoT (Internet of Things)."
+    "sectionDesc": "Program pembinaan mencakup Cloud Computing, Full-Stack Web Development, Cyber Security, Fiber Optic Network Engineering, dan IoT (Internet of Things).",
+    "worldChangedTitle": "Dunia Kerja 100% Berubah",
+    "worldChangedDesc": "Dahulu lulusan hanya berfokus mencari kerja. Sekarang, industri membutuhkan kombinasi nyata: Skill, Portfolio, Experience, dan Attitude.",
+    "everyDay": "Setiap Hari",
+    "focusTitle": "Fokus Pembelajaran:",
+    "catalogTitle": "Pilihan Bidang Spesialisasi DTP",
+    "catalogDesc": "Dibentuk berdasarkan analisis judul PKL, evaluasi kebutuhan mitra industri, dan target kejuaraan kompetisi nasional.",
+    "searchPlaceholder": "Cari spesialisasi, keahlian, atau tools...",
+    "emptySearch": "Tidak ada bidang spesialisasi yang sesuai dengan pencarian",
+    "resetSearch": "Atur Ulang Pencarian",
+    "collabTitle": "Contoh Proyek Kolaborasi Industri",
+    "collabDesc": "Peserta DTP tidak belajar dalam sekat yang terpisah. Berbagai spesialisasi berpadu dalam satu proyek terpadu skala kota dan perusahaan.",
+    "fieldsInvolved": "Bidang Terlibat:",
+    "curriculumDetails": "Detail Kurikulum",
+    "specDescription": "Deskripsi Spesialisasi",
+    "coreSkills": "Core Skills (Keahlian Utama)",
+    "supportingSkills": "Kompetensi Pendukung",
+    "careerProspects": "Peluang & Prospek Karir",
+    "toolsTitle": "Tools & Software Industri",
+    "closeDetails": "Tutup Informasi"
   },
   "ts21": {
     "breadcrumb": "Program TS21",

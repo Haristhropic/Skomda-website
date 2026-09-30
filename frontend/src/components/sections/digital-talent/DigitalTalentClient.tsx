@@ -20,7 +20,7 @@ import DtpSpecializationCard from "./DtpSpecializationCard";
 import DtpDetailModal from "./DtpDetailModal";
 
 export default function DigitalTalentClient() {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSpec, setSelectedSpec] = useState<DtpSpecialization | null>(null);
 
@@ -46,17 +46,17 @@ export default function DigitalTalentClient() {
       <PageHeroSection
         breadcrumbs={[
           { label: t("nav.programs", "Program"), href: "/program/profil-jurusan" },
-          { label: "Digital Talent Program", href: "/program/digital-talent" },
+          { label: t("digitalTalent.breadcrumb", "Digital Talent"), href: "/program/digital-talent" },
         ]}
-        titlePrefix="Digital"
-        titleHighlight="Talent"
-        titleSuffix="Program"
+        titlePrefix={t("digitalTalent.heroTitle1", "Digital")}
+        titleHighlight={t("digitalTalent.heroTitle2", "Talent")}
+        titleSuffix={t("digitalTalent.heroTitleSuffix", "Program")}
         titleHighlightColor="text-[#e7000b]"
         showAccentBar={true}
-        description="Digital Talent Program merupakan inisiatif unggulan SMK Telkom Sidoarjo untuk membekali siswa dengan keahlian teknologi masa depan melalui model pembelajaran khusus setiap pekan. Siswa mendalami salah satu dari sembilan bidang spesialisasi digital, mengerjakan studi kasus nyata, dan membangun portofolio profesional yang siap bersaing di industri global."
+        description={t("digitalTalent.heroDesc")}
         studentImage="/images/program/digital-talent/hero-student-digital-talent.png"
-        studentAlt="Digital Talent Program SMK Telkom Sidoarjo"
-        ctaText="Jelajahi"
+        studentAlt={`${t("digitalTalent.breadcrumb", "Digital Talent Program")} SMK Telkom Sidoarjo`}
+        ctaText={t("digitalTalent.heroCta", "Jelajahi")}
         ctaHref="#spesialisasi-dtp"
         imagePosition="right"
         isIntegratedArtwork={true}
@@ -70,12 +70,21 @@ export default function DigitalTalentClient() {
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-14 sm:mb-16">
             <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828] mb-4">
-              Dunia Kerja 100% Berubah
+              {t("digitalTalent.worldChangedTitle")}
             </h2>
             <div className="mx-auto h-1 w-16 rounded-full bg-[#bc0c11] mb-4" />
             <p className="font-jakarta text-base text-[#4a5565] leading-relaxed">
-              Dahulu lulusan hanya berfokus mencari kerja. Sekarang, industri membutuhkan kombinasi nyata:{" "}
-              <strong className="text-[#101828]">Skill, Portfolio, Experience, dan Attitude</strong>.
+              {isEn ? (
+                <>
+                  Graduates once solely focused on finding jobs. Today, industry demands a real combination:{" "}
+                  <strong className="text-[#101828]">Skill, Portfolio, Experience, and Attitude</strong>.
+                </>
+              ) : (
+                <>
+                  Dahulu lulusan hanya berfokus mencari kerja. Sekarang, industri membutuhkan kombinasi nyata:{" "}
+                  <strong className="text-[#101828]">Skill, Portfolio, Experience, dan Attitude</strong>.
+                </>
+              )}
             </p>
           </div>
 
@@ -95,7 +104,7 @@ export default function DigitalTalentClient() {
                   <div className="flex items-center gap-2 mb-4 pb-4 border-b border-dashed border-[#e5e7eb]">
                     <Calendar className="size-5 text-[#bc0c11]" />
                     <h3 className="font-jakarta font-extrabold text-xl text-[#101828]">
-                      Setiap Hari {sched.day}
+                      {t("digitalTalent.everyDay", "Setiap Hari")} {isEn ? (sched.day === "Rabu" ? "Wednesday" : "Thursday") : sched.day}
                     </h3>
                   </div>
 
@@ -103,14 +112,33 @@ export default function DigitalTalentClient() {
                     {sched.sessionTitle}
                   </h4>
                   <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed mb-6">
-                    {sched.description}
+                    {isEn
+                      ? (sched.day === "Rabu"
+                          ? "Intensive session mastering core subject matter with expert faculty through demonstrations, concept reviews, and phased practice."
+                          : "Collaborative session with telecom and technology industry practitioners to test deliverables against real professional standards.")
+                      : sched.description}
                   </p>
 
                   <div className="space-y-3 pt-2">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider font-jakarta">
-                      Fokus Pembelajaran:
+                      {t("digitalTalent.focusTitle", "Fokus Pembelajaran:")}
                     </p>
-                    {sched.points.map((point, pIdx) => (
+                    {(isEn
+                      ? (sched.day === "Rabu"
+                          ? [
+                              "Mastering fundamental concepts and logical reasoning",
+                              "Direct case-study walkthroughs by instructors",
+                              "Hands-on lab simulations in modern environments",
+                              "Targeted exercises reinforcing technical understanding",
+                            ]
+                          : [
+                              "Hands-on execution on real-world projects",
+                              "Tackling genuine enterprise industry cases",
+                              "Code, design, and architecture review sessions",
+                              "Direct industry feedback and best-practice adoption",
+                            ])
+                      : sched.points
+                    ).map((point, pIdx) => (
                       <div key={pIdx} className="flex items-start gap-2.5">
                         <CheckCircle2 className="size-4 text-[#bc0c11] shrink-0 mt-0.5" />
                         <span className="font-jakarta text-xs sm:text-sm text-[#364153]">
@@ -133,11 +161,11 @@ export default function DigitalTalentClient() {
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828] mb-4">
-              Pilihan Bidang Spesialisasi DTP
+              {t("digitalTalent.catalogTitle")}
             </h2>
             <div className="mx-auto h-1 w-16 rounded-full bg-[#bc0c11] mb-4" />
             <p className="font-jakarta text-base text-[#4a5565] leading-relaxed">
-              Dibentuk berdasarkan analisis judul PKL, evaluasi kebutuhan mitra industri, dan target kejuaraan kompetisi nasional.
+              {t("digitalTalent.catalogDesc")}
             </p>
           </div>
 
@@ -151,7 +179,7 @@ export default function DigitalTalentClient() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari spesialisasi, keahlian, atau tools..."
+                placeholder={t("digitalTalent.searchPlaceholder")}
                 className="w-full rounded-full bg-white pl-14 sm:pl-16 pr-12 sm:pr-14 py-3.5 sm:py-4 text-sm sm:text-base font-jakarta text-[#101828] placeholder-gray-400 border border-gray-200/90 focus:border-[#bc0c11] focus:outline-none shadow-xs transition-all"
               />
               {searchQuery && (
@@ -159,7 +187,7 @@ export default function DigitalTalentClient() {
                   type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
-                  aria-label="Hapus pencarian"
+                  aria-label={isEn ? "Clear search" : "Hapus pencarian"}
                 >
                   <X className="size-3.5" />
                 </button>
@@ -171,14 +199,14 @@ export default function DigitalTalentClient() {
           {filteredSpecs.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
-                Tidak ada bidang spesialisasi yang sesuai dengan pencarian &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
+                {t("digitalTalent.emptySearch")} &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
               </p>
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
                 className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer shadow-xs"
               >
-                <span>Atur Ulang Pencarian</span>
+                <span>{t("digitalTalent.resetSearch")}</span>
               </button>
             </div>
           ) : (
@@ -207,11 +235,11 @@ export default function DigitalTalentClient() {
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
             <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828] mb-4">
-              Contoh Proyek Kolaborasi Industri
+              {t("digitalTalent.collabTitle")}
             </h2>
             <div className="mx-auto h-1 w-16 rounded-full bg-[#bc0c11] mb-4" />
             <p className="font-jakarta text-base text-[#4a5565] leading-relaxed">
-              Peserta DTP tidak belajar dalam sekat yang terpisah. Berbagai spesialisasi berpadu dalam satu proyek terpadu skala kota dan perusahaan.
+              {t("digitalTalent.collabDesc")}
             </p>
           </div>
 
@@ -233,7 +261,7 @@ export default function DigitalTalentClient() {
 
                 <div className="pt-3 border-t border-dashed border-[#e5e7eb]">
                   <p className="text-xs font-bold text-[#101828] mb-1 font-jakarta">
-                    Bidang Terlibat:
+                    {t("digitalTalent.fieldsInvolved")}
                   </p>
                   <p className="text-xs font-semibold text-[#bc0c11] font-jakarta">
                     {proj.involvedDtp.join(" • ")}

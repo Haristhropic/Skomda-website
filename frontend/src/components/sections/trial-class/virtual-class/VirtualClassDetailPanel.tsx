@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Clock, CheckCircle2, XCircle, RotateCcw, ExternalLink, Sparkles, ArrowLeft } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 import { VirtualClassDtpItem } from "@/data/virtualClassData";
 
 interface VirtualClassDetailPanelProps {
@@ -20,6 +21,7 @@ export default function VirtualClassDetailPanel({
   ticketCode,
   userName,
 }: VirtualClassDetailPanelProps) {
+  const { isEn } = useLanguage();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [hasCheckedAnswer, setHasCheckedAnswer] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
@@ -51,7 +53,7 @@ export default function VirtualClassDetailPanel({
           <button
             type="button"
             onClick={onBack}
-            aria-label="Kembali ke semua program"
+            aria-label={isEn ? "Back to all programs" : "Kembali ke semua program"}
             className="size-9 sm:size-10 rounded-[10px] border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-[#364153] hover:text-[#101828] flex items-center justify-center shrink-0 transition-all duration-150 cursor-pointer shadow-xs active:scale-95"
           >
             <ArrowLeft className="size-4.5" />
@@ -93,7 +95,7 @@ export default function VirtualClassDetailPanel({
               </svg>
             </div>
             <p className="mt-4 font-jakarta font-medium text-sm sm:text-base text-gray-200 text-center">
-              Klik untuk memutar materi {item.title}
+              {isEn ? `Click to play ${item.title}` : `Klik untuk memutar materi ${item.title}`}
             </p>
           </div>
         )}
@@ -106,7 +108,7 @@ export default function VirtualClassDetailPanel({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/70 hover:bg-black text-white text-[11px] font-medium backdrop-blur-sm border border-white/15 transition-colors"
           >
-            <span>Buka di Google Drive</span>
+            <span>{isEn ? "Open in Google Drive" : "Buka di Google Drive"}</span>
             <ExternalLink className="size-3" />
           </a>
         </div>
@@ -137,10 +139,12 @@ export default function VirtualClassDetailPanel({
           </div>
           <div>
             <h4 className="font-jakarta font-bold text-lg sm:text-xl text-[#101828] leading-tight">
-              Yuk, Cek Pemahamanmu!
+              {isEn ? "Check Your Understanding!" : "Yuk, Cek Pemahamanmu!"}
             </h4>
             <p className="font-jakarta text-xs sm:text-sm text-[#4a5565] mt-0.5 leading-relaxed">
-              Jawab pertanyaan ini untuk memastikan kamu sudah memahami materi dengan baik, yaa!
+              {isEn
+                ? "Answer this question to make sure you have understood the topic thoroughly!"
+                : "Jawab pertanyaan ini untuk memastikan kamu sudah memahami materi dengan baik, yaa!"}
             </p>
           </div>
         </div>
@@ -245,7 +249,7 @@ export default function VirtualClassDetailPanel({
                     : undefined,
               }}
             >
-              Periksa Jawaban
+              {isEn ? "Check Answer" : "Periksa Jawaban"}
             </button>
           )}
 
@@ -262,14 +266,14 @@ export default function VirtualClassDetailPanel({
                   <>
                     <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
                     <span className="font-jakarta font-bold text-sm sm:text-base text-emerald-800">
-                      Jawaban Benar! Hebat sekali!
+                      {isEn ? "Correct Answer! Great job!" : "Jawaban Benar! Hebat sekali!"}
                     </span>
                   </>
                 ) : (
                   <>
                     <XCircle className="size-5 text-rose-600 shrink-0" />
                     <span className="font-jakarta font-bold text-sm sm:text-base text-rose-800">
-                      Jawaban Belum Tepat
+                      {isEn ? "Incorrect Answer" : "Jawaban Belum Tepat"}
                     </span>
                   </>
                 )}
@@ -278,7 +282,9 @@ export default function VirtualClassDetailPanel({
               <p className="font-jakarta text-xs sm:text-sm leading-relaxed">
                 {isCorrect
                   ? item.quiz.explanation
-                  : "Silakan telaah kembali penjelasan di materi video, lalu coba lagi pertanyaan di atas yaa!"}
+                  : (isEn
+                      ? "Please review the video lesson and try this question again!"
+                      : "Silakan telaah kembali penjelasan di materi video, lalu coba lagi pertanyaan di atas yaa!")}
               </p>
 
               {/* Action Buttons after result */}
@@ -290,13 +296,13 @@ export default function VirtualClassDetailPanel({
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-jakarta font-medium text-xs transition-all duration-200 active:scale-[0.98] cursor-pointer"
                   >
                     <RotateCcw className="size-3.5" />
-                    <span>Coba Lagi</span>
+                    <span>{isEn ? "Try Again" : "Coba Lagi"}</span>
                   </button>
                 ) : (
                   <>
                     <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-100/90 text-emerald-800 font-jakarta font-semibold text-xs">
                       <Sparkles className="size-3.5 text-emerald-600" />
-                      <span>Modul {item.title} Selesai</span>
+                      <span>{isEn ? `Module ${item.title} Completed` : `Modul ${item.title} Selesai`}</span>
                     </div>
 
                     {onNextClass && (
@@ -309,7 +315,7 @@ export default function VirtualClassDetailPanel({
                             "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
                         }}
                       >
-                        <span>Materi Berikutnya</span>
+                        <span>{isEn ? "Next Lesson" : "Materi Berikutnya"}</span>
                         <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                           <path d="M5 12h14M12 5l7 7-7 7" />
                         </svg>

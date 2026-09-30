@@ -8,7 +8,8 @@ const YEARS = [
   {
     id: "year-10",
     grade: "10",
-    yearLabel: "Tahun Pertama",
+    yearLabelId: "Tahun Pertama",
+    yearLabelEn: "Year One",
     colorClass: "bg-[#bc0c11]",
     trackAll: true,
     itemsId: [
@@ -27,7 +28,8 @@ const YEARS = [
   {
     id: "year-11",
     grade: "11",
-    yearLabel: "Tahun Kedua",
+    yearLabelId: "Tahun Kedua",
+    yearLabelEn: "Year Two",
     colorClass: "bg-[#bc0c11]",
     trackAll: true,
     itemsId: [
@@ -48,7 +50,8 @@ const YEARS = [
   {
     id: "year-12",
     grade: "12",
-    yearLabel: "Tahun Ketiga",
+    yearLabelId: "Tahun Ketiga",
+    yearLabelEn: "Year Three",
     colorClass: "bg-[#bc0c11]",
     trackAll: false,
     track3: {
@@ -87,7 +90,8 @@ const YEARS = [
   {
     id: "year-13",
     grade: "13",
-    yearLabel: "Tahun Keempat",
+    yearLabelId: "Tahun Keempat",
+    yearLabelEn: "Year Four",
     colorClass: "bg-[#101828]",
     trackAll: false,
     track4Only: {
@@ -159,9 +163,9 @@ export default function PpdbLearningJourneySection() {
 
         {/* Mobile Swipe Hint */}
         <div className="sm:hidden flex items-center justify-between text-xs text-[#6a7282] font-medium mb-3 px-1">
-          <span className="font-semibold text-[#101828]">Kelas 10 – 13</span>
+          <span className="font-semibold text-[#101828]">{isEn ? "Grades 10 - 13" : "Kelas 10 – 13"}</span>
           <span className="inline-flex items-center gap-1 text-[#bc0c11] font-semibold">
-            <span>Geser untuk melihat tahun berikutnya</span>
+            <span>{isEn ? "Swipe to view next year" : "Geser untuk melihat tahun berikutnya"}</span>
             <span className="text-sm font-bold">→</span>
           </span>
         </div>
@@ -179,7 +183,7 @@ export default function PpdbLearningJourneySection() {
                 <div className={`${year.colorClass} px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between relative overflow-hidden select-none`}>
                   <div className="relative z-10">
                     <span className="font-jakarta text-white/80 text-[10px] sm:text-[11px] font-semibold tracking-wider uppercase block mb-0.5">
-                      {year.yearLabel}
+                      {isEn ? year.yearLabelEn : year.yearLabelId}
                     </span>
                     <span className="font-jakarta text-white font-bold text-xl sm:text-2xl tracking-tight leading-none">
                       {isEn ? `Grade ${year.grade}` : `Kelas ${year.grade}`}

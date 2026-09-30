@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function ProgramsSection() {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
   const [activeTab, setActiveTab] = useState<"SIJA" | "TJAT">("SIJA");
 
   return (
@@ -75,11 +75,17 @@ export default function ProgramsSection() {
             {/* 1. Title + Description (mobile: first, desktop: right col row 1) */}
             <div className="order-1 lg:col-span-7 lg:col-start-6 lg:row-start-1">
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl leading-tight">
-                <span className="text-[#bc0c11]">Sistem Informasi</span>{" "}
-                <span className="text-[#101828]">Jaringan dan Aplikasi</span>
+                <span className="text-[#bc0c11]">
+                  {isEn ? "Information Systems" : "Sistem Informasi"}
+                </span>{" "}
+                <span className="text-[#101828]">
+                  {isEn ? "Networks & Applications" : "Jaringan dan Aplikasi"}
+                </span>
               </h3>
               <p className="mt-2 font-jakarta text-sm sm:text-base leading-relaxed text-[#4a5565]">
-                Program 4 tahun yang mempelajari pemrograman, pengelolaan basis data, dan sistem informasi berbasis teknologi modern.
+                {isEn
+                  ? "A 4-year program focusing on programming, database engineering, and modern cloud-native information systems."
+                  : "Program 4 tahun yang mempelajari pemrograman, pengelolaan basis data, dan sistem informasi berbasis teknologi modern."}
               </p>
             </div>
 
@@ -102,7 +108,9 @@ export default function ProgramsSection() {
               {[
                 {
                   title: "Software Development",
-                  desc: "Pengembangan aplikasi web, mobile, dan desktop yang responsif dengan arsitektur modern serta integrasi API.",
+                  desc: isEn
+                    ? "Development of responsive web, mobile, and desktop applications with modern architecture and API integration."
+                    : "Pengembangan aplikasi web, mobile, dan desktop yang responsif dengan arsitektur modern serta integrasi API.",
                   icon: (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                       <polyline points="16 18 22 12 16 6" />
@@ -112,7 +120,9 @@ export default function ProgramsSection() {
                 },
                 {
                   title: "Database & Cloud Computing",
-                  desc: "Pengelolaan basis data relasional dan NoSQL serta implementasi server berbasis teknologi cloud computing.",
+                  desc: isEn
+                    ? "Relational and NoSQL database management along with cloud-native computing infrastructure deployment."
+                    : "Pengelolaan basis data relasional dan NoSQL serta implementasi server berbasis teknologi cloud computing.",
                   icon: (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                       <ellipse cx="12" cy="5" rx="9" ry="3" />
@@ -123,7 +133,9 @@ export default function ProgramsSection() {
                 },
                 {
                   title: "Networking & Cybersecurity",
-                  desc: "Konfigurasi infrastruktur jaringan komputer, routing, switching, dan proteksi sistem dari ancaman siber.",
+                  desc: isEn
+                    ? "Computer networking configuration, routing, switching, and security countermeasures against cyber threats."
+                    : "Konfigurasi infrastruktur jaringan komputer, routing, switching, dan proteksi sistem dari ancaman siber.",
                   icon: (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -151,7 +163,7 @@ export default function ProgramsSection() {
             <div className="order-4 lg:col-span-7 lg:col-start-6 lg:row-start-3">
               <div className="rounded-2xl bg-white border-2 border-dashed border-[#d1d5dc] p-4 sm:p-5">
                 <h4 className="font-jakarta font-semibold text-sm sm:text-base text-[#c10007]">
-                  Prospek Kerja:
+                  {isEn ? "Career Prospects:" : "Prospek Kerja:"}
                 </h4>
                 <p className="font-jakarta text-xs sm:text-sm text-[#364153] mt-1 leading-relaxed">
                   Software Engineer, Web Developer, Mobile App Developer, Database Administrator, IT Security Specialist, System Analyst.
@@ -169,7 +181,7 @@ export default function ProgramsSection() {
                     "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
                 }}
               >
-                <span className="font-jakarta font-medium">Pelajari Selengkapnya</span>
+                <span className="font-jakarta font-medium">{t("programs.learnMore", "Pelajari Lebih Lanjut")}</span>
                 <svg
                   width="18"
                   height="18"
@@ -197,11 +209,17 @@ export default function ProgramsSection() {
             {/* 1. Title + Description */}
             <div className="order-1 lg:col-span-7 lg:col-start-6 lg:row-start-1">
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl leading-tight">
-                <span className="text-[#bc0c11]">Teknik Jaringan</span>{" "}
-                <span className="text-[#101828]">Akses Telekomunikasi</span>
+                <span className="text-[#bc0c11]">
+                  {isEn ? "Telecommunication" : "Teknik Jaringan"}
+                </span>{" "}
+                <span className="text-[#101828]">
+                  {isEn ? "Access Network Engineering" : "Akses Telekomunikasi"}
+                </span>
               </h3>
               <p className="mt-2 font-jakarta text-sm sm:text-base leading-relaxed text-[#4a5565]">
-                Program 3 tahun yang fokus pada teknologi jaringan telekomunikasi, infrastruktur fiber optik, dan komunikasi nirkabel berkecepatan tinggi.
+                {isEn
+                  ? "A 3-year program centered on telecommunication network infrastructure, fiber optics, and high-speed wireless connectivity."
+                  : "Program 3 tahun yang fokus pada teknologi jaringan telekomunikasi, infrastruktur fiber optik, dan komunikasi nirkabel berkecepatan tinggi."}
               </p>
             </div>
 
@@ -224,7 +242,9 @@ export default function ProgramsSection() {
               {[
                 {
                   title: "Telecommunication Networks",
-                  desc: "Mempelajari prinsip transmisi sinyal dan arsitektur jaringan komunikasi suara dan data.",
+                  desc: isEn
+                    ? "Mastering signal transmission fundamentals and voice/data communication network architecture."
+                    : "Mempelajari prinsip transmisi sinyal dan arsitektur jaringan komunikasi suara dan data.",
                   icon: (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                       <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
@@ -234,7 +254,9 @@ export default function ProgramsSection() {
                 },
                 {
                   title: "Fiber Optic Technology",
-                  desc: "Instalasi, penyambungan fusion splicing, pengukuran OTDR, dan pemeliharaan kabel serat optik.",
+                  desc: isEn
+                    ? "Installation, fusion splicing, OTDR testing, and long-term fiber optic cable infrastructure maintenance."
+                    : "Instalasi, penyambungan fusion splicing, pengukuran OTDR, dan pemeliharaan kabel serat optik.",
                   icon: (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                       <path d="M4 11a9 9 0 0 1 9 9" />
@@ -245,7 +267,9 @@ export default function ProgramsSection() {
                 },
                 {
                   title: "Wireless & Microwave Communication",
-                  desc: "Konfigurasi radio link, base transceiver station (BTS), serta transmisi frekuensi nirkabel seluler.",
+                  desc: isEn
+                    ? "Radio links configuration, Base Transceiver Stations (BTS), and cellular high-frequency transmission."
+                    : "Konfigurasi radio link, base transceiver station (BTS), serta transmisi frekuensi nirkabel seluler.",
                   icon: (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bc0c11" strokeWidth="2">
                       <path d="M5 12.55a11 11 0 0 1 14.08 0" />
@@ -276,7 +300,7 @@ export default function ProgramsSection() {
             <div className="order-4 lg:col-span-7 lg:col-start-6 lg:row-start-3">
               <div className="rounded-2xl bg-white border-2 border-dashed border-[#d1d5dc] p-4 sm:p-5">
                 <h4 className="font-jakarta font-semibold text-sm sm:text-base text-[#c10007]">
-                  Prospek Kerja:
+                  {isEn ? "Career Prospects:" : "Prospek Kerja:"}
                 </h4>
                 <p className="font-jakarta text-xs sm:text-sm text-[#364153] mt-1 leading-relaxed">
                   Fiber Optic Engineer, Telecom Network Specialist, BTS Engineer, Wireless Technician, ISP Support Engineer.
@@ -294,7 +318,7 @@ export default function ProgramsSection() {
                     "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
                 }}
               >
-                <span className="font-jakarta font-medium">Pelajari Selengkapnya</span>
+                <span className="font-jakarta font-medium">{t("programs.learnMore", "Pelajari Lebih Lanjut")}</span>
                 <svg
                   width="18"
                   height="18"

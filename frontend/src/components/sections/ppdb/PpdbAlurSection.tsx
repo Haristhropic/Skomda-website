@@ -64,8 +64,8 @@ export default function PpdbAlurSection() {
               <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] leading-[1.2] tracking-tight text-[#101828] mb-4">
                 {isEn ? (
                   <>
-                    Alur Pendaftaran <br />
-                    <span className="text-[#bc0c11]">Siswa Baru</span>
+                    New Student <br />
+                    <span className="text-[#bc0c11]">Admission Flow</span>
                   </>
                 ) : (
                   <>

@@ -20,6 +20,8 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { useLanguage } from "@/context/LanguageContext";
+
 interface ChatSource {
   title: string;
   url: string;
@@ -35,19 +37,34 @@ interface Message {
   isStreaming?: boolean;
 }
 
-const QUICK_PROMPTS = [
+const QUICK_PROMPTS_ID = [
   "Apa saja pilar Program BMW di SMK Telkom Sidoarjo?",
   "Sebutkan jalur dan sertifikasi Digital Talent Program (DTP)!",
   "Apa perbedaan jurusan SIJA (4 tahun) dan TJAT (3 tahun)?",
   "Berapa estimasi biaya hidup dan sewa kos di sekitar sekolah?",
 ];
 
-const INITIAL_WELCOME: Message = {
+const QUICK_PROMPTS_EN = [
+  "What are the pillars of the BMW Program at SMK Telkom Sidoarjo?",
+  "List the tracks and certifications in the Digital Talent Program (DTP)!",
+  "What is the difference between SIJA (4-year) and TJAT (3-year)?",
+  "What is the estimated cost of living and student boarding near school?",
+];
+
+const INITIAL_WELCOME_ID: Message = {
   id: "welcome-1",
   role: "assistant",
   content:
     "Halo! Saya **Skomda AI Assistant**, asisten virtual resmi SMK Telkom Sidoarjo.\n\nAda yang bisa saya bantu seputar program BMW (Bekerja, Melanjutkan, Wirausaha), Digital Talent Program (DTP), jurusan SIJA & TJAT, alur PPDB 2026/2027, atau rekomendasi kos?",
   timestamp: "Baru saja",
+};
+
+const INITIAL_WELCOME_EN: Message = {
+  id: "welcome-1",
+  role: "assistant",
+  content:
+    "Hello! I am **Skomda AI Assistant**, the official virtual assistant of SMK Telkom Sidoarjo.\n\nHow can I help you regarding our BMW Program (Work, Continue study, Entrepreneurship), Digital Talent Program (DTP), SIJA & TJAT majors, PPDB 2026/2027 admissions, or boarding accommodation?",
+  timestamp: "Just now",
 };
 
 // Minimalist Typing Indicator Dots
@@ -72,8 +89,12 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
+  const { isEn } = useLanguage();
+  const initialWelcome = isEn ? INITIAL_WELCOME_EN : INITIAL_WELCOME_ID;
+  const quickPrompts = isEn ? QUICK_PROMPTS_EN : QUICK_PROMPTS_ID;
+
   const [inputMessage, setInputMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([INITIAL_WELCOME]);
+  const [messages, setMessages] = useState<Message[]>([initialWelcome]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -92,14 +113,19 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const cleaned = parsed.map((m: Message) => ({ ...m, isStreaming: false }));
+          const cleaned = parsed.map((m: Message) => {
+            if (m.id === "welcome-1") {
+              return initialWelcome;
+            }
+            return { ...m, isStreaming: false };
+          });
           setMessages(cleaned);
         }
       }
     } catch (err) {
       console.warn("[SkomdaChat] Failed to restore chat from localStorage:", err);
     }
-  }, []);
+  }, [initialWelcome]);
 
   // Persist chat messages to localStorage whenever they change
   useEffect(() => {
@@ -288,11 +314,11 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
               prev.map((msg) =>
                 msg.id === botMsgId
                   ? {
-                      ...msg,
-                      content: displayContent,
-                      sources: collectedSources,
-                      isStreaming: true,
-                    }
+                    ...msg,
+                    content: displayContent,
+                    sources: collectedSources,
+                    isStreaming: true,
+                  }
                   : msg
               )
             );
@@ -330,20 +356,20 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                     typeof parsed.delta === "string"
                       ? parsed.delta
                       : typeof parsed.delta?.content === "string"
-                      ? parsed.delta.content
-                      : typeof parsed.choices?.[0]?.delta?.content === "string"
-                      ? parsed.choices[0].delta.content
-                      : typeof parsed.chunk === "string"
-                      ? parsed.chunk
-                      : typeof parsed.content === "string"
-                      ? parsed.content
-                      : typeof parsed.text === "string"
-                      ? parsed.text
-                      : typeof parsed.response === "string"
-                      ? parsed.response
-                      : typeof parsed.message === "string"
-                      ? parsed.message
-                      : null;
+                        ? parsed.delta.content
+                        : typeof parsed.choices?.[0]?.delta?.content === "string"
+                          ? parsed.choices[0].delta.content
+                          : typeof parsed.chunk === "string"
+                            ? parsed.chunk
+                            : typeof parsed.content === "string"
+                              ? parsed.content
+                              : typeof parsed.text === "string"
+                                ? parsed.text
+                                : typeof parsed.response === "string"
+                                  ? parsed.response
+                                  : typeof parsed.message === "string"
+                                    ? parsed.message
+                                    : null;
 
                   if (textChunk) {
                     accumulatedText += textChunk;
@@ -366,11 +392,11 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           prev.map((msg) =>
             msg.id === botMsgId
               ? {
-                  ...msg,
-                  content: cleanFinal || accumulatedText || "Halo! Ada yang bisa saya bantu seputar informasi SMK Telkom Sidoarjo?",
-                  sources: collectedSources,
-                  isStreaming: false,
-                }
+                ...msg,
+                content: cleanFinal || accumulatedText || "Halo! Ada yang bisa saya bantu seputar informasi SMK Telkom Sidoarjo?",
+                sources: collectedSources,
+                isStreaming: false,
+              }
               : msg
           )
         );
@@ -380,23 +406,23 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           typeof data.response === "string"
             ? data.response
             : typeof data.message === "string"
-            ? data.message
-            : typeof data.delta === "string"
-            ? data.delta
-            : typeof data.content === "string"
-            ? data.content
-            : "Maaf, tidak ada respon dari sistem.";
+              ? data.message
+              : typeof data.delta === "string"
+                ? data.delta
+                : typeof data.content === "string"
+                  ? data.content
+                  : "Maaf, tidak ada respon dari sistem.";
         const cleanContent = rawContent.replace(/<think>[\s\S]*?(<\/think>|$)/gi, "").trim();
 
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === botMsgId
               ? {
-                  ...msg,
-                  content: cleanContent || rawContent,
-                  sources: data.sources || [],
-                  isStreaming: false,
-                }
+                ...msg,
+                content: cleanContent || rawContent,
+                sources: data.sources || [],
+                isStreaming: false,
+              }
               : msg
           )
         );
@@ -422,10 +448,10 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
         prev.map((msg) =>
           msg.id === botMsgId
             ? {
-                ...msg,
-                content: offlineReply,
-                isStreaming: false,
-              }
+              ...msg,
+              content: offlineReply,
+              isStreaming: false,
+            }
             : msg
         )
       );
@@ -444,13 +470,13 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
   };
 
   const handleConfirmReset = () => {
-    setMessages([INITIAL_WELCOME]);
+    setMessages([initialWelcome]);
     setErrorStatus(null);
     setInputMessage("");
     setShowResetConfirm(false);
     try {
       localStorage.removeItem("skomda_chat_messages");
-    } catch {}
+    } catch { }
   };
 
   return (
@@ -538,9 +564,8 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex items-start gap-2.5 ${
-              msg.role === "user" ? "flex-row-reverse" : "flex-row"
-            }`}
+            className={`flex items-start gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"
+              }`}
           >
             {msg.role === "assistant" && (
               <div className="shrink-0 text-[#bc0c11] mt-1" aria-hidden="true">
@@ -549,16 +574,14 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             )}
 
             <div
-              className={`flex flex-col max-w-[88%] ${
-                msg.role === "user" ? "items-end" : "items-start"
-              }`}
+              className={`flex flex-col max-w-[88%] ${msg.role === "user" ? "items-end" : "items-start"
+                }`}
             >
               <div
-                className={`rounded-2xl px-4 py-3 leading-relaxed break-words text-[13.5px] ${
-                  msg.role === "user"
+                className={`rounded-2xl px-4 py-3 leading-relaxed break-words text-[13.5px] ${msg.role === "user"
                     ? "bg-[#bc0c11] text-white rounded-br-xs shadow-xs"
                     : "bg-white text-[#101828] rounded-bl-xs border border-slate-200/80 shadow-xs"
-                }`}
+                  }`}
               >
                 {msg.role === "user" ? (
                   <div className="whitespace-pre-wrap font-medium">{msg.content}</div>
@@ -602,12 +625,6 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
               <div className="flex items-center justify-between w-full text-[11px] text-slate-400 mt-1 px-1">
                 <div className="flex items-center gap-1.5">
                   <span>{msg.timestamp}</span>
-                  {msg.role === "assistant" && !msg.isStreaming && (
-                    <>
-                      <span className="text-slate-300">·</span>
-                      <span className="text-[10px] text-slate-500 font-medium">SKOMDA AI</span>
-                    </>
-                  )}
                 </div>
 
                 {msg.role === "assistant" && msg.content && !msg.isStreaming && (
@@ -648,7 +665,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
               Pertanyaan Populer:
             </p>
             <div className="flex flex-col gap-2">
-              {QUICK_PROMPTS.map((prompt, index) => (
+              {quickPrompts.map((prompt: string, index: number) => (
                 <button
                   key={index}
                   onClick={() => handleSendMessage(prompt)}
