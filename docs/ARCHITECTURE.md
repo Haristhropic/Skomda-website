@@ -114,7 +114,7 @@ Skomda-website/
 
 | Lingkungan | Database | Provider | Cara Koneksi |
 |---|---|---|---|
-| Production / Staging | **PostgreSQL** | Supabase atau Neon | DATABASE_URL (connection string) |
+| Production / Staging | **PostgreSQL** | Supabase | DATABASE_URL (connection string) |
 | Local Development | **SQLite** | File lokal | file:smktelkom_dev.db?cache=shared |
 
 > SQLite menggunakan driver `github.com/glebarez/sqlite` (Pure-Go, tanpa CGO/GCC). Jika DATABASE_URL di-set tapi koneksi ke Postgres gagal, backend **otomatis fallback** ke SQLite.
@@ -160,7 +160,7 @@ Skomda-website/
           |                    |                   |
           v                    v                   v
    [ PostgreSQL      [ Cloudinary API    [ NexusRouter AI
-     Supabase/Neon ]   Upload/Transform/    fahlyce.vercel.app ]
+     Supabase ]      Upload/Transform/    fahlyce.vercel.app ]
      (fallback:         CDN Delivery ]
       SQLite .db) ]
 
@@ -326,7 +326,7 @@ Request masuk
 ### 6.1. Konfigurasi
 
 ```
-Production:   PostgreSQL (Supabase / Neon)
+Production:   PostgreSQL (Supabase)
               Driver: gorm.io/driver/postgres via jackc/pgx v5
               Koneksi: DATABASE_URL
               RLS: Row Level Security aktif di tabel utama
@@ -675,7 +675,7 @@ Backend: simpan URL/public_id ke database via GORM
 |---|---|---|---|
 | **NexusRouter AI Gateway** | Chatbot menjawab pertanyaan profil, PPDB, jurusan | HTTP POST ke fahlyce.vercel.app/api/v1/skomda/chat | `NEXUS_ROUTER_URL`, `LLM_API_KEY` |
 | **Cloudinary** | Upload, storage, transformasi, CDN delivery | REST API + Signed Upload | `CLOUDINARY_URL` |
-| **PostgreSQL (Supabase/Neon)** | Database production | GORM driver postgres | `DATABASE_URL` |
+| **PostgreSQL (Supabase)** | Database production | GORM driver postgres | `DATABASE_URL` |
 | **Google Maps** | Embed peta lokasi kampus di footer | Iframe embed publik | - |
 
 ---
@@ -766,12 +766,12 @@ npm run start      # Jalankan production build
 
 | Field | Nilai |
 |---|---|
-| **Nama Proyek** | SMK Telkom Sidoarjo Website Redesign |
+| **Nama Proyek** | SMK Telkom Sidoarjo Website |
 | **Kode Proyek** | SKOMDA |
 | **Status Arsitektur** | Aktif & Tersinkronisasi Penuh |
 | **Bahasa Backend** | Go 1.25.0 |
 | **Framework Frontend** | Next.js 16.3.0 |
-| **Database Primary** | PostgreSQL (Supabase / Neon) |
+| **Database Primary** | PostgreSQL (Supabase) |
 | **Database Development** | SQLite (Pure-Go, file lokal) |
 | **Total Model GORM** | 14 (termasuk 3 sub-model BKK) |
 | **Terakhir Diperbarui** | September 2026 |
