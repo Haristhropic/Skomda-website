@@ -109,9 +109,14 @@ export default function PengumumanKelulusanClient() {
           { label: t("nav.information", "Informasi"), href: "/informasi/berita" },
           { label: t("informasi.kelulusanBreadcrumb", "Pengumuman Kelulusan"), href: "/informasi/pengumuman-kelulusan" },
         ]}
-        titleHighlight={t("informasi.kelulusanTitle1", "Pengumuman Kelulusan")}
-        titleHighlightColor="text-[#101828]"
-        description={t("informasi.kelulusanDesc")}
+        titlePrefix={t("informasi.kelulusanTitle1", "Pengumuman")}
+        titleHighlight={t("informasi.kelulusanTitle2", "Kelulusan Siswa")}
+        titleHighlightColor="text-[#bc0c11]"
+        showAccentBar={true}
+        description={t(
+          "informasi.kelulusanDesc",
+          "Akses informasi resmi penetapan kelulusan peserta didik SMK Telkom Sidoarjo tahun ajaran berjalan, prosedur verifikasi berkas, dan panduan transisi ke dunia kerja maupun perguruan tinggi."
+        )}
         studentImage="/images/informasi/pengumuman-kelulusan/hero-student-kelulusan.png"
         studentAlt={`${t("informasi.kelulusanBreadcrumb", "Pengumuman Kelulusan")} SMK Telkom Sidoarjo`}
         ctaText={t("informasi.kelulusanCta", "Jelajahi")}
@@ -129,7 +134,7 @@ export default function PengumumanKelulusanClient() {
             <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-[34px] text-[#101828] leading-tight">
               Pencarian Status Kelulusan Siswa
             </h2>
-            <div className="mx-auto h-1 w-12 rounded-full bg-[#bc0c11] my-3" />
+            <div className="section-title-line" />
             <p className="font-jakarta text-sm sm:text-base text-[#4b5563]">
               Masukkan nama siswa atau pilih kategori status untuk melihat informasi kelulusan resmi dan detail Surat Keterangan Lulus (SKL).
             </p>
@@ -161,8 +166,8 @@ export default function PengumumanKelulusanClient() {
               )}
             </div>
 
-            {/* Category Filter Pills - Full-bleed horizontal slide on mobile */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
+            {/* Category Filter Pills - Full-bleed horizontal slide on mobile with ample padding to avoid shadow clipping */}
+            <div className="neu-filter-container">
               {categories.map((cat) => {
                 const isActive = selectedCategory === cat.key;
                 return (
@@ -170,10 +175,8 @@ export default function PengumumanKelulusanClient() {
                     key={cat.key}
                     type="button"
                     onClick={() => setSelectedCategory(cat.key)}
-                    className={`group shrink-0 rounded-full px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer flex items-center gap-2 select-none ${
-                      isActive
-                        ? "bg-[#bc0c11] text-white shadow-xs"
-                        : "bg-white text-[#4a5565] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
+                    className={`group shrink-0 transition-all duration-200 cursor-pointer flex items-center gap-2 select-none ${
+                      isActive ? "neu-pill-active" : "neu-pill"
                     }`}
                   >
                     <span>{cat.label}</span>
@@ -181,7 +184,7 @@ export default function PengumumanKelulusanClient() {
                       className={`text-[11px] rounded-full px-2 py-0.5 font-bold transition-colors ${
                         isActive
                           ? "bg-white/20 text-white"
-                          : "bg-gray-100 text-[#4a5565] group-hover:bg-red-50 group-hover:text-[#bc0c11]"
+                          : "bg-gray-200/70 text-[#4a5565] group-hover:bg-red-50 group-hover:text-[#bc0c11]"
                       }`}
                     >
                       {cat.count}
@@ -205,7 +208,7 @@ export default function PengumumanKelulusanClient() {
           </div>
 
           {/* ── Table List Siswa Kelulusan (Per Baris) ── */}
-          <div className="rounded-[24px] bg-white border-2 border-dashed border-[#d1d5dc] shadow-xs overflow-hidden">
+          <div className="rounded-[24px] neu-card shadow-xs overflow-hidden">
             {paginatedAlumni.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left font-jakarta border-collapse">

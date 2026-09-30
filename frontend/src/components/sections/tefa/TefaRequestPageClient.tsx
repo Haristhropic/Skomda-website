@@ -184,7 +184,7 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
               {/* Decorative Concentric Rings */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none -translate-y-4">
                 <div className="w-[420px] h-[420px] rounded-full border border-red-200/50" />
-                <div className="w-[520px] h-[520px] rounded-full border border-dashed border-red-200/35 absolute" />
+                <div className="w-[520px] h-[520px] rounded-full border border-red-200/30 absolute" />
               </div>
 
               {/* Angled Red Rectangle / Card */}
@@ -266,11 +266,7 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
                   <button
                     type="button"
                     onClick={() => setIsSent(false)}
-                    className="mt-6 px-6 py-2.5 rounded-full bg-[#bc0c11] text-white text-sm font-medium font-jakarta hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] cursor-pointer"
-                    style={{
-                      boxShadow:
-                        "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                    }}
+                    className="btn-primary mt-6 !h-10 !min-h-[40px] !px-6 !text-sm cursor-pointer"
                   >
                     {isEn ? "Send Another Request" : "Kirim Request Lain"}
                   </button>
@@ -453,11 +449,7 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="w-full group inline-flex items-center justify-center gap-3 rounded-full bg-[#bc0c11] px-8 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer"
-                      style={{
-                        boxShadow:
-                          "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                      }}
+                      className="btn-primary group w-full !h-[50px] !min-h-[48px] cursor-pointer"
                     >
                       <span className="font-jakarta font-semibold text-[15px] leading-none">
                         {isEn ? "Send Request via WhatsApp" : "Kirim Request via WhatsApp"}
@@ -492,7 +484,7 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
             {/* Decorative Concentric Rings */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none -translate-y-4">
               <div className="w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] rounded-full border border-red-200/50" />
-              <div className="w-[360px] h-[360px] sm:w-[460px] sm:h-[460px] rounded-full border border-dashed border-red-200/35 absolute" />
+              <div className="w-[360px] h-[360px] sm:w-[460px] sm:h-[460px] rounded-full border border-red-200/30 absolute" />
             </div>
 
             {/* Angled Red Rectangle / Card */}

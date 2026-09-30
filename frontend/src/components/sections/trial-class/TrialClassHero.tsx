@@ -20,8 +20,8 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
   };
 
   return (
-    <section className="relative w-full pt-24 sm:pt-28 lg:pt-28 pb-12 sm:pb-16 overflow-hidden">
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+    <section className="relative w-full min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20 overflow-hidden">
+      <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">
         {/* Top Hero Row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
           {/* Left Text & CTA Column */}
@@ -61,9 +61,12 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
             </nav>
 
             {/* Main Heading (Pure bold Title matching */}
-            <h1 className="font-jakarta text-4xl sm:text-5xl lg:text-[56px] font-bold text-[#101828] leading-[1.15] tracking-tight mb-4 sm:mb-5">
+            <h1 className="font-jakarta text-4xl sm:text-5xl lg:text-[56px] font-bold text-[#101828] leading-[1.15] tracking-tight mb-4">
               Trial Class
             </h1>
+
+            {/* Red accent line */}
+            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mb-5 sm:mb-6" />
 
             <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed max-w-xl mb-8">
               {t(
@@ -76,11 +79,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
               <button
                 type="button"
                 onClick={handleScrollToEvent}
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 min-h-[48px] text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.97] cursor-pointer shadow-card-cta"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7 !h-[50px] !min-h-[48px]"
               >
                 <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
                   {t("trialClassPage.seeUpcoming", "Lihat Event Terdekat")}
@@ -105,7 +104,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
 
               <Link
                 href="/trial-class/virtual-class"
-                className="inline-flex items-center gap-2 rounded-full bg-white border border-gray-200 hover:border-[#bc0c11] hover:text-[#bc0c11] text-[#364153] px-6 py-3.5 min-h-[48px] text-sm font-jakarta font-semibold transition-all duration-200 active:scale-[0.98] shadow-2xs cursor-pointer"
+                className="btn-secondary !h-[50px] !min-h-[48px] !px-6 text-sm"
               >
                 <span>{t("virtualClass.breadcrumb", "Virtual Class")}</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -254,11 +253,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                 <button
                   type="button"
                   onClick={onOpenRegister}
-                  className="w-full sm:w-auto lg:w-[200px] group inline-flex items-center justify-center gap-2.5 px-6 py-3 min-h-[46px] rounded-full bg-[#bc0c11] text-white font-jakarta font-medium text-sm sm:text-base hover:bg-[#990a0e] transition-all duration-300 active:scale-[0.98] cursor-pointer"
-                  style={{
-                    boxShadow:
-                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                  }}
+                  className="btn-primary group w-full sm:w-auto lg:w-[200px]"
                 >
                   <span className="whitespace-nowrap">{t("trialClassPage.registerNow", "Daftar Sekarang")}</span>
                   <svg

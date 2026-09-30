@@ -241,13 +241,7 @@ export default function VirtualClassDetailPanel({
               type="button"
               disabled={selectedOption === null}
               onClick={handleCheckAnswer}
-              className="w-full sm:w-auto self-start px-6 py-2.5 rounded-full font-jakarta font-medium text-sm text-white bg-[#bc0c11] hover:bg-[#990a0e] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98] cursor-pointer"
-              style={{
-                boxShadow:
-                  selectedOption !== null
-                    ? "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)"
-                    : undefined,
-              }}
+              className="btn-primary w-full sm:w-auto self-start !h-[44px] !text-sm cursor-pointer"
             >
               {isEn ? "Check Answer" : "Periksa Jawaban"}
             </button>
@@ -309,11 +303,7 @@ export default function VirtualClassDetailPanel({
                       <button
                         type="button"
                         onClick={onNextClass}
-                        className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white font-jakarta font-medium text-xs transition-all duration-200 cursor-pointer active:scale-[0.98]"
-                        style={{
-                          boxShadow:
-                            "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                        }}
+                        className="btn-primary !h-[40px] !min-h-[40px] !px-5 !text-xs cursor-pointer"
                       >
                         <span>{isEn ? "Next Lesson" : "Materi Berikutnya"}</span>
                         <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

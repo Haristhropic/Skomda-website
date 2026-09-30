@@ -332,11 +332,12 @@ export default function MitraIndustriSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="flex flex-col gap-2 mb-14"
+          className="flex flex-col items-center text-center max-w-3xl mx-auto mb-14"
         >
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828]">
             {t("hubIndustri.mitraTitle", "Mitra Industri & Perusahaan Ternama")}
           </h2>
+          <div className="section-title-line" />
           <p className="font-jakarta text-base text-[#4a5565] max-w-[540px] leading-relaxed">
             {t("hubIndustri.mitraSubtitle", "Kolaborasi erat bersama perusahaan teknologi, telekomunikasi, dan instansi nasional.")}
           </p>
@@ -360,7 +361,7 @@ export default function MitraIndustriSection() {
                   href={targetUrl}
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
-                  className="group relative h-full rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+                  className="group relative h-full rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
                 >
                   <div className="flex flex-col gap-4">
                     {/* Top Bar: Logo + External Link Button */}

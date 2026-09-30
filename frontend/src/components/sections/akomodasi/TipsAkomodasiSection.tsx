@@ -52,7 +52,7 @@ export default function TipsAkomodasiSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left: Helpdesk Card */}
           <div className="lg:col-span-5 flex flex-col gap-6">
-            <div className="rounded-[28px] bg-white p-8 sm:p-9 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md">
+            <div className="rounded-[28px] neu-card p-8 sm:p-9">
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl leading-tight text-[#101828] mb-3">
                 {isEn ? "Need Help Finding Accommodation?" : "Butuh Bantuan Memilih Kos yang Tepat?"}
               </h3>
@@ -67,11 +67,7 @@ export default function TipsAkomodasiSection() {
                   href="https://wa.me/6281234567899?text=Halo%20Admin%20Kesiswaan%20SMK%20Telkom%20Sidoarjo,%20saya%20calon%20wali%20murid/siswa%20ingin%20berkonsultasi%20mengenai%20rekomendasi%20akomodasi%20kos/asrama."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 text-[15px] font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] font-jakarta cursor-pointer"
-                  style={{
-                    boxShadow:
-                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                  }}
+                  className="btn-primary group !px-7 !h-[50px] !min-h-[48px] font-jakarta cursor-pointer"
                 >
                   <span>{isEn ? "Chat Student Affairs on WhatsApp" : "Chat WhatsApp Kesiswaan"}</span>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="transition-transform duration-300 group-hover:translate-x-1">
@@ -94,6 +90,7 @@ export default function TipsAkomodasiSection() {
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828] leading-tight">
                 {t("akomodasi.tipsTitle")}
               </h3>
+              <div className="section-title-line !mx-0 !mt-2.5 !mb-3" />
               <p className="font-jakarta text-sm text-[#4a5565] mt-1">
                 {t("akomodasi.tipsSubtitle")}
               </p>
@@ -108,7 +105,7 @@ export default function TipsAkomodasiSection() {
                 return (
                   <div
                     key={faq.qId}
-                    className="rounded-[20px] bg-white border-2 border-dashed border-[#d1d5dc] overflow-hidden transition-colors hover:border-[#bc0c11]"
+                    className="rounded-[20px] neu-card-interactive overflow-hidden"
                   >
                     <button
                       type="button"

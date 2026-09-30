@@ -16,7 +16,10 @@ export default function HubIndustriHeroSection() {
       titleHighlight={t("hubIndustri.heroTitle2", "Industri")}
       titleHighlightColor="text-[#e7000b]"
       showAccentBar={true}
-      description={t("hubIndustri.heroDesc")}
+      description={t(
+        "hubIndustri.heroDesc",
+        "Menghubungkan peserta didik dengan ekosistem industri terdepan melalui sinkronisasi kurikulum, program magang intensif, guru tamu praktisi, dan rekrutmen kerja langsung."
+      )}
       studentImage="/images/tentang-kami/hub-industri/hero-student-hub-industri.png"
       studentAlt={`${t("hubIndustri.breadcrumb", "Hubungan Industri")} SMK Telkom Sidoarjo`}
       ctaText={t("hubIndustri.heroCta", "Jelajahi")}

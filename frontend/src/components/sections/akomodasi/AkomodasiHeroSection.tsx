@@ -12,16 +12,20 @@ export default function AkomodasiHeroSection() {
         { label: t("nav.aboutUs", "Tentang Kami"), href: "/tentang-kami/profil-sekolah" },
         { label: t("akomodasi.breadcrumb", "Akomodasi"), href: "/tentang-kami/akomodasi" },
       ]}
-      titleHighlight={t("akomodasi.heroTitle1", "Akomodasi")}
-      titleHighlightColor="text-[#101828]"
-      description={t("akomodasi.heroDesc")}
+      titlePrefix={t("akomodasi.heroTitle1", "Akomodasi")}
+      titleHighlight={t("akomodasi.heroTitle2", "Siswa")}
+      titleHighlightColor="text-[#bc0c11]"
+      showAccentBar={true}
+      description={t(
+        "akomodasi.heroDesc",
+        "Informasi akomodasi dan estimasi biaya hidup siswa SMK Telkom Sidoarjo secara transparan. Rekomendasi kos, asrama, dan hunian aman serta nyaman di sekitar lingkungan sekolah."
+      )}
       studentImage="/images/tentang-kami/akomodasi/hero-student-akomodasi.png"
       studentAlt={`${t("akomodasi.breadcrumb", "Akomodasi")} SMK Telkom Sidoarjo`}
       ctaText={t("akomodasi.heroCta", "Jelajahi")}
       ctaHref="#biaya-hidup"
       imagePosition="right"
       isIntegratedArtwork={true}
-      sectionPaddingClassName="pt-28 sm:pt-32 lg:pt-32 pb-16 lg:pb-24"
     />
   );
 }

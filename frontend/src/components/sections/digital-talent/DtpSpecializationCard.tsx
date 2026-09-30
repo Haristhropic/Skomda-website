@@ -53,7 +53,7 @@ export default function DtpSpecializationCard({
   return (
     <div
       onClick={() => onSelect(item)}
-      className="group rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-xl hover:-translate-y-1 h-full cursor-pointer"
+      className="group rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between h-full cursor-pointer"
     >
       <div>
         {/* Top Header: Unboxed Icon & Large Number */}
@@ -78,7 +78,7 @@ export default function DtpSpecializationCard({
       </div>
 
       {/* Card Footer: Action Button */}
-      <div className="pt-5 mt-5 border-t border-dashed border-[#e5e7eb] flex items-center justify-end">
+      <div className="pt-5 mt-5 border-t border-gray-100 flex items-center justify-end">
         <button
           type="button"
           onClick={(e) => {

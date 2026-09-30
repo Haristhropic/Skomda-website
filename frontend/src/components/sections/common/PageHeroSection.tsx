@@ -89,12 +89,7 @@ export default function PageHeroSection({
   };
 
   const ctaButtonClasses =
-    "group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 min-h-[48px] text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer select-none";
-
-  const ctaButtonStyle = {
-    boxShadow:
-      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-  };
+    "btn-primary group !px-7 !h-[50px] !min-h-[48px] cursor-pointer select-none";
 
   const ctaButtonInner = (
     <>
@@ -122,11 +117,11 @@ export default function PageHeroSection({
 
   return (
     <section
-      className={`relative w-full ${
-        sectionPaddingClassName || "pt-24 sm:pt-28 lg:pt-28 pb-16 lg:pb-24"
+      className={`relative w-full min-h-[100dvh] flex items-center ${
+        sectionPaddingClassName || "pt-28 sm:pt-32 pb-16 sm:pb-20"
       } bg-[#f8f9fb] overflow-hidden`}
     >
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">
         <div
           className={`grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 ${
             gridAlignmentClassName || "items-center"
@@ -266,12 +261,11 @@ export default function PageHeroSection({
                   href={ctaHref}
                   onClick={(e) => handleScrollToHash(e, ctaHref)}
                   className={ctaButtonClasses}
-                  style={ctaButtonStyle}
                 >
                   {ctaButtonInner}
                 </a>
               ) : (
-                <Link href={ctaHref} className={ctaButtonClasses} style={ctaButtonStyle}>
+                <Link href={ctaHref} className={ctaButtonClasses}>
                   {ctaButtonInner}
                 </Link>
               )
@@ -280,7 +274,6 @@ export default function PageHeroSection({
                 type="button"
                 onClick={onCtaClick}
                 className={ctaButtonClasses}
-                style={ctaButtonStyle}
               >
                 {ctaButtonInner}
               </button>

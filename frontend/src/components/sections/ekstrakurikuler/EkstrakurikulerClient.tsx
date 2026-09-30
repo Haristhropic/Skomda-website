@@ -59,7 +59,10 @@ export default function EkstrakurikulerClient() {
         titleHighlight={t("ekstrakurikuler.heroTitle2", "Ekstrakurikuler")}
         titleHighlightColor="text-[#e7000b]"
         showAccentBar={true}
-        description={t("ekstrakurikuler.heroDesc")}
+        description={t(
+          "ekstrakurikuler.heroDesc",
+          "Wadah pengembangan minat, bakat, dan karakter kepemimpinan siswa melalui 18 cabang ekstrakurikuler unggulan di bidang teknologi, robotika, seni musik, olahraga prestasi, dan kepemimpinan."
+        )}
         studentImage="/images/program/ekstrakurikuler/hero-student-ekskul.png"
         studentAlt={`${t("ekstrakurikuler.breadcrumb", "Ekstrakurikuler")} SMK Telkom Sidoarjo`}
         ctaText={t("ekstrakurikuler.heroCta", "Jelajahi")}
@@ -113,7 +116,7 @@ export default function EkstrakurikulerClient() {
 
           {/* Ekstrakurikuler Grid & Mobile Horizontal Scroll */}
           {filteredItems.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
+            <div className="text-center py-16 neu-inset-panel rounded-[24px] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
                 {isEn ? "No extracurriculars match your search " : "Tidak ada ekstrakurikuler yang sesuai dengan pencarian "}
                 &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
@@ -121,11 +124,7 @@ export default function EkstrakurikulerClient() {
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-medium font-jakarta transition-all duration-200 active:scale-[0.98] cursor-pointer"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary !h-10 !min-h-[40px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{isEn ? "Reset Search" : "Atur Ulang Pencarian"}</span>
               </button>
@@ -139,7 +138,7 @@ export default function EkstrakurikulerClient() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group neu-card-interactive rounded-[24px] overflow-hidden flex flex-col"
                   >
                     {/* Header or Image (No Category Span Tag) */}
                     {item.image ? (

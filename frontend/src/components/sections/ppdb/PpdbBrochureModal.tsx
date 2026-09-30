@@ -97,7 +97,7 @@ export default function PpdbBrochureModal({
                   href={fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-[#101828] px-3.5 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-colors min-h-[44px] cursor-pointer"
+                  className="btn-secondary !h-10 !min-h-[40px] !px-3.5 !py-2 !text-xs sm:!text-sm cursor-pointer"
                   title={isEn ? "Open in new tab" : "Buka di tab baru"}
                 >
                   <ExternalLink className="size-4" />
@@ -109,11 +109,7 @@ export default function PpdbBrochureModal({
                 <a
                   href={fileUrl}
                   download
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-5 py-2.5 text-xs sm:text-sm font-medium font-jakarta transition-all duration-200 min-h-[44px] cursor-pointer active:scale-[0.98]"
-                  style={{
-                    boxShadow:
-                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                  }}
+                  className="btn-primary !h-10 !min-h-[40px] !px-5 !py-2 !text-xs sm:!text-sm cursor-pointer"
                   title={isEn ? "Download PDF" : "Unduh PDF"}
                 >
                   <Download className="size-4" />
@@ -125,7 +121,7 @@ export default function PpdbBrochureModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="size-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
+                  className="neu-btn-icon !size-10 cursor-pointer"
                   aria-label={isEn ? "Close preview" : "Tutup pratinjau"}
                 >
                   <X className="size-5" />

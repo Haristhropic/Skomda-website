@@ -61,7 +61,7 @@ export default function TefaNeedSection({
             <h2 className="font-jakarta font-bold text-3xl sm:text-[36px] lg:text-[40px] leading-tight text-[#101828] mb-3 tracking-tight">
               {t("tefa.needTitle")}
             </h2>
-            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-3" />
+            <div className="section-title-line !mx-0" />
             <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-lg">
               {t("tefa.needEyebrow")}
             </p>
@@ -71,8 +71,8 @@ export default function TefaNeedSection({
           <div className="flex flex-col">
             {needs.map((item) => (
               <div key={item.id} className="w-full">
-                {/* Clean Dashed Divider */}
-                <div className="w-full border-t border-dashed border-gray-200" />
+                {/* Clean Subtle Divider */}
+                <div className="w-full border-t border-gray-100" />
 
                 {item.href ? (
                   <Link
@@ -132,8 +132,8 @@ export default function TefaNeedSection({
                 )}
               </div>
             ))}
-            {/* Bottom Closing Dashed Divider */}
-            <div className="w-full border-t border-dashed border-gray-200" />
+            {/* Bottom Closing Subtle Divider */}
+            <div className="w-full border-t border-gray-100" />
           </div>
         </div>
 

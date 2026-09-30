@@ -25,7 +25,7 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
           <h2 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828] leading-tight tracking-tight">
             {kepalaSekolah.name}
           </h2>
-          <div className="mt-2.5 h-1 w-12 rounded-full bg-[#bc0c11] mx-auto sm:mx-0" />
+          <div className="section-title-line mx-auto sm:mx-0" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
@@ -38,7 +38,7 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="lg:col-span-5 flex justify-center lg:justify-start"
           >
-            <div className="w-full max-w-[340px] sm:max-w-[420px] aspect-[448/560] relative rounded-[20px] border-2 border-dashed border-[#d1d5dc] p-3 bg-white shadow-sm overflow-hidden group hover:border-[#bc0c11] transition-colors">
+            <div className="w-full max-w-[340px] sm:max-w-[420px] aspect-[448/560] relative rounded-[24px] neu-card-interactive p-3 overflow-hidden group">
               <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
                 <Image
                   src={kepalaSekolah.image}

@@ -34,8 +34,8 @@ export default function Ts21HeroSection() {
   }, [isOpen]);
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#f3f4f6] pt-36 sm:pt-40 lg:pt-44 pb-16 lg:pb-24">
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+    <section className="relative w-full overflow-hidden bg-[#f3f4f6] min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20">
+      <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">
         {/* Hero Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* Left: Text Content & Breadcrumbs */}
@@ -63,14 +63,20 @@ export default function Ts21HeroSection() {
             </nav>
 
             {/* Main Title */}
-            <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] leading-[1.18] tracking-tight text-[#101828] mb-5">
-              {t("ts21.heroTitle1")}{" "}
-              <span className="text-[#bc0c11]">{t("ts21.heroTitle2")}</span>
+            <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] leading-[1.18] tracking-tight text-[#101828] mb-4">
+              {t("ts21.heroTitle1", "Kerangka Pembelajaran")}{" "}
+              <span className="text-[#bc0c11]">{t("ts21.heroTitle2", "Abad ke-21 (TS.21)")}</span>
             </h1>
+
+            {/* Red accent line */}
+            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mb-5 sm:mb-6" />
 
             {/* Description */}
             <p className="font-jakarta text-base sm:text-lg text-[#4a5565] leading-relaxed mb-8 max-w-2xl">
-              {t("ts21.heroDesc")}
+              {t(
+                "ts21.heroDesc",
+                "Metodologi pendidikan modern Telkom Schools yang menggabungkan penguasaan teknologi digital, pemecahan masalah kreatif, kolaborasi tim, dan pembentukan karakter akhlak mulia."
+              )}
             </p>
 
             {/* Exact Website Standard Primary CTA Button */}
@@ -78,11 +84,7 @@ export default function Ts21HeroSection() {
               <button
                 type="button"
                 onClick={scrollToFramework}
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3 text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7 !h-[50px] !min-h-[48px]"
               >
                 <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
                   {t("ts21.heroCta")}
@@ -114,13 +116,10 @@ export default function Ts21HeroSection() {
             className="lg:col-span-6 flex items-center justify-center relative"
           >
             <div className="relative w-full max-w-[580px]">
-              {/* 1. Outer Dashed Border Accent Frame */}
-              <div className="absolute -left-2.5 -top-2.5 -right-2.5 -bottom-2.5 border-2 border-dashed border-[#bc0c11]/30 rounded-[26px] pointer-events-none transition-colors duration-300" />
-
-              {/* 2. Main Image Container */}
+              {/* Main Image Container */}
               <div
                 onClick={() => setIsOpen(true)}
-                className="group relative w-full aspect-[16/10] rounded-[20px] bg-white p-2 sm:p-3 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-gray-200/80 flex items-center justify-center"
+                className="group relative w-full aspect-[16/10] rounded-[24px] neu-card-interactive p-2 sm:p-3 cursor-pointer overflow-hidden flex items-center justify-center"
               >
                 <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-white flex items-center justify-center">
                   <Image

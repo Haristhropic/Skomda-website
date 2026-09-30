@@ -123,17 +123,17 @@ export default function PartnersSection() {
   const marqueeItems = [...displayPartners, ...displayPartners];
 
   return (
-    <section id="mitra" className="relative w-full bg-[#f3f4f6] py-6 sm:py-7 overflow-hidden scroll-mt-24" data-node-id="95:312">
-      {/* Infinite scrolling marquee track */}
-      <div className="flex w-full overflow-hidden">
-        <div className="animate-marquee items-center py-1.5">
+    <section id="mitra" className="relative w-full bg-[#f3f4f6] py-8 sm:py-10 overflow-hidden scroll-mt-24" data-node-id="95:312">
+      {/* Infinite scrolling marquee track with generous padding to prevent shadow clipping */}
+      <div className="flex w-full overflow-hidden py-5 -my-5">
+        <div className="animate-marquee items-center py-4">
           {marqueeItems.map((p, index) => (
             <div
               key={`${p.name}-${index}`}
-              className="flex h-[88px] sm:h-[96px] w-[180px] sm:w-[200px] shrink-0 items-center justify-center px-3 sm:px-4"
+              className="flex h-[116px] sm:h-[128px] w-[184px] sm:w-[204px] shrink-0 items-center justify-center px-3 sm:px-4 py-3"
             >
               <div
-                className="group relative flex h-[84px] sm:h-[92px] w-[156px] sm:w-[172px] items-center justify-center rounded-lg border-2 border-dashed border-[#d1d5dc] bg-white p-2.5 sm:p-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.08),0px_1px_2px_-1px_rgba(0,0,0,0.08)] transition-all duration-200 hover:border-[#bc0c11] hover:shadow-md"
+                className="group relative flex h-[84px] sm:h-[92px] w-[156px] sm:w-[172px] items-center justify-center rounded-2xl neu-card-interactive p-2.5 sm:p-3"
               >
                 {/* Logo Image */}
                 <div className="relative h-[46px] sm:h-[52px] w-[116px] sm:w-[130px] opacity-80 transition-opacity duration-200 group-hover:opacity-100">

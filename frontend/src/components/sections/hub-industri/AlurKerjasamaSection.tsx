@@ -62,11 +62,12 @@ export default function AlurKerjasamaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="flex flex-col gap-3 mb-16"
+          className="flex flex-col items-center text-center max-w-3xl mx-auto mb-16"
         >
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828]">
             {t("hubIndustri.alurTitle", "Alur Kerjasama Kemitraan")}
           </h2>
+          <div className="section-title-line" />
           <p className="font-jakarta text-base text-[#4a5565] max-w-[560px] leading-relaxed">
             {t("hubIndustri.alurSubtitle", "Langkah terstruktur dalam membangun kolaborasi strategis bersama SMK Telkom Sidoarjo.")}
           </p>
@@ -84,7 +85,7 @@ export default function AlurKerjasamaSection() {
             <motion.div
               key={item.step}
               variants={cardVariants}
-              className="relative group rounded-[24px] bg-[#f9fafb] p-6 sm:p-7 flex flex-col gap-3 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="relative group rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col gap-3"
             >
               {/* Step Number Header */}
               <div className="mb-2">

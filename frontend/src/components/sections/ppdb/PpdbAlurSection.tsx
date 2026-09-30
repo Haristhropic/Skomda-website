@@ -74,6 +74,7 @@ export default function PpdbAlurSection() {
                   </>
                 )}
               </h2>
+              <div className="section-title-line !mx-0 !mt-2 !mb-5" />
 
               {/* Subtitle */}
               <p className="font-jakarta text-base sm:text-[17px] text-[#364153] leading-relaxed max-w-md mb-8 lg:mb-10">

@@ -75,7 +75,7 @@ export default function Ts21MetodeSection() {
               </>
             )}
           </h2>
-          <div className="h-[3px] w-12 rounded-full bg-[#bc0c11] mt-5 mb-2" />
+          <div className="section-title-line" />
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mt-2">
             {isEn
               ? "Standardized, student-centered, innovative, and engaging learning processes to cultivate resilient 21st-century graduates."
@@ -88,7 +88,7 @@ export default function Ts21MetodeSection() {
           {methods.map((item) => (
             <div
               key={item.title}
-              className="group relative rounded-[24px] bg-white p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="group relative rounded-[24px] neu-card-interactive p-7 flex flex-col justify-between"
             >
               <div>
                 {/* Top Icon Badge */}

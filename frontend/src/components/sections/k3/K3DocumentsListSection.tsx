@@ -113,16 +113,16 @@ export default function K3DocumentsListSection() {
     >
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="mb-8 sm:mb-10 flex flex-col gap-3">
+        <div className="mb-10 sm:mb-12 flex flex-col items-center text-center max-w-3xl mx-auto">
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] text-[#101828] tracking-tight leading-tight">
             {isEn
               ? "Official K3 Documents & Regulations Catalog"
               : "Katalog Berkas & Regulasi K3 Skomda"}
           </h2>
 
-          <div className="h-1 w-12 rounded-full bg-[#bc0c11]" />
+          <div className="section-title-line" />
 
-          <p className="font-jakarta text-sm sm:text-base text-[#4a5565] max-w-3xl leading-relaxed">
+          <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
             {isEn
               ? "A complete list of laboratory SOP manuals, evacuation maps, safety regulations, and official OSH standards at SMK Telkom Sidoarjo."
               : "Daftar lengkap berkas SOP, denah jalur evakuasi, regulasi keselamatan, dan pedoman K3 resmi SMK Telkom Sidoarjo."}
@@ -145,13 +145,13 @@ export default function K3DocumentsListSection() {
                   ? "Search laboratory SOPs, evacuation maps, or safety files..."
                   : "Cari dokumen SOP, jalur evakuasi, atau berkas K3..."
               }
-              className="w-full rounded-full bg-white pl-14 sm:pl-16 pr-12 sm:pr-14 py-3.5 sm:py-4 text-sm sm:text-base font-jakarta text-[#101828] placeholder-gray-400 border border-gray-200/90 focus:border-[#bc0c11] focus:outline-none shadow-xs transition-all"
+              className="w-full neu-input !pl-14 sm:!pl-16 !pr-12 sm:!pr-14 !h-[48px] !min-h-[48px] text-sm sm:text-base font-jakarta"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
+                className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-200/80 hover:bg-gray-300 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
                 aria-label="Hapus pencarian"
               >
                 <X className="size-3.5" />
@@ -159,8 +159,8 @@ export default function K3DocumentsListSection() {
             )}
           </div>
 
-          {/* Category Chips - Full-bleed horizontal slide on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
+          {/* Category Chips - Full-bleed horizontal slide on mobile with ample padding to avoid shadow clipping */}
+          <div className="neu-filter-container">
             {CATEGORIES.map((cat) => {
               const isActive = selectedCategory === cat;
               return (
@@ -168,11 +168,7 @@ export default function K3DocumentsListSection() {
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`shrink-0 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? "bg-[#bc0c11] text-white shadow-xs"
-                      : "bg-white text-[#4a5565] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                  }`}
+                  className={isActive ? "neu-pill-active" : "neu-pill"}
                 >
                   {cat}
                 </button>
@@ -182,7 +178,7 @@ export default function K3DocumentsListSection() {
         </div>
 
         {/* ─── Documents Table List ─── */}
-        <div className="rounded-[24px] bg-white border-2 border-dashed border-[#d1d5dc] shadow-xs overflow-hidden">
+        <div className="rounded-[24px] neu-card shadow-xs overflow-hidden">
           {paginatedDocs.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left font-jakarta border-collapse">

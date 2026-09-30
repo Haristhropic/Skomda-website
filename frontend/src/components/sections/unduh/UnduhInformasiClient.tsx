@@ -231,7 +231,7 @@ export default function UnduhInformasiClient() {
         {/* ─── Breadcrumb ─── */}
         <nav
           aria-label="Breadcrumb"
-          className="mb-6 sm:mb-8 flex items-center gap-2 text-xs sm:text-sm font-jakarta text-[#6a7282]"
+          className="mb-6 sm:mb-8 flex items-center justify-center gap-2 text-xs sm:text-sm font-jakarta text-[#6a7282]"
         >
           <Link href="/" className="hover:text-[#bc0c11] transition-colors font-medium">
             {t("nav.home")}
@@ -241,12 +241,14 @@ export default function UnduhInformasiClient() {
         </nav>
 
         {/* ─── Header Section ─── */}
-        <div className="mb-10 sm:mb-12 flex flex-col gap-3">
+        <div className="mb-10 sm:mb-12 flex flex-col items-center text-center max-w-3xl mx-auto">
           <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[42px] leading-tight tracking-tight text-[#101828]">
             {t("unduh.title1")} <span className="text-[#bc0c11]">{t("unduh.title2")}</span>
           </h1>
 
-          <p className="font-jakarta text-base sm:text-lg text-[#4a5565] max-w-3xl leading-relaxed">
+          <div className="section-title-line" />
+
+          <p className="font-jakarta text-base sm:text-lg text-[#4a5565] leading-relaxed">
             {t("unduh.description")}
           </p>
         </div>
@@ -263,13 +265,13 @@ export default function UnduhInformasiClient() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("unduh.searchPlaceholder")}
-              className="w-full rounded-full bg-white pl-14 sm:pl-16 pr-12 sm:pr-14 py-3.5 sm:py-4 text-sm sm:text-base font-jakarta text-[#101828] placeholder-gray-400 border border-gray-200/90 focus:border-[#bc0c11] focus:outline-none shadow-xs transition-all"
+              className="w-full neu-input !pl-14 sm:!pl-16 !pr-12 sm:!pr-14 !h-[48px] !min-h-[48px] text-sm sm:text-base font-jakarta"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
+                className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-200/80 hover:bg-gray-300 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
                 aria-label="Hapus pencarian"
               >
                 <X className="size-3.5" />
@@ -277,8 +279,8 @@ export default function UnduhInformasiClient() {
             )}
           </div>
 
-          {/* Category Chips - Full-bleed horizontal slide on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
+          {/* Category Chips - Full-bleed horizontal slide on mobile with ample padding to avoid shadow clipping */}
+          <div className="neu-filter-container">
             {CATEGORY_OPTIONS.map((cat) => {
               const isActive = selectedCategory === cat.key;
               const label = isEn ? cat.en : cat.id;
@@ -287,11 +289,7 @@ export default function UnduhInformasiClient() {
                   key={cat.key}
                   type="button"
                   onClick={() => setSelectedCategory(cat.key)}
-                  className={`shrink-0 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? "bg-[#bc0c11] text-white shadow-xs"
-                      : "bg-white text-[#4a5565] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                  }`}
+                  className={isActive ? "neu-pill-active" : "neu-pill"}
                 >
                   {label}
                 </button>
@@ -309,7 +307,7 @@ export default function UnduhInformasiClient() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: idx * 0.05 }}
-                className="group relative flex flex-col justify-between rounded-[22px] bg-white p-5 sm:p-6 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-lg"
+                className="group relative flex flex-col justify-between rounded-[22px] neu-card-interactive p-5 sm:p-6"
               >
                 <div className="flex flex-col gap-4">
                   {/* Thumbnail Preview with Zoom Overlay */}
@@ -362,7 +360,7 @@ export default function UnduhInformasiClient() {
                   <button
                     type="button"
                     onClick={() => setPreviewDoc(doc)}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-gray-100 hover:bg-[#bc0c11]/10 text-[#101828] hover:text-[#bc0c11] py-2.5 px-4 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
+                    className="btn-secondary flex-1 !h-10 !min-h-[40px] !py-2 !px-4 !text-xs sm:!text-sm cursor-pointer"
                   >
                     <Eye className="size-4" />
                     <span>{t("unduh.view")}</span>
@@ -371,11 +369,7 @@ export default function UnduhInformasiClient() {
                   <a
                     href={doc.fileUrl}
                     download
-                    className="group flex-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white py-2.5 px-4 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
-                    style={{
-                      boxShadow:
-                        "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                    }}
+                    className="btn-primary group flex-1 !h-10 !min-h-[40px] !py-2 !px-4 !text-xs sm:!text-sm cursor-pointer"
                   >
                     <Download className="size-4 transition-transform duration-200 group-hover:translate-y-0.5" />
                     <span>{t("unduh.download")}</span>
@@ -397,11 +391,7 @@ export default function UnduhInformasiClient() {
                 setSearchQuery("");
                 setSelectedCategory("Semua");
               }}
-              className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
-              style={{
-                boxShadow:
-                  "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-              }}
+              className="btn-primary !h-10 !min-h-[40px] !px-6 !text-xs sm:!text-sm cursor-pointer"
             >
               <span>{isEn ? "Reset Search" : "Reset Pencarian"}</span>
             </button>
@@ -409,7 +399,7 @@ export default function UnduhInformasiClient() {
         )}
 
         {/* ─── Table Summary Section ─── */}
-        <div className="mt-16 sm:mt-20 bg-white rounded-[24px] p-6 sm:p-8 border border-gray-200/80 shadow-sm">
+        <div className="mt-16 sm:mt-20 neu-card rounded-[24px] p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-5 border-b border-gray-100">
             <div>
               <h2 className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828]">
@@ -455,7 +445,7 @@ export default function UnduhInformasiClient() {
                         <button
                           type="button"
                           onClick={() => setPreviewDoc(doc)}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 hover:bg-[#bc0c11]/10 text-[#101828] hover:text-[#bc0c11] px-3.5 py-1.5 text-xs font-semibold font-jakarta transition-all duration-200 active:scale-95 cursor-pointer"
+                          className="btn-secondary !h-8 !min-h-[34px] !px-3.5 !py-1 !text-xs cursor-pointer"
                         >
                           <Eye className="size-3.5" />
                           <span>{t("unduh.view")}</span>
@@ -463,11 +453,7 @@ export default function UnduhInformasiClient() {
                         <a
                           href={doc.fileUrl}
                           download
-                          className="group inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-3.5 py-1.5 text-xs font-semibold font-jakarta transition-all duration-200 active:scale-95 cursor-pointer"
-                          style={{
-                            boxShadow:
-                              "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                          }}
+                          className="btn-primary group !h-8 !min-h-[34px] !px-3 !py-1 !text-xs cursor-pointer"
                         >
                           <Download className="size-3.5 transition-transform duration-200 group-hover:translate-y-0.5" />
                           <span>{t("unduh.download")}</span>
@@ -511,7 +497,7 @@ export default function UnduhInformasiClient() {
                     href={previewDoc.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-[#101828] px-3.5 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.98] cursor-pointer"
+                    className="btn-secondary !h-10 !min-h-[40px] !px-4 !py-2 !text-xs sm:!text-sm cursor-pointer"
                     title={lang === "EN" ? "Open in new tab" : "Buka di tab baru"}
                   >
                     <ExternalLink className="size-4" />
@@ -521,11 +507,7 @@ export default function UnduhInformasiClient() {
                   <a
                     href={previewDoc.fileUrl}
                     download
-                    className="group inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-4 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 active:scale-[0.97] cursor-pointer"
-                    style={{
-                      boxShadow:
-                        "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                    }}
+                    className="btn-primary group !h-10 !min-h-[40px] !px-4 !py-2 !text-xs sm:!text-sm cursor-pointer"
                   >
                     <Download className="size-4 transition-transform duration-200 group-hover:translate-y-0.5" />
                     <span className="hidden sm:inline">{t("unduh.download")}</span>
@@ -534,7 +516,7 @@ export default function UnduhInformasiClient() {
                   <button
                     type="button"
                     onClick={() => setPreviewDoc(null)}
-                    className="size-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-all duration-200 active:scale-95 cursor-pointer"
+                    className="neu-btn-icon !size-10 !min-h-[40px] !h-10 cursor-pointer"
                     aria-label={lang === "EN" ? "Close preview" : "Tutup pratinjau"}
                   >
                     <X className="size-5" />

@@ -50,12 +50,13 @@ export default function VirtualClassDtpGrid({
       id="pilih-dtp"
       className="relative w-full py-10 sm:py-14 lg:py-16 bg-[#fcfcfd] border-t border-gray-100 transition-all duration-300"
     >
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="max-w-3xl mb-8 sm:mb-10">
+        <div className="max-w-3xl mb-8 sm:mb-10 mx-auto text-center flex flex-col items-center">
           <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-[34px] text-[#101828] leading-tight">
             {t("virtualClass.dtpSectionTitle", "Pilih DTP Trial Class")}
           </h2>
+          <div className="section-title-line" />
           <p className="mt-2.5 font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
             {t(
               "virtualClass.dtpSectionSubtitle",
@@ -84,7 +85,7 @@ export default function VirtualClassDtpGrid({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.25, delay: idx * 0.03 }}
                   onClick={() => handleSelect(item)}
-                  className="group relative bg-white rounded-[14px] border border-gray-100/80 p-4 sm:p-5 shadow-[0px_2px_8px_0px_rgba(0,0,0,0.05)] hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.10)] hover:border-gray-200 transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.99]"
+                  className="group relative neu-card-interactive rounded-[20px] p-4 sm:p-5 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.99]"
                 >
                   {/* Left: Icon & Text Info */}
                   <div className="flex items-center gap-3.5 min-w-0 flex-1">

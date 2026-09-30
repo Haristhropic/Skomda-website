@@ -36,17 +36,17 @@ export default function TrialClassFeelingsSection() {
   return (
     <section className="relative w-full py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
-        {/* Section Heading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="mb-12 sm:mb-16"
+          className="mb-12 sm:mb-16 flex flex-col items-center text-center"
         >
           <h2 className="font-jakarta text-3xl sm:text-4xl font-bold text-[#101828] tracking-tight">
             {t("trialClassPage.feelingsTitle", "Apa Yang Akan Kamu Rasakan?")}
           </h2>
+          <div className="section-title-line" />
         </motion.div>
 
         {/* 3 Columns Grid */}

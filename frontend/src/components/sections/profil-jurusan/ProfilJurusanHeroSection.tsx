@@ -16,7 +16,10 @@ export default function ProfilJurusanHeroSection() {
       titleHighlight={t("profilJurusan.heroTitle2", "Jurusan")}
       titleHighlightColor="text-[#e7000b]"
       showAccentBar={true}
-      description={t("profilJurusan.heroDesc")}
+      description={t(
+        "profilJurusan.heroDesc",
+        "Mempersiapkan siswa menjadi praktisi handal di era digital melalui 2 kompetensi keahlian unggulan: Sistem Informasi, Jaringan, dan Aplikasi (SIJA) serta Teknik Jaringan Akses Telekomunikasi (TJAT)."
+      )}
       studentImage="/images/program/profil-jurusan/hero-jurusan-student.png"
       studentAlt={`${t("profilJurusan.breadcrumb", "Profil Jurusan")} SMK Telkom Sidoarjo`}
       ctaText={t("profilJurusan.heroCta", "Jelajahi")}

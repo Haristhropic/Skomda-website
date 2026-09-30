@@ -42,7 +42,7 @@ export default function StrukturOrganisasiSection() {
                 {t("profilSekolah.strukturTitle", "Struktur Organisasi")} <br />
                 <span className="text-[#e7000b]">SMK Telkom Sidoarjo</span>
               </h2>
-              <div className="mt-3.5 h-[3px] w-14 bg-[#bc0c11] rounded-full" />
+              <div className="section-title-line !mx-0" />
             </div>
 
             <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed">

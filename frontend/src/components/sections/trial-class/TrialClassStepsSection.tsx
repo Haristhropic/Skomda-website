@@ -66,9 +66,10 @@ export default function TrialClassStepsSection() {
             className="lg:col-span-6"
           >
             <div className="bg-[#f3f4f6]/80 backdrop-blur-sm rounded-[20px] sm:rounded-[24px] p-6 sm:p-8 lg:p-10 border border-gray-200/80 shadow-sm">
-              <h2 className="font-jakarta text-2xl sm:text-3xl lg:text-4xl font-bold text-[#101828] mb-8 sm:mb-10">
+              <h2 className="font-jakarta text-2xl sm:text-3xl lg:text-4xl font-bold text-[#101828] mb-2">
                 {t("trialClassPage.stepsTitle", "Cara Mengikuti")}
               </h2>
+              <div className="section-title-line !mx-0 !mt-2 !mb-8 sm:!mb-10" />
 
               <div className="flex flex-col gap-8 sm:gap-10">
                 {steps.map((step, idx) => (

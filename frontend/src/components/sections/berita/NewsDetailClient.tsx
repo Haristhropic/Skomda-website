@@ -153,7 +153,7 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
               {relatedNews.map((item) => (
                 <article
                   key={item.id || item.slug}
-                  className="bg-white rounded-[16px] p-3 pb-4 flex flex-col shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] group"
+                  className="neu-card-interactive rounded-[18px] p-3 pb-4 flex flex-col group"
                 >
                   <Link
                     href={`/berita/${item.slug}`}

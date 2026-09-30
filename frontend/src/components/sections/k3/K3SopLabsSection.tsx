@@ -217,7 +217,7 @@ export default function K3SopLabsSection() {
             {t("k3.sopTitle", "Standar Operasional Prosedur (SOP) Laboratorium")}
           </h2>
 
-          <div className="mx-auto h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+          <div className="section-title-line" />
 
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
             {t(
@@ -228,7 +228,7 @@ export default function K3SopLabsSection() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10 scrollbar-none overscroll-x-contain">
+        <div className="neu-filter-container justify-center mb-8 sm:mb-10">
           {labsData.map((lab) => {
             const isActive = activeTab === lab.id;
             return (
@@ -236,24 +236,20 @@ export default function K3SopLabsSection() {
                 key={lab.id}
                 type="button"
                 onClick={() => setActiveTab(lab.id)}
-                className={`inline-flex items-center gap-2 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 ${
-                  isActive
-                    ? "bg-[#bc0c11] text-white shadow-xs"
-                    : "bg-white text-[#4a5565] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                }`}
+                className={`${isActive ? "neu-pill-active" : "neu-pill"} !gap-2 !px-4 sm:!px-5`}
                 aria-pressed={isActive}
               >
                 {lab.icon}
-                {isEn ? lab.tabLabelEn : lab.tabLabelId}
+                <span>{isEn ? lab.tabLabelEn : lab.tabLabelId}</span>
               </button>
             );
           })}
         </div>
 
         {/* Tab Content Panel */}
-        <div className="rounded-[28px] bg-white border-2 border-dashed border-[#d1d5dc] p-6 sm:p-9">
+        <div className="rounded-[28px] neu-card p-6 sm:p-9">
           {/* Lab Info Banner */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-dashed border-gray-200">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-100">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="text-[#bc0c11] shrink-0">
@@ -272,7 +268,7 @@ export default function K3SopLabsSection() {
           {/* Do's & Don'ts Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Do's Column */}
-            <div className="rounded-[22px] bg-[#f9fafb] p-5 sm:p-6 border-2 border-dashed border-[#d1d5dc]">
+            <div className="rounded-[22px] neu-inset-panel p-5 sm:p-6">
               <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-emerald-100">
                 <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
                 <div>
@@ -300,7 +296,7 @@ export default function K3SopLabsSection() {
             </div>
 
             {/* Don'ts Column */}
-            <div className="rounded-[22px] bg-[#f9fafb] p-5 sm:p-6 border-2 border-dashed border-[#d1d5dc]">
+            <div className="rounded-[22px] neu-inset-panel p-5 sm:p-6">
               <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-red-100">
                 <XCircle className="size-5 text-[#bc0c11] shrink-0" />
                 <div>
@@ -329,7 +325,7 @@ export default function K3SopLabsSection() {
           </div>
 
           {/* Required APD for this lab */}
-          <div className="rounded-[20px] bg-[#f9fafb] p-4 sm:p-5 border-2 border-dashed border-[#d1d5dc] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="rounded-[20px] neu-inset-panel p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#101828]">
               <ShieldCheck className="size-4 text-[#bc0c11] shrink-0" />
               <p>{isEn ? "Mandatory Equipment for this Lab:" : "APD Wajib di Laboratorium Ini:"}</p>

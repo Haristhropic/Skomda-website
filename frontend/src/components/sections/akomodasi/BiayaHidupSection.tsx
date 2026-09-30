@@ -134,6 +134,7 @@ export default function BiayaHidupSection() {
               </>
             )}
           </h2>
+          <div className="section-title-line" />
           <p className="font-jakarta text-base text-[#4a5565] leading-relaxed mt-1">
             {t("akomodasi.biayaSubtitle")}
           </p>
@@ -151,7 +152,7 @@ export default function BiayaHidupSection() {
             <motion.div
               key={tier.category}
               variants={cardVariants}
-              className="relative rounded-[28px] p-7 sm:p-9 flex flex-col justify-between bg-white border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="relative rounded-[28px] p-7 sm:p-9 flex flex-col justify-between neu-card-interactive"
             >
               <div>
                 {/* Header Info */}

@@ -95,7 +95,7 @@ export default function KeunggulanSertifikasiSection() {
               </>
             )}
           </h2>
-          <div className="h-[3px] w-12 rounded-full bg-[#bc0c11] mt-4 mb-3" />
+          <div className="section-title-line" />
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
             {t("profilJurusan.sertifikasiDesc")}
           </p>
@@ -106,7 +106,7 @@ export default function KeunggulanSertifikasiSection() {
           {advantages.map((item) => (
             <div
               key={item.number}
-              className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-xl hover:-translate-y-1"
+              className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
             >
               <div>
                 {/* Top Header: Unboxed Icon & Large Gray Number */}
@@ -134,7 +134,7 @@ export default function KeunggulanSertifikasiSection() {
         </div>
 
         {/* Certification Logos & Badges Banner */}
-        <div className="rounded-[24px] bg-white p-7 sm:p-9 border-2 border-dashed border-[#d1d5dc]">
+        <div className="rounded-[24px] neu-card p-7 sm:p-9">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
             <div>
               <h3 className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828]">
@@ -152,7 +152,7 @@ export default function KeunggulanSertifikasiSection() {
             {certifications.map((cert) => (
               <div
                 key={cert.name}
-                className="group flex items-center gap-3.5 p-3.5 rounded-[18px] bg-[#f8f9fb] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all duration-200"
+                className="group flex items-center gap-3.5 p-3.5 rounded-[18px] neu-inset-panel transition-all duration-200"
               >
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#bc0c11]/10 text-[#bc0c11] group-hover:bg-[#bc0c11] group-hover:text-white transition-all duration-200">
                   <CheckCircle2 className="size-5" />

@@ -20,25 +20,28 @@ export default function ProgramsSection() {
             {t("programs.title1")}
           </h2>
 
-          <p className="mt-2 font-jakarta font-bold text-2xl sm:text-[30px] leading-[36px] text-[#101828]">
+          <p className="mt-1 font-jakarta font-bold text-2xl sm:text-[30px] leading-[36px] text-[#101828]">
             {t("programs.title2")} <span className="text-[#bc0c11]">SMK Telkom Sidoarjo</span>
           </p>
 
+          {/* Red Accent Line */}
+          <div className="section-title-line !mb-2" />
+
           {/* Segmented Pill Tabs with Animated Sliding Pill */}
-          <div className="mt-6 sm:mt-8 relative inline-flex h-[48px] sm:h-[52px] w-[280px] sm:w-[340px] items-center rounded-full bg-white p-1 border border-gray-200/60 overflow-hidden">
+          <div className="mt-4 sm:mt-5 neu-tab-track h-[50px] sm:h-[54px] w-[280px] sm:w-[340px]">
             {/* Smooth CSS sliding pill indicator */}
             <div
-              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-[#bc0c11] transition-transform duration-300 ease-out pointer-events-none ${
-                activeTab === "SIJA" ? "left-1 translate-x-0" : "left-1 translate-x-[calc(100%+0px)]"
+              className={`neu-tab-active-pill top-1.5 bottom-1.5 w-[calc(50%-6px)] ${
+                activeTab === "SIJA" ? "left-1.5 translate-x-0" : "left-1.5 translate-x-full"
               }`}
             />
             <button
               type="button"
               onClick={() => setActiveTab("SIJA")}
-              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${
+              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm transition-colors duration-200 cursor-pointer select-none ${
                 activeTab === "SIJA"
                   ? "text-white font-semibold"
-                  : "text-[#364153] hover:text-[#bc0c11]"
+                  : "text-[#4a5565] font-medium hover:text-[#bc0c11]"
               }`}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,10 +53,10 @@ export default function ProgramsSection() {
             <button
               type="button"
               onClick={() => setActiveTab("TJAT")}
-              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${
+              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm transition-colors duration-200 cursor-pointer select-none ${
                 activeTab === "TJAT"
                   ? "text-white font-semibold"
-                  : "text-[#364153] hover:text-[#bc0c11]"
+                  : "text-[#4a5565] font-medium hover:text-[#bc0c11]"
               }`}
             >
               {/* Exact TJAT vector icon from (node 96:378) */}
@@ -162,7 +165,7 @@ export default function ProgramsSection() {
 
             {/* 4. Prospek Kerja (mobile: fourth, desktop: right col row 3) */}
             <div className="order-4 lg:col-span-7 lg:col-start-6 lg:row-start-3">
-              <div className="rounded-2xl bg-white border-2 border-dashed border-[#d1d5dc] p-4 sm:p-5">
+              <div className="rounded-2xl neu-inset-panel p-4 sm:p-5">
                 <h4 className="font-jakarta font-semibold text-sm sm:text-base text-[#c10007]">
                   {isEn ? "Career Prospects:" : "Prospek Kerja:"}
                 </h4>
@@ -176,11 +179,7 @@ export default function ProgramsSection() {
             <div className="order-5 lg:col-span-7 lg:col-start-6 lg:row-start-4">
               <Link
                 href="/program/profil-jurusan?jurusan=SIJA#kompetensi"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3 text-sm sm:text-base font-medium text-white transition-all hover:bg-[#990a0e] active:scale-[0.98]"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7"
               >
                 <span className="font-jakarta font-medium">{t("programs.learnMore", "Pelajari Lebih Lanjut")}</span>
                 <svg
@@ -299,7 +298,7 @@ export default function ProgramsSection() {
 
             {/* 4. Prospek Kerja */}
             <div className="order-4 lg:col-span-7 lg:col-start-6 lg:row-start-3">
-              <div className="rounded-2xl bg-white border-2 border-dashed border-[#d1d5dc] p-4 sm:p-5">
+              <div className="rounded-2xl neu-inset-panel p-4 sm:p-5">
                 <h4 className="font-jakarta font-semibold text-sm sm:text-base text-[#c10007]">
                   {isEn ? "Career Prospects:" : "Prospek Kerja:"}
                 </h4>
@@ -313,11 +312,7 @@ export default function ProgramsSection() {
             <div className="order-5 lg:col-span-7 lg:col-start-6 lg:row-start-4">
               <Link
                 href="/program/profil-jurusan?jurusan=TJAT#kompetensi"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3 text-sm sm:text-base font-medium text-white transition-all hover:bg-[#990a0e] active:scale-[0.98]"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7"
               >
                 <span className="font-jakarta font-medium">{t("programs.learnMore", "Pelajari Lebih Lanjut")}</span>
                 <svg

@@ -82,17 +82,21 @@ export default function FasilitasClient() {
           { label: t("nav.aboutUs", "Tentang Kami"), href: "/tentang-kami/profil-sekolah" },
           { label: t("fasilitas.breadcrumb", "Fasilitas"), href: "/tentang-kami/fasilitas" },
         ]}
-        titleHighlight={t("fasilitas.breadcrumb", "Fasilitas")}
-        titleHighlightColor="text-[#101828]"
-        description={t("fasilitas.heroDesc")}
+        titlePrefix={t("fasilitas.heroTitle1", "Fasilitas &")}
+        titleHighlight={t("fasilitas.heroTitle2", "Sarana Prasarana")}
+        titleHighlightColor="text-[#bc0c11]"
+        showAccentBar={true}
+        description={t(
+          "fasilitas.heroDesc",
+          "Didukung infrastruktur modern bersertifikasi ISO 21001:2018, kami menyediakan laboratorium jaringan berkecepatan tinggi, studio pengembangan software, perpustakaan digital, serta ruang kelas interaktif."
+        )}
         studentImage="/images/tentang-kami/fasilitas/hero-fasilitas-terpadu.png"
         studentAlt={`${t("fasilitas.breadcrumb", "Fasilitas")} SMK Telkom Sidoarjo`}
         ctaText={t("fasilitas.heroCta", "Jelajahi")}
         ctaHref="#daftar-fasilitas"
         imagePosition="right"
         isIntegratedArtwork={true}
-        imageContainerClassName="w-full max-w-[520px] sm:max-w-[580px] lg:max-w-[620px] aspect-[1.12/1]"
-        sectionPaddingClassName="pt-28 sm:pt-32 lg:pt-30 pb-16 lg:pb-24"
+        imageContainerClassName="w-full max-w-[540px] sm:max-w-[600px] lg:max-w-[650px] xl:max-w-[680px] aspect-[16/10]"
       />
 
       {/* Main Facilities Catalog */}
@@ -100,10 +104,10 @@ export default function FasilitasClient() {
         <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828] mb-4">
+            <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828]">
               {t("fasilitas.sectionTitle", "Laboratorium & Sarana Prasarana Terpadu")}
             </h2>
-            <div className="mx-auto h-1 w-16 rounded-full bg-[#bc0c11] mb-4" />
+            <div className="section-title-line" />
             <p className="font-jakarta text-base text-[#4a5565] leading-relaxed">
               {t("fasilitas.sectionDesc", "Mulai dari laboratorium kejuruan tingkat lanjut hingga lingkungan belajar luar ruang yang asri, seluruh sarana dirancang demi kenyamanan dan kesiapan kerja siswa.")}
             </p>
@@ -120,13 +124,13 @@ export default function FasilitasClient() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={isEn ? "Search school facilities..." : "Cari fasilitas sekolah..."}
-                className="w-full rounded-full bg-white pl-14 sm:pl-16 pr-12 sm:pr-14 py-3.5 sm:py-4 text-sm sm:text-base font-jakarta text-[#101828] placeholder-gray-400 border border-gray-200/90 focus:border-[#bc0c11] focus:outline-none shadow-xs transition-all"
+                className="w-full neu-input !pl-14 sm:!pl-16 !pr-12 sm:!pr-14 !h-[48px] !min-h-[48px] text-sm sm:text-base font-jakarta"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
+                  className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-200/80 hover:bg-gray-300 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
                   aria-label={isEn ? "Clear search" : "Hapus pencarian"}
                 >
                   <X className="size-3.5" />
@@ -137,7 +141,7 @@ export default function FasilitasClient() {
 
           {/* Facilities Grid & Mobile Horizontal Scroll */}
           {filteredItems.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
+            <div className="text-center py-16 neu-inset-panel rounded-[24px] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
                 {isEn ? "No facilities match your search " : "Tidak ada fasilitas yang sesuai dengan pencarian "}
                 &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
@@ -145,11 +149,7 @@ export default function FasilitasClient() {
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-medium font-jakarta transition-all duration-200 active:scale-[0.98] cursor-pointer"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary !h-10 !min-h-[40px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{isEn ? "Reset Search" : "Atur Ulang Pencarian"}</span>
               </button>
@@ -167,7 +167,7 @@ export default function FasilitasClient() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] neu-card-interactive overflow-hidden flex flex-col"
                   >
                     {/* Image */}
                     <div className="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">

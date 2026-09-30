@@ -42,7 +42,7 @@ export default function BkkAlumniJourneySection() {
               </span>
             </h2>
 
-            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+            <div className="section-title-line !mx-0" />
 
             <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mb-6">
               {isEn
@@ -60,9 +60,9 @@ export default function BkkAlumniJourneySection() {
             </div>
           </div>
 
-          {/* Right Column: Interactive Testimonial Card styled like K3 box */}
+          {/* Right Column: Interactive Testimonial Card */}
           <div className="lg:col-span-7">
-            <div className="bg-white rounded-[28px] border-2 border-dashed border-[#d1d5dc] p-6 sm:p-8 hover:border-[#bc0c11] hover:shadow-md transition-all duration-300 group">
+            <div className="neu-card-interactive rounded-[28px] p-6 sm:p-8 group">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                 
                 {/* Alumnus Photo */}
@@ -89,7 +89,7 @@ export default function BkkAlumniJourneySection() {
                   </div>
 
                   {/* Name & Alumnus Details with Navigation Controls */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-dashed border-gray-200">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-100">
                     <div>
                       <h3 className="font-jakarta font-bold text-base text-[#101828]">
                         {currentStory.name}
@@ -107,7 +107,7 @@ export default function BkkAlumniJourneySection() {
                       <button
                         onClick={handlePrev}
                         aria-label={isEn ? "Previous Alumni Story" : "Cerita Alumni Sebelumnya"}
-                        className="w-10 h-10 rounded-full border-2 border-dashed border-[#d1d5dc] bg-white text-[#101828] hover:border-[#bc0c11] hover:text-[#bc0c11] flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
+                        className="w-10 h-10 rounded-full neu-card-interactive text-[#101828] hover:text-[#bc0c11] flex items-center justify-center transition-all cursor-pointer active:scale-95"
                       >
                         <ChevronLeft className="size-4" />
                       </button>

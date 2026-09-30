@@ -163,6 +163,7 @@ export default function RekomendasiKosSection() {
             <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828]">
               {t("akomodasi.kosTitle")}
             </h2>
+            <div className="section-title-line !mx-0" />
             <p className="font-jakarta text-base text-[#4a5565] leading-relaxed">
               {t("akomodasi.kosSubtitle")}
             </p>
@@ -199,7 +200,7 @@ export default function RekomendasiKosSection() {
           {filteredItems.map((item) => (
             <div
               key={item.id}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative h-full rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative h-full rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
             >
               <div className="flex flex-col gap-4">
                 {/* Header: Category + Name + Location */}
@@ -254,11 +255,7 @@ export default function RekomendasiKosSection() {
                   )}.`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] px-4 py-2 text-xs font-medium text-white transition-all duration-200 font-jakarta shrink-0 active:scale-[0.98] cursor-pointer"
-                  style={{
-                    boxShadow:
-                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                  }}
+                  className="btn-primary !h-8 !min-h-[34px] !px-4 !py-1.5 !text-xs font-jakarta shrink-0 cursor-pointer"
                 >
                   <span>{isEn ? "Contact" : "Hubungi"}</span>
                   <svg

@@ -66,49 +66,18 @@ export default function WhyChooseUsSection() {
     <section id="keunggulan" className="w-full bg-[#f3f4f6] py-14 sm:py-20 lg:py-24 scroll-mt-24">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
 
-        {/* Header Row 67:126 & 67:140) */}
-        <div className="flex flex-col gap-5 sm:gap-6 sm:flex-row sm:items-end sm:justify-between mb-8 sm:mb-12">
-          <div className="flex flex-col gap-1">
-            <h2 className="font-jakarta font-bold text-3xl sm:text-[36px] leading-[40px] text-[#101828]">
-              {t("why.title1")}
-            </h2>
-            <span className="font-jakarta font-bold text-3xl sm:text-[36px] leading-[40px] text-[#bc0c11]">
-              {t("why.title2")}
-            </span>
-          </div>
-
-          {/* CTA Daftar Sekarang Button 67:140) */}
-          <div className="shrink-0">
-            <Link
-              href="/ppdb"
-              className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-[#990a0e] active:scale-[0.98]"
-              style={{
-                boxShadow:
-                  "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-              }}
-            >
-              <span className="font-jakarta font-medium text-base">{t("why.applyNow")}</span>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="transition-transform group-hover:translate-x-1"
-              >
-                <path
-                  d="M5 12H19M19 12L12 5M19 12L12 19"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
-          </div>
+        {/* Header Row */}
+        <div className="flex flex-col items-center text-center mb-10 sm:mb-12">
+          <h2 className="font-jakarta font-bold text-3xl sm:text-[36px] leading-[40px] text-[#101828]">
+            {t("why.title1")}{" "}
+            <span className="text-[#bc0c11]">{t("why.title2")}</span>
+          </h2>
+          {/* Red Accent Line */}
+          <div className="section-title-line" />
         </div>
 
         {/* 6 Feature Cards Grid nodes 67:180, 67:235, 67:214, 67:248, 67:261, 67:274) */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {whyCards.map((card) => {
             if (card.isHighlight) {
               return (
@@ -116,11 +85,11 @@ export default function WhyChooseUsSection() {
                   key={card.id}
                   href={card.href || "#"}
                   data-node-id={card.id}
-                  className="group relative rounded-[25px] bg-[#bc0c11] px-6 sm:px-7 py-6 text-white shadow-[0px_4px_9px_0px_rgba(0,0,0,0.1)] flex items-center gap-4 sm:gap-5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-pointer border-2 border-dashed border-white/50 hover:border-white min-h-[120px]"
+                  className="group relative rounded-[22px] sm:rounded-[25px] neu-card-red px-4 sm:px-7 py-4 sm:py-6 text-white flex items-center gap-3.5 sm:gap-5 cursor-pointer min-h-[105px] sm:min-h-[120px]"
                 >
-                  {/* White circle icon 23:120 / 67:237) */}
-                  <div className="flex size-[64px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-white shadow-sm p-3 transition-transform duration-300 group-hover:scale-105">
-                    <div className="relative size-[36px] sm:size-[40px]">
+                  {/* White circle icon */}
+                  <div className="flex size-[52px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-white shadow-sm p-2 sm:p-3 transition-transform duration-300 group-hover:scale-105">
+                    <div className="relative size-[30px] sm:size-[40px]">
                       <Image
                         src={card.iconSrc}
                         alt=""
@@ -165,11 +134,11 @@ export default function WhyChooseUsSection() {
               <div
                 key={card.id}
                 data-node-id={card.id}
-                className="relative rounded-[25px] bg-white px-6 sm:px-7 py-6 shadow-[0px_4px_4.5px_rgba(0,0,0,0.08)] flex items-center gap-4 sm:gap-5 border-2 border-dashed border-[#d1d5dc] min-h-[120px]"
+                className="relative rounded-[22px] sm:rounded-[25px] neu-card px-4 sm:px-7 py-4 sm:py-6 flex items-center gap-3.5 sm:gap-5 min-h-[105px] sm:min-h-[120px]"
               >
                 {/* Light pink/red circle icon 67:145) */}
-                <div className="flex size-[64px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-[#ffebed] p-3">
-                  <div className="relative size-[36px] sm:size-[40px]">
+                <div className="flex size-[52px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-[#ffebed] p-2 sm:p-3">
+                  <div className="relative size-[30px] sm:size-[40px]">
                     <Image
                       src={card.iconSrc}
                       alt=""
@@ -192,7 +161,6 @@ export default function WhyChooseUsSection() {
             );
           })}
         </div>
-
       </div>
     </section>
   );

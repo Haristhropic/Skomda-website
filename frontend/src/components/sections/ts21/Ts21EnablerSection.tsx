@@ -120,7 +120,7 @@ export default function Ts21EnablerSection() {
               </>
             )}
           </h2>
-          <div className="h-[3px] w-12 rounded-full bg-[#bc0c11] mt-5 mb-2" />
+          <div className="section-title-line" />
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mt-2">
             {isEn
               ? "An integrated digital ecosystem and educator skill acceleration underpinning the success of the TS.21 Program."
@@ -148,7 +148,7 @@ export default function Ts21EnablerSection() {
             {digitalEnablers.map((tool) => (
               <div
                 key={tool.name}
-                className="group relative rounded-[22px] bg-white p-6 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-sm"
+                className="group relative rounded-[22px] neu-card-interactive p-6 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex size-11 items-center justify-center rounded-xl bg-[#bc0c11]/10 text-[#bc0c11] group-hover:bg-[#bc0c11] group-hover:text-white transition-all duration-300 mb-4 shadow-xs">
@@ -170,7 +170,7 @@ export default function Ts21EnablerSection() {
         </div>
 
         {/* 2. Teacher & Mentor Skill Development Card */}
-        <div className="rounded-[28px] bg-[#f9fafb] p-8 sm:p-12 border-2 border-dashed border-[#d1d5dc]">
+        <div className="rounded-[28px] neu-inset-panel p-8 sm:p-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-gray-200/80">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#bc0c11] font-jakarta">

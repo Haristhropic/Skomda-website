@@ -55,10 +55,10 @@ export default function ShareArticleWidget({ slug }: ShareArticleWidgetProps) {
       <button
         type="button"
         onClick={handleCopy}
-        className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold font-jakarta transition-all shadow-xs active:scale-95 cursor-pointer ${
+        className={`inline-flex items-center gap-1.5 rounded-full px-4 text-xs font-bold font-jakarta transition-all cursor-pointer ${
           copied
-            ? "bg-[#bc0c11] text-white border-[#bc0c11]"
-            : "border-gray-200/90 bg-white text-[#bc0c11] hover:bg-[#bc0c11] hover:text-white hover:border-[#bc0c11]"
+            ? "btn-primary !h-9 !min-h-[36px]"
+            : "btn-secondary !h-9 !min-h-[36px]"
         }`}
         aria-label={copied ? "Tersalin" : "Salin Link"}
       >

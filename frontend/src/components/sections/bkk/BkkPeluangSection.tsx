@@ -127,11 +127,11 @@ export default function BkkPeluangSection() {
   };
 
   return (
-    <section id="peluang-karier" className="relative w-full py-16 sm:py-20 lg:py-24 bg-[#f9fafb] border-t border-gray-200/60 overflow-hidden scroll-mt-24">
+    <section id="peluang-karier" className="relative w-full py-16 sm:py-20 lg:py-24 bg-[#f9fafb] border-t border-gray-200/60 overflow-x-clip scroll-mt-24">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-8 sm:mb-10 max-w-3xl mx-auto text-center flex flex-col items-center">
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828] mb-2">
             {isEn ? (
               <>
@@ -144,7 +144,7 @@ export default function BkkPeluangSection() {
             )}
           </h2>
 
-          <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-3" />
+          <div className="section-title-line" />
 
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] max-w-3xl leading-relaxed">
             {isEn
@@ -179,8 +179,8 @@ export default function BkkPeluangSection() {
             )}
           </div>
 
-          {/* Category Filter Pills - Full-bleed horizontal slide on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
+          {/* Category Filter Pills - Full-bleed horizontal slide on mobile with ample padding to avoid shadow clipping */}
+          <div className="neu-filter-container">
             {filterOptions.map((filter) => {
               const isActive = activeFilter === filter;
               return (
@@ -188,11 +188,7 @@ export default function BkkPeluangSection() {
                   key={filter}
                   type="button"
                   onClick={() => setActiveFilter(filter)}
-                  className={`shrink-0 rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer select-none ${
-                    isActive
-                      ? "bg-[#bc0c11] text-white shadow-xs"
-                      : "bg-white text-[#4a5565] border border-gray-200/90 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                  }`}
+                  className={isActive ? "neu-pill-active" : "neu-pill"}
                 >
                   {filter}
                 </button>
@@ -207,7 +203,7 @@ export default function BkkPeluangSection() {
             displayedJobs.map((job) => (
               <div
                 key={job.id}
-                className="bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] px-5 sm:px-7 py-5 sm:py-6 hover:shadow-md hover:border-[#bc0c11] transition-all duration-300 group"
+                className="rounded-[24px] neu-card-interactive px-5 sm:px-7 py-5 sm:py-6 group"
               >
                 {/* Desktop Aligned Row Layout (>= 1024px) */}
                 <div className="hidden lg:flex items-center justify-between gap-6">
@@ -291,7 +287,7 @@ export default function BkkPeluangSection() {
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between pt-3 border-t border-dashed border-gray-200 gap-2">
+                  <div className="flex flex-wrap items-center justify-between pt-3 border-t border-gray-100 gap-2">
                     <div className="flex items-center gap-3 text-xs font-jakarta text-[#4a5565]">
                       <span className="flex items-center gap-1">
                         <MapPin className="size-3.5 text-[#bc0c11] shrink-0" />
@@ -317,7 +313,7 @@ export default function BkkPeluangSection() {
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-[24px] p-10 text-center border-2 border-dashed border-[#d1d5dc]">
+            <div className="neu-inset-panel rounded-[24px] p-10 text-center">
               <p className="font-jakarta font-semibold text-base text-[#101828] mb-1">
                 {isEn ? "No matching opportunities found" : "Tidak ada lowongan yang sesuai"}
               </p>
@@ -332,7 +328,7 @@ export default function BkkPeluangSection() {
                   setActiveFilter(isEn ? "All" : "Semua");
                   setSearchQuery("");
                 }}
-                className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer shadow-xs"
+                className="btn-primary !h-10 !min-h-[40px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{isEn ? "Reset Search" : "Atur Ulang Pencarian"}</span>
               </button>
@@ -344,7 +340,7 @@ export default function BkkPeluangSection() {
         <div className="flex justify-center">
           <button
             onClick={handleToggleViewAll}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border-2 border-dashed border-[#bc0c11]/50 text-sm font-jakarta font-bold text-[#bc0c11] hover:border-[#bc0c11] hover:bg-red-50/60 transition-all group cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full neu-card-interactive text-sm font-jakarta font-bold text-[#bc0c11] hover:bg-red-50/40 transition-all group cursor-pointer"
           >
             <span>
               {!showAll ||
@@ -381,7 +377,7 @@ export default function BkkPeluangSection() {
           onClick={() => setSelectedJob(null)}
         >
           <div
-            className="relative w-full max-w-2xl bg-white rounded-[28px] border border-gray-200/90 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+            className="relative w-full max-w-2xl neu-card rounded-[28px] shadow-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -429,7 +425,7 @@ export default function BkkPeluangSection() {
             </div>
 
             {/* Timeline & Metadata */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-[#f9fafb] border-2 border-dashed border-[#d1d5dc] mb-6 text-xs font-jakarta">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl neu-inset-panel mb-6 text-xs font-jakarta">
               <div>
                 <span className="text-gray-400 block mb-0.5">{isEn ? "Deadline" : "Batas Lamaran"}</span>
                 <span className="font-semibold text-[#101828]">{selectedJob.deadline}</span>
@@ -481,10 +477,10 @@ export default function BkkPeluangSection() {
             </div>
 
             {/* Action Bar */}
-            <div className="pt-4 border-t border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
               <button
                 onClick={() => copyEmail(selectedJob.applyEmail)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 text-xs sm:text-sm font-jakarta font-medium text-[#4a5565] hover:border-[#bc0c11] hover:text-[#bc0c11] transition-all duration-200 active:scale-[0.98] cursor-pointer"
+                className="btn-secondary w-full sm:w-auto !h-[44px] !px-5 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>
                   {copied
@@ -500,11 +496,7 @@ export default function BkkPeluangSection() {
 
               <a
                 href={`mailto:${selectedJob.applyEmail}?subject=Lamaran%20Posisi%20${encodeURIComponent(selectedJob.title)}%20-%20Alumni%20SMK%20Telkom%20Sidoarjo`}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#bc0c11] text-xs sm:text-sm font-jakarta font-medium text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] cursor-pointer"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary w-full sm:w-auto !h-[44px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{isEn ? "Submit Application / CV" : "Kirim Lamaran / CV"}</span>
                 <Send className="size-4" />

@@ -27,9 +27,10 @@ export default function VisiMisiSection() {
             className="lg:col-span-7 flex flex-col items-start"
           >
             {/* Section Heading */}
-            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl text-[#101828] mb-10 tracking-tight">
+            <h2 className="font-jakarta font-bold text-3xl sm:text-4xl text-[#101828] tracking-tight">
               {t("profilSekolah.visiTitle", "Visi & Misi Sekolah")}
             </h2>
+            <div className="section-title-line !mx-0 !mt-3.5 !mb-10" />
 
             {/* Visi Block */}
             <div className="flex items-start gap-4 sm:gap-5 mb-10 group">

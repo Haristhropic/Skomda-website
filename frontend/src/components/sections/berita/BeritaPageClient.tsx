@@ -89,11 +89,11 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#f3f4f6] pt-36 sm:pt-40 lg:pt-44 pb-20 sm:pb-28">
+    <section className="relative w-full overflow-x-clip bg-[#f3f4f6] pt-36 sm:pt-40 lg:pt-44 pb-20 sm:pb-28">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {/* ─── 1. Header & Breadcrumbs ─── */}
-        <div className="max-w-3xl mb-8">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-jakarta text-[#4a5565] mb-3">
+        <div className="max-w-3xl mb-8 flex flex-col items-center text-center mx-auto">
+          <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-2 text-xs sm:text-sm font-jakarta text-[#4a5565] mb-3">
             <Link href="/" className="hover:text-[#bc0c11] transition-colors">
               {t("nav.home", "Beranda")}
             </Link>
@@ -111,7 +111,10 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
             {t("informasi.beritaTitle1", "Berita & Informasi")}{" "}
             <span className="text-[#bc0c11]">{t("informasi.beritaTitle2", "Terkini")}</span>
           </h1>
-          <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mt-2.5 max-w-2xl">
+
+          <div className="section-title-line" />
+
+          <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-2xl">
             {t(
               "informasi.beritaDesc",
               "Temukan kabar terbaru seputar kegiatan sekolah, prestasi siswa, kemitraan industri, dan informasi penting dari SMK Telkom Sidoarjo."
@@ -131,7 +134,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder={t("informasi.searchPlaceholder", "Cari judul berita, kegiatan, prestasi, atau pengumuman...")}
-              className="w-full rounded-full bg-white pl-14 sm:pl-16 pr-12 sm:pr-14 py-3.5 text-sm sm:text-base font-jakarta text-[#101828] placeholder-gray-400 border border-gray-200/90 focus:border-[#bc0c11] focus:outline-none shadow-xs transition-all"
+              className="w-full neu-input !pl-14 sm:!pl-16 !pr-12 sm:!pr-14 !h-[48px] !min-h-[48px] text-sm sm:text-base font-jakarta"
             />
             {searchQuery && (
               <button
@@ -145,8 +148,8 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
             )}
           </div>
 
-          {/* Category Filter Pills - Full-bleed horizontal slide on mobile */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
+          {/* Category Filter Pills - Full-bleed horizontal slide on mobile with ample padding to avoid shadow clipping */}
+          <div className="neu-filter-container">
             {NEWS_CATEGORIES.map((cat) => {
               const isActive = selectedCategory === cat;
               const displayCat = cat === "Semua" && isEn ? "All" : cat;
@@ -155,11 +158,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
                   key={cat}
                   type="button"
                   onClick={() => handleCategorySelect(cat)}
-                  className={`shrink-0 rounded-full px-4 py-2 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? "bg-[#bc0c11] text-white shadow-xs"
-                      : "bg-white text-[#4a5565] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                  }`}
+                  className={isActive ? "neu-pill-active" : "neu-pill"}
                 >
                   {displayCat}
                 </button>
@@ -174,7 +173,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
             {paginatedArticles.map((item) => (
               <article
                 key={item.id || item.slug}
-                className="bg-white rounded-[16px] p-[11px] pt-[13px] pb-[14px] flex flex-col gap-[4px] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] group"
+                className="neu-card-interactive rounded-[18px] p-3 flex flex-col gap-1 group"
               >
                 {/* Thumbnail with Date Badge (Clickable Link) */}
                 <Link
@@ -301,10 +300,10 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
                 type="button"
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className={`size-[48px] rounded-[8px] bg-white border border-[rgba(188,12,17,0.98)] flex items-center justify-center transition-all ${
+                className={`size-[48px] rounded-full flex items-center justify-center transition-all ${
                   currentPage === 1
-                    ? "opacity-40 cursor-not-allowed"
-                    : "hover:bg-red-50 hover:shadow-sm active:scale-95 cursor-pointer"
+                    ? "opacity-40 cursor-not-allowed bg-[#f0f2f5]"
+                    : "neu-btn-icon cursor-pointer !size-[48px]"
                 }`}
                 aria-label="Previous page"
               >
@@ -350,7 +349,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
                     <span
                       className={`rounded-full transition-all duration-200 ${
                         isActive
-                          ? "size-[12px] bg-[#bc0c11] scale-110 shadow-sm"
+                          ? "size-[12px] bg-[#bc0c11] scale-110 shadow-neu-red"
                           : "size-[8px] bg-[#99a1af] hover:bg-[#6a7282]"
                       }`}
                     />
@@ -365,10 +364,10 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
                 type="button"
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className={`size-[48px] rounded-[8px] bg-[rgba(188,12,17,0.98)] text-white flex items-center justify-center transition-all shadow-sm ${
+                className={`size-[48px] rounded-full flex items-center justify-center transition-all ${
                   currentPage === totalPages
-                    ? "opacity-40 cursor-not-allowed"
-                    : "hover:bg-[#990a0e] hover:shadow-md active:scale-95 cursor-pointer"
+                    ? "opacity-40 cursor-not-allowed bg-[#a80a0e] text-white"
+                    : "btn-primary !p-0 !min-h-[48px] !h-[48px] !w-[48px] !rounded-full cursor-pointer"
                 }`}
                 aria-label="Next page"
               >

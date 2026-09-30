@@ -20,14 +20,16 @@ export default function BkkHeroSection() {
       textColSpan="lg:col-span-7"
       imageColSpan="lg:col-span-5"
       showAccentBar={true}
-      description={t("bkk.heroDesc")}
+      description={t(
+        "bkk.heroDesc",
+        "Menjembatani lulusan SMK Telkom Sidoarjo dengan dunia usaha dan industri melalui informasi lowongan kerja terpercaya, pelatihan kesiapan kerja, serta rekrutmen kampus."
+      )}
       studentImage="/images/program/bkk/hero-student-bkk.png"
       studentAlt={`${t("bkk.breadcrumb", "Bursa Kerja Khusus")} SMK Telkom Sidoarjo`}
       ctaText={t("bkk.heroCta", "Jelajahi")}
       ctaHref="#peluang-karier"
       imagePosition="right"
       isIntegratedArtwork={true}
-      sectionPaddingClassName="pt-28 sm:pt-32 lg:pt-30 pb-16 lg:pb-24"
       gridAlignmentClassName="items-center"
       textJustifyClassName="justify-center"
       imageContainerClassName="w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[340px] aspect-[1024/1536]"

@@ -17,8 +17,8 @@ export default function PrestasiHeroSection() {
   };
 
   return (
-    <section className="relative w-full pt-32 pb-16 lg:pt-40 lg:pb-24 bg-[#f3f4f6] overflow-hidden">
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+    <section className="relative w-full min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20 bg-[#f3f4f6] overflow-hidden">
+      <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* Left Column: Visual Artwork (LKS Winners & Medals) */}
           <motion.div
@@ -98,11 +98,7 @@ export default function PrestasiHeroSection() {
               <a
                 href="#daftar-prestasi"
                 onClick={scrollToPrestasi}
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 min-h-[48px] text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer shadow-card-cta"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7 !h-[50px] !min-h-[48px]"
               >
                 <span className="font-jakarta font-semibold text-[15px] leading-none whitespace-nowrap">
                   {isEn ? "Explore Achievements" : "Jelajahi Prestasi"}

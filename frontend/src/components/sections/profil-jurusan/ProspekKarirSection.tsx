@@ -187,7 +187,7 @@ export default function ProspekKarirSection() {
               </>
             )}
           </h2>
-          <div className="h-[3px] w-12 rounded-full bg-[#bc0c11] mt-4 mb-3" />
+          <div className="section-title-line" />
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
             {t("profilJurusan.prospekDesc")}
           </p>
@@ -198,7 +198,7 @@ export default function ProspekKarirSection() {
           {careerData.map((item) => (
             <div
               key={item.code}
-              className="group relative rounded-[24px] bg-white p-7 sm:p-9 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-xl hover:-translate-y-1"
+              className="group relative rounded-[24px] neu-card-interactive p-7 sm:p-9 flex flex-col justify-between"
             >
               <div>
                 {/* Header */}
@@ -274,7 +274,7 @@ export default function ProspekKarirSection() {
         </div>
 
         {/* BMW (Bekerja, Melanjutkan, Wirausaha) Redesigned Section */}
-        <div className="rounded-[24px] bg-[#f9fafb] p-7 sm:p-10 border-2 border-dashed border-[#d1d5dc]">
+        <div className="rounded-[24px] neu-inset-panel p-7 sm:p-10">
           {/* Top Header */}
           <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10">
             <h3 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828]">
@@ -300,7 +300,7 @@ export default function ProspekKarirSection() {
             {bmwData.map((bmw) => (
               <div
                 key={bmw.letter}
-                className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-xl hover:-translate-y-1"
+                className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
               >
                 <div>
                   {/* Top: Unboxed Icon on Left & Large Subtle Letter on Right */}

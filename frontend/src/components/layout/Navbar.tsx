@@ -214,13 +214,13 @@ export default function Navbar() {
                   </svg>
                 </button>
                 {/* Language Selector */}
-                <div className="flex h-[38px] items-center rounded-full border border-[#e5e7eb] bg-[#f9fafb] p-1 gap-1">
+                <div className="flex h-[38px] items-center rounded-full bg-[#f0f2f5] p-1 gap-1 shadow-neu-inset">
                   <button
                     type="button"
                     onClick={() => setLang("ID")}
                     className={`h-[30px] w-[34px] flex items-center justify-center rounded-full text-xs font-bold font-jakarta transition-all cursor-pointer ${
                       lang === "ID"
-                        ? "bg-[#bc0c11] text-white shadow-sm"
+                        ? "bg-[#bc0c11] text-white shadow-neu-red"
                         : "text-[#4b5563] hover:text-[#bc0c11]"
                     }`}
                     aria-label="Bahasa Indonesia"
@@ -232,7 +232,7 @@ export default function Navbar() {
                     onClick={() => setLang("EN")}
                     className={`h-[30px] w-[34px] flex items-center justify-center rounded-full text-xs font-bold font-jakarta transition-all cursor-pointer ${
                       lang === "EN"
-                        ? "bg-[#bc0c11] text-white shadow-sm"
+                        ? "bg-[#bc0c11] text-white shadow-neu-red"
                         : "text-[#4b5563] hover:text-[#bc0c11]"
                     }`}
                     aria-label="English"
@@ -244,7 +244,7 @@ export default function Navbar() {
                 {/* CTA Button Unduh Informasi */}
                 <Link
                   href="/unduh-informasi"
-                  className="inline-flex h-[38px] items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] px-5 text-xs font-bold font-jakarta text-white transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                  className="btn-primary !h-[38px] !min-h-[38px] !px-5 !text-xs !font-bold"
                 >
                   <span>{t("nav.downloadInfo")}</span>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -359,13 +359,13 @@ export default function Navbar() {
                 );
               })}
 
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <div className="flex h-[36px] items-center rounded-full border border-[#e5e7eb] bg-[#f9fafb] p-1 gap-1">
+              <div className="mt-4 pt-4 flex items-center justify-between">
+                <div className="flex h-[36px] items-center rounded-full bg-[#f0f2f5] p-1 gap-1 shadow-neu-inset">
                   <button
                     type="button"
                     onClick={() => setLang("ID")}
                     className={`h-[28px] w-[32px] flex items-center justify-center rounded-full text-xs font-bold font-jakarta transition-all cursor-pointer ${
-                      lang === "ID" ? "bg-[#bc0c11] text-white shadow-sm" : "text-[#4b5563]"
+                      lang === "ID" ? "bg-[#bc0c11] text-white shadow-neu-red" : "text-[#4b5563]"
                     }`}
                   >
                     ID
@@ -374,7 +374,7 @@ export default function Navbar() {
                     type="button"
                     onClick={() => setLang("EN")}
                     className={`h-[28px] w-[32px] flex items-center justify-center rounded-full text-xs font-bold font-jakarta transition-all cursor-pointer ${
-                      lang === "EN" ? "bg-[#bc0c11] text-white shadow-sm" : "text-[#4b5563]"
+                      lang === "EN" ? "bg-[#bc0c11] text-white shadow-neu-red" : "text-[#4b5563]"
                     }`}
                   >
                     EN
@@ -383,7 +383,7 @@ export default function Navbar() {
                 <Link
                   href="/unduh-informasi"
                   onClick={() => setMobileOpen(false)}
-                  className="inline-flex h-[36px] items-center rounded-full bg-[#bc0c11] px-5 text-xs font-bold font-jakarta text-white shadow-sm"
+                  className="btn-primary !h-[36px] !min-h-[36px] !px-5 !text-xs !font-bold"
                 >
                   {t("nav.downloadInfo")}
                 </Link>

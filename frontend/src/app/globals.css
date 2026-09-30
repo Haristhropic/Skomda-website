@@ -216,21 +216,194 @@ textarea.custom-scrollbar::-webkit-scrollbar-thumb:hover {
 }
 
 @layer components {
-  /* Standarisasi Tombol Publik (Pill Shape) */
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 font-jakarta font-semibold rounded-full bg-[#bc0c11] text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bc0c11] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
+  /* ── 1. Neumorphic Primary Button (Brand Red Extruded 3D) ── */
+  .btn-primary,
+  .neu-btn-primary {
+    @apply inline-flex items-center justify-center gap-2.5 min-h-[44px] h-[46px] px-6 font-jakarta text-sm sm:text-base font-semibold rounded-full text-white transition-all duration-200 cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none;
+    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
+    box-shadow: 4px 4px 10px rgba(160, 10, 15, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.9), inset 1px 1px 1px rgba(255, 255, 255, 0.25);
+  }
+  .btn-primary:hover,
+  .neu-btn-primary:hover {
+    background: linear-gradient(145deg, #d80e15 0%, #990a0e 100%);
+    box-shadow: 5px 5px 14px rgba(160, 10, 15, 0.4), -5px -5px 12px rgba(255, 255, 255, 1), inset 1px 1px 1px rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active,
+  .neu-btn-primary:active {
+    box-shadow: inset 3px 3px 6px rgba(70, 4, 7, 0.65), inset -2px -2px 4px rgba(255, 255, 255, 0.25);
+    transform: translateY(0);
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 font-jakarta font-medium rounded-full bg-white text-[#101828] border border-gray-200/90 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 active:scale-[0.98] shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bc0c11] focus-visible:ring-offset-2 cursor-pointer;
+  /* ── 2. Neumorphic Light / Neutral Button (Sesuai Referensi Gambar) ── */
+  .btn-secondary,
+  .neu-btn {
+    @apply inline-flex items-center justify-center gap-2.5 min-h-[44px] h-[46px] px-6 font-jakarta text-sm sm:text-base font-semibold rounded-full text-[#1e293b] transition-all duration-200 cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none;
+    background: #f0f2f5;
+    box-shadow: 4px 4px 10px rgba(166, 175, 195, 0.38), -4px -4px 10px rgba(255, 255, 255, 0.95);
+  }
+  .btn-secondary:hover,
+  .neu-btn:hover {
+    color: #bc0c11;
+    box-shadow: 6px 6px 14px rgba(166, 175, 195, 0.45), -6px -6px 14px rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+  }
+  .btn-secondary:active,
+  .neu-btn:active {
+    box-shadow: inset 3px 3px 6px rgba(166, 175, 195, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95);
+    transform: translateY(0);
   }
 
+  /* ── 3. Neumorphic Outline Button ── */
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 font-jakarta font-semibold rounded-full bg-transparent text-[#bc0c11] border-2 border-[#bc0c11] hover:bg-[#bc0c11] hover:text-white transition-all duration-200 active:scale-[0.98] cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2.5 min-h-[44px] h-[46px] px-6 font-jakarta text-sm sm:text-base font-semibold rounded-full text-[#bc0c11] transition-all duration-200 cursor-pointer select-none;
+    background: #f0f2f5;
+    border: 2px solid rgba(188, 12, 17, 0.25);
+    box-shadow: 5px 5px 12px rgba(166, 175, 195, 0.4), -5px -5px 12px rgba(255, 255, 255, 0.95);
+  }
+  .btn-outline:hover {
+    border-color: #bc0c11;
+    box-shadow: 7px 7px 16px rgba(188, 12, 17, 0.25), -6px -6px 14px rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+  }
+  .btn-outline:active {
+    box-shadow: inset 3px 3px 6px rgba(188, 12, 17, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+    transform: translateY(0);
   }
 
-  /* Standarisasi Tombol Admin / Form (Rounded-XL) */
+  /* ── 4. Neumorphic Admin / Rounded-2XL Button ── */
   .btn-admin {
-    @apply inline-flex items-center justify-center gap-2 font-jakarta font-semibold rounded-xl bg-[#bc0c11] text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#bc0c11] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
+    @apply inline-flex items-center justify-center gap-2 min-h-[44px] px-5 font-jakarta text-sm font-semibold rounded-2xl text-white transition-all duration-200 cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none;
+    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
+    box-shadow: 4px 4px 10px rgba(160, 10, 15, 0.35), -4px -4px 10px rgba(255, 255, 255, 0.85);
+  }
+  .btn-admin:hover {
+    background: linear-gradient(145deg, #d80e15 0%, #990a0e 100%);
+    box-shadow: 6px 6px 14px rgba(160, 10, 15, 0.45), -5px -5px 12px rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+  }
+  .btn-admin:active {
+    box-shadow: inset 3px 3px 6px rgba(70, 4, 7, 0.65), inset -2px -2px 4px rgba(255, 255, 255, 0.25);
+    transform: translateY(0);
+  }
+
+  /* ── 5. Neumorphic Inset Input / Search (Sesuai Referensi Gambar) ── */
+  .neu-input {
+    @apply min-h-[44px] h-[46px] px-5 rounded-full font-jakarta text-sm text-[#101828] placeholder-gray-400 border-none outline-none transition-all duration-200;
+    background: #f0f2f5;
+    box-shadow: inset 3px 3px 7px rgba(166, 175, 195, 0.45), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+  }
+  .neu-input:focus {
+    box-shadow: inset 4px 4px 8px rgba(188, 12, 17, 0.2), inset -3px -3px 7px rgba(255, 255, 255, 0.95), 0 0 0 2px rgba(188, 12, 17, 0.4);
+  }
+
+  /* ── 6. Neumorphic Icon Button (44x44px Bulat) ── */
+  .neu-btn-icon {
+    @apply inline-flex items-center justify-center size-11 rounded-full text-[#1e293b] transition-all duration-200 cursor-pointer select-none;
+    background: #f0f2f5;
+    box-shadow: 5px 5px 12px rgba(166, 175, 195, 0.45), -5px -5px 12px rgba(255, 255, 255, 0.95);
+  }
+  .neu-btn-icon:hover {
+    color: #bc0c11;
+    box-shadow: 7px 7px 16px rgba(166, 175, 195, 0.55), -7px -7px 16px rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+  }
+  .neu-btn-icon:active {
+    box-shadow: inset 3px 3px 6px rgba(166, 175, 195, 0.5), inset -3px -3px 6px rgba(255, 255, 255, 0.95);
+    transform: translateY(0);
+  }
+
+  /* ── 7. Neumorphic Filter Pill Buttons (Sesuai Komponen Filter Berita / Dokumen) ── */
+  .neu-pill {
+    @apply inline-flex items-center justify-center shrink-0 min-h-[38px] h-[38px] px-4 rounded-full font-jakarta text-xs sm:text-sm font-semibold text-[#1e293b] transition-all duration-200 cursor-pointer select-none;
+    background: #f0f2f5;
+    box-shadow: 3px 3px 8px rgba(166, 175, 195, 0.35), -3px -3px 8px rgba(255, 255, 255, 0.95);
+  }
+  .neu-pill:hover {
+    color: #bc0c11;
+    box-shadow: 4px 4px 10px rgba(166, 175, 195, 0.45), -4px -4px 10px rgba(255, 255, 255, 1);
+    transform: translateY(-1px);
+  }
+  .neu-pill:active {
+    box-shadow: inset 2px 2px 5px rgba(166, 175, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.95);
+    transform: translateY(0);
+  }
+
+  .neu-pill-active {
+    @apply inline-flex items-center justify-center shrink-0 min-h-[38px] h-[38px] px-4 rounded-full font-jakarta text-xs sm:text-sm font-semibold text-white transition-all duration-200 cursor-pointer select-none;
+    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
+    box-shadow: 3px 3px 9px rgba(160, 10, 15, 0.32), -3px -3px 8px rgba(255, 255, 255, 0.85);
+  }
+  .neu-pill-active:hover {
+    background: linear-gradient(145deg, #d80e15 0%, #990a0e 100%);
+    box-shadow: 4px 4px 12px rgba(160, 10, 15, 0.42), -4px -4px 10px rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+  }
+
+  /* ── 8. Safe Filter Container: Ample padding prevents shadow cut-off lines ── */
+  .neu-filter-container {
+    @apply flex items-center gap-2.5 overflow-x-auto py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 scrollbar-none overscroll-x-contain -my-1.5;
+  }
+
+  /* ── 9. Neumorphic Segmented Tab Track & Sliding Pill ── */
+  .neu-tab-track {
+    @apply relative inline-flex items-center rounded-full p-1.5 transition-all duration-200 select-none;
+    background: #eef1f5;
+    box-shadow: inset 3px 3px 6px rgba(166, 175, 195, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95);
+  }
+
+  .neu-tab-active-pill {
+    @apply absolute rounded-full transition-transform duration-300 ease-out pointer-events-none;
+    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
+    box-shadow: 3px 3px 8px rgba(160, 10, 15, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.5), inset 1px 1px 1px rgba(255, 255, 255, 0.25);
+  }
+
+  /* ── 10. Consistent Section Heading Red Accent Line ── */
+  .section-title-line {
+    @apply h-[3px] w-14 rounded-full bg-[#bc0c11] mt-3.5 mb-4 mx-auto;
+  }
+
+  /* ── 11. Minimalist & Professional Neumorphic Cards ── */
+  .neu-card {
+    @apply bg-white transition-all duration-300;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 6px 6px 18px rgba(166, 175, 195, 0.22), -6px -6px 18px rgba(255, 255, 255, 0.95);
+  }
+
+  .neu-card-interactive {
+    @apply bg-white transition-all duration-300;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 6px 6px 18px rgba(166, 175, 195, 0.22), -6px -6px 18px rgba(255, 255, 255, 0.95);
+  }
+  .neu-card-interactive:hover {
+    border-color: rgba(188, 12, 17, 0.18);
+    box-shadow: 8px 8px 24px rgba(166, 175, 195, 0.32), -8px -8px 22px rgba(255, 255, 255, 1), 0 0 16px rgba(188, 12, 17, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .neu-card-flat {
+    @apply bg-white transition-all duration-300;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 4px 4px 12px rgba(166, 175, 195, 0.18), -4px -4px 12px rgba(255, 255, 255, 0.9);
+  }
+
+  .neu-card-red {
+    @apply transition-all duration-300;
+    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 6px 6px 18px rgba(160, 10, 15, 0.32), -4px -4px 14px rgba(255, 255, 255, 0.7), inset 1px 1px 1px rgba(255, 255, 255, 0.25);
+  }
+  .neu-card-red:hover {
+    box-shadow: 8px 8px 24px rgba(160, 10, 15, 0.42), -5px -5px 16px rgba(255, 255, 255, 0.85), inset 1px 1px 1px rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+  }
+
+  .neu-inset-panel {
+    @apply transition-all duration-200;
+    background: #f0f2f5;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: inset 3px 3px 7px rgba(166, 175, 195, 0.32), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
   }
 }
+
+

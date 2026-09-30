@@ -73,9 +73,9 @@ export default function PpdbFaqSection() {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           
-          {/* Left: Helpdesk Card (Identical to Tips Akomodasi signature style) */}
+          {/* Left: Helpdesk Card */}
           <div className="lg:col-span-5 flex flex-col gap-6">
-            <div className="rounded-[28px] bg-white p-8 sm:p-9 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md">
+            <div className="rounded-[28px] neu-card p-8 sm:p-9">
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl leading-tight text-[#101828] mb-3">
                 {isEn ? "Need Direct Guidance from the Admission Team?" : "Butuh Panduan Langsung dari Panitia PPDB?"}
               </h3>
@@ -90,10 +90,10 @@ export default function PpdbFaqSection() {
                   href="https://wa.me/6281234567899?text=Halo%20Panitia%20PPDB%20SMK%20Telkom%20Sidoarjo,%20saya%20calon%20wali%20murid/siswa%20ingin%20berkonsultasi%20mengenai%20informasi%20pendaftaran%20siswa%20baru."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-[#bc0c11] px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-[#990a0e] shadow-card-cta font-jakarta cursor-pointer active:scale-[0.98]"
+                  className="btn-primary group !px-7 !h-[50px] !min-h-[48px] font-jakarta cursor-pointer"
                 >
                   <span>{isEn ? "Chat Admission on WhatsApp" : "Chat Panitia PPDB"}</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="transition-transform duration-300 group-hover:translate-x-1">
                     <path
                       d="M5 12H19M19 12L12 5M19 12L12 19"
                       stroke="white"
@@ -107,12 +107,13 @@ export default function PpdbFaqSection() {
             </div>
           </div>
 
-          {/* Right: FAQ Accordion (Identical dashed cards & chevron circle) */}
+          {/* Right: FAQ Accordion */}
           <div className="lg:col-span-7 flex flex-col gap-4">
             <div className="mb-4">
               <h3 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828] leading-tight">
                 {isEn ? "Frequently Asked Questions" : "Tanya Jawab Seputar PPDB"}
               </h3>
+              <div className="section-title-line !mx-0 !mt-2.5 !mb-3" />
               <p className="font-jakarta text-sm text-[#4a5565] mt-1">
                 {isEn
                   ? "Find answers to key questions about admission tracks, programs, selection, and facilities"
@@ -129,7 +130,7 @@ export default function PpdbFaqSection() {
                 return (
                   <div
                     key={faq.id}
-                    className="rounded-[20px] bg-white border-2 border-dashed border-[#d1d5dc] overflow-hidden transition-colors hover:border-[#bc0c11]"
+                    className="rounded-[20px] neu-card-interactive overflow-hidden"
                   >
                     <button
                       type="button"

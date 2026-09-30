@@ -87,7 +87,10 @@ export default function TefaHeroSection({
 
             {/* Description */}
             <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed max-w-xl mb-8 font-normal">
-              {t("tefa.heroDesc")}
+              {t(
+                "tefa.heroDesc",
+                "Produk dan layanan yang dikembangkan melalui proses pembelajaran Teaching Factory SMK Telkom Sidoarjo."
+              )}
             </p>
 
             {/* Action Buttons with Signature Button Styles */}
@@ -96,11 +99,7 @@ export default function TefaHeroSection({
               <button
                 type="button"
                 onClick={onExploreServices}
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 text-base font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7 !h-[50px] !min-h-[48px] cursor-pointer"
               >
                 <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
                   {t("tefa.exploreServices")}
@@ -126,7 +125,7 @@ export default function TefaHeroSection({
               {/* Secondary Button */}
               <Link
                 href="/tefa/request"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-white border border-[#d1d5dc] px-7 py-3.5 text-base font-medium text-[#364153] transition-all duration-300 hover:bg-gray-50 hover:border-[#bc0c11] hover:text-[#bc0c11] active:scale-[0.98] shadow-sm cursor-pointer"
+                className="btn-secondary group !px-7 !h-[50px] !min-h-[48px] cursor-pointer"
               >
                 <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
                   {t("tefa.requestProject")}

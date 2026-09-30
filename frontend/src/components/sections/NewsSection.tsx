@@ -122,7 +122,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {/* 1. Header */}
         {showTitle && (
-          <div className="flex flex-col items-center text-center gap-2 sm:gap-[9px] mb-5 sm:mb-8 lg:mb-10">
+          <div className="flex flex-col items-center text-center mb-6 sm:mb-8 lg:mb-10">
             <div className="flex flex-col items-center gap-1 sm:gap-2 w-full">
               <h2 className="font-jakarta font-bold text-2xl sm:text-[32px] leading-tight sm:leading-[40px] text-[#101828]">
                 {t("news.title1")}
@@ -131,6 +131,8 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                 {t("news.title2")}
               </h3>
             </div>
+            {/* Red Accent Line */}
+            <div className="section-title-line" />
             <p className="font-jakarta font-medium text-sm sm:text-[14px] leading-relaxed sm:leading-[28px] text-[#515151] max-w-[434px]">
               {t("news.subtitle")}
             </p>
@@ -211,7 +213,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                   {filteredNews.length} {isEn ? "Articles" : "Berita"}
                 </span>
               </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none overscroll-x-contain">
+              <div className="neu-filter-container">
                 {NEWS_CATEGORIES.map((cat) => {
                   const isActive = activeCategory === cat;
                   return (
@@ -219,11 +221,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                       key={cat}
                       type="button"
                       onClick={() => handleCategoryChange(cat)}
-                      className={`shrink-0 h-[36px] px-4 rounded-full font-jakarta text-sm font-medium transition-all duration-150 select-none whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
-                        isActive
-                          ? "bg-[rgba(188,12,17,0.98)] text-white shadow-sm font-semibold"
-                          : "bg-white text-[#364153] border border-gray-200/80 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                      }`}
+                      className={isActive ? "neu-pill-active" : "neu-pill"}
                     >
                       <span>{getCategoryLabel(cat)}</span>
                     </button>
@@ -246,7 +244,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                 currentNews.map((item) => (
                   <article
                     key={item.id || item.slug}
-                    className="bg-white rounded-[16px] p-[11px] pt-[13px] pb-[14px] flex flex-col gap-[4px] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] group"
+                    className="neu-card-interactive rounded-[18px] p-3 flex flex-col gap-1 group"
                     data-node-id="125:321"
                   >
                     {/* Thumbnail with Date Badge (Clickable Link) */}
@@ -354,10 +352,10 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                     type="button"
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
-                    className={`size-[48px] rounded-[8px] bg-white border border-[rgba(188,12,17,0.98)] flex items-center justify-center transition-all ${
+                    className={`size-[48px] rounded-full flex items-center justify-center transition-all ${
                       currentPage === 1
-                        ? "opacity-40 cursor-not-allowed"
-                        : "hover:bg-red-50 hover:shadow-sm active:scale-95 cursor-pointer"
+                        ? "opacity-40 cursor-not-allowed bg-[#f0f2f5]"
+                        : "neu-btn-icon cursor-pointer !size-[48px]"
                     }`}
                     aria-label="Previous page"
                     data-node-id="123:92"
@@ -409,7 +407,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                           <span
                             className={`rounded-full transition-all duration-200 ${
                               isActive
-                                ? "size-[12px] bg-[#bc0c11] scale-110 shadow-sm"
+                                ? "size-[12px] bg-[#bc0c11] scale-110 shadow-neu-red"
                                 : "size-[8px] bg-[#99a1af] hover:bg-[#6a7282]"
                             }`}
                           />
@@ -425,10 +423,10 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                     type="button"
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
-                    className={`size-[48px] rounded-[8px] bg-[rgba(188,12,17,0.98)] text-white flex items-center justify-center transition-all shadow-sm ${
+                    className={`size-[48px] rounded-full flex items-center justify-center transition-all ${
                       currentPage === totalPages
-                        ? "opacity-40 cursor-not-allowed"
-                        : "hover:bg-[#990a0e] hover:shadow-md active:scale-95 cursor-pointer"
+                        ? "opacity-40 cursor-not-allowed bg-[#a80a0e] text-white"
+                        : "btn-primary !p-0 !min-h-[48px] !h-[48px] !w-[48px] !rounded-full cursor-pointer"
                     }`}
                     aria-label="Next page"
                     data-node-id="123:117"

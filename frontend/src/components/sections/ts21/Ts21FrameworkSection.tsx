@@ -104,7 +104,7 @@ export default function Ts21FrameworkSection() {
               </>
             )}
           </h2>
-          <div className="h-[3px] w-12 rounded-full bg-[#bc0c11] mt-5 mb-2" />
+          <div className="section-title-line" />
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed mt-2">
             {isEn
               ? "Implementing TS.21 Independent Curriculum with balanced weighting between Attitude/Character and Knowledge/Skills for holistic student development."
@@ -117,7 +117,7 @@ export default function Ts21FrameworkSection() {
           {frameworkPillars.map((pillar) => (
             <div
               key={pillar.number}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[28px] bg-white p-6 sm:p-9 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[28px] neu-card-interactive p-6 sm:p-9 flex flex-col justify-between"
             >
               <div>
                 {/* Card Top */}
@@ -158,7 +158,7 @@ export default function Ts21FrameworkSection() {
         </div>
 
         {/* Holistic Balance Callout Card */}
-        <div className="rounded-[28px] bg-[#f9fafb] p-8 sm:p-10 border-2 border-dashed border-[#d1d5dc]">
+        <div className="rounded-[28px] neu-inset-panel p-8 sm:p-10">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             <div className="md:col-span-8 flex flex-col gap-2">
               <h3 className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828]">

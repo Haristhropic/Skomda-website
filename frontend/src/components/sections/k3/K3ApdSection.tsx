@@ -138,7 +138,7 @@ export default function K3ApdSection() {
           {apdList.map((apd) => (
             <div
               key={apd.id}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
             >
               <div>
                 {/* Card Top: Unboxed Icon & Code Pill */}
@@ -168,7 +168,7 @@ export default function K3ApdSection() {
               </div>
 
               {/* Card Footer: Usage Area Chips */}
-              <div className="pt-4 border-t border-dashed border-gray-200">
+              <div className="pt-4 border-t border-gray-100">
                 <p className="font-jakarta text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
                   {isEn ? "Applicable Labs:" : "Ruang Praktik Wajib:"}
                 </p>

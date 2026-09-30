@@ -53,7 +53,10 @@ export default function DigitalTalentClient() {
         titleSuffix={t("digitalTalent.heroTitleSuffix", "Program")}
         titleHighlightColor="text-[#e7000b]"
         showAccentBar={true}
-        description={t("digitalTalent.heroDesc")}
+        description={t(
+          "digitalTalent.heroDesc",
+          "Inisiatif unggulan SMK Telkom Sidoarjo untuk membekali siswa dengan kompetensi teknologi terdepan, sertifikasi keahlian berstandar global, dan kesiapan berkarier langsung di industri digital."
+        )}
         studentImage="/images/program/digital-talent/hero-student-digital-talent.png"
         studentAlt={`${t("digitalTalent.breadcrumb", "Digital Talent Program")} SMK Telkom Sidoarjo`}
         ctaText={t("digitalTalent.heroCta", "Jelajahi")}
@@ -97,11 +100,11 @@ export default function DigitalTalentClient() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.15 }}
-                className="rounded-[24px] bg-white p-6 sm:p-8 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all duration-300 hover:shadow-xl flex flex-col justify-between"
+                className="rounded-[24px] neu-card-interactive p-6 sm:p-8 flex flex-col justify-between"
               >
                 <div>
                   {/* Hari & Sesi Header */}
-                  <div className="flex items-center gap-2 mb-4 pb-4 border-b border-dashed border-[#e5e7eb]">
+                  <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
                     <Calendar className="size-5 text-[#bc0c11]" />
                     <h3 className="font-jakarta font-extrabold text-xl text-[#101828]">
                       {t("digitalTalent.everyDay", "Setiap Hari")} {isEn ? (sched.day === "Rabu" ? "Wednesday" : "Thursday") : sched.day}
@@ -197,14 +200,14 @@ export default function DigitalTalentClient() {
 
           {/* Specializations Grid & Mobile Horizontal Scroll */}
           {filteredSpecs.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
+            <div className="text-center py-16 neu-inset-panel rounded-[24px] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
                 {t("digitalTalent.emptySearch")} &ldquo;<strong className="text-[#101828]">{searchQuery}</strong>&rdquo;.
               </p>
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer shadow-xs"
+                className="btn-primary !h-10 !min-h-[40px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{t("digitalTalent.resetSearch")}</span>
               </button>
@@ -247,7 +250,7 @@ export default function DigitalTalentClient() {
             {DTP_COLLABORATION_PROJECTS.slice(0, 6).map((proj) => (
               <div
                 key={proj.id}
-                className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] bg-white p-6 sm:p-7 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col justify-between"
+                className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
               >
                 <div>
                   <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">
@@ -259,7 +262,7 @@ export default function DigitalTalentClient() {
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-dashed border-[#e5e7eb]">
+                <div className="pt-3 border-t border-gray-100">
                   <p className="text-xs font-bold text-[#101828] mb-1 font-jakarta">
                     {t("digitalTalent.fieldsInvolved")}
                   </p>

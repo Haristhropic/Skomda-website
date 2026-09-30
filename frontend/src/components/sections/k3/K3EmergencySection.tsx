@@ -64,7 +64,7 @@ export default function K3EmergencySection() {
             {t("k3.emergencyTitle", "Fasilitas & Mitigasi Keadaan Darurat")}
           </h2>
 
-          <div className="mx-auto h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+          <div className="section-title-line" />
 
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
             {t(
@@ -79,7 +79,7 @@ export default function K3EmergencySection() {
           {facilities.map((fac) => (
             <div
               key={fac.id}
-              className="group rounded-[24px] bg-white p-6 sm:p-7 flex flex-col justify-between border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="group rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
             >
               <div>
                 <div className="text-[#bc0c11] mb-3">
@@ -93,7 +93,7 @@ export default function K3EmergencySection() {
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-dashed border-gray-200 font-jakarta text-xs text-gray-500 font-medium flex items-center gap-1.5">
+              <div className="pt-3 border-t border-gray-100 font-jakarta text-xs text-gray-500 font-medium flex items-center gap-1.5">
                 <MapPin className="size-3.5 text-[#bc0c11] shrink-0" />
                 <p>{fac.location}</p>
               </div>

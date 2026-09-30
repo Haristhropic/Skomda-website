@@ -40,7 +40,7 @@ export default function PrincipalSection() {
             </h2>
 
             {/* Accent Line Underline */}
-            <div className="mt-3 mb-4 lg:mb-5 h-1 w-14 rounded-full bg-[#bc0c11]" />
+            <div className="section-title-line mx-auto lg:mx-0" />
 
             {/* Sambutan Paragraph Text */}
             <p className="font-poppins text-sm sm:text-[15px] leading-relaxed text-[#515151]">

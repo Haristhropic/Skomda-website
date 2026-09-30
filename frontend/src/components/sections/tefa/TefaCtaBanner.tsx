@@ -20,7 +20,7 @@ export default function TefaCtaBanner({ onRequestProject }: TefaCtaBannerProps) 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="relative rounded-[28px] sm:rounded-[32px] bg-[#bc0c11] p-8 sm:p-12 lg:p-14 text-white overflow-hidden border-2 border-dashed border-white/50 hover:border-white transition-all duration-300 hover:shadow-xl"
+          className="relative rounded-[28px] sm:rounded-[32px] neu-card-red p-8 sm:p-12 lg:p-14 text-white overflow-hidden"
         >
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 lg:gap-12 relative z-10">
             {/* Left Column: Heading & Description */}

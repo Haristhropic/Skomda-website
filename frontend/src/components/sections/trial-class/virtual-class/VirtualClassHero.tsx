@@ -19,8 +19,8 @@ export default function VirtualClassHero({
   const isEn = lang === "EN";
 
   return (
-    <section className="relative w-full overflow-hidden pt-32 sm:pt-36 lg:pt-36 pb-12 sm:pb-16 bg-[#f3f4f6]">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative w-full overflow-hidden min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20 bg-[#f3f4f6]">
+      <div className="relative mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8">
         {/* Personalized Welcome Banner if registered */}
         {ticketCode && (
           <motion.div
@@ -117,6 +117,9 @@ export default function VirtualClassHero({
               </span>
             </h1>
 
+            {/* Red accent line */}
+            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mt-3.5 mb-2" />
+
             <p className="mt-4 sm:mt-5 font-jakarta text-base sm:text-lg text-[#4a5565] leading-relaxed max-w-2xl">
               {t(
                 "virtualClass.heroDesc",
@@ -124,7 +127,7 @@ export default function VirtualClassHero({
               )}
             </p>
 
-            {/* Schedule Info (Flat, minimal — no pill wrappers) */}
+            {/* Schedule Info (Flat, minimal - no pill wrappers) */}
             <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-jakarta text-sm text-[#364153]">
               <div className="inline-flex items-center gap-2">
                 <Image

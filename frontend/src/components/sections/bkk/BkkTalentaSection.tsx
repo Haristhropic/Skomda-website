@@ -41,7 +41,7 @@ export default function BkkTalentaSection() {
               </span>
             </h2>
 
-            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-3" />
+            <div className="section-title-line !mx-0" />
 
             <p className="font-jakarta text-sm sm:text-base text-[#4a5565]">
               {isEn
@@ -64,7 +64,7 @@ export default function BkkTalentaSection() {
           {TALENTA_SKOMDA_ITEMS.map((talent) => (
             <div
               key={talent.id}
-              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-5 sm:p-6 flex flex-row items-center gap-4 sm:gap-5 hover:shadow-md hover:border-[#bc0c11] transition-all duration-300 group h-full justify-between"
+              className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none rounded-[24px] neu-card-interactive p-5 sm:p-6 flex flex-row items-center gap-4 sm:gap-5 group h-full justify-between"
             >
               {/* Left: Student Photo */}
               <div className="relative w-24 sm:w-28 h-32 sm:h-36 rounded-2xl overflow-hidden bg-gray-50 shrink-0 border border-gray-100">
@@ -104,7 +104,7 @@ export default function BkkTalentaSection() {
                 </div>
 
                 {/* Action Link */}
-                <div className="pt-3 border-t border-dashed border-gray-100 mt-2">
+                <div className="pt-3 border-t border-gray-100 mt-2">
                   <button
                     onClick={() => setSelectedTalent(talent)}
                     className="inline-flex items-center gap-1 text-xs sm:text-sm font-jakarta font-semibold text-[#bc0c11] hover:text-[#990a0e] group/btn cursor-pointer"
@@ -131,7 +131,7 @@ export default function BkkTalentaSection() {
           onClick={() => setSelectedTalent(null)}
         >
           <div
-            className="relative w-full max-w-lg bg-white rounded-[28px] border-2 border-dashed border-[#d1d5dc] p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200"
+            className="relative w-full max-w-lg neu-card rounded-[28px] p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
@@ -207,7 +207,7 @@ export default function BkkTalentaSection() {
             </div>
 
             {/* Modal Footer CTA */}
-            <div className="pt-4 border-t border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-end gap-3">
+            <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-end gap-3">
               <a
                 href={
                   isEn
@@ -216,11 +216,7 @@ export default function BkkTalentaSection() {
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#bc0c11] text-xs sm:text-sm font-jakarta font-medium text-white hover:bg-[#990a0e] transition-all duration-200 active:scale-[0.98] cursor-pointer"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary w-full sm:w-auto !h-[44px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{isEn ? "Contact Talent via BKK" : "Hubungi Talenta via BKK"}</span>
                 <Send className="size-3.5" />

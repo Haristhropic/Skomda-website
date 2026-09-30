@@ -86,7 +86,7 @@ export default function TeacherCarouselSection({
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl text-[#101828] tracking-tight">
             {isEn && titleEn ? titleEn : title}
           </h2>
-          <div className="mt-3 h-[3px] w-14 bg-[#bc0c11] rounded-full mx-auto mb-2" />
+          <div className="section-title-line" />
           {(subtitle || subtitleEn) && (
             <p className="font-jakarta text-sm sm:text-base font-semibold text-[#bc0c11] tracking-wide mt-1">
               {isEn && subtitleEn ? subtitleEn : subtitle}
@@ -100,10 +100,10 @@ export default function TeacherCarouselSection({
             {items.map((teacher, idx) => (
               <div
                 key={`mobile-${teacher.name}-${idx}`}
-                className="w-[235px] shrink-0 snap-start relative h-[345px] rounded-[20px] bg-white p-3 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all duration-300 flex flex-col justify-between overflow-hidden shadow-xs"
+                className="w-[235px] shrink-0 snap-start relative h-[345px] rounded-[24px] neu-card-interactive p-3 flex flex-col justify-between overflow-hidden"
               >
                 {/* Photo Canvas */}
-                <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
+                <div className="relative w-full h-full rounded-[16px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
                   <Image
                     src={getTeacherPhotoUrl(teacher.image, 300, 380)}
                     alt={teacher.name}
@@ -114,7 +114,7 @@ export default function TeacherCarouselSection({
                 </div>
 
                 {/* Floating Info Box */}
-                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-[12px] p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.08)] border border-gray-100/90 z-10">
+                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md rounded-[14px] p-3 shadow-[0px_4px_12px_rgba(0,0,0,0.08)] border border-gray-100/90 z-10">
                   <h3 className="font-jakarta font-bold text-[14px] text-[#101828] leading-snug line-clamp-2">
                     {teacher.name}
                   </h3>
@@ -143,7 +143,7 @@ export default function TeacherCarouselSection({
               {currentItems.map((teacher, idx) => (
                 <div
                   key={`${teacher.name}-${idx}`}
-                  className="relative h-[360px] rounded-[20px] bg-white p-3 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-lg group flex flex-col justify-between overflow-hidden shadow-xs"
+                  className="relative h-[360px] rounded-[24px] neu-card-interactive p-3 group flex flex-col justify-between overflow-hidden"
                 >
                   {/* Photo Canvas */}
                   <div className="relative w-full h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#f3f4f6] to-[#e5e7eb]">
@@ -180,7 +180,7 @@ export default function TeacherCarouselSection({
               onClick={handlePrev}
               disabled={currentPage === 0}
               aria-label={isEn ? "Previous profile" : "Profil sebelumnya"}
-              className="size-12 rounded-full bg-[#bc0c11] text-white flex items-center justify-center transition-all duration-300 hover:bg-[#990a0e] active:scale-95 disabled:opacity-30 disabled:pointer-events-none shadow-md shadow-[#bc0c11]/20 cursor-pointer"
+              className="neu-btn-icon !size-12 cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
             >
               <ChevronLeft className="size-6" />
             </button>
@@ -194,7 +194,7 @@ export default function TeacherCarouselSection({
                   aria-label={isEn ? `Go to page ${dotIdx + 1}` : `Ke halaman ${dotIdx + 1}`}
                   className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
                     dotIdx === currentPage
-                       ? "w-8 bg-[#bc0c11]"
+                       ? "w-8 bg-[#bc0c11] shadow-neu-red"
                       : "w-2.5 bg-gray-300 hover:bg-gray-400"
                   }`}
                 />
@@ -206,7 +206,7 @@ export default function TeacherCarouselSection({
               onClick={handleNext}
               disabled={currentPage === totalPages - 1}
               aria-label={isEn ? "Next profile" : "Profil berikutnya"}
-              className="size-12 rounded-full bg-[#bc0c11] text-white flex items-center justify-center transition-all duration-300 hover:bg-[#990a0e] active:scale-95 disabled:opacity-30 disabled:pointer-events-none shadow-md shadow-[#bc0c11]/20 cursor-pointer"
+              className="btn-primary !p-0 !size-12 !min-h-[48px] !h-12 !w-12 !rounded-full cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
             >
               <ChevronRight className="size-6" />
             </button>

@@ -77,8 +77,7 @@ export default function TefaPillarsSection() {
             )}
           </h2>
 
-          {/* Signature Red Accent Bar */}
-          <div className="h-1 w-12 rounded-full bg-[#bc0c11] mt-4 mb-4" />
+          <div className="section-title-line" />
 
           {/* Subtitle Description */}
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-2xl font-normal">
@@ -99,7 +98,7 @@ export default function TefaPillarsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: idx * 0.1 }}
-                className="group relative rounded-[20px] bg-white p-6 sm:p-7 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md flex flex-col justify-between"
+                className="group relative rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
               >
                 <div>
                   {/* Top Row: Icon & Number */}

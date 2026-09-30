@@ -68,8 +68,7 @@ export default function TefaPartnersSection() {
               </span>
             </h2>
 
-            {/* Signature Red Accent Bar */}
-            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+            <div className="section-title-line !mx-0" />
 
             {/* Body Description */}
             <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-xl mb-8 font-normal">
@@ -82,11 +81,7 @@ export default function TefaPartnersSection() {
             <div>
               <Link
                 href="/tentang-kami/hub-industri"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 py-3.5 min-h-[48px] text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer select-none"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7 !h-[50px] !min-h-[48px]"
               >
                 <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
                   {isEn ? "View Industry Partners" : "Lihat Mitra Industri"}
@@ -125,7 +120,7 @@ export default function TefaPartnersSection() {
                 {TEFA_PARTNERS.map((partner, index) => (
                   <div
                     key={index}
-                    className="group w-full h-24 flex items-center justify-center p-3 rounded-xl bg-white sm:bg-white/80 border-2 border-dashed border-[#d1d5dc] shadow-sm hover:shadow-md hover:border-[#bc0c11] hover:scale-[1.03] transition-all duration-200 cursor-pointer"
+                    className="group w-full h-24 flex items-center justify-center p-3 rounded-2xl neu-card-interactive cursor-pointer"
                   >
                     <div className="relative w-full h-full max-h-12 flex items-center justify-center pointer-events-none">
                       <Image

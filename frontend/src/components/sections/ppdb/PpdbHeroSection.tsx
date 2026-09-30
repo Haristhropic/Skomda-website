@@ -13,8 +13,8 @@ export default function PpdbHeroSection({ onOpenBrochure }: PpdbHeroSectionProps
   const { isEn } = useLanguage();
 
   return (
-    <section className="relative w-full pt-40 pb-16 sm:pt-44 sm:pb-20 lg:pt-48 lg:pb-24 bg-[#f3f4f6] overflow-hidden">
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+    <section className="relative w-full min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20 bg-[#f3f4f6] overflow-hidden">
+      <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
 
           {/* Left Column: Text Content (Col 7) */}
@@ -26,7 +26,7 @@ export default function PpdbHeroSection({ onOpenBrochure }: PpdbHeroSectionProps
           >
 
             {/* Main Headline */}
-            <h1 className="font-jakarta font-bold text-4xl sm:text-5xl lg:text-[52px] leading-[1.12] tracking-tight text-[#101828] mb-5">
+            <h1 className="font-jakarta font-bold text-4xl sm:text-5xl lg:text-[52px] leading-[1.12] tracking-tight text-[#101828] mb-4">
               {isEn ? (
                 <>
                   Time to Become Your{" "}
@@ -39,6 +39,9 @@ export default function PpdbHeroSection({ onOpenBrochure }: PpdbHeroSectionProps
                 </>
               )}
             </h1>
+
+            {/* Red accent line */}
+            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mb-5 sm:mb-6" />
 
             {/* Description */}
             <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed max-w-xl mb-8 sm:mb-9">
@@ -53,11 +56,7 @@ export default function PpdbHeroSection({ onOpenBrochure }: PpdbHeroSectionProps
                 href="https://ppdb.telkomschools.sch.id/signup?lemdik=4"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#bc0c11] px-7 sm:px-8 py-3.5 sm:py-4 min-h-[48px] font-jakarta font-semibold text-[15px] sm:text-base text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer shadow-card-cta"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary group !px-7 sm:!px-8 !h-[50px] !min-h-[48px] !text-[15px] sm:!text-base cursor-pointer"
               >
                 <span>{isEn ? "Register Now" : "Daftar Sekarang"}</span>
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 shrink-0" />
@@ -66,7 +65,7 @@ export default function PpdbHeroSection({ onOpenBrochure }: PpdbHeroSectionProps
               <button
                 type="button"
                 onClick={onOpenBrochure}
-                className="group inline-flex items-center gap-2.5 rounded-full border border-gray-300 bg-white hover:bg-gray-50 hover:border-[#bc0c11] hover:text-[#bc0c11] px-7 sm:px-8 py-3.5 sm:py-4 min-h-[48px] font-jakarta font-semibold text-[15px] sm:text-base text-[#364153] transition-all duration-300 active:scale-[0.98] cursor-pointer shadow-xs"
+                className="btn-secondary group !px-7 sm:!px-8 !h-[50px] !min-h-[48px] !text-[15px] sm:!text-base cursor-pointer"
               >
                 <Eye className="w-4 h-4 text-current transition-transform duration-300 group-hover:scale-110 shrink-0" />
                 <span>{isEn ? "View Brochure" : "Lihat Brosur"}</span>

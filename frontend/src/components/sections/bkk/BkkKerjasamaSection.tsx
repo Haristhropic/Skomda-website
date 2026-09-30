@@ -71,8 +71,8 @@ export default function BkkKerjasamaSection() {
     <section id="kerjasama-rekrutmen" className="relative w-full py-16 sm:py-20 lg:py-24 bg-[#f9fafb] border-t border-gray-200/60 overflow-hidden scroll-mt-24">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         
-        {/* Main Box with Signature Dashed Border */}
-        <div className="relative rounded-[32px] bg-white border-2 border-dashed border-[#d1d5dc] p-8 sm:p-12 lg:p-14 overflow-hidden transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md">
+        {/* Main Box with Neumorphic Card Styling */}
+        <div className="relative rounded-[32px] neu-card p-8 sm:p-12 lg:p-14 overflow-hidden">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             
@@ -84,7 +84,7 @@ export default function BkkKerjasamaSection() {
                 <span className="text-[#bc0c11]">SKOMDA</span>
               </h2>
 
-              <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+              <div className="section-title-line !mx-0" />
 
               {/* Description */}
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed max-w-xl mb-8">
@@ -97,11 +97,7 @@ export default function BkkKerjasamaSection() {
               <div className="flex flex-wrap items-center gap-3.5">
                 <button
                   onClick={() => setModalOpen(true)}
-                  className="group inline-flex items-center gap-2 rounded-full bg-[#bc0c11] px-7 py-3 text-[15px] font-jakarta font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer"
-                  style={{
-                    boxShadow:
-                      "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                  }}
+                  className="btn-primary group !px-7 !h-[50px] !min-h-[48px] cursor-pointer"
                 >
                   <span>{isEn ? "Post a Job" : "Pasang Lowongan"}</span>
                   <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
@@ -115,7 +111,7 @@ export default function BkkKerjasamaSection() {
                   }
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2 rounded-full border-2 border-[#bc0c11] px-7 py-2.5 text-sm font-jakarta font-bold text-[#bc0c11] transition-all duration-300 hover:bg-[#bc0c11] hover:text-white active:scale-[0.98] cursor-pointer"
+                  className="btn-outline group !px-7 !h-[50px] !min-h-[48px] cursor-pointer"
                 >
                   <MessageSquare className="size-4" />
                   <span>{isEn ? "Contact BKK" : "Hubungi BKK"}</span>
@@ -125,7 +121,7 @@ export default function BkkKerjasamaSection() {
 
             {/* Right Tagline Box with Unboxed Icon & Clean Quotes */}
             <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center text-center lg:text-right">
-              <div className="relative p-6 sm:p-8 rounded-[24px] bg-[#f9fafb] border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] transition-all max-w-sm">
+              <div className="relative p-6 sm:p-8 rounded-[24px] neu-inset-panel max-w-sm">
                 <Handshake className="size-9 text-[#bc0c11] mb-3 mx-auto lg:ml-auto lg:mr-0" />
                 <p className="font-jakarta italic text-base sm:text-lg font-semibold text-[#101828] leading-snug mb-3">
                   {isEn
@@ -318,11 +314,7 @@ export default function BkkKerjasamaSection() {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="w-full py-3 rounded-full bg-[#bc0c11] font-medium text-sm sm:text-base text-white hover:bg-[#990a0e] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 group active:scale-[0.98]"
-                      style={{
-                        boxShadow:
-                          "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                      }}
+                      className="btn-primary group w-full !h-[48px] cursor-pointer"
                     >
                       <span>{isEn ? "Submit Vacancy Details" : "Kirim Kebutuhan Lowongan"}</span>
                       <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />

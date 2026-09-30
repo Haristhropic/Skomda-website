@@ -138,8 +138,7 @@ export default function TefaCatalogSection({
               {t("tefa.catalogTitle")}
             </h2>
 
-            {/* Signature Red Accent Bar */}
-            <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-3" />
+            <div className="section-title-line !mx-0" />
 
             {/* Subtitle Description */}
             <p className="text-sm sm:text-base text-[#4a5565] font-jakarta max-w-xl leading-relaxed">
@@ -149,7 +148,7 @@ export default function TefaCatalogSection({
 
           {/* Category Filter Pills - Full-bleed on mobile, aligned on desktop */}
           <div className="w-full md:w-auto">
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 scrollbar-none overscroll-x-contain">
+            <div className="neu-filter-container">
               {categories.map((cat) => {
                 const isActive = activeFilter === cat.value;
                 return (
@@ -157,11 +156,7 @@ export default function TefaCatalogSection({
                     key={cat.value}
                     type="button"
                     onClick={() => setActiveFilter(cat.value)}
-                    className={`shrink-0 rounded-full px-5 py-2.5 text-xs sm:text-sm font-semibold font-jakarta transition-all duration-200 cursor-pointer select-none ${
-                      isActive
-                        ? "bg-[#bc0c11] text-white shadow-xs"
-                        : "bg-white text-[#4a5565] border border-gray-200/90 hover:border-[#bc0c11] hover:text-[#bc0c11]"
-                    }`}
+                    className={isActive ? "neu-pill-active" : "neu-pill"}
                   >
                     {cat.label}
                   </button>
@@ -183,7 +178,7 @@ export default function TefaCatalogSection({
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[25px] bg-white overflow-hidden shadow-[0px_4px_12px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 border-2 border-dashed border-[#d1d5dc] hover:border-[#bc0c11] flex flex-col"
+              className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[25px] neu-card-interactive overflow-hidden flex flex-col"
             >
                 {/* Thumbnail */}
                 <div className="relative w-full h-[155px] overflow-hidden bg-gray-100">
@@ -208,7 +203,7 @@ export default function TefaCatalogSection({
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-4 border-t border-dashed border-gray-200 flex items-center justify-between gap-3">
+                  <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
                     <button
                       type="button"
                       onClick={() => onSelectProduct(product)}
@@ -220,11 +215,7 @@ export default function TefaCatalogSection({
 
                     <Link
                       href={`/tefa/request?service=${encodeURIComponent(product.title)}`}
-                      className="px-4 py-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white text-xs font-jakarta font-medium transition-all active:scale-[0.98] cursor-pointer inline-flex items-center justify-center"
-                      style={{
-                        boxShadow:
-                          "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                      }}
+                      className="btn-primary !h-8 !min-h-[34px] !px-4 !text-xs cursor-pointer inline-flex items-center justify-center"
                     >
                       {t("tefa.cardOrder")}
                     </Link>

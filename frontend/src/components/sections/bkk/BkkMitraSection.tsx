@@ -36,7 +36,7 @@ export default function BkkMitraSection() {
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         
         {/* Section Header with Red Bar Divider */}
-        <div className="mb-10 sm:mb-12 max-w-3xl">
+        <div className="mb-10 sm:mb-12 max-w-3xl mx-auto text-center flex flex-col items-center">
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828] mb-3">
             {isEn ? "Connected with the " : "Terhubung dengan "}
             <span className="text-[#bc0c11]">
@@ -44,7 +44,7 @@ export default function BkkMitraSection() {
             </span>
           </h2>
 
-          <div className="h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+          <div className="section-title-line" />
 
           <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
             {isEn
@@ -59,7 +59,7 @@ export default function BkkMitraSection() {
             <div
               key={mitra.name}
               title={mitra.name}
-              className="h-24 sm:h-28 rounded-[20px] bg-white border-2 border-dashed border-[#d1d5dc] p-3 sm:p-4 flex flex-col items-center justify-center text-center shadow-xs hover:border-[#bc0c11] hover:shadow-md transition-all duration-300 group"
+              className="h-24 sm:h-28 rounded-[20px] neu-card-interactive p-3 sm:p-4 flex flex-col items-center justify-center text-center group"
             >
               <div className="relative w-full h-12 flex items-center justify-center">
                 <Image

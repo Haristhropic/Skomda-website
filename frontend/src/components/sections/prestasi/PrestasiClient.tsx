@@ -100,7 +100,7 @@ export default function PrestasiClient() {
                 </>
               )}
             </h2>
-            <div className="mx-auto h-1 w-12 rounded-full bg-[#bc0c11] mb-4" />
+            <div className="section-title-line" />
             <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
               {isEn
                 ? "A curated showcase of competitions won by SMK Telkom Sidoarjo students across AI, technology, arts, and athletics."
@@ -140,7 +140,7 @@ export default function PrestasiClient() {
 
           {/* Prestasi Grid & Mobile Horizontal Scroll */}
           {filteredItems.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-[24px] border-2 border-dashed border-[#d1d5dc] p-8 max-w-xl mx-auto">
+            <div className="text-center py-16 neu-inset-panel rounded-[24px] p-8 max-w-xl mx-auto">
               <p className="font-jakarta text-sm sm:text-base text-[#4a5565] mb-4">
                 {isEn
                   ? "No achievements match your search "
@@ -150,11 +150,7 @@ export default function PrestasiClient() {
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="inline-flex items-center gap-2 rounded-full bg-[#bc0c11] hover:bg-[#990a0e] text-white px-6 py-2.5 text-xs sm:text-sm font-medium font-jakarta transition-all duration-200 active:scale-[0.98] cursor-pointer"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary !h-10 !min-h-[40px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{isEn ? "Reset Search" : "Atur Ulang Pencarian"}</span>
               </button>

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { getCloudinaryUrl } from "@/lib/cloudinary";
 import {
@@ -176,26 +175,27 @@ export default function MembangunKompetensiSection() {
           <p className="font-jakarta font-semibold text-xl sm:text-2xl text-[#101828] mt-1">
             {isEn ? "Aligned with Student Passions & Talents." : "Sesuai Minat dan Bakat Siswa."}
           </p>
-          <div className="h-[3px] w-12 rounded-full bg-[#bc0c11] mt-5" />
+          <div className="section-title-line" />
 
           {/* Segmented Pill Tabs with Animated Sliding Pill Indicator */}
-          <div className="mt-8 relative inline-flex h-[52px] w-[340px] items-center rounded-full bg-[#f3f4f6] p-1 shadow-sm border border-gray-200/60">
+          <div className="mt-8 neu-tab-track h-[50px] sm:h-[54px] w-[280px] sm:w-[340px]">
+            {/* Smooth CSS sliding pill indicator */}
+            <div
+              className={`neu-tab-active-pill top-1.5 bottom-1.5 w-[calc(50%-6px)] ${
+                activeJurusan === "SIJA" ? "left-1.5 translate-x-0" : "left-1.5 translate-x-full"
+              }`}
+            />
+
             {/* SIJA Button */}
             <button
               type="button"
               onClick={() => setActiveJurusan("SIJA")}
-              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${activeJurusan === "SIJA"
+              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm transition-colors duration-200 cursor-pointer select-none ${
+                activeJurusan === "SIJA"
                   ? "text-white font-semibold"
-                  : "text-[#364153] hover:text-[#bc0c11]"
-                }`}
+                  : "text-[#4a5565] font-medium hover:text-[#bc0c11]"
+              }`}
             >
-              {activeJurusan === "SIJA" && (
-                <motion.div
-                  layoutId="activeJurusanPill"
-                  className="absolute inset-0 rounded-full bg-[#bc0c11] shadow-sm -z-10"
-                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                />
-              )}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="16 18 22 12 16 6" />
                 <polyline points="8 6 2 12 8 18" />
@@ -207,18 +207,12 @@ export default function MembangunKompetensiSection() {
             <button
               type="button"
               onClick={() => setActiveJurusan("TJAT")}
-              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm font-medium transition-colors duration-200 cursor-pointer select-none ${activeJurusan === "TJAT"
+              className={`relative z-10 flex-1 h-full rounded-full flex items-center justify-center gap-2 font-jakarta text-sm transition-colors duration-200 cursor-pointer select-none ${
+                activeJurusan === "TJAT"
                   ? "text-white font-semibold"
-                  : "text-[#364153] hover:text-[#bc0c11]"
-                }`}
+                  : "text-[#4a5565] font-medium hover:text-[#bc0c11]"
+              }`}
             >
-              {activeJurusan === "TJAT" && (
-                <motion.div
-                  layoutId="activeJurusanPill"
-                  className="absolute inset-0 rounded-full bg-[#bc0c11] shadow-sm -z-10"
-                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
-                />
-              )}
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M13.54 6.47a5 5 0 0 1 0 7.06" />
                 <path d="M15.9 4.11a8.33 8.33 0 0 1 0 11.78" />
@@ -232,11 +226,9 @@ export default function MembangunKompetensiSection() {
         </div>
 
         {/* Content Container with Clean, Instant Crossfade */}
-        <motion.div
+        <div
           key={activeJurusan}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          className="animate-in fade-in duration-200"
         >
           {/* Main Jurusan Showcase Box */}
           <div className="mt-6 sm:mt-10 mb-12 sm:mb-16">
@@ -337,7 +329,7 @@ export default function MembangunKompetensiSection() {
                 return (
                   <div
                     key={`${activeJurusan}-${idx}-${sub.nameId}`}
-                    className="group relative min-h-[96px] sm:min-h-[76px] rounded-[16px] sm:rounded-[20px] bg-white p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3.5 border-2 border-dashed border-[#d1d5dc] transition-all duration-200 hover:border-[#bc0c11] hover:shadow-xs justify-between sm:justify-start"
+                    className="group relative min-h-[96px] sm:min-h-[76px] rounded-[16px] sm:rounded-[20px] neu-card-interactive p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3.5 justify-between sm:justify-start"
                   >
                     {/* Minimalist Red Icon Container */}
                     <div className="flex size-8 sm:size-10 items-center justify-center rounded-lg sm:rounded-xl bg-[#bc0c11]/10 text-[#bc0c11] group-hover:bg-[#bc0c11] group-hover:text-white transition-all duration-200 shrink-0">
@@ -345,7 +337,7 @@ export default function MembangunKompetensiSection() {
                     </div>
 
                     {/* Subject Name */}
-                    <p className="font-jakarta font-semibold text-[11px] sm:text-sm text-[#101828] group-hover:text-[#bc0c11] transition-colors leading-snug line-clamp-3 sm:line-clamp-none">
+                    <p className="font-jakarta font-semibold text-[11px] sm:text-sm text-[#101828] group-hover:text-[#bc0c11] transition-colors leading-snug break-words hyphens-auto line-clamp-3 sm:line-clamp-none">
                       {isEn ? sub.nameEn : sub.nameId}
                     </p>
                   </div>
@@ -353,7 +345,7 @@ export default function MembangunKompetensiSection() {
               })}
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

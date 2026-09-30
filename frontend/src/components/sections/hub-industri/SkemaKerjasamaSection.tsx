@@ -65,6 +65,7 @@ export default function SkemaKerjasamaSection() {
           <h2 className="font-jakarta font-bold text-3xl sm:text-4xl leading-tight tracking-tight text-[#101828]">
             {t("hubIndustri.skemaTitle", "4 Pilar Skema Kerjasama Industri")}
           </h2>
+          <div className="section-title-line" />
           <p className="mt-4 font-jakarta text-base text-[#4a5565] max-w-[560px] leading-relaxed">
             {t("hubIndustri.skemaSubtitle", "Sinergi berkelanjutan untuk menjamin lulusan memiliki kompetensi tepat guna.")}
           </p>
@@ -82,7 +83,7 @@ export default function SkemaKerjasamaSection() {
             <motion.div
               key={pilar.number}
               variants={cardVariants}
-              className="group relative rounded-[25px] bg-white p-6 sm:p-8 flex flex-col gap-4 border-2 border-dashed border-[#d1d5dc] transition-all duration-300 hover:border-[#bc0c11] hover:shadow-md"
+              className="group relative rounded-[25px] neu-card-interactive p-6 sm:p-8 flex flex-col gap-4"
             >
               {/* Top Row: Number */}
               <div className="flex items-center justify-between">

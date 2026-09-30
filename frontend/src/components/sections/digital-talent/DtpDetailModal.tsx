@@ -126,10 +126,10 @@ export default function DtpDetailModal({
                 </p>
               </div>
 
-              {/* Grid: Core Skills vs Supporting Skills (with Dashed Borders) */}
+              {/* Grid: Core Skills vs Supporting Skills */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Core Skills Box */}
-                <div className="rounded-[20px] bg-[#f8f9fb] p-5 border-2 border-dashed border-[#d1d5dc]">
+                <div className="rounded-[20px] neu-inset-panel p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="size-4 text-[#bc0c11]" />
                     <h5 className="font-jakarta font-bold text-sm text-[#101828]">
@@ -147,7 +147,7 @@ export default function DtpDetailModal({
                 </div>
 
                 {/* Supporting Skills Box */}
-                <div className="rounded-[20px] bg-[#f8f9fb] p-5 border-2 border-dashed border-[#d1d5dc]">
+                <div className="rounded-[20px] neu-inset-panel p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="size-4 text-[#bc0c11]" />
                     <h5 className="font-jakarta font-bold text-sm text-[#101828]">
@@ -166,7 +166,7 @@ export default function DtpDetailModal({
               </div>
 
               {/* Prospek Karir Box */}
-              <div className="rounded-[20px] bg-white p-5 border-2 border-dashed border-[#d1d5dc]">
+              <div className="rounded-[20px] neu-card-flat p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Briefcase className="size-4 text-[#bc0c11]" />
                   <h5 className="font-jakarta font-bold text-sm text-[#101828]">
@@ -177,7 +177,7 @@ export default function DtpDetailModal({
                   {item.careerProspects.map((career, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-[#d1d5dc]"
+                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-gray-200"
                     >
                       {career}
                     </span>
@@ -186,7 +186,7 @@ export default function DtpDetailModal({
               </div>
 
               {/* Tools & Tech Stack */}
-              <div className="rounded-[20px] bg-white p-5 border-2 border-dashed border-[#d1d5dc]">
+              <div className="rounded-[20px] neu-card-flat p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Wrench className="size-4 text-[#bc0c11]" />
                   <h5 className="font-jakarta font-bold text-sm text-[#101828]">
@@ -197,7 +197,7 @@ export default function DtpDetailModal({
                   {item.tools.map((tool, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-[#d1d5dc]"
+                      className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-gray-200"
                     >
                       {tool}
                     </span>
@@ -211,11 +211,7 @@ export default function DtpDetailModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="group inline-flex items-center gap-2.5 rounded-full bg-[#bc0c11] px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-[#990a0e] active:scale-[0.98] cursor-pointer font-jakarta"
-                style={{
-                  boxShadow:
-                    "0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -4px rgba(0,0,0,0.1), inset 0px -4px 2px 0px rgba(0,0,0,0.25)",
-                }}
+                className="btn-primary !h-10 !min-h-[40px] !px-6 !text-sm cursor-pointer"
               >
                 <span className="leading-none whitespace-nowrap">{t("digitalTalent.closeDetails", "Tutup Informasi")}</span>
               </button>
