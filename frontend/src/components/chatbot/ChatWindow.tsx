@@ -499,16 +499,16 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
         <div className="flex items-center gap-1">
           <button
             onClick={handleTriggerReset}
-            title="Bersihkan percakapan"
-            aria-label="Bersihkan riwayat percakapan"
+            title={isEn ? "Clear conversation" : "Bersihkan percakapan"}
+            aria-label={isEn ? "Clear conversation history" : "Bersihkan riwayat percakapan"}
             className="flex size-11 sm:size-8 items-center justify-center rounded-lg text-red-100 hover:bg-white/15 hover:text-white transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-white"
           >
             <RotateCcw className="size-4" />
           </button>
           <button
             onClick={onClose}
-            title="Tutup (Esc)"
-            aria-label="Tutup jendela chatbot"
+            title={isEn ? "Close (Esc)" : "Tutup (Esc)"}
+            aria-label={isEn ? "Close chatbot window" : "Tutup jendela chatbot"}
             className="flex size-11 sm:size-8 items-center justify-center rounded-lg text-red-100 hover:bg-white/15 hover:text-white transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-white"
           >
             <X className="size-5" />
@@ -530,10 +530,12 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
               <Trash2 className="size-5" />
             </div>
             <h3 className="font-jakarta font-bold text-sm text-slate-900 mb-1">
-              Bersihkan Percakapan?
+              {isEn ? "Clear Conversation?" : "Bersihkan Percakapan?"}
             </h3>
             <p className="text-xs text-slate-500 leading-relaxed mb-4">
-              Riwayat obrolan ini akan dihapus dari peramban Anda dan tidak dapat dikembalikan.
+              {isEn
+                ? "This chat history will be deleted from your browser and cannot be recovered."
+                : "Riwayat obrolan ini akan dihapus dari peramban Anda dan tidak dapat dikembalikan."}
             </p>
             <div className="flex items-center gap-2 w-full">
               <button
@@ -541,14 +543,14 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                 onClick={() => setShowResetConfirm(false)}
                 className="flex-1 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
               >
-                Batal
+                {isEn ? "Cancel" : "Batal"}
               </button>
               <button
                 type="button"
                 onClick={handleConfirmReset}
                 className="flex-1 py-2 text-xs font-semibold text-white bg-[#bc0c11] hover:bg-[#990a0e] rounded-xl shadow-xs transition-colors cursor-pointer"
               >
-                Hapus
+                {isEn ? "Clear" : "Hapus"}
               </button>
             </div>
           </div>
@@ -715,14 +717,14 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Ketik pertanyaan seputar sekolah..."
+            placeholder={isEn ? "Type your question about school..." : "Ketik pertanyaan seputar sekolah..."}
             disabled={isLoading}
             className="flex-1 min-h-[44px] px-3.5 py-2 text-base sm:text-sm text-[#101828] bg-slate-50 rounded-xl border border-slate-200 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#bc0c11]/30 focus:border-[#bc0c11] transition-all disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!inputMessage.trim() || isLoading}
-            aria-label="Kirim pertanyaan"
+            aria-label={isEn ? "Send question" : "Kirim pertanyaan"}
             className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#bc0c11] text-white hover:bg-[#990a0e] transition-colors disabled:opacity-40 disabled:hover:bg-[#bc0c11] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#bc0c11] cursor-pointer active:scale-95"
           >
             <Send className="size-4.5" />

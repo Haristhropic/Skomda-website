@@ -10,6 +10,7 @@ import {
   NewsCategory,
   getNewsList,
 } from "@/services/news";
+import { getLocalizedNewsItem } from "@/services/newsLocalization";
 import { useLanguage } from "@/context/LanguageContext";
 import { getNewsImageUrl } from "@/lib/cloudinary";
 
@@ -241,12 +242,14 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
               data-node-id="125:467"
             >
               {currentNews.length > 0 ? (
-                currentNews.map((item) => (
-                  <article
-                    key={item.id || item.slug}
-                    className="neu-card-interactive rounded-[18px] p-3 flex flex-col gap-1 group"
-                    data-node-id="125:321"
-                  >
+                currentNews.map((rawItem) => {
+                  const item = getLocalizedNewsItem(rawItem, isEn);
+                  return (
+                    <article
+                      key={item.id || item.slug}
+                      className="neu-card-interactive rounded-[18px] p-3 flex flex-col gap-1 group"
+                      data-node-id="125:321"
+                    >
                     {/* Thumbnail with Date Badge (Clickable Link) */}
                     <Link
                       href={`/berita/${item.slug}`}
@@ -328,7 +331,8 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
                       </div>
                     </div>
                   </article>
-                ))
+                  );
+                })
               ) : (
                 <div className="col-span-full bg-white rounded-2xl p-12 text-center border border-gray-100">
                   <p className="font-jakarta font-semibold text-[#364153] text-base mb-1">

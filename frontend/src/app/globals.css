@@ -49,7 +49,7 @@ img {
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marquee-scroll 28s linear infinite;
+  animation: marquee-scroll 18s linear infinite;
 }
 
 .animate-marquee:hover {
@@ -216,127 +216,136 @@ textarea.custom-scrollbar::-webkit-scrollbar-thumb:hover {
 }
 
 @layer components {
-  /* ── 1. Neumorphic Primary Button (Brand Red Extruded 3D) ── */
+  /* ── 1. Clean Elevated Primary Button (Sesuai Tombol Hero Beranda, Elegan & Timbul) ── */
   .btn-primary,
   .neu-btn-primary {
     @apply inline-flex items-center justify-center gap-2.5 min-h-[44px] h-[46px] px-6 font-jakarta text-sm sm:text-base font-semibold rounded-full text-white transition-all duration-200 cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none;
-    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
-    box-shadow: 4px 4px 10px rgba(160, 10, 15, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.9), inset 1px 1px 1px rgba(255, 255, 255, 0.25);
+    background: #bc0c11;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
   }
   .btn-primary:hover,
   .neu-btn-primary:hover {
-    background: linear-gradient(145deg, #d80e15 0%, #990a0e 100%);
-    box-shadow: 5px 5px 14px rgba(160, 10, 15, 0.4), -5px -5px 12px rgba(255, 255, 255, 1), inset 1px 1px 1px rgba(255, 255, 255, 0.35);
-    transform: translateY(-1px);
+    background: #a00a0e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(188, 12, 17, 0.15);
+    transform: translateY(-1.5px);
   }
   .btn-primary:active,
   .neu-btn-primary:active {
-    box-shadow: inset 3px 3px 6px rgba(70, 4, 7, 0.65), inset -2px -2px 4px rgba(255, 255, 255, 0.25);
-    transform: translateY(0);
+    background: #8f090d;
+    box-shadow: 0 2px 6px rgba(188, 12, 17, 0.3);
+    transform: translateY(0.5px);
   }
 
-  /* ── 2. Neumorphic Light / Neutral Button (Sesuai Referensi Gambar) ── */
+  /* ── 2. Clean Elevated Secondary / Neutral Button ── */
   .btn-secondary,
   .neu-btn {
     @apply inline-flex items-center justify-center gap-2.5 min-h-[44px] h-[46px] px-6 font-jakarta text-sm sm:text-base font-semibold rounded-full text-[#1e293b] transition-all duration-200 cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none;
-    background: #f0f2f5;
-    box-shadow: 4px 4px 10px rgba(166, 175, 195, 0.38), -4px -4px 10px rgba(255, 255, 255, 0.95);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   }
   .btn-secondary:hover,
   .neu-btn:hover {
     color: #bc0c11;
-    box-shadow: 6px 6px 14px rgba(166, 175, 195, 0.45), -6px -6px 14px rgba(255, 255, 255, 1);
+    border-color: rgba(188, 12, 17, 0.35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
     transform: translateY(-1px);
   }
   .btn-secondary:active,
   .neu-btn:active {
-    box-shadow: inset 3px 3px 6px rgba(166, 175, 195, 0.45), inset -3px -3px 6px rgba(255, 255, 255, 0.95);
-    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    transform: translateY(0.5px);
   }
 
-  /* ── 3. Neumorphic Outline Button ── */
+  /* ── 3. Clean Elevated Outline Button ── */
   .btn-outline {
     @apply inline-flex items-center justify-center gap-2.5 min-h-[44px] h-[46px] px-6 font-jakarta text-sm sm:text-base font-semibold rounded-full text-[#bc0c11] transition-all duration-200 cursor-pointer select-none;
-    background: #f0f2f5;
-    border: 2px solid rgba(188, 12, 17, 0.25);
-    box-shadow: 5px 5px 12px rgba(166, 175, 195, 0.4), -5px -5px 12px rgba(255, 255, 255, 0.95);
+    background: #ffffff;
+    border: 2px solid #bc0c11;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
   .btn-outline:hover {
-    border-color: #bc0c11;
-    box-shadow: 7px 7px 16px rgba(188, 12, 17, 0.25), -6px -6px 14px rgba(255, 255, 255, 1);
+    background: #bc0c11;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(188, 12, 17, 0.15);
     transform: translateY(-1px);
   }
   .btn-outline:active {
-    box-shadow: inset 3px 3px 6px rgba(188, 12, 17, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.9);
-    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(188, 12, 17, 0.2);
+    transform: translateY(0.5px);
   }
 
-  /* ── 4. Neumorphic Admin / Rounded-2XL Button ── */
+  /* ── 4. Clean Elevated Admin Button ── */
   .btn-admin {
     @apply inline-flex items-center justify-center gap-2 min-h-[44px] px-5 font-jakarta text-sm font-semibold rounded-2xl text-white transition-all duration-200 cursor-pointer select-none disabled:opacity-50 disabled:pointer-events-none;
-    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
-    box-shadow: 4px 4px 10px rgba(160, 10, 15, 0.35), -4px -4px 10px rgba(255, 255, 255, 0.85);
+    background: #bc0c11;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
   }
   .btn-admin:hover {
-    background: linear-gradient(145deg, #d80e15 0%, #990a0e 100%);
-    box-shadow: 6px 6px 14px rgba(160, 10, 15, 0.45), -5px -5px 12px rgba(255, 255, 255, 0.95);
+    background: #990a0e;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(188, 12, 17, 0.15);
     transform: translateY(-1px);
   }
   .btn-admin:active {
-    box-shadow: inset 3px 3px 6px rgba(70, 4, 7, 0.65), inset -2px -2px 4px rgba(255, 255, 255, 0.25);
-    transform: translateY(0);
+    transform: translateY(0.5px);
+    box-shadow: 0 1px 3px rgba(188, 12, 17, 0.25);
   }
 
-  /* ── 5. Neumorphic Inset Input / Search (Sesuai Referensi Gambar) ── */
+  /* ── 5. Clean Elevated Inset Input / Search ── */
   .neu-input {
-    @apply min-h-[44px] h-[46px] px-5 rounded-full font-jakarta text-sm text-[#101828] placeholder-gray-400 border-none outline-none transition-all duration-200;
-    background: #f0f2f5;
-    box-shadow: inset 3px 3px 7px rgba(166, 175, 195, 0.45), inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+    @apply min-h-[44px] h-[46px] px-5 rounded-full font-jakarta text-sm text-[#101828] placeholder-gray-400 border border-gray-200 outline-none transition-all duration-200;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
   .neu-input:focus {
-    box-shadow: inset 4px 4px 8px rgba(188, 12, 17, 0.2), inset -3px -3px 7px rgba(255, 255, 255, 0.95), 0 0 0 2px rgba(188, 12, 17, 0.4);
+    border-color: #bc0c11;
+    box-shadow: 0 0 0 3px rgba(188, 12, 17, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
-  /* ── 6. Neumorphic Icon Button (44x44px Bulat) ── */
+  /* ── 6. Clean Elevated Icon Button (Bulat, Timbul Rapi) ── */
   .neu-btn-icon {
     @apply inline-flex items-center justify-center size-11 rounded-full text-[#1e293b] transition-all duration-200 cursor-pointer select-none;
-    background: #f0f2f5;
-    box-shadow: 5px 5px 12px rgba(166, 175, 195, 0.45), -5px -5px 12px rgba(255, 255, 255, 0.95);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07), 0 1px 2px rgba(0, 0, 0, 0.04);
   }
   .neu-btn-icon:hover {
     color: #bc0c11;
-    box-shadow: 7px 7px 16px rgba(166, 175, 195, 0.55), -7px -7px 16px rgba(255, 255, 255, 1);
+    border-color: rgba(188, 12, 17, 0.35);
+    box-shadow: 0 4px 14px rgba(188, 12, 17, 0.18), 0 2px 4px rgba(0, 0, 0, 0.05);
     transform: translateY(-1px);
   }
   .neu-btn-icon:active {
-    box-shadow: inset 3px 3px 6px rgba(166, 175, 195, 0.5), inset -3px -3px 6px rgba(255, 255, 255, 0.95);
-    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    transform: translateY(0.5px);
   }
 
-  /* ── 7. Neumorphic Filter Pill Buttons (Sesuai Komponen Filter Berita / Dokumen) ── */
+  /* ── 7. Clean Elevated Filter Pill Buttons ── */
   .neu-pill {
     @apply inline-flex items-center justify-center shrink-0 min-h-[38px] h-[38px] px-4 rounded-full font-jakarta text-xs sm:text-sm font-semibold text-[#1e293b] transition-all duration-200 cursor-pointer select-none;
-    background: #f0f2f5;
-    box-shadow: 3px 3px 8px rgba(166, 175, 195, 0.35), -3px -3px 8px rgba(255, 255, 255, 0.95);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
   .neu-pill:hover {
     color: #bc0c11;
-    box-shadow: 4px 4px 10px rgba(166, 175, 195, 0.45), -4px -4px 10px rgba(255, 255, 255, 1);
+    border-color: rgba(188, 12, 17, 0.3);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     transform: translateY(-1px);
   }
   .neu-pill:active {
-    box-shadow: inset 2px 2px 5px rgba(166, 175, 195, 0.45), inset -2px -2px 5px rgba(255, 255, 255, 0.95);
-    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transform: translateY(0.5px);
   }
 
   .neu-pill-active {
     @apply inline-flex items-center justify-center shrink-0 min-h-[38px] h-[38px] px-4 rounded-full font-jakarta text-xs sm:text-sm font-semibold text-white transition-all duration-200 cursor-pointer select-none;
-    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
-    box-shadow: 3px 3px 9px rgba(160, 10, 15, 0.32), -3px -3px 8px rgba(255, 255, 255, 0.85);
+    background: #bc0c11;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
   }
   .neu-pill-active:hover {
-    background: linear-gradient(145deg, #d80e15 0%, #990a0e 100%);
-    box-shadow: 4px 4px 12px rgba(160, 10, 15, 0.42), -4px -4px 10px rgba(255, 255, 255, 0.95);
+    background: #990a0e;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
     transform: translateY(-1px);
   }
 
@@ -354,8 +363,8 @@ textarea.custom-scrollbar::-webkit-scrollbar-thumb:hover {
 
   .neu-tab-active-pill {
     @apply absolute rounded-full transition-transform duration-300 ease-out pointer-events-none;
-    background: linear-gradient(145deg, #c70d13 0%, #a80a0e 100%);
-    box-shadow: 3px 3px 8px rgba(160, 10, 15, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.5), inset 1px 1px 1px rgba(255, 255, 255, 0.25);
+    background: #bc0c11;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
   }
 
   /* ── 10. Consistent Section Heading Red Accent Line ── */

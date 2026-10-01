@@ -36,6 +36,7 @@ export interface PageHeroSectionProps {
   textJustifyClassName?: string;
   titleClassName?: string;
   titleHighlightClassName?: string;
+  titleStyle?: React.CSSProperties;
 }
 
 export default function PageHeroSection({
@@ -63,6 +64,7 @@ export default function PageHeroSection({
   textJustifyClassName,
   titleClassName,
   titleHighlightClassName,
+  titleStyle,
 }: PageHeroSectionProps) {
   const { t } = useLanguage();
   const isImageRight = imagePosition === "right";
@@ -232,9 +234,10 @@ export default function PageHeroSection({
             {/* Title */}
             <div className="relative mb-5 sm:mb-6">
               <h1
-                className={`font-jakarta font-bold leading-tight sm:leading-[1.2] lg:leading-[1.18] tracking-tight text-[#101828] ${
+                className={`font-jakarta font-bold !leading-[1.10] tracking-tight text-[#101828] ${
                   titleClassName || "text-3xl sm:text-4xl lg:text-[46px] xl:text-[52px]"
                 }`}
+                style={{ lineHeight: 1.10, ...titleStyle }}
               >
                 {titlePrefix && <span className="text-[#101828]">{titlePrefix} </span>}
                 {titleHighlight && (

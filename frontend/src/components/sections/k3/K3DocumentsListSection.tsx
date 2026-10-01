@@ -26,6 +26,15 @@ const CATEGORIES = [
   "Formulir & Checklist",
 ];
 
+const K3_CATEGORY_MAP_EN: Record<string, string> = {
+  Semua: "All",
+  "SOP & Pedoman": "SOPs & Guidelines",
+  "Rute & Denah Evakuasi": "Evacuation Routes & Maps",
+  "Regulasi Pemerintah": "Government Regulations",
+  "Standar Internasional": "International Standards",
+  "Formulir & Checklist": "Forms & Checklists",
+};
+
 const ITEMS_PER_PAGE = 10;
 
 export default function K3DocumentsListSection() {
@@ -152,7 +161,7 @@ export default function K3DocumentsListSection() {
                 type="button"
                 onClick={() => setSearchQuery("")}
                 className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 size-7 rounded-full bg-gray-200/80 hover:bg-gray-300 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"
-                aria-label="Hapus pencarian"
+                aria-label={isEn ? "Clear search" : "Hapus pencarian"}
               >
                 <X className="size-3.5" />
               </button>
@@ -170,7 +179,7 @@ export default function K3DocumentsListSection() {
                   onClick={() => setSelectedCategory(cat)}
                   className={isActive ? "neu-pill-active" : "neu-pill"}
                 >
-                  {cat}
+                  {isEn ? (K3_CATEGORY_MAP_EN[cat] || cat) : cat}
                 </button>
               );
             })}
@@ -211,14 +220,14 @@ export default function K3DocumentsListSection() {
                                 {doc.title}
                               </p>
                               <p className="text-xs text-gray-500 sm:hidden mt-0.5">
-                                {doc.category} ({doc.fileSize})
+                                {isEn ? (K3_CATEGORY_MAP_EN[doc.category] || doc.category) : doc.category} ({doc.fileSize})
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="py-4 px-4 hidden md:table-cell">
                           <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-                            {doc.category}
+                            {isEn ? (K3_CATEGORY_MAP_EN[doc.category] || doc.category) : doc.category}
                           </span>
                         </td>
                         <td className="py-4 px-4 hidden sm:table-cell font-semibold text-gray-600">
@@ -350,7 +359,7 @@ export default function K3DocumentsListSection() {
                     type="button"
                     onClick={() => setPreviewDoc(null)}
                     className="min-h-[40px] size-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-colors cursor-pointer"
-                    aria-label="Tutup preview"
+                    aria-label={isEn ? "Close preview" : "Tutup preview"}
                   >
                     <X className="size-5" />
                   </button>
@@ -372,7 +381,9 @@ export default function K3DocumentsListSection() {
                 <div className="flex items-center gap-3">
                   <p>
                     {isEn ? "Category:" : "Kategori:"}{" "}
-                    <strong className="text-[#101828]">{previewDoc.category}</strong>
+                    <strong className="text-[#101828]">
+                      {isEn ? (K3_CATEGORY_MAP_EN[previewDoc.category] || previewDoc.category) : previewDoc.category}
+                    </strong>
                   </p>
                   <p>
                     {isEn ? "Size:" : "Ukuran:"}{" "}

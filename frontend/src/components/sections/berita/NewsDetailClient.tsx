@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ShareArticleWidget from "@/components/news/ShareArticleWidget";
 import { NewsItem } from "@/services/news";
+import { getLocalizedNewsItem } from "@/services/newsLocalization";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface NewsDetailClientProps {
@@ -14,6 +15,9 @@ interface NewsDetailClientProps {
 export default function NewsDetailClient({ news, relatedNews }: NewsDetailClientProps) {
   const { lang, language, t } = useLanguage();
   const isEn = lang === "EN" || language === "en";
+
+  const currentNews = getLocalizedNewsItem(news, isEn);
+  const localizedRelated = relatedNews.map((item) => getLocalizedNewsItem(item, isEn));
 
   return (
     <main className="pt-24 sm:pt-28 pb-16 sm:pb-24">
@@ -59,7 +63,7 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
               <circle
                 cx="6.375"
                 cy="6.375"
-                r="5.625"
+                r="5.125"
                 strokeWidth="1.25"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -72,14 +76,14 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
               />
             </svg>
             <span>
-              {news.dateFormatted || (isEn ? "Latest" : "Terbaru")}{" "}
-              {news.time ? `• ${news.time} WIB` : ""}
+              {currentNews.dateFormatted || (isEn ? "Latest" : "Terbaru")}{" "}
+              {currentNews.time ? `• ${currentNews.time} WIB` : ""}
             </span>
           </div>
 
           {/* Title */}
           <h1 className="font-jakarta font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[42px] leading-tight text-[#101828] mb-6">
-            {news.title}
+            {currentNews.title}
           </h1>
 
           {/* Author bar */}
@@ -89,7 +93,7 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
             </div>
             <div>
               <p className="font-jakarta font-semibold text-sm text-[#101828]">
-                {news.author || "Humas SKOMDA"}
+                {currentNews.author || (isEn ? "SKOMDA Public Relations" : "Humas SKOMDA")}
               </p>
               <p className="text-xs text-[#6a7282]">
                 SMK Telkom Sidoarjo Official Media
@@ -101,8 +105,8 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
         {/* Featured Image */}
         <div className="relative w-full h-[280px] sm:h-[420px] md:h-[500px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-md mb-10 bg-gray-200">
           <Image
-            src={news.image || "/images/berita/news-thumb-1.png"}
-            alt={news.title}
+            src={currentNews.image || "/images/berita/news-thumb-1.png"}
+            alt={currentNews.title}
             fill
             priority
             className="object-cover"
@@ -112,30 +116,30 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
 
         {/* Article Body */}
         <article className="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-12 shadow-sm border border-gray-100 mb-14">
-          {news.summary && (
+          {currentNews.summary && (
             <div className="p-4 sm:p-6 mb-8 bg-red-50/60 border-l-4 border-[#bc0c11] rounded-r-xl">
               <p className="font-jakarta font-medium text-base sm:text-lg leading-relaxed text-[#364153] italic">
-                &ldquo;{news.summary}&rdquo;
+                &ldquo;{currentNews.summary}&rdquo;
               </p>
             </div>
           )}
 
           <div className="font-jakarta text-[#364153] text-base sm:text-lg leading-relaxed sm:leading-8 space-y-6">
-            {news.content ? (
-              news.content.split("\n\n").map((paragraph, idx) => (
+            {currentNews.content ? (
+              currentNews.content.split("\n\n").map((paragraph, idx) => (
                 <p key={idx}>{paragraph}</p>
               ))
             ) : (
-              <p>{news.summary || news.title}</p>
+              <p>{currentNews.summary || currentNews.title}</p>
             )}
           </div>
 
           {/* Share Widget */}
-          <ShareArticleWidget slug={news.slug} />
+          <ShareArticleWidget slug={currentNews.slug} />
         </article>
 
         {/* Berita Terkait / Rekomendasi */}
-        {relatedNews.length > 0 && (
+        {localizedRelated.length > 0 && (
           <section className="mt-8">
             <div className="flex items-center justify-between mb-8">
               <h3 className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828]">
@@ -150,7 +154,7 @@ export default function NewsDetailClient({ news, relatedNews }: NewsDetailClient
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedNews.map((item) => (
+              {localizedRelated.map((item) => (
                 <article
                   key={item.id || item.slug}
                   className="neu-card-interactive rounded-[18px] p-3 pb-4 flex flex-col group"

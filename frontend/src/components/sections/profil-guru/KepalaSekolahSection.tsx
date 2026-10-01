@@ -8,7 +8,8 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { data?: any }) {
   const kepalaSekolah = data;
-  const { lang } = useLanguage();
+  const { lang, language } = useLanguage();
+  const isEn = lang === "EN" || language === "en";
 
   return (
     <section
@@ -19,7 +20,7 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
         {/* Mobile-Only Heading (Appears before photo on mobile) */}
         <div className="lg:hidden text-center sm:text-left w-full mb-6">
           <p className="font-jakarta text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#4a5565] mb-1.5">
-            {lang === "EN" ? "Principal of" : "Kepala Sekolah"}{" "}
+            {isEn ? "Principal of" : "Kepala Sekolah"}{" "}
             <span className="text-[#bc0c11]">SMK Telkom Sidoarjo</span>
           </p>
           <h2 className="font-jakarta font-bold text-2xl sm:text-3xl text-[#101828] leading-tight tracking-tight">
@@ -63,7 +64,7 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
             {/* Eyebrow & Name (Desktop only, since on mobile it is placed at the top) */}
             <div className="hidden lg:block">
               <p className="font-jakarta text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#4a5565] mb-2">
-                {lang === "EN" ? "Principal of" : "Kepala Sekolah"}{" "}
+                {isEn ? "Principal of" : "Kepala Sekolah"}{" "}
                 <span className="text-[#bc0c11]">SMK Telkom Sidoarjo</span>
               </p>
 
@@ -74,35 +75,41 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
 
             {/* Bio */}
             <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed mb-8 max-w-2xl">
-              {kepalaSekolah.bio}
+              {isEn
+                ? "Committed to leading SMK Telkom Sidoarjo in producing exemplary graduates of strong character, global competitiveness, and readiness to pioneer the digital technology industry."
+                : kepalaSekolah.bio}
             </p>
 
             {/* 2x2 Grid Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 w-full max-w-xl mb-8">
               <div className="rounded-2xl bg-[#f9fafb] p-5 border border-gray-100 hover:border-gray-200/80 transition-all shadow-xs">
                 <span className="font-jakarta text-xs font-bold uppercase tracking-wider text-[#bc0c11] block mb-1">
-                  {lang === "EN" ? "Highest Education" : "Pendidikan Terakhir"}
+                  {isEn ? "Highest Education" : "Pendidikan Terakhir"}
                 </span>
                 <p className="font-jakarta text-base text-[#101828] font-medium">
-                  {kepalaSekolah.pendidikanTerakhir}
+                  {isEn && kepalaSekolah.pendidikanTerakhir === "S2 Magister Pendidikan"
+                    ? "Master of Education (M.Ed.)"
+                    : kepalaSekolah.pendidikanTerakhir}
                 </p>
               </div>
 
               <div className="rounded-2xl bg-[#f9fafb] p-5 border border-gray-100 hover:border-gray-200/80 transition-all shadow-xs">
                 <span className="font-jakarta text-xs font-bold uppercase tracking-wider text-[#bc0c11] block mb-1">
-                  {lang === "EN" ? "Area of Expertise" : "Bidang Keahlian"}
+                  {isEn ? "Area of Expertise" : "Bidang Keahlian"}
                 </span>
                 <p className="font-jakarta text-base text-[#101828] font-medium">
-                  {kepalaSekolah.bidangKeahlian}
+                  {isEn && kepalaSekolah.bidangKeahlian === "Manajemen Pendidikan & Kepemimpinan Sekolah"
+                    ? "Educational Management & School Leadership"
+                    : kepalaSekolah.bidangKeahlian}
                 </p>
               </div>
 
               <div className="rounded-2xl bg-[#f9fafb] p-5 border border-gray-100 hover:border-gray-200/80 transition-all shadow-xs">
                 <span className="font-jakarta text-xs font-bold uppercase tracking-wider text-[#bc0c11] block mb-1">
-                  {lang === "EN" ? "Position / Title" : "Jabatan / Posisi"}
+                  {isEn ? "Position / Title" : "Jabatan / Posisi"}
                 </span>
                 <p className="font-jakarta text-base text-[#101828] font-medium">
-                  {kepalaSekolah.role}
+                  {isEn ? "Principal / Head of School" : kepalaSekolah.role}
                 </p>
               </div>
 
@@ -111,7 +118,7 @@ export default function KepalaSekolahSection({ data = defaultKepalaSekolah }: { 
                   Motto
                 </span>
                 <p className="font-jakarta text-sm sm:text-[15px] text-[#364153] italic leading-relaxed">
-                  &ldquo;{kepalaSekolah.motto}&rdquo;
+                  &ldquo;{isEn && kepalaSekolah.motto === "Belajar bukan sekadar mencari nilai, tapi membangun masa depan." ? "Learning is not just seeking grades, but building the future." : kepalaSekolah.motto}&rdquo;
                 </p>
               </div>
             </div>

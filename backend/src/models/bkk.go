@@ -19,10 +19,14 @@ type BKKJob struct {
 	Description  string         `gorm:"type:text" json:"description"`
 	CompanyLogo  string         `gorm:"size:500" json:"companyLogo"`
 	ApplyURL     string         `gorm:"size:500" json:"applyUrl"`
-	Status       string         `gorm:"size:20;not null;default:'active'" json:"status"` // active, closed
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	Status        string         `gorm:"size:20;not null;default:'active'" json:"status"` // active, pending, rejected, closed
+	ContactPerson string         `gorm:"size:150" json:"contactPerson"`
+	EmailOrWa     string         `gorm:"size:150" json:"emailOrWa"`
+	Jurusan       string         `gorm:"size:100" json:"jurusan"`
+	Source        string         `gorm:"size:50;default:'admin'" json:"source"` // 'admin' atau 'mitra'
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // BKKPartner merepresentasikan mitra industri yang bekerja sama dengan SMK Telkom Sidoarjo.

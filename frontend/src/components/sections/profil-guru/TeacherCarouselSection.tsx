@@ -8,6 +8,26 @@ import { TeacherItem } from "@/data/teachers";
 import { useLanguage } from "@/context/LanguageContext";
 import { getTeacherPhotoUrl } from "@/lib/cloudinary";
 
+const ROLE_MAP_EN: Record<string, string> = {
+  "Kepala Sekolah": "Principal / Head of School",
+  "Waka Bid. Kurikulum": "Vice Principal for Curriculum",
+  "Waka Bid. Sarana dan Prasarana": "Vice Principal for Facilities & Infrastructure",
+  "Waka Bid. Kesiswaan": "Vice Principal for Student Affairs",
+  "Kepala Administrasi": "Head of Administration",
+  "Kepala Program Studi": "Head of Study Program",
+  "Kepala Urusan": "Head of Affairs",
+  "Guru Produktif SIJA": "SIJA Vocational Teacher",
+  "Guru Produktif TJAT": "TJAT Vocational Teacher",
+  "Guru Umum": "General Subject Teacher",
+  "Guru Bimbingan Konseling": "Guidance & Counseling Counselor",
+  "Staff Administrasi": "Administrative Staff",
+};
+
+function translateTeacherRole(role: string, isEn: boolean): string {
+  if (!isEn) return role;
+  return ROLE_MAP_EN[role] || role;
+}
+
 interface TeacherCarouselSectionProps {
   title: string;
   titleEn?: string;
@@ -119,7 +139,7 @@ export default function TeacherCarouselSection({
                     {teacher.name}
                   </h3>
                   <p className="font-jakarta text-[12px] text-[#4a5565] leading-relaxed line-clamp-2 mt-0.5 font-normal">
-                    {teacher.role}
+                    {translateTeacherRole(teacher.role, isEn)}
                   </p>
                 </div>
               </div>
@@ -162,7 +182,7 @@ export default function TeacherCarouselSection({
                       {teacher.name}
                     </h3>
                     <p className="font-jakarta text-[12px] text-[#4a5565] leading-relaxed line-clamp-2 mt-0.5 font-normal">
-                      {teacher.role}
+                      {translateTeacherRole(teacher.role, isEn)}
                     </p>
                   </div>
                 </div>

@@ -6,7 +6,39 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { NewsItem, NEWS_CATEGORIES } from "@/services/news";
+import { getLocalizedNewsItem } from "@/services/newsLocalization";
 import { useLanguage } from "@/context/LanguageContext";
+
+const CATEGORY_MAP_EN: Record<string, string> = {
+  Semua: "All",
+  "Kegiatan Sekolah": "School Activities",
+  Pengumuman: "Announcements",
+  Prestasi: "Achievements",
+  "Kemitraan & Kerja Sama": "Partnerships",
+  "Karya & Inovasi Siswa": "Student Innovations",
+  "Artikel & Edukasi": "Articles & Education",
+  Alumni: "Alumni",
+};
+
+function getCategoryLabel(cat: string, isEn: boolean): string {
+  if (!isEn) return cat;
+  return CATEGORY_MAP_EN[cat] || cat;
+}
+
+function formatMonth(month?: string, isEn?: boolean): string {
+  if (!month) return "";
+  if (!isEn) return month;
+  const m = month.toUpperCase().trim();
+  const map: Record<string, string> = {
+    MEI: "MAY",
+    AGU: "AUG",
+    AGS: "AUG",
+    OKT: "OCT",
+    NOP: "NOV",
+    DES: "DEC",
+  };
+  return map[m] || m;
+}
 
 interface BeritaPageClientProps {
   initialNews: NewsItem[];
@@ -53,17 +85,23 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
     // Filter by search query
     if (searchQuery.trim() !== "") {
       const q = searchQuery.toLowerCase().trim();
-      list = list.filter(
-        (item) =>
+      list = list.filter((item) => {
+        const loc = getLocalizedNewsItem(item, isEn);
+        return (
           item.title.toLowerCase().includes(q) ||
+          loc.title.toLowerCase().includes(q) ||
           (item.summary && item.summary.toLowerCase().includes(q)) ||
+          (loc.summary && loc.summary.toLowerCase().includes(q)) ||
           (item.category && item.category.toLowerCase().includes(q)) ||
-          (item.content && item.content.toLowerCase().includes(q))
-      );
+          (loc.category && loc.category.toLowerCase().includes(q)) ||
+          (item.content && item.content.toLowerCase().includes(q)) ||
+          (loc.content && loc.content.toLowerCase().includes(q))
+        );
+      });
     }
 
     return list;
-  }, [initialNews, selectedCategory, searchQuery]);
+  }, [initialNews, selectedCategory, searchQuery, isEn]);
 
   // Pagination calculation
   const totalPages = Math.max(1, Math.ceil(filteredNews.length / itemsPerPage));
@@ -107,7 +145,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
             <span className="font-semibold text-[#101828]">{t("nav.news", "Berita")}</span>
           </nav>
 
-          <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] leading-[1.18] tracking-tight text-[#101828]">
+          <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] leading-tight tracking-tight text-[#101828]">
             {t("informasi.beritaTitle1", "Berita & Informasi")}{" "}
             <span className="text-[#bc0c11]">{t("informasi.beritaTitle2", "Terkini")}</span>
           </h1>
@@ -152,7 +190,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
           <div className="neu-filter-container">
             {NEWS_CATEGORIES.map((cat) => {
               const isActive = selectedCategory === cat;
-              const displayCat = cat === "Semua" && isEn ? "All" : cat;
+              const displayCat = getCategoryLabel(cat, isEn);
               return (
                 <button
                   key={cat}
@@ -170,11 +208,13 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
         {/* ─── 3. News Articles Grid (Exact Beranda Card Design) ─── */}
         {paginatedArticles.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 lg:gap-x-5 gap-y-6 lg:gap-y-7">
-            {paginatedArticles.map((item) => (
-              <article
-                key={item.id || item.slug}
-                className="neu-card-interactive rounded-[18px] p-3 flex flex-col gap-1 group"
-              >
+            {paginatedArticles.map((rawItem) => {
+              const item = getLocalizedNewsItem(rawItem, isEn);
+              return (
+                <article
+                  key={item.id || item.slug}
+                  className="neu-card-interactive rounded-[18px] p-3 flex flex-col gap-1 group"
+                >
                 {/* Thumbnail with Date Badge (Clickable Link) */}
                 <Link
                   href={`/berita/${item.slug}`}
@@ -194,7 +234,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
                       {item.day || "24"}
                     </span>
                     <span className="font-poppins font-medium text-[16px] leading-[16px] uppercase tracking-wide">
-                      {item.month || "MEI"}
+                      {formatMonth(item.month, isEn) || "MEI"}
                     </span>
                   </div>
                 </Link>
@@ -243,7 +283,8 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
                   </div>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         ) : (
           /* ─── Simplified Minimal Empty State ─── */
@@ -259,7 +300,7 @@ export default function BeritaPageClient({ initialNews }: BeritaPageClientProps)
                   )}
                   {selectedCategory !== "Semua" && selectedCategory !== "All" && (
                     <>
-                      {searchQuery ? " in" : " in"} category &ldquo;<strong className="text-[#101828]">{selectedCategory}</strong>&rdquo;
+                      {searchQuery ? " in" : " in"} category &ldquo;<strong className="text-[#101828]">{getCategoryLabel(selectedCategory, true)}</strong>&rdquo;
                     </>
                   )}
                   .

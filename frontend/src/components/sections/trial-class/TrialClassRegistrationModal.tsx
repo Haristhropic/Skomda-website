@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
-const MAJOR_OPTIONS = [
+const MAJOR_OPTIONS_ID = [
   {
     id: "SIJA",
     label: "Sistem Informasi, Jaringan, dan Aplikasi (SIJA - 4 Tahun)",
@@ -21,6 +21,21 @@ const MAJOR_OPTIONS = [
   },
 ];
 
+const MAJOR_OPTIONS_EN = [
+  {
+    id: "SIJA",
+    label: "Information Systems, Networks, and Applications (SIJA - 4 Years)",
+  },
+  {
+    id: "TJKT",
+    label: "Computer & Network Engineering (TJKT - 3 Years)",
+  },
+  {
+    id: "RPL",
+    label: "Software Engineering (RPL)",
+  },
+];
+
 interface TrialClassRegistrationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,7 +45,9 @@ export default function TrialClassRegistrationModal({
   isOpen,
   onClose,
 }: TrialClassRegistrationModalProps) {
-  const { t } = useLanguage();
+  const { lang, language, t } = useLanguage();
+  const isEn = lang === "EN" || language === "en";
+  const majorOptions = isEn ? MAJOR_OPTIONS_EN : MAJOR_OPTIONS_ID;
 
   const [fullName, setFullName] = useState("");
   const [schoolOrigin, setSchoolOrigin] = useState("");
@@ -44,7 +61,7 @@ export default function TrialClassRegistrationModal({
   const [ticketCode, setTicketCode] = useState("");
 
   const selectedMajor =
-    MAJOR_OPTIONS.find((opt) => opt.id === major) || MAJOR_OPTIONS[0];
+    majorOptions.find((opt) => opt.id === major) || majorOptions[0];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -144,7 +161,7 @@ export default function TrialClassRegistrationModal({
             <button
               onClick={onClose}
               className="absolute top-6 right-6 sm:top-8 sm:right-8 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 flex items-center justify-center transition-colors cursor-pointer z-20"
-              aria-label="Tutup formulir"
+              aria-label={isEn ? "Close form" : "Tutup formulir"}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -178,7 +195,7 @@ export default function TrialClassRegistrationModal({
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Contoh: Muhammad Raihan"
+                      placeholder={isEn ? "e.g., Muhammad Raihan" : "Contoh: Muhammad Raihan"}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-jakarta text-[#101828] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#bc0c11]/20 focus:border-[#bc0c11] transition-all"
                     />
                   </div>
@@ -193,7 +210,7 @@ export default function TrialClassRegistrationModal({
                       required
                       value={schoolOrigin}
                       onChange={(e) => setSchoolOrigin(e.target.value)}
-                      placeholder="Contoh: SMP Negeri 1 Sidoarjo"
+                      placeholder={isEn ? "e.g., SMP Negeri 1 Sidoarjo" : "Contoh: SMP Negeri 1 Sidoarjo"}
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-jakarta text-[#101828] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#bc0c11]/20 focus:border-[#bc0c11] transition-all"
                     />
                   </div>
@@ -284,7 +301,7 @@ export default function TrialClassRegistrationModal({
                           aria-labelledby="major-dropdown-label"
                           className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white rounded-xl border border-gray-200 shadow-xl py-1.5 overflow-hidden"
                         >
-                          {MAJOR_OPTIONS.map((item) => {
+                          {majorOptions.map((item) => {
                             const isSelected = major === item.id;
                             return (
                               <button

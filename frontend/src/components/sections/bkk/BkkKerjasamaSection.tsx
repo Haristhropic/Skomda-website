@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { submitPublicBKKJob } from "@/services/bkk";
 import {
   Handshake,
   X,
@@ -15,6 +16,8 @@ import {
   Briefcase,
   Layers,
   FileText,
+  Loader2,
+  Calendar,
 } from "lucide-react";
 
 export default function BkkKerjasamaSection() {
@@ -23,13 +26,16 @@ export default function BkkKerjasamaSection() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     companyName: "",
     contactPerson: "",
     emailOrWa: "",
     positionTitle: "",
     jobType: "Full Time",
-    jurusanNeeded: "SIJA",
+    jurusanNeeded: "SIJA & TJAT",
+    deadline: "",
     notes: "",
   });
 
@@ -49,22 +55,60 @@ export default function BkkKerjasamaSection() {
     };
   }, [modalOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setModalOpen(false);
-      setFormData({
-        companyName: "",
-        contactPerson: "",
-        emailOrWa: "",
-        positionTitle: "",
-        jobType: "Full Time",
-        jurusanNeeded: "SIJA",
-        notes: "",
-      });
-    }, 2200);
+    if (!formData.companyName.trim() || !formData.positionTitle.trim()) {
+      setErrorMessage(
+        isEn
+          ? "Company Name and Position Title are required."
+          : "Nama Perusahaan dan Posisi yang dibuka wajib diisi."
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    const res = await submitPublicBKKJob({
+      title: formData.positionTitle.trim(),
+      company: formData.companyName.trim(),
+      contactPerson: formData.contactPerson.trim(),
+      emailOrWa: formData.emailOrWa.trim(),
+      jobType: formData.jobType,
+      jurusan: formData.jurusanNeeded,
+      deadline: formData.deadline || "Segera",
+      requirements: `Jurusan yang dibutuhkan: ${formData.jurusanNeeded}. ${formData.notes || ""}`.trim(),
+      description: `Kualifikasi / Catatan Tambahan: ${formData.notes || "-"}\nNarahubung: ${formData.contactPerson} (${formData.emailOrWa})`,
+      status: "pending",
+      source: "mitra",
+    });
+
+    setIsSubmitting(false);
+
+    if (res.success) {
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setModalOpen(false);
+        setFormData({
+          companyName: "",
+          contactPerson: "",
+          emailOrWa: "",
+          positionTitle: "",
+          jobType: "Full Time",
+          jurusanNeeded: "SIJA & TJAT",
+          deadline: "",
+          notes: "",
+        });
+      }, 3500);
+    } else {
+      setErrorMessage(
+        res.error ||
+          (isEn
+            ? "Failed to submit vacancy. Please try again later."
+            : "Gagal mengirim pengajuan lowongan. Silakan coba beberapa saat lagi.")
+      );
+    }
   };
 
   return (
@@ -274,22 +318,37 @@ export default function BkkKerjasamaSection() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="flex items-center gap-1.5 font-semibold text-[#101828] mb-1.5">
-                      <Layers className="size-4 text-[#bc0c11]" />
-                      <span>{isEn ? "Target Major" : "Jurusan yang Dibutuhkan"}</span>
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={formData.jurusanNeeded}
-                        onChange={(e) => setFormData({ ...formData, jurusanNeeded: e.target.value })}
-                        className="w-full appearance-none px-3.5 py-2.5 pr-10 rounded-xl border border-gray-200 bg-white text-[#101828] focus:outline-none focus:border-[#bc0c11] focus:ring-1 focus:ring-[#bc0c11] transition-all cursor-pointer hover:border-gray-300"
-                      >
-                        <option value="SIJA">SIJA ({isEn ? "Information Systems, Networks, and Applications" : "Sistem Informasi Jaringan dan Aplikasi"})</option>
-                        <option value="TJAT">TJAT ({isEn ? "Telecommunications Access Network Engineering" : "Teknik Jaringan Akses Telekomunikasi"})</option>
-                        <option value="SIJA & TJAT">{isEn ? "Both (SIJA & TJAT)" : "Keduanya (SIJA & TJAT)"}</option>
-                      </select>
-                      <ChevronDown className="size-4 text-gray-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="flex items-center gap-1.5 font-semibold text-[#101828] mb-1.5">
+                        <Layers className="size-4 text-[#bc0c11]" />
+                        <span>{isEn ? "Target Major" : "Jurusan yang Dibutuhkan"}</span>
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={formData.jurusanNeeded}
+                          onChange={(e) => setFormData({ ...formData, jurusanNeeded: e.target.value })}
+                          className="w-full appearance-none px-3.5 py-2.5 pr-10 rounded-xl border border-gray-200 bg-white text-[#101828] focus:outline-none focus:border-[#bc0c11] focus:ring-1 focus:ring-[#bc0c11] transition-all cursor-pointer hover:border-gray-300"
+                        >
+                          <option value="SIJA & TJAT">{isEn ? "Both (SIJA & TJAT)" : "Keduanya (SIJA & TJAT)"}</option>
+                          <option value="SIJA">SIJA ({isEn ? "Information Systems, Networks, and Applications" : "Sistem Informasi Jaringan & Aplikasi"})</option>
+                          <option value="TJAT">TJAT ({isEn ? "Telecommunications Access Network Engineering" : "Teknik Jaringan Akses Telekomunikasi"})</option>
+                          <option value="Semua Jurusan">{isEn ? "All Majors" : "Semua Jurusan"}</option>
+                        </select>
+                        <ChevronDown className="size-4 text-gray-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-1.5 font-semibold text-[#101828] mb-1.5">
+                        <Calendar className="size-4 text-[#bc0c11]" />
+                        <span>{isEn ? "Application Deadline" : "Batas Pendaftaran"}</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.deadline}
+                        onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-[#101828] focus:outline-none focus:border-[#bc0c11] focus:ring-1 focus:ring-[#bc0c11] transition-all hover:border-gray-300 cursor-pointer text-xs sm:text-sm"
+                      />
                     </div>
                   </div>
 
@@ -311,13 +370,29 @@ export default function BkkKerjasamaSection() {
                     />
                   </div>
 
+                  {errorMessage && (
+                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
+                      {errorMessage}
+                    </div>
+                  )}
+
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="btn-primary group w-full !h-[48px] cursor-pointer"
+                      disabled={isSubmitting}
+                      className="btn-primary group w-full !h-[48px] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <span>{isEn ? "Submit Vacancy Details" : "Kirim Kebutuhan Lowongan"}</span>
-                      <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="size-4 animate-spin shrink-0" />
+                          <span>{isEn ? "Submitting..." : "Mengirim Permohonan..."}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>{isEn ? "Submit Vacancy Details" : "Kirim Kebutuhan Lowongan"}</span>
+                          <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>

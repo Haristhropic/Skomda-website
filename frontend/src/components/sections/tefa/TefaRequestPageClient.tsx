@@ -150,7 +150,7 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
           >
             <div className="w-full flex flex-col items-start">
               {/* Main Title matching 271:43 */}
-              <h1 className="font-jakarta font-bold text-4xl sm:text-5xl lg:text-[52px] leading-[1.12] tracking-tight text-[#101828] mb-6">
+              <h1 className="font-jakarta font-bold text-4xl sm:text-5xl lg:text-[52px] leading-[1.12] tracking-tight text-[#101828] mb-4">
                 {isEn ? (
                   <>
                     Tell Us <br />
@@ -165,6 +165,9 @@ Mohon informasi ketersediaan jadwal konsultasi dan alur kerja samanya. Terima ka
                   </>
                 )}
               </h1>
+
+              {/* Red accent line */}
+              <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mb-5 sm:mb-6" />
 
               {/* Subtitle */}
               <p className="font-jakarta text-base sm:text-lg text-[#364153] leading-relaxed mb-6 max-w-lg font-normal">

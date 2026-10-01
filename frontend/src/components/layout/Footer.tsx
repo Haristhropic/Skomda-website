@@ -71,7 +71,7 @@ export default function Footer() {
     { label: t("nav.trialClass"), href: "/trial-class" },
     { label: t("nav.ppdb"), href: "/ppdb" },
     { label: t("nav.tefa", "TeFa"), href: "/tefa" },
-    { label: "Pengumuman Kelulusan", href: "/informasi/pengumuman-kelulusan" },
+    { label: t("nav.graduationAnnouncement", "Pengumuman Kelulusan"), href: "/informasi/pengumuman-kelulusan" },
     { label: t("nav.downloadInfo", "Unduh Informasi"), href: "/unduh-informasi" },
   ];
 
@@ -84,7 +84,7 @@ export default function Footer() {
 
   const beritaSekolah = [
     { label: t("footer.schoolActivities", "Kegiatan Sekolah"), href: "/informasi/berita?kategori=Kegiatan+Sekolah" },
-    { label: t("nav.achievements", "Prestasi"), href: "/informasi/berita?kategori=Prestasi" },
+    { label: t("footer.achievements", "Prestasi"), href: "/informasi/berita?kategori=Prestasi" },
     { label: t("footer.announcements", "Pengumuman"), href: "/informasi/berita?kategori=Pengumuman" },
     { label: t("footer.partnerships", "Kemitraan & Kerja Sama"), href: "/informasi/berita?kategori=Kemitraan+%26+Kerja+Sama" },
     { label: t("footer.innovations", "Karya & Inovasi Siswa"), href: "/informasi/berita?kategori=Karya+%26+Inovasi+Siswa" },

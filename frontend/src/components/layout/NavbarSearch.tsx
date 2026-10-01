@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_NEWS, NewsItem, getNewsList } from "@/services/news";
+import { getLocalizedNewsItem } from "@/services/newsLocalization";
 import { DOWNLOAD_DOCUMENTS } from "@/components/sections/unduh/UnduhInformasiClient";
 import { PRESTASI_LIST } from "@/data/prestasiData";
 import { FASILITAS_LIST } from "@/data/fasilitasData";
@@ -548,7 +549,8 @@ function ItemIcon({ type }: { type: SearchItem["iconType"] }) {
 /* ──────────────────── Component ──────────────────── */
 export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
   const router = useRouter();
-  const { lang, t } = useLanguage();
+  const { lang, language, t } = useLanguage();
+  const isEn = lang === "EN" || language === "en";
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -636,16 +638,19 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
     }));
 
     // 6. Berita & Agenda
-    const newsItems: SearchItem[] = liveNews.map((n): SearchItem => ({
-      id: `news-${n.slug}`,
-      title: n.title,
-      description: n.summary || `Kategori: ${n.category}`,
-      href: `/berita/${n.slug}`,
-      category: "Berita",
-      badge: n.category,
-      iconType: "news",
-      keywords: `berita kabar informasi artikel pengumuman ${n.category} ${n.author || ""}`,
-    }));
+    const newsItems: SearchItem[] = liveNews.map((rawNews): SearchItem => {
+      const n = getLocalizedNewsItem(rawNews, isEn);
+      return {
+        id: `news-${n.slug}`,
+        title: n.title,
+        description: n.summary || (isEn ? `Category: ${n.category}` : `Kategori: ${n.category}`),
+        href: `/berita/${n.slug}`,
+        category: "Berita",
+        badge: n.category,
+        iconType: "news",
+        keywords: `berita news kabar informasi artikel article pengumuman announcement ${n.category} ${n.author || ""}`,
+      };
+    });
 
     // 7. Dokumen Unduh Informasi
     const docItems: SearchItem[] = DOWNLOAD_DOCUMENTS.map((d): SearchItem => ({
@@ -798,23 +803,23 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
       const matched = filteredResults.filter((r) => r.category === cat);
       if (matched.length > 0) {
         let label = cat;
-        if (cat === "Jurusan") label = lang === "EN" ? "Majors & Programs" : "Jurusan & Keahlian";
-        else if (cat === "Kelulusan") label = lang === "EN" ? "Graduation & Alumni" : "Pengumuman Kelulusan & Alumni";
-        else if (cat === "TeFa") label = lang === "EN" ? "Teaching Factory (Products & Services)" : "Teaching Factory (Produk & Jasa)";
-        else if (cat === "Prestasi") label = lang === "EN" ? "Student Achievements" : "Prestasi Siswa";
-        else if (cat === "Fasilitas") label = lang === "EN" ? "Campus Facilities" : "Fasilitas & Sarana";
-        else if (cat === "Ekskul") label = lang === "EN" ? "Extracurriculars" : "Ekstrakurikuler";
-        else if (cat === "Karier") label = lang === "EN" ? "Career & BKK Jobs" : "Peluang Karier & BKK";
-        else if (cat === "Dokumen") label = lang === "EN" ? "Official Documents & K3" : "Dokumen & Panduan K3";
-        else if (cat === "Halaman") label = lang === "EN" ? "Pages" : "Halaman";
-        else if (cat === "Berita") label = lang === "EN" ? "News & Updates" : "Berita & Agenda";
-        else if (cat === "Section") label = lang === "EN" ? "Page Sections" : "Bagian Halaman (Section)";
-        else if (cat === "Info") label = lang === "EN" ? "Information" : "Informasi Cepat";
+        if (cat === "Jurusan") label = isEn ? "Majors & Programs" : "Jurusan & Keahlian";
+        else if (cat === "Kelulusan") label = isEn ? "Graduation & Alumni" : "Pengumuman Kelulusan & Alumni";
+        else if (cat === "TeFa") label = isEn ? "Teaching Factory (Products & Services)" : "Teaching Factory (Produk & Jasa)";
+        else if (cat === "Prestasi") label = isEn ? "Student Achievements" : "Prestasi Siswa";
+        else if (cat === "Fasilitas") label = isEn ? "Campus Facilities" : "Fasilitas & Sarana";
+        else if (cat === "Ekskul") label = isEn ? "Extracurriculars" : "Ekstrakurikuler";
+        else if (cat === "Karier") label = isEn ? "Career & BKK Jobs" : "Peluang Karier & BKK";
+        else if (cat === "Dokumen") label = isEn ? "Official Documents & K3" : "Dokumen & Panduan K3";
+        else if (cat === "Halaman") label = isEn ? "Pages" : "Halaman";
+        else if (cat === "Berita") label = isEn ? "News & Updates" : "Berita & Agenda";
+        else if (cat === "Section") label = isEn ? "Page Sections" : "Bagian Halaman (Section)";
+        else if (cat === "Info") label = isEn ? "Information" : "Informasi Cepat";
         map.set(label, matched);
       }
     }
     return map;
-  }, [filteredResults, lang]);
+  }, [filteredResults, isEn]);
 
   // Focus on open
   useEffect(() => {
@@ -948,7 +953,7 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
                     inputRef.current?.focus();
                   }}
                   className="size-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                  aria-label="Hapus teks"
+                  aria-label={isEn ? "Clear text" : "Hapus teks"}
                 >
                   <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -1013,7 +1018,7 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
                   {/* Clean List Quick Access Links */}
                   <div>
                     <p className="font-jakarta text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1">
-                      {lang === "EN" ? "Quick Access Pages & Programs" : "Akses Cepat Halaman & Program"}
+                      {isEn ? "Quick Access Pages & Programs" : "Akses Cepat Halaman & Program"}
                     </p>
                     <div className="flex flex-col gap-1">
                       {QUICK_FEATURED_ITEMS.map((item, idx) => {
@@ -1078,7 +1083,7 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
                           {category}
                         </span>
                         <span className="font-jakarta text-[11px] font-medium text-slate-400">
-                          {items.length} hasil
+                          {items.length} {isEn ? (items.length === 1 ? "result" : "results") : "hasil"}
                         </span>
                       </div>
 
@@ -1148,10 +1153,10 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
                     </svg>
                   </div>
                   <p className="font-jakarta text-sm font-bold text-slate-900">
-                    {lang === "EN" ? `No results for "${query}"` : `Tidak ada hasil untuk "${query}"`}
+                    {isEn ? `No results for "${query}"` : `Tidak ada hasil untuk "${query}"`}
                   </p>
                   <p className="font-jakarta text-xs text-slate-500 mt-1">
-                    {lang === "EN"
+                    {isEn
                       ? "Try keywords like 'Graduation', 'SKL', 'TeFa', 'PPDB', 'LKS AI', 'SIJA', or 'BKK'"
                       : "Coba kata kunci seperti 'Kelulusan', 'SKL', 'Ahmad', 'TeFa', 'PPDB', 'SIJA', atau 'BKK'"}
                   </p>

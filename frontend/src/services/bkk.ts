@@ -10,7 +10,11 @@ export interface BKKJobItem {
   description?: string;
   companyLogo?: string;
   applyUrl?: string;
-  status?: string;
+  status?: string; // 'active', 'pending', 'rejected', 'closed'
+  contactPerson?: string;
+  emailOrWa?: string;
+  jurusan?: string;
+  source?: string; // 'admin' | 'mitra'
   created_at?: string;
 }
 
@@ -92,6 +96,49 @@ export async function deleteBKKJob(
     const json = await res.json();
     if (!res.ok) return { success: false, error: json.error || "Gagal menghapus lowongan" };
     return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal terhubung ke backend" };
+  }
+}
+
+/**
+ * Public function: Pengajuan lowongan oleh mitra / publik.
+ * Status otomatis 'pending' agar diverifikasi admin terlebih dahulu.
+ */
+export async function submitPublicBKKJob(
+  data: Partial<BKKJobItem>
+): Promise<{ success: boolean; data?: BKKJobItem; error?: string; message?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/bkk/jobs/submit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) return { success: false, error: json.error || "Gagal mengirim pengajuan lowongan" };
+    return { success: true, data: json.data, message: json.message };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal terhubung ke backend" };
+  }
+}
+
+/**
+ * Admin function: Verifikasi / ubah status lowongan (active / approved, rejected, closed).
+ */
+export async function updateBKKJobStatus(
+  id: number | string,
+  status: "active" | "rejected" | "closed" | "pending"
+): Promise<{ success: boolean; data?: BKKJobItem; error?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/bkk/jobs/${id}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ status }),
+    });
+    const json = await res.json();
+    if (!res.ok) return { success: false, error: json.error || "Gagal memperbarui status lowongan" };
+    return { success: true, data: json.data };
   } catch (err: any) {
     return { success: false, error: err.message || "Gagal terhubung ke backend" };
   }

@@ -63,7 +63,10 @@ export default function Ts21HeroSection() {
             </nav>
 
             {/* Main Title */}
-            <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] leading-[1.18] tracking-tight text-[#101828] mb-4">
+            <h1
+              className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] !leading-[1.12] tracking-tight text-[#101828] mb-4"
+              style={{ lineHeight: 1.12 }}
+            >
               {t("ts21.heroTitle1", "Kerangka Pembelajaran")}{" "}
               <span className="text-[#bc0c11]">{t("ts21.heroTitle2", "Abad ke-21 (TS.21)")}</span>
             </h1>

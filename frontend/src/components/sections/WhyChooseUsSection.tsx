@@ -136,14 +136,14 @@ export default function WhyChooseUsSection() {
                 data-node-id={card.id}
                 className="relative rounded-[22px] sm:rounded-[25px] neu-card px-4 sm:px-7 py-4 sm:py-6 flex items-center gap-3.5 sm:gap-5 min-h-[105px] sm:min-h-[120px]"
               >
-                {/* Light pink/red circle icon 67:145) */}
-                <div className="flex size-[52px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-[#ffebed] p-2 sm:p-3">
+                {/* Red circle icon */}
+                <div className="flex size-[52px] sm:size-[70px] shrink-0 items-center justify-center rounded-full bg-[#bc0c11] p-2 sm:p-3 shadow-[0_2px_6px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:scale-105">
                   <div className="relative size-[30px] sm:size-[40px]">
                     <Image
                       src={card.iconSrc}
                       alt=""
                       fill
-                      className="object-contain"
+                      className="object-contain brightness-0 invert"
                     />
                   </div>
                 </div>

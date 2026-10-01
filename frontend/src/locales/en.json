@@ -137,7 +137,14 @@
     "thisYear": "This Year :",
     "location": "School Location",
     "openMaps": "Open in Maps",
-    "rights": "Copyright © 2026 All rights reserved | SMK Telkom Sidoarjo"
+    "rights": "Copyright © 2026 All rights reserved | SMK Telkom Sidoarjo",
+    "schoolActivities": "School Activities",
+    "achievements": "Achievements",
+    "announcements": "Announcements",
+    "partnerships": "Partnerships & Collaborations",
+    "innovations": "Student Innovations & Works",
+    "articles": "Articles & Education",
+    "alumni": "Alumni"
   },
   "tefa": {
     "breadcrumb": "Products & Services",

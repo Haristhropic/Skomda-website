@@ -5,13 +5,13 @@ import Image from "next/image";
 import { PELUANG_KARIER_ITEMS, PeluangKarierItem } from "@/data/bkkData";
 import { getBKKJobs } from "@/services/bkk";
 import { useLanguage } from "@/context/LanguageContext";
-import { Search, MapPin, Briefcase, ChevronRight, X, Copy, Check, Send } from "lucide-react";
+import { Search, MapPin, Briefcase, ChevronRight, ChevronDown, ChevronUp, X, Copy, Check, Send, RotateCcw } from "lucide-react";
 
 export default function BkkPeluangSection() {
   const { isEn } = useLanguage();
 
   const [jobsList, setJobsList] = useState<PeluangKarierItem[]>(PELUANG_KARIER_ITEMS);
-  const [activeFilter, setActiveFilter] = useState<string>("Semua");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showAll, setShowAll] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<PeluangKarierItem | null>(null);
@@ -19,73 +19,120 @@ export default function BkkPeluangSection() {
 
   useEffect(() => {
     let isMounted = true;
-    getBKKJobs("active")
-      .then((data) => {
-        if (isMounted && data && data.length > 0) {
-          setJobsList(
-            data.map((j) => {
-              // find matching item in PELUANG_KARIER_ITEMS if any for rich details
-              const existing = PELUANG_KARIER_ITEMS.find((e) => e.title.toLowerCase() === j.title.toLowerCase() || e.company.toLowerCase() === j.company.toLowerCase());
-              return {
-                id: String(j.id),
-                title: j.title,
-                company: j.company,
-                logo: j.companyLogo || existing?.logo || "/images/partners/logo-telkom-indonesia.jpg",
-                location: j.location,
-                type: (j.jobType === "Internship" ? "Internship" : "Full Time") as any,
-                jurusan: existing?.jurusan || "SIJA & TJAT",
-                postedDate: existing?.postedDate || "September 2026",
-                deadline: j.deadline || "Segera",
-                salaryRange: j.salary || existing?.salaryRange,
-                description: j.description || existing?.description || "",
-                responsibilities: existing?.responsibilities || [],
-                requirements: existing?.requirements || (j.requirements ? j.requirements.split(".").map(s => s.trim()).filter(Boolean) : []),
-                applyEmail: existing?.applyEmail || (j.applyUrl ? j.applyUrl.replace("mailto:", "") : "karir@smktelkom-sda.sch.id"),
-              };
-            })
-          );
-        }
-      })
-      .catch(() => {});
+
+    // Mengambil lowongan yang berstatus 'active' (yang telah disetujui / di-ACC admin)
+    const fetchActiveJobs = () => {
+      getBKKJobs("active")
+        .then((data) => {
+          if (!isMounted) return;
+          if (Array.isArray(data) && data.length > 0) {
+            // Dobel filter sisi klien untuk memastikan hanya lowongan berstatus 'active' yang tampil
+            const activeJobsOnly = data.filter(
+              (j) => (j.status || "active").toLowerCase() === "active"
+            );
+
+            if (activeJobsOnly.length > 0) {
+              setJobsList(
+                activeJobsOnly.map((j) => {
+                  const existing = PELUANG_KARIER_ITEMS.find(
+                    (e) =>
+                      e.title.toLowerCase() === (j.title || "").toLowerCase() ||
+                      e.company.toLowerCase() === (j.company || "").toLowerCase()
+                  );
+
+                  const isIntern =
+                    (j.jobType || "").toLowerCase().includes("magang") ||
+                    (j.jobType || "").toLowerCase().includes("pkl") ||
+                    (j.jobType || "").toLowerCase().includes("intern");
+
+                  const parsedRequirements = j.requirements?.trim()
+                    ? j.requirements
+                        .split(/\r?\n|•|\*/)
+                        .map((s) => s.trim())
+                        .filter((s) => s.length > 0)
+                    : existing?.requirements || [];
+
+                  return {
+                    id: String(j.id),
+                    title: j.title || "Lowongan Kerja",
+                    company: j.company || "Mitra Industri",
+                    logo:
+                      j.companyLogo ||
+                      existing?.logo ||
+                      "/images/partners/logo-telkom-indonesia.jpg",
+                    location: j.location || "Sidoarjo",
+                    type: (isIntern ? "Internship" : "Full Time") as "Internship" | "Full Time",
+                    jurusan: j.jurusan || existing?.jurusan || "SIJA & TJAT",
+                    postedDate: existing?.postedDate || "Oktober 2026",
+                    deadline: j.deadline || "Segera",
+                    salaryRange: j.salary || existing?.salaryRange || "Standar Industri",
+                    description: j.description || existing?.description || "",
+                    responsibilities: existing?.responsibilities || [],
+                    requirements: parsedRequirements,
+                    applyEmail:
+                      j.applyUrl?.replace("mailto:", "") ||
+                      existing?.applyEmail ||
+                      "karir@smktelkom-sda.sch.id",
+                  };
+                })
+              );
+            }
+          }
+        })
+        .catch(() => {
+          // Fallback jika API backend belum terhubung/offline: tetap gunakan default data
+        });
+    };
+
+    fetchActiveJobs();
+
+    // Auto refresh saat pengguna beralih kembali ke tab halaman ini (misal setelah approve di Admin)
+    window.addEventListener("focus", fetchActiveJobs);
 
     return () => {
       isMounted = false;
+      window.removeEventListener("focus", fetchActiveJobs);
     };
   }, []);
 
-  const filterOptions = isEn
-    ? ["All", "SIJA", "TJAT", "Internship", "Full Time"]
-    : ["Semua", "SIJA", "TJAT", "Internship", "Full Time"];
+  const filterOptions = [
+    { key: "all", label: isEn ? "All" : "Semua" },
+    { key: "sija", label: "SIJA" },
+    { key: "tjat", label: "TJAT" },
+    { key: "internship", label: isEn ? "Internship" : "Magang" },
+    { key: "full_time", label: isEn ? "Full Time" : "Penuh Waktu" },
+  ];
 
-  // Filter jobs based on active category & search query
+  // Filter jobs based on active category & search query (recalculates whenever jobsList updates)
   const filteredJobs = useMemo(() => {
     return jobsList.filter((job) => {
+      const q = searchQuery.toLowerCase().trim();
       const matchSearch =
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchQuery.toLowerCase());
+        !q ||
+        (job.title || "").toLowerCase().includes(q) ||
+        (job.company || "").toLowerCase().includes(q) ||
+        (job.location || "").toLowerCase().includes(q);
 
       if (!matchSearch) return false;
 
-      if (activeFilter === "Semua" || activeFilter === "All") return true;
-      if (activeFilter === "SIJA") return job.jurusan.includes("SIJA");
-      if (activeFilter === "TJAT") return job.jurusan.includes("TJAT");
-      if (activeFilter === "Internship") return job.type === "Internship";
-      if (activeFilter === "Full Time") return job.type === "Full Time";
+      const jur = (job.jurusan || "").toUpperCase();
+      if (activeFilter === "all") return true;
+      if (activeFilter === "sija") return jur.includes("SIJA");
+      if (activeFilter === "tjat") return jur.includes("TJAT");
+      if (activeFilter === "internship") return job.type === "Internship";
+      if (activeFilter === "full_time") return job.type === "Full Time";
 
       return true;
     });
-  }, [activeFilter, searchQuery]);
+  }, [jobsList, activeFilter, searchQuery]);
 
-  // Displayed jobs: show top 4 when not expanded and no active search/filter
+  // Displayed jobs: show top 4 when not expanded, or all matching jobs when showAll is true
   const displayedJobs = useMemo(() => {
-    const isFiltered =
-      (activeFilter !== "Semua" && activeFilter !== "All") || searchQuery.trim() !== "";
-    if (isFiltered || showAll) {
+    if (showAll) {
       return filteredJobs;
     }
     return filteredJobs.slice(0, 4);
-  }, [filteredJobs, activeFilter, searchQuery, showAll]);
+  }, [filteredJobs, showAll]);
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -111,19 +158,13 @@ export default function BkkPeluangSection() {
   };
 
   const handleToggleViewAll = () => {
-    const isFiltered =
-      (activeFilter !== "Semua" && activeFilter !== "All") || searchQuery.trim() !== "";
-    if (isFiltered) {
-      setActiveFilter(isEn ? "All" : "Semua");
-      setSearchQuery("");
-      setShowAll(true);
-    } else {
-      setShowAll((prev) => !prev);
-    }
-    const el = document.getElementById("peluang-karier");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    setShowAll((prev) => !prev);
+  };
+
+  const handleResetFiltersAndShowAll = () => {
+    setActiveFilter("all");
+    setSearchQuery("");
+    setShowAll(true);
   };
 
   return (
@@ -181,20 +222,39 @@ export default function BkkPeluangSection() {
 
           {/* Category Filter Pills - Full-bleed horizontal slide on mobile with ample padding to avoid shadow clipping */}
           <div className="neu-filter-container">
-            {filterOptions.map((filter) => {
-              const isActive = activeFilter === filter;
+            {filterOptions.map((opt) => {
+              const isActive = activeFilter === opt.key;
               return (
                 <button
-                  key={filter}
+                  key={opt.key}
                   type="button"
-                  onClick={() => setActiveFilter(filter)}
+                  onClick={() => setActiveFilter(opt.key)}
                   className={isActive ? "neu-pill-active" : "neu-pill"}
                 >
-                  {filter}
+                  {opt.label}
                 </button>
               );
             })}
           </div>
+        </div>
+
+        {/* Counter & Active Filter Bar */}
+        <div className="flex items-center justify-between gap-3 mb-4 px-1 flex-wrap">
+          <p className="text-xs sm:text-sm font-jakarta font-semibold text-[#4a5565]">
+            {isEn
+              ? `Menampilkan ${displayedJobs.length} dari ${filteredJobs.length} peluang karier`
+              : `Menampilkan ${displayedJobs.length} dari ${filteredJobs.length} lowongan kerja`}
+          </p>
+          {(activeFilter !== "all" || searchQuery.trim() !== "") && (
+            <button
+              type="button"
+              onClick={handleResetFiltersAndShowAll}
+              className="text-xs font-jakarta font-bold text-[#bc0c11] hover:underline cursor-pointer inline-flex items-center gap-1.5"
+            >
+              <RotateCcw className="size-3" />
+              <span>{isEn ? "Reset Filter" : "Atur Ulang Filter"}</span>
+            </button>
+          )}
         </div>
 
         {/* Job Opportunity Cards List */}
@@ -203,7 +263,7 @@ export default function BkkPeluangSection() {
             displayedJobs.map((job) => (
               <div
                 key={job.id}
-                className="rounded-[24px] neu-card-interactive px-5 sm:px-7 py-5 sm:py-6 group"
+                className="rounded-[24px] neu-card-interactive px-5 sm:px-7 py-5 sm:py-6 group transition-all duration-200 animate-in fade-in-0"
               >
                 {/* Desktop Aligned Row Layout (>= 1024px) */}
                 <div className="hidden lg:flex items-center justify-between gap-6">
@@ -325,7 +385,7 @@ export default function BkkPeluangSection() {
               <button
                 type="button"
                 onClick={() => {
-                  setActiveFilter(isEn ? "All" : "Semua");
+                  setActiveFilter("all");
                   setSearchQuery("");
                 }}
                 className="btn-primary !h-10 !min-h-[40px] !px-6 !text-xs sm:!text-sm cursor-pointer"
@@ -336,33 +396,63 @@ export default function BkkPeluangSection() {
           )}
         </div>
 
-        {/* Bottom Expand / View All Opportunities Link */}
-        <div className="flex justify-center">
-          <button
-            onClick={handleToggleViewAll}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full neu-card-interactive text-sm font-jakarta font-bold text-[#bc0c11] hover:bg-red-50/40 transition-all group cursor-pointer"
-          >
-            <span>
-              {!showAll ||
-              (activeFilter !== "Semua" && activeFilter !== "All") ||
-              searchQuery.trim() !== ""
-                ? isEn
-                  ? `View All Opportunities (${PELUANG_KARIER_ITEMS.length})`
-                  : `Lihat Semua Peluang (${PELUANG_KARIER_ITEMS.length} Lowongan)`
-                : isEn
-                ? "Show Less"
-                : "Tampilkan Lebih Sedikit"}
-            </span>
-            <ChevronRight
-              className={`size-4 text-[#bc0c11] transition-transform ${
-                showAll &&
-                searchQuery.trim() === "" &&
-                (activeFilter === "Semua" || activeFilter === "All")
-                  ? "-rotate-90"
-                  : "rotate-90"
-              }`}
-            />
-          </button>
+        {/* Bottom Expand / View All Opportunities Controls */}
+        <div className="flex flex-col items-center justify-center gap-3 pt-2">
+          {filteredJobs.length > 4 ? (
+            <>
+              <button
+                type="button"
+                onClick={handleToggleViewAll}
+                className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-white border border-red-200/90 text-sm font-jakarta font-bold text-[#bc0c11] shadow-2xs hover:bg-[#bc0c11] hover:text-white hover:border-[#bc0c11] hover:shadow-md active:scale-[0.98] transition-all duration-200 group cursor-pointer"
+              >
+                <span>
+                  {showAll
+                    ? isEn
+                      ? "Show Less"
+                      : "Tampilkan Lebih Sedikit"
+                    : isEn
+                    ? `View All Opportunities (${filteredJobs.length} Jobs)`
+                    : `Lihat Semua Lowongan (${filteredJobs.length} Lowongan)`}
+                </span>
+                {showAll ? (
+                  <ChevronUp className="size-4.5 transition-transform group-hover:-translate-y-0.5" />
+                ) : (
+                  <ChevronDown className="size-4.5 transition-transform group-hover:translate-y-0.5" />
+                )}
+              </button>
+              <p className="text-xs font-jakarta text-[#64748b]">
+                {isEn
+                  ? `Showing ${displayedJobs.length} of ${filteredJobs.length} available opportunities`
+                  : `Menampilkan ${displayedJobs.length} dari ${filteredJobs.length} lowongan yang tersedia`}
+              </p>
+            </>
+          ) : (activeFilter !== "all" || searchQuery.trim() !== "") && jobsList.length > filteredJobs.length ? (
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-xs font-jakarta text-[#64748b]">
+                {isEn
+                  ? `Showing ${filteredJobs.length} opportunities for this filter`
+                  : `Menampilkan ${filteredJobs.length} lowongan untuk filter ini`}
+              </p>
+              <button
+                type="button"
+                onClick={handleResetFiltersAndShowAll}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-slate-200 text-xs sm:text-sm font-jakarta font-bold text-slate-700 hover:border-[#bc0c11] hover:text-[#bc0c11] transition-all shadow-2xs cursor-pointer"
+              >
+                <RotateCcw className="size-3.5 text-[#bc0c11]" />
+                <span>
+                  {isEn
+                    ? `Show All Opportunities (${jobsList.length} Jobs)`
+                    : `Lihat Semua Lowongan (${jobsList.length} Lowongan)`}
+                </span>
+              </button>
+            </div>
+          ) : jobsList.length > 0 ? (
+            <p className="text-xs font-jakarta text-[#64748b]">
+              {isEn
+                ? `All ${jobsList.length} available opportunities are displayed`
+                : `Semua ${jobsList.length} lowongan terverifikasi telah ditampilkan`}
+            </p>
+          ) : null}
         </div>
 
       </div>
@@ -383,7 +473,7 @@ export default function BkkPeluangSection() {
             {/* Close Button */}
             <button
               onClick={() => setSelectedJob(null)}
-              aria-label="Tutup Detail Lowongan"
+              aria-label={isEn ? "Close job details" : "Tutup Detail Lowongan"}
               className="absolute top-5 right-5 z-20 w-9 h-9 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-800 flex items-center justify-center transition-colors cursor-pointer"
             >
               <X className="size-5" />

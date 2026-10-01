@@ -42,7 +42,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	app.Use(recover.New())
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:3001,http://localhost:4321,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:4321,http://127.0.0.1:5173",
+		AllowOrigins:     "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:4321,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:4321,http://127.0.0.1:5173",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With",
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowCredentials: true,
@@ -522,6 +522,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		httpReq.Header.Set("Content-Type", "application/json")
+		if cfg.LLMAPIKey != "" {
+			httpReq.Header.Set("Authorization", "Bearer "+cfg.LLMAPIKey)
+		}
 		httpReq.Header.Set("X-Agent-Name", "Skomda-Website-Bot")
 		httpReq.Header.Set("X-Internal-Client", "skomda")
 		httpReq.Header.Set("X-Virtual-Key", "vk-skomda")

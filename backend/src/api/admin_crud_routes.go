@@ -144,8 +144,44 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			query = query.Where("LOWER(status) = ?", strings.ToLower(status))
 		}
 		var list []models.BKKJob
-		config.DB.Find(&list)
+		query.Find(&list)
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
+	})
+
+	// Public endpoint: Pasang Lowongan oleh Mitra / Perusahaan / Pengguna Publik
+	// Status selalu otomatis 'pending' (menunggu verifikasi admin agar tidak langsung tayang jika tidak valid)
+	bkkGroup.Post("/jobs/submit", func(c *fiber.Ctx) error {
+		var item models.BKKJob
+		if err := c.BodyParser(&item); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format permohonan lowongan tidak valid"})
+		}
+		if strings.TrimSpace(item.Title) == "" || strings.TrimSpace(item.Company) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Posisi yang dibuka dan nama perusahaan wajib diisi"})
+		}
+
+		item.Status = "pending"
+		item.Source = "mitra"
+		if strings.TrimSpace(item.Location) == "" {
+			item.Location = "Sidoarjo / Fleksibel"
+		}
+		if strings.TrimSpace(item.JobType) == "" {
+			item.JobType = "Full Time"
+		}
+		if strings.TrimSpace(item.CompanyLogo) == "" {
+			item.CompanyLogo = "/images/partners/logo-telkom-indonesia.jpg"
+		}
+		if strings.TrimSpace(item.Deadline) == "" {
+			item.Deadline = "Segera"
+		}
+
+		if err := config.DB.Create(&item).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan pengajuan lowongan kerja"})
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"message": "Pengajuan lowongan berhasil terkirim. Menunggu verifikasi dan persetujuan dari tim BKK SKOMDA.",
+			"data":    item,
+		})
 	})
 
 	bkkGroup.Post("/jobs", authGuard, func(c *fiber.Ctx) error {
@@ -153,9 +189,42 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if err := c.BodyParser(&item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
+		if strings.TrimSpace(item.Status) == "" {
+			item.Status = "active"
+		}
+		if strings.TrimSpace(item.Source) == "" {
+			item.Source = "admin"
+		}
 		config.DB.Create(&item)
 		recordAudit(c, "CREATE", "bkk_job", fmt.Sprint(item.ID), fmt.Sprintf("Membuat lowongan: %s di %s", item.Title, item.Company))
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Lowongan kerja berhasil ditambahkan", "data": item})
+	})
+
+	// Endpoint khusus update status (ACC/Setujui, Tolak, atau Tutup) oleh Admin
+	bkkGroup.Put("/jobs/:id/status", authGuard, func(c *fiber.Ctx) error {
+		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		var input struct {
+			Status string `json:"status"`
+		}
+		if err := c.BodyParser(&input); err != nil || strings.TrimSpace(input.Status) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Status tidak valid"})
+		}
+		var existing models.BKKJob
+		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Lowongan tidak ditemukan"})
+		}
+		oldStatus := existing.Status
+		existing.Status = strings.ToLower(strings.TrimSpace(input.Status))
+		config.DB.Save(&existing)
+
+		actionDesc := fmt.Sprintf("Memperbarui status lowongan '%s' dari %s menjadi %s", existing.Title, oldStatus, existing.Status)
+		if existing.Status == "active" {
+			actionDesc = fmt.Sprintf("Menyetujui (ACC) lowongan: %s (%s)", existing.Title, existing.Company)
+		} else if existing.Status == "rejected" {
+			actionDesc = fmt.Sprintf("Menolak pengajuan lowongan: %s (%s)", existing.Title, existing.Company)
+		}
+		recordAudit(c, "STATUS_UPDATE", "bkk_job", fmt.Sprint(id), actionDesc)
+		return c.JSON(fiber.Map{"message": "Status lowongan berhasil diperbarui", "data": existing})
 	})
 
 	bkkGroup.Put("/jobs/:id", authGuard, func(c *fiber.Ctx) error {

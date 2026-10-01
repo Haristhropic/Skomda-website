@@ -56,7 +56,7 @@ const YEARS = [
     trackAll: false,
     track3: {
       labelId: "Program 3 Tahun - TJAT",
-      labelEn: "3-Year Program - TJAT",
+      labelEn: "3 Year Program - TJAT",
       itemsId: [
         "Praktik Kerja Lapangan (PKL)",
         "Penilaian Akhir Kelulusan",
@@ -72,7 +72,7 @@ const YEARS = [
     },
     track4: {
       labelId: "Program 4 Tahun - SIJA",
-      labelEn: "4-Year Program - SIJA",
+      labelEn: "4 Year Program - SIJA",
       itemsId: [
         "Mata Pelajaran Umum & Kejuruan",
         "Penilaian Akhir Kelulusan",
@@ -96,7 +96,7 @@ const YEARS = [
     trackAll: false,
     track4Only: {
       labelId: "Program 4 Tahun - SIJA",
-      labelEn: "4-Year Program Only - SIJA",
+      labelEn: "4 Year Program - SIJA",
       itemsId: [
         "Praktik Kerja Lapangan (PKL)",
         "Sertifikasi Kompetensi",

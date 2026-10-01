@@ -12,7 +12,7 @@ export interface PeluangKarierItem {
   logo: string;
   location: string;
   type: "Full Time" | "Internship";
-  jurusan: "SIJA" | "TJAT" | "SIJA & TJAT";
+  jurusan: "SIJA" | "TJAT" | "SIJA & TJAT" | (string & {});
   postedDate: string;
   deadline: string;
   salaryRange?: string;

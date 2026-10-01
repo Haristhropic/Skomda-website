@@ -48,7 +48,7 @@ export default function ShareArticleWidget({ slug }: ShareArticleWidgetProps) {
     <div className="mt-8 pt-6 border-t border-gray-100 flex flex-wrap items-center gap-3 sm:gap-4">
       {/* Label */}
       <span className="text-[#4a5565] font-jakarta text-sm font-semibold">
-        {isEn ? "Bagikan artikel ini:" : "Bagikan artikel ini:"}
+        {isEn ? "Share this article:" : "Bagikan artikel ini:"}
       </span>
 
       {/* Copy Link Button */}
@@ -60,7 +60,7 @@ export default function ShareArticleWidget({ slug }: ShareArticleWidgetProps) {
             ? "btn-primary !h-9 !min-h-[36px]"
             : "btn-secondary !h-9 !min-h-[36px]"
         }`}
-        aria-label={copied ? "Tersalin" : "Salin Link"}
+        aria-label={copied ? (isEn ? "Copied" : "Tersalin") : (isEn ? "Copy link" : "Salin Link")}
       >
         {copied ? (
           <>

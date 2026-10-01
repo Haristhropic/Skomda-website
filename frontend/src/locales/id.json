@@ -137,7 +137,14 @@
     "thisYear": "Pengunjung Tahun ini :",
     "location": "Lokasi Sekolah",
     "openMaps": "Buka di Maps",
-    "rights": "Copyright © 2026 All rights reserved | SMK Telkom Sidoarjo"
+    "rights": "Copyright © 2026 All rights reserved | SMK Telkom Sidoarjo",
+    "schoolActivities": "Kegiatan Sekolah",
+    "achievements": "Prestasi",
+    "announcements": "Pengumuman",
+    "partnerships": "Kemitraan & Kerja Sama",
+    "innovations": "Karya & Inovasi Siswa",
+    "articles": "Artikel & Edukasi",
+    "alumni": "Alumni"
   },
   "tefa": {
     "breadcrumb": "Produk & Jasa",
