@@ -248,6 +248,8 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
 
       const liveGatewayUrl =
         process.env.NEXT_PUBLIC_NEXUS_ROUTER_URL || "https://fahlyce.vercel.app";
+      const chatbotModel =
+        process.env.NEXT_PUBLIC_CHATBOT_MODEL || "llama-3.3-70b-versatile";
 
       let response: Response | null = null;
 
@@ -257,13 +259,15 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           headers: {
             "Content-Type": "application/json",
             "X-Internal-Client": "skomda",
+            "X-Agent-Name": "Skomda-Website-Bot",
+            "X-Virtual-Key": "vk-skomda",
             Accept: "text/event-stream, application/json",
           },
           body: JSON.stringify({
             message: promptPayload,
             history: historyPayload,
             stream: true,
-            model: "gemini-3.8-flash",
+            model: chatbotModel,
           }),
         });
       } catch (cloudErr) {
@@ -282,7 +286,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
               message: promptPayload,
               history: historyPayload,
               stream: true,
-              model: "gemini-3.8-flash",
+              model: chatbotModel,
             }),
           });
         } catch (localErr) {

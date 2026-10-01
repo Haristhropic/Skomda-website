@@ -494,8 +494,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 
-		if req.Model == "" || req.Model == "groq" || req.Model == "gemini" {
-			req.Model = "gemini-3.8-flash"
+		if req.Model == "" || req.Model == "groq" || req.Model == "gemini" || req.Model == "gemini-3.8-flash" {
+			if cfg.ChatbotModel != "" {
+				req.Model = cfg.ChatbotModel
+			} else {
+				req.Model = "llama-3.3-70b-versatile"
+			}
 		}
 
 		// Kirim pesan murni pengguna tanpa polusi prefix agar RAG retrieval & instruction-following akurat

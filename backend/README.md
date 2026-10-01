@@ -78,6 +78,7 @@ LLM_API_KEY=
 JWT_SECRET=rahasia-jwt-skomda
 ALLOWED_ORIGIN=http://localhost:3001
 NEXUS_ROUTER_URL=https://fahlyce.vercel.app
+CHATBOT_MODEL=llama-3.3-70b-versatile    # Model chatbot cepat (Groq Llama 3.3 70B)
 SERVER_ENGINE=fiber                    # Pilihan: fiber (default) atau gin
 ```
 

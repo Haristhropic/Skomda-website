@@ -21,6 +21,7 @@ type Config struct {
 	AllowedOrigin   string // origin frontend Next.js, untuk CORS
 	NexusRouterURL  string // URL NexusRouter AI gateway (default: http://localhost:3000)
 	ServerEngine    string // gin | fiber (default: gin)
+	ChatbotModel    string // Model AI untuk chatbot (default: llama-3.3-70b-versatile)
 }
 
 // Load membaca .env (kalau ada, biasanya cuma di local dev) lalu env var asli.
@@ -39,6 +40,7 @@ func Load() Config {
 		AllowedOrigin:  getEnv("ALLOWED_ORIGIN", "http://localhost:3000"),
 		NexusRouterURL: getEnv("NEXUS_ROUTER_URL", "https://fahlyce.vercel.app"),
 		ServerEngine:   strings.ToLower(getEnv("SERVER_ENGINE", "fiber")),
+		ChatbotModel:   getEnv("CHATBOT_MODEL", "llama-3.3-70b-versatile"),
 	}
 }
 
