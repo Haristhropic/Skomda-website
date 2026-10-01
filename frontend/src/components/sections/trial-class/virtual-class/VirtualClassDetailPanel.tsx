@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Clock, CheckCircle2, XCircle, RotateCcw, ExternalLink, Sparkles, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -24,13 +24,17 @@ export default function VirtualClassDetailPanel({
   const { isEn } = useLanguage();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [hasCheckedAnswer, setHasCheckedAnswer] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [videoError, setVideoError] = useState<boolean>(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Reset quiz state whenever active class item changes
+  // Reset quiz & video state whenever active class item changes
   useEffect(() => {
     setSelectedOption(null);
     setHasCheckedAnswer(false);
-    setIsPlaying(true);
+    setVideoError(false);
+    if (videoRef.current) {
+      videoRef.current.load();
+    }
   }, [item.id]);
 
   const isCorrect = selectedOption !== null && selectedOption === item.quiz.correctIndex;
@@ -46,10 +50,10 @@ export default function VirtualClassDetailPanel({
   };
 
   return (
-    <div className="w-full bg-white border border-[#dfdfe0] rounded-[16px] p-5 sm:p-7 lg:p-8 drop-shadow-[0px_1px_2px_rgba(0,0,0,0.25)] flex flex-col gap-6 transition-all duration-300">
+    <div className="w-full bg-white border border-[#dfdfe0] rounded-[16px] sm:rounded-[18px] p-3.5 sm:p-7 lg:p-8 drop-shadow-[0px_1px_2px_rgba(0,0,0,0.25)] flex flex-col gap-4 sm:gap-6 transition-all duration-300">
       {/* ─── Top Header: Back Button (Kotak Kecil), Title, and Duration Badge ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-gray-100">
-        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+      <div className="flex items-center justify-between gap-2.5 sm:gap-4 pb-3 border-b border-gray-100">
+        <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 flex-1">
           <button
             type="button"
             onClick={onBack}
@@ -59,58 +63,47 @@ export default function VirtualClassDetailPanel({
             <ArrowLeft className="size-4.5" />
           </button>
 
-          <h2 className="font-jakarta font-bold text-xl sm:text-2xl lg:text-[28px] text-[#101828] leading-normal pb-0.5 truncate">
+          <h2 className="font-jakarta font-bold text-base sm:text-2xl lg:text-[28px] text-[#101828] leading-snug truncate">
             {item.title}
           </h2>
         </div>
 
         {/* Duration Badge */}
-        <div className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#f3f4f6] text-[#364153] border border-gray-200/90 shrink-0 font-jakarta text-xs sm:text-sm font-semibold">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[#f3f4f6] text-[#364153] border border-gray-200/90 shrink-0 font-jakarta text-xs sm:text-sm font-semibold">
           <Clock className="size-3.5 text-[#4a5565]" />
           <span>{item.duration}</span>
         </div>
       </div>
 
-      {/* ─── Video Player Container (Google Drive Embed) ─── */}
-      <div className="relative w-full rounded-[16px] overflow-hidden bg-black aspect-video border border-gray-200/80 shadow-inner group">
-        {isPlaying ? (
-          <iframe
-            src={`https://drive.google.com/file/d/${item.driveVideoId}/preview`}
-            title={`Video Pembelajaran: ${item.title}`}
-            allow="autoplay; encrypted-media; fullscreen"
-            allowFullScreen
-            className="w-full h-full border-0"
-          />
-        ) : (
-          <div
-            onClick={() => setIsPlaying(true)}
-            className="absolute inset-0 bg-neutral-900/95 flex flex-col items-center justify-center cursor-pointer text-white p-6"
-          >
-            <div className="size-16 sm:size-20 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#bc0c11] transition-all duration-300 shadow-xl">
-              <svg
-                className="size-8 sm:size-10 ml-1 text-white fill-current"
-                viewBox="0 0 24 24"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-            <p className="mt-4 font-jakarta font-medium text-sm sm:text-base text-gray-200 text-center">
-              {isEn ? `Click to play ${item.title}` : `Klik untuk memutar materi ${item.title}`}
-            </p>
-          </div>
-        )}
-
-        {/* External Link Pill */}
-        <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 opacity-90 hover:opacity-100 transition-opacity">
-          <a
-            href={`https://drive.google.com/file/d/${item.driveVideoId}/view?usp=sharing`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/70 hover:bg-black text-white text-[11px] font-medium backdrop-blur-sm border border-white/15 transition-colors"
-          >
-            <span>{isEn ? "Open in Google Drive" : "Buka di Google Drive"}</span>
-            <ExternalLink className="size-3" />
-          </a>
+      {/* ─── Native Video Player (100% Uncropped, Clean, & Responsive) ─── */}
+      <div className="flex flex-col gap-2 w-full">
+        <div className="relative w-full rounded-[14px] sm:rounded-[18px] overflow-hidden bg-black aspect-video border border-gray-200/80 shadow-md flex items-center justify-center">
+          {!videoError ? (
+            <video
+              ref={videoRef}
+              key={item.id}
+              controls
+              playsInline
+              preload="metadata"
+              onError={() => setVideoError(true)}
+              className="w-full h-full object-contain bg-black"
+              src={`/api/virtual-class/video?id=${item.driveVideoId}`}
+            >
+              <source
+                src={`/api/virtual-class/video?id=${item.driveVideoId}`}
+                type="video/mp4"
+              />
+              Browser Anda tidak mendukung pemutar video HTML5.
+            </video>
+          ) : (
+            <iframe
+              src={`https://drive.google.com/file/d/${item.driveVideoId}/preview`}
+              title={`Video Pembelajaran: ${item.title}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              allowFullScreen
+              className="w-full h-full border-0"
+            />
+          )}
         </div>
       </div>
 

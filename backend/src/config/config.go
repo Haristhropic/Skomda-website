@@ -30,7 +30,7 @@ func Load() Config {
 		log.Println("info: tidak menemukan file .env, lanjut pakai env var sistem")
 	}
 
-	return Config{
+	cfg := Config{
 		Env:            getEnv("ENV", getEnv("APP_ENV", "development")),
 		Port:           getEnv("PORT", "8080"),
 		DatabaseURL:    getEnv("DATABASE_URL", ""),
@@ -42,6 +42,16 @@ func Load() Config {
 		ServerEngine:   strings.ToLower(getEnv("SERVER_ENGINE", "fiber")),
 		ChatbotModel:   getEnv("CHATBOT_MODEL", "llama-3.3-70b-versatile"),
 	}
+
+	if len(strings.TrimSpace(cfg.JWTSecret)) < 16 {
+		if strings.EqualFold(cfg.Env, "production") {
+			log.Fatal("[FATAL SECURITY] JWT_SECRET wajib dikonfigurasi dengan aman (minimal 16 karakter) pada environment production!")
+		} else {
+			log.Println("[SECURITY WARNING] JWT_SECRET belum disetel atau kurang dari 16 karakter. Fitur otentikasi admin diblokir hingga JWT_SECRET diisi.")
+		}
+	}
+
+	return cfg
 }
 
 func getEnv(key, fallback string) string {

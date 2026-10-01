@@ -119,8 +119,8 @@ export default function PageHeroSection({
 
   return (
     <section
-      className={`relative w-full min-h-[100dvh] flex items-center ${
-        sectionPaddingClassName || "pt-28 sm:pt-32 pb-16 sm:pb-20"
+      className={`relative w-full lg:min-h-[100dvh] lg:flex lg:items-center ${
+        sectionPaddingClassName || "pt-28 sm:pt-32 lg:pt-32 pb-8 sm:pb-12 lg:pb-20"
       } bg-[#f8f9fb] overflow-hidden`}
     >
       <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -19,8 +20,8 @@ type JWTClaims struct {
 
 // GenerateToken membuat token JWT yang ditandatangani dengan secret key.
 func GenerateToken(user *models.User, secret string, duration time.Duration) (string, error) {
-	if secret == "" {
-		secret = "skomda-super-secret-jwt-key-2026-production"
+	if len(strings.TrimSpace(secret)) < 16 {
+		return "", errors.New("kunci rahasia JWT (JWT_SECRET) tidak valid atau terlalu pendek (minimal 16 karakter)")
 	}
 
 	claims := JWTClaims{
@@ -43,8 +44,8 @@ func GenerateToken(user *models.User, secret string, duration time.Duration) (st
 
 // ValidateToken memvalidasi string JWT dan mengembalikan claims terurai jika valid.
 func ValidateToken(tokenStr, secret string) (*JWTClaims, error) {
-	if secret == "" {
-		secret = "skomda-super-secret-jwt-key-2026-production"
+	if len(strings.TrimSpace(secret)) < 16 {
+		return nil, errors.New("kunci rahasia JWT (JWT_SECRET) tidak valid atau tidak dikonfigurasi")
 	}
 
 	token, err := jwt.ParseWithClaims(tokenStr, &JWTClaims{}, func(t *jwt.Token) (interface{}, error) {

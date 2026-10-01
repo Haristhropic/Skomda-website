@@ -23,8 +23,8 @@ func main() {
 	// Inisialisasi Database & Seeder
 	config.InitDB(cfg)
 
-	// Jika SERVER_ENGINE diset ke fiber, jalankan engine Fiber
-	if cfg.ServerEngine == "fiber" {
+	// Default engine: Fiber (mendukung seluruh fitur Auth, Admin, dan CRUD)
+	if cfg.ServerEngine != "gin" {
 		log.Printf("🚀 Memulai backend dengan engine: FIBER (port %s)", cfg.Port)
 		fiberApp := api.NewFiberApp(cfg)
 		if err := fiberApp.Listen(":" + cfg.Port); err != nil {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -16,19 +16,61 @@ import {
   DTP_WEEKLY_SCHEDULE,
   DtpSpecialization,
 } from "@/data/dtpData";
+import { getDtpList } from "@/services/dtp";
 import DtpSpecializationCard from "./DtpSpecializationCard";
 import DtpDetailModal from "./DtpDetailModal";
 
 export default function DigitalTalentClient() {
   const { t, isEn } = useLanguage();
+  const [specializations, setSpecializations] = useState<DtpSpecialization[]>(DTP_SPECIALIZATIONS);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSpec, setSelectedSpec] = useState<DtpSpecialization | null>(null);
 
-  // Search filter across 9 specializations
+  // Fetch dynamic DTP data from backend database
+  useEffect(() => {
+    let isMounted = true;
+    getDtpList()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setSpecializations(
+            data.map((item) => {
+              const matchedLocal = DTP_SPECIALIZATIONS.find(
+                (l) => l.id === item.slug || l.title.toLowerCase() === item.title.toLowerCase()
+              );
+
+              const splitComma = (str?: string) =>
+                str ? str.split(",").map((s) => s.trim()).filter(Boolean) : [];
+
+              return {
+                id: item.slug || (matchedLocal ? matchedLocal.id : `dtp-${item.id}`),
+                number: item.number || (matchedLocal ? matchedLocal.number : "01"),
+                title: item.title,
+                category: (item.category || matchedLocal?.category || "Software & AI") as any,
+                image: item.image || matchedLocal?.image || "",
+                badgeText: item.badgeText || matchedLocal?.badgeText || "",
+                shortDesc: item.shortDesc || matchedLocal?.shortDesc || "",
+                fullDesc: item.fullDesc || matchedLocal?.fullDesc || "",
+                coreSkills: item.coreSkills ? splitComma(item.coreSkills) : (matchedLocal?.coreSkills || []),
+                supportingSkills: item.supportingSkills ? splitComma(item.supportingSkills) : (matchedLocal?.supportingSkills || []),
+                careerProspects: item.careerProspects ? splitComma(item.careerProspects) : (matchedLocal?.careerProspects || []),
+                tools: item.tools ? splitComma(item.tools) : (matchedLocal?.tools || []),
+              };
+            })
+          );
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Search filter across dynamic specializations
   const filteredSpecs = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    if (!q) return DTP_SPECIALIZATIONS;
-    return DTP_SPECIALIZATIONS.filter((item) => {
+    if (!q) return specializations;
+    return specializations.filter((item) => {
       return (
         item.title.toLowerCase().includes(q) ||
         item.shortDesc.toLowerCase().includes(q) ||
@@ -38,7 +80,7 @@ export default function DigitalTalentClient() {
         item.careerProspects.some((c) => c.toLowerCase().includes(q))
       );
     });
-  }, [searchQuery]);
+  }, [searchQuery, specializations]);
 
   return (
     <>

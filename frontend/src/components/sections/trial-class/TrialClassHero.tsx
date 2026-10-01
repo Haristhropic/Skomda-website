@@ -20,7 +20,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
   };
 
   return (
-    <section className="relative w-full min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20 overflow-hidden">
+    <section className="relative w-full lg:min-h-[100dvh] lg:flex lg:items-center pt-28 sm:pt-32 lg:pt-32 pb-8 sm:pb-12 lg:pb-20 overflow-hidden">
       <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">
         {/* Top Hero Row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">

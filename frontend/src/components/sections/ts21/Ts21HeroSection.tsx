@@ -34,10 +34,10 @@ export default function Ts21HeroSection() {
   }, [isOpen]);
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#f3f4f6] min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20">
+    <section className="relative w-full overflow-hidden bg-[#f3f4f6] lg:min-h-[100dvh] lg:flex lg:items-center pt-28 sm:pt-32 lg:pt-32 pb-8 sm:pb-12 lg:pb-20">
       <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 lg:px-8">
         {/* Hero Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-14 items-center">
           {/* Left: Text Content & Breadcrumbs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -46,7 +46,7 @@ export default function Ts21HeroSection() {
             className="lg:col-span-6 flex flex-col items-start"
           >
             {/* Breadcrumbs - placed tightly right above the heading */}
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-jakarta text-[#4a5565] mb-3">
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-jakarta text-[#4a5565] mb-2.5 sm:mb-3">
               <Link href="/" className="hover:text-[#bc0c11] transition-colors">
                 {t("nav.home", "Beranda")}
               </Link>
@@ -64,7 +64,7 @@ export default function Ts21HeroSection() {
 
             {/* Main Title */}
             <h1
-              className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[44px] !leading-[1.12] tracking-tight text-[#101828] mb-4"
+              className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-[44px] !leading-[1.12] tracking-tight text-[#101828] mb-2.5 sm:mb-4"
               style={{ lineHeight: 1.12 }}
             >
               {t("ts21.heroTitle1", "Kerangka Pembelajaran")}{" "}
@@ -72,10 +72,10 @@ export default function Ts21HeroSection() {
             </h1>
 
             {/* Red accent line */}
-            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mb-5 sm:mb-6" />
+            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mb-3.5 sm:mb-6" />
 
             {/* Description */}
-            <p className="font-jakarta text-base sm:text-lg text-[#4a5565] leading-relaxed mb-8 max-w-2xl">
+            <p className="font-jakarta text-sm sm:text-base lg:text-lg text-[#4a5565] leading-relaxed mb-5 sm:mb-8 max-w-2xl">
               {t(
                 "ts21.heroDesc",
                 "Metodologi pendidikan modern Telkom Schools yang menggabungkan penguasaan teknologi digital, pemecahan masalah kreatif, kolaborasi tim, dan pembentukan karakter akhlak mulia."

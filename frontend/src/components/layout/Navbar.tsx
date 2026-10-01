@@ -51,11 +51,13 @@ export default function Navbar() {
     setMobileSubmenu((prev) => (prev === href ? null : href));
   };
 
+  const isRoot = pathname === "/";
+
   const navItems: NavItem[] = [
     { label: t("nav.home"), href: "/" },
     {
       label: t("nav.aboutUs"),
-      href: "#sambutan",
+      href: isRoot ? "#sambutan" : "/#sambutan",
       submenu: [
         { label: t("nav.schoolProfile"), href: "/tentang-kami/profil-sekolah", desc: t("nav.schoolProfileDesc") },
         { label: t("nav.industryHub"), href: "/tentang-kami/hub-industri", desc: t("nav.industryHubDesc") },
@@ -67,7 +69,7 @@ export default function Navbar() {
     },
     {
       label: t("nav.programs"),
-      href: "#program",
+      href: isRoot ? "#program" : "/#program",
       submenu: [
         { label: t("nav.majorProfiles"), href: "/program/profil-jurusan", desc: t("nav.majorProfilesDesc") },
         { label: t("nav.extracurriculars"), href: "/program/ekstrakurikuler", desc: t("nav.extracurricularsDesc") },
@@ -78,7 +80,7 @@ export default function Navbar() {
     },
     {
       label: t("nav.information"),
-      href: "#informasi",
+      href: isRoot ? "#informasi" : "/#informasi",
       submenu: [
         { label: t("nav.news"), href: "/informasi/berita", desc: t("nav.newsDesc") },
         { label: t("nav.graduationAnnouncement"), href: "/informasi/pengumuman-kelulusan", desc: t("nav.graduationAnnouncementDesc") },
@@ -87,7 +89,7 @@ export default function Navbar() {
     },
     {
       label: t("nav.tefa"),
-      href: "#tefa",
+      href: isRoot ? "#tefa" : "/#tefa",
       submenu: [
         { label: t("nav.tefaOverview"), href: "/tefa", desc: t("nav.tefaOverviewDesc") },
         { label: t("nav.tefaProducts"), href: "/tefa/produk", desc: t("nav.tefaProductsDesc") },

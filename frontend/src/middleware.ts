@@ -18,7 +18,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Proteksi stealth seluruh rute /admin (termasuk /admin/login)
+  // 2. Alihkan /admin/login langsung ke gerbang masuk resmi internal
+  if (pathname === "/admin/login") {
+    return NextResponse.redirect(new URL("/gate-internal-skomda", request.url));
+  }
+
+  // 3. Proteksi stealth seluruh rute /admin
   if (pathname.startsWith("/admin")) {
     // Jika tidak memiliki token otentikasi, samarkan dengan halaman 404 Not Found
     if (!token) {

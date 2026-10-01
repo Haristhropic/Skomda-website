@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"github.com/glebarez/sqlite"
@@ -35,6 +36,14 @@ func InitDB(cfg Config) *gorm.DB {
 		log.Fatalf("fatal: gagal inisialisasi database: %v", err)
 	}
 
+	// Konfigurasi connection pooling untuk mencegah kebocoran koneksi di bawah beban tinggi
+	if sqlDB, err := DB.DB(); err == nil {
+		sqlDB.SetMaxOpenConns(25)
+		sqlDB.SetMaxIdleConns(5)
+		sqlDB.SetConnMaxLifetime(15 * time.Minute)
+		sqlDB.SetConnMaxIdleTime(5 * time.Minute)
+	}
+
 	// Migration tabel
 	if err := DB.AutoMigrate(
 		&models.Jurusan{},
@@ -51,6 +60,7 @@ func InitDB(cfg Config) *gorm.DB {
 		&models.Document{},
 		&models.SiteSetting{},
 		&models.Alumni{},
+		&models.DigitalTalent{},
 	); err != nil {
 		log.Fatalf("fatal: gagal auto migrate database: %v", err)
 	}
@@ -62,6 +72,7 @@ func InitDB(cfg Config) *gorm.DB {
 		DB.Exec("ALTER TABLE IF EXISTS public.users ENABLE ROW LEVEL SECURITY;")
 		DB.Exec("ALTER TABLE IF EXISTS public.audit_logs ENABLE ROW LEVEL SECURITY;")
 		DB.Exec("ALTER TABLE IF EXISTS public.alumnis ENABLE ROW LEVEL SECURITY;")
+		DB.Exec("ALTER TABLE IF EXISTS public.digital_talents ENABLE ROW LEVEL SECURITY;")
 	}
 
 	// Inisialisasi akun Super Admin default hanya jika tabel users kosong (0 user)
@@ -70,6 +81,9 @@ func InitDB(cfg Config) *gorm.DB {
 	// Inisialisasi data alumni kelulusan jika tabel alumnis kosong
 	SeedAlumniIfEmpty(DB)
 	DB.Model(&models.Alumni{}).Where("status_aktivitas = ?", "Lulus Resmi").Update("status_aktivitas", "")
+
+	// Inisialisasi spesialisasi Digital Talent Program jika tabel masih kosong
+	SeedDtpIfEmpty(DB)
 
 	// CATATAN: Seluruh seeder konten otomatis telah dinonaktifkan permanen sesuai instruksi.
 	// Seluruh data (Jurusan, Berita, Guru, Prestasi, Ekskul, Fasilitas, BKK, Dokumen)
@@ -339,8 +353,13 @@ func SeedDefaultAdminIfEmpty(db *gorm.DB) {
 		Avatar: "/images/common/telkom-schools-icon.png",
 	}
 
+	adminPassword := os.Getenv("ADMIN_DEFAULT_PASSWORD")
+	if adminPassword == "" {
+		adminPassword = "SkomdaAdmin2026!"
+	}
+
 	// Password default pengembang aman di-hash dengan bcrypt
-	if err := admin.SetPassword("SkomdaAdmin2026!"); err != nil {
+	if err := admin.SetPassword(adminPassword); err != nil {
 		log.Printf("peringatan: gagal mengenkripsi password admin seeder: %v", err)
 		return
 	}

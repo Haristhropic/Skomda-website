@@ -48,7 +48,7 @@ export default function VirtualClassDtpGrid({
     <section
       ref={sectionRef}
       id="pilih-dtp"
-      className="relative w-full py-10 sm:py-14 lg:py-16 bg-[#fcfcfd] border-t border-gray-100 transition-all duration-300"
+      className="relative w-full py-8 sm:py-12 lg:py-16 bg-[#fcfcfd] border-t border-gray-100 transition-all duration-300"
     >
       <div className="relative mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -127,12 +127,12 @@ export default function VirtualClassDtpGrid({
               transition={{ duration: 0.3 }}
               className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8 w-full"
             >
-              {/* Left Column: 9 Cards Stacked Vertically */}
+              {/* Left Column: 9 Cards Stacked Vertically (Desktop only, hidden on mobile for direct video view) */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.35 }}
-                className="w-full lg:w-[380px] xl:w-[415px] shrink-0 flex flex-col gap-3"
+                className="hidden lg:flex w-full lg:w-[380px] xl:w-[415px] shrink-0 flex-col gap-3"
               >
                 <div className="flex items-center justify-between pb-1 px-1">
                   <span className="font-jakarta font-semibold text-xs text-gray-500 uppercase tracking-wider">

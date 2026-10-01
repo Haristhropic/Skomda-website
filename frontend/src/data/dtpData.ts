@@ -9,6 +9,7 @@ export interface DtpSpecialization {
   careerProspects: string[];
   tools: string[];
   badgeText?: string;
+  image?: string;
   category: "Software & AI" | "Network & Cloud" | "Hardware & Security" | "Design & Creative";
 }
 

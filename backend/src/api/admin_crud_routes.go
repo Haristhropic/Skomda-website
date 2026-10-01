@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/nademmm/smktelkom-web/backend/src/api/middleware"
 	"github.com/nademmm/smktelkom-web/backend/src/config"
 	"github.com/nademmm/smktelkom-web/backend/src/models"
@@ -150,7 +151,16 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	// Public endpoint: Pasang Lowongan oleh Mitra / Perusahaan / Pengguna Publik
 	// Status selalu otomatis 'pending' (menunggu verifikasi admin agar tidak langsung tayang jika tidak valid)
-	bkkGroup.Post("/jobs/submit", func(c *fiber.Ctx) error {
+	bkkSubmitLimiter := limiter.New(limiter.Config{
+		Max:        5,
+		Expiration: 10 * time.Minute,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error": "Batas frekuensi permohonan lowongan terlampaui. Silakan tunggu beberapa saat sebelum mencoba kembali.",
+			})
+		},
+	})
+	bkkGroup.Post("/jobs/submit", bkkSubmitLimiter, func(c *fiber.Ctx) error {
 		var item models.BKKJob
 		if err := c.BodyParser(&item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format permohonan lowongan tidak valid"})
@@ -505,7 +515,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"data": list, "map": settingsMap})
 	})
 
-	settingsGroup.Put("/:key", authGuard, func(c *fiber.Ctx) error {
+	settingsGroup.Put("/:key", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		key := strings.TrimSpace(c.Params("key"))
 		var payload struct {
 			Value string `json:"value"`
@@ -629,6 +639,97 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		config.DB.Delete(&existing)
 		recordAudit(c, "DELETE", "alumni", fmt.Sprint(id), fmt.Sprintf("Menghapus data siswa kelulusan: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Data siswa kelulusan berhasil dihapus"})
+	})
+
+	// ==================== 9. DIGITAL TALENT PROGRAM (DTP) ====================
+	dtpGroup := api.Group("/dtp")
+	dtpGroup.Get("", func(c *fiber.Ctx) error {
+		category := strings.TrimSpace(c.Query("category"))
+		q := strings.TrimSpace(c.Query("q"))
+		query := config.DB.Model(&models.DigitalTalent{}).Order("order_index ASC, id ASC")
+		if category != "" && !strings.EqualFold(category, "semua") {
+			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
+		}
+		if q != "" {
+			query = query.Where("LOWER(title) LIKE ? OR LOWER(short_desc) LIKE ? OR LOWER(core_skills) LIKE ? OR LOWER(tools) LIKE ?",
+				"%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%")
+		}
+		var list []models.DigitalTalent
+		if err := query.Find(&list).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data program digital talent"})
+		}
+		return c.JSON(fiber.Map{"data": list, "total": len(list)})
+	})
+
+	dtpGroup.Get("/:id", func(c *fiber.Ctx) error {
+		param := strings.TrimSpace(c.Params("id"))
+		var item models.DigitalTalent
+		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
+			if err := config.DB.First(&item, uint(id)).Error; err == nil {
+				return c.JSON(fiber.Map{"data": item})
+			}
+		}
+		if err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(param)).First(&item).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Program Digital Talent tidak ditemukan"})
+		}
+		return c.JSON(fiber.Map{"data": item})
+	})
+
+	dtpGroup.Post("", authGuard, func(c *fiber.Ctx) error {
+		var item models.DigitalTalent
+		if err := c.BodyParser(&item); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		if strings.TrimSpace(item.Title) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Judul spesialisasi DTP wajib diisi"})
+		}
+		if strings.TrimSpace(item.Slug) == "" {
+			item.Slug = slugify(item.Title)
+		}
+		if strings.TrimSpace(item.Category) == "" {
+			item.Category = "Software & AI"
+		}
+		if item.OrderIndex == 0 {
+			var count int64
+			config.DB.Model(&models.DigitalTalent{}).Count(&count)
+			item.OrderIndex = int(count) + 1
+		}
+		item.IsActive = true
+
+		if err := config.DB.Create(&item).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan program digital talent"})
+		}
+		recordAudit(c, "CREATE", "dtp", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan spesialisasi DTP: %s", item.Title))
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Program Digital Talent berhasil ditambahkan", "data": item})
+	})
+
+	dtpGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
+		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		var existing models.DigitalTalent
+		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Program Digital Talent tidak ditemukan"})
+		}
+		if err := c.BodyParser(&existing); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		existing.ID = uint(id)
+		if strings.TrimSpace(existing.Slug) == "" {
+			existing.Slug = slugify(existing.Title)
+		}
+		config.DB.Save(&existing)
+		recordAudit(c, "UPDATE", "dtp", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui spesialisasi DTP: %s", existing.Title))
+		return c.JSON(fiber.Map{"message": "Program Digital Talent berhasil diperbarui", "data": existing})
+	})
+
+	dtpGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		var existing models.DigitalTalent
+		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Program Digital Talent tidak ditemukan"})
+		}
+		config.DB.Delete(&existing)
+		recordAudit(c, "DELETE", "dtp", fmt.Sprint(id), fmt.Sprintf("Menghapus spesialisasi DTP: %s", existing.Title))
+		return c.JSON(fiber.Map{"message": "Program Digital Talent berhasil dihapus"})
 	})
 }
 

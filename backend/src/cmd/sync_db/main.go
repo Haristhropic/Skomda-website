@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
+	"github.com/nademmm/smktelkom-web/backend/src/config"
 	"github.com/nademmm/smktelkom-web/backend/src/models"
 )
 
@@ -21,7 +22,7 @@ func main() {
 
 	pgDSN := os.Getenv("DATABASE_URL")
 	if pgDSN == "" {
-		pgDSN = "postgresql://postgres:smktelkomsda123@db.riwvswehvkonbamrdpls.supabase.co:5432/postgres"
+		log.Fatal("DATABASE_URL wajib diatur di file .env atau environment variable")
 	}
 
 	sqlitePath := "smktelkom_dev.db"
@@ -58,9 +59,13 @@ func main() {
 		&models.Document{},
 		&models.SiteSetting{},
 		&models.Alumni{},
+		&models.DigitalTalent{},
 	); err != nil {
 		log.Fatalf("AutoMigrate error: %v", err)
 	}
+
+	// Seed data Digital Talent Program jika tabel masih kosong di Postgres
+	config.SeedDtpIfEmpty(pgDB)
 
 	// 3. Sync Teachers
 	var teachers []models.Teacher
@@ -199,7 +204,7 @@ func main() {
 	tablesWithSerial := []string{
 		"teachers", "bkk_partners", "bkk_jobs", "bkk_alumnis", "fasilitas",
 		"ekstrakurikulers", "prestasis", "documents", "site_settings",
-		"audit_logs", "jurusans", "news", "users", "alumnis",
+		"audit_logs", "jurusans", "news", "users", "alumnis", "digital_talents",
 	}
 
 	for _, tbl := range tablesWithSerial {

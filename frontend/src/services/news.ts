@@ -310,12 +310,12 @@ export async function getNewsList(params?: {
 
     if (res) {
       const json = await res.json();
-      if (Array.isArray(json.data) && json.data.length > 0) {
+      if (Array.isArray(json.data)) {
         return json.data.map(normalizeNewsItem);
       }
     }
 
-    // Backend tidak merespons atau data kosong → fallback
+    // Backend tidak merespons (jaringan offline / backend belum jalan) → fallback lokal
     if (typeof window !== "undefined") {
       console.log("[News] Menggunakan data lokal (backend belum tersedia)");
     }

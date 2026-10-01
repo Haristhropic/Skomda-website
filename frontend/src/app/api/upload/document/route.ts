@@ -4,12 +4,33 @@ import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. Verifikasi token otentikasi admin
+    const token =
+      req.cookies.get("skomda_admin_token")?.value ||
+      req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Akses ditolak: otentikasi administrator diperlukan untuk mengunggah dokumen." },
+        { status: 401 }
+      );
+    }
+
     const formData = await req.formData();
     const file = (formData.get("file") || formData.get("document")) as File | null;
 
     if (!file) {
       return NextResponse.json(
         { error: "Berkas dokumen tidak ditemukan. Silakan pilih berkas." },
+        { status: 400 }
+      );
+    }
+
+    // 2. Batas ukuran berkas maksimum 10 MB
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: "Ukuran berkas melebihi batas maksimum 10 MB." },
         { status: 400 }
       );
     }

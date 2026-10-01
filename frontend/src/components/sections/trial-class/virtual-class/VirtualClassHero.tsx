@@ -19,14 +19,14 @@ export default function VirtualClassHero({
   const isEn = lang === "EN";
 
   return (
-    <section className="relative w-full overflow-hidden min-h-[100dvh] flex items-center pt-28 sm:pt-32 pb-16 sm:pb-20 bg-[#f3f4f6]">
+    <section className="relative w-full overflow-hidden lg:min-h-[100dvh] lg:flex lg:items-center pt-28 sm:pt-32 lg:pt-32 pb-8 sm:pb-12 lg:pb-20 bg-[#f3f4f6]">
       <div className="relative mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8">
         {/* Personalized Welcome Banner if registered */}
         {ticketCode && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 p-4 rounded-2xl bg-white border border-red-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+            className="mb-6 p-4 rounded-2xl bg-white border border-red-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
           >
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
@@ -54,7 +54,7 @@ export default function VirtualClassHero({
         )}
 
         {/* Main Grid: Left Text Block & Right Visual */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
           {/* Left Text Block */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -65,7 +65,7 @@ export default function VirtualClassHero({
             {/* Breadcrumb Path - aligned and directly connected to the hero title */}
             <nav
               aria-label="Breadcrumb"
-              className="flex items-center gap-2 mb-3 sm:mb-4 text-xs sm:text-sm font-jakarta text-[#4a5565] flex-wrap"
+              className="flex items-center gap-2 mb-2.5 sm:mb-3.5 text-xs sm:text-sm font-jakarta text-[#4a5565] flex-wrap"
             >
               <Link href="/" className="hover:text-[#bc0c11] transition-colors">
                 {t("nav.home", "Beranda")}
@@ -110,7 +110,7 @@ export default function VirtualClassHero({
               </span>
             </nav>
 
-            <h1 className="font-jakarta font-bold text-3xl sm:text-4xl lg:text-[40px] xl:text-[44px] leading-tight text-[#101828] tracking-tight">
+            <h1 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-[40px] xl:text-[44px] leading-tight text-[#101828] tracking-tight">
               {t("virtualClass.heroTitle1", "Rasakan Pengalaman Belajar di")}{" "}
               <span className="text-[#bc0c11]">
                 {t("virtualClass.heroTitle2", "Virtual Class")}
@@ -118,9 +118,9 @@ export default function VirtualClassHero({
             </h1>
 
             {/* Red accent line */}
-            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mt-3.5 mb-2" />
+            <div className="h-[3px] w-14 rounded-full bg-[#bc0c11] mt-2.5 mb-1.5" />
 
-            <p className="mt-4 sm:mt-5 font-jakarta text-base sm:text-lg text-[#4a5565] leading-relaxed max-w-2xl">
+            <p className="mt-3 sm:mt-4 font-jakarta text-sm sm:text-base lg:text-lg text-[#4a5565] leading-relaxed max-w-2xl">
               {t(
                 "virtualClass.heroDesc",
                 "Jelajahi Digital Talent Program (DTP) SMK Telkom Sidoarjo melalui sesi interaktif, alur kegiatan yang terarah, dan pengalaman belajar yang lebih dekat dengan suasana sekolah."
@@ -128,7 +128,7 @@ export default function VirtualClassHero({
             </p>
 
             {/* Schedule Info (Flat, minimal - no pill wrappers) */}
-            <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 font-jakarta text-sm text-[#364153]">
+            <div className="mt-4 sm:mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 font-jakarta text-xs sm:text-sm text-[#364153]">
               <div className="inline-flex items-center gap-2">
                 <Image
                   src="/images/trial-class/calendar-3d-icon.png"
@@ -161,7 +161,7 @@ export default function VirtualClassHero({
             transition={{ duration: 0.6, delay: 0.1 }}
             className="lg:col-span-5 relative flex items-center justify-center"
           >
-            <div className="relative w-full max-w-[500px] aspect-[16/11]">
+            <div className="relative w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[500px] aspect-[16/11]">
               <Image
                 src="/images/trial-class/virtual-hero-students.png"
                 alt="Virtual Class Siswa SMK Telkom Sidoarjo"

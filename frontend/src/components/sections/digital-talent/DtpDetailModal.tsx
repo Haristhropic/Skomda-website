@@ -18,8 +18,10 @@ import {
   Wrench,
   Sparkles,
 } from "lucide-react";
+import Image from "next/image";
 import { DtpSpecialization } from "@/data/dtpData";
 import { useLanguage } from "@/context/LanguageContext";
+import { getCloudinaryUrl } from "@/lib/cloudinary";
 
 interface DtpDetailModalProps {
   item: DtpSpecialization | null;
@@ -75,6 +77,32 @@ export default function DtpDetailModal({
     }
   };
 
+  const getFallbackImage = () => {
+    switch (item?.id) {
+      case "software-developer":
+        return "/images/tentang-kami/fasilitas/fasilitas-lab-komputer-1.png";
+      case "network-sysadmin":
+        return "/images/tentang-kami/fasilitas/fasilitas-lab-komputer-2.png";
+      case "network-infrastructure":
+        return "/images/tentang-kami/fasilitas/fasilitas-lab-fiber-optik.png";
+      case "visual-communication-design":
+        return "/images/tentang-kami/fasilitas/fasilitas-studio-multimedia.png";
+      case "iot-engineer":
+        return "/images/tentang-kami/fasilitas/fasilitas-ruang-tefa.png";
+      case "cloud-engineer":
+        return "/images/tentang-kami/fasilitas/fasilitas-datacenter.png";
+      case "ai-specialist":
+        return "/images/tentang-kami/fasilitas/fasilitas-lab-komputer-3.png";
+      case "digital-marketing":
+        return "/images/tentang-kami/fasilitas/fasilitas-gedung-smk.png";
+      case "cyber-security":
+      default:
+        return "/images/tentang-kami/fasilitas/fasilitas-lab-iot.png";
+    }
+  };
+
+  const displayImage = item?.image || getFallbackImage();
+
   return (
     <AnimatePresence>
       {isOpen && item && (
@@ -116,6 +144,17 @@ export default function DtpDetailModal({
 
             {/* Modal Body (Scrollable) */}
             <div className="flex-1 overflow-y-auto mt-4 pr-1 space-y-6 custom-scrollbar">
+              {/* Image Banner Laboratorium / Spesialisasi (Mirip Fasilitas) */}
+              <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] rounded-[20px] overflow-hidden bg-gray-100 shadow-inner">
+                <Image
+                  src={getCloudinaryUrl(displayImage, { width: 900, quality: "auto:good" })}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 768px"
+                />
+              </div>
+
               {/* Deskripsi Lengkap */}
               <div>
                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 font-jakarta">

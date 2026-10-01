@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Shield,
   ArrowRight,
+  Sparkles,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAdminAuth } from "@/context/AdminAuthContext";
@@ -31,6 +32,7 @@ interface DashboardStats {
   totalJobs?: number;
   totalPartners?: number;
   totalDocuments?: number;
+  totalDtp?: number;
   recentLogs: Array<{
     id: number;
     user_name: string;
@@ -168,7 +170,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Quick Shortcut Panels */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Link
             href="/admin/berita"
             className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs transition-all hover:border-slate-300"
@@ -179,7 +181,23 @@ export default function AdminDashboardPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-900">Kelola Berita</p>
-                <p className="text-xs text-slate-500">Tambah, edit, dan atur publikasi</p>
+                <p className="text-xs text-slate-500">Tambah, edit, publikasi</p>
+              </div>
+            </div>
+            <ArrowRight className="size-4 text-slate-400 group-hover:text-slate-700 transition-colors" />
+          </Link>
+
+          <Link
+            href="/admin/dtp"
+            className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs transition-all hover:border-slate-300"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-red-50 text-[#bc0c11]">
+                <Sparkles className="size-4.5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Digital Talent</p>
+                <p className="text-xs text-slate-500">{stats?.totalDtp ?? 9} Spesialisasi DTP</p>
               </div>
             </div>
             <ArrowRight className="size-4 text-slate-400 group-hover:text-slate-700 transition-colors" />
@@ -212,7 +230,7 @@ export default function AdminDashboardPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-900">Website Publik</p>
-                <p className="text-xs text-slate-500">Buka portal utama SKOMDA</p>
+                <p className="text-xs text-slate-500">Buka portal utama</p>
               </div>
             </div>
             <ArrowRight className="size-4 text-slate-400 group-hover:text-slate-700 transition-colors" />

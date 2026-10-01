@@ -18,6 +18,7 @@ import {
   ExternalLink,
   LogOut,
   X,
+  Sparkles,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -44,6 +45,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: "Akademik & Siswa",
     items: [
+      { title: "Digital Talent (DTP)", href: "/admin/dtp", icon: Sparkles },
       { title: "Kelulusan & Alumni", href: "/admin/kelulusan", icon: GraduationCap },
       { title: "Guru & Tenaga Kependidikan", href: "/admin/guru", icon: Users },
       { title: "Prestasi Siswa", href: "/admin/prestasi", icon: Trophy },

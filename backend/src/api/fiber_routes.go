@@ -36,13 +36,20 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:      "SMK Telkom Sidoarjo API (Fiber Edition)",
 		ServerHeader: "Fiber",
+		BodyLimit:    15 * 1024 * 1024, // 15 MB limit untuk upload gambar dan dokumen
 	})
 
 	// Middleware
 	app.Use(recover.New())
 	app.Use(logger.New())
+
+	allowedOrigins := "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:4321,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:4321,http://127.0.0.1:5173"
+	if cfg.AllowedOrigin != "" && !strings.Contains(allowedOrigins, cfg.AllowedOrigin) {
+		allowedOrigins = allowedOrigins + "," + strings.TrimSpace(cfg.AllowedOrigin)
+	}
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:4321,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:4321,http://127.0.0.1:5173",
+		AllowOrigins:     allowedOrigins,
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With",
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowCredentials: true,
@@ -90,6 +97,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		var totalJobs int64
 		var totalPartners int64
 		var totalDocuments int64
+		var totalDtp int64
 		var recentLogs []models.AuditLog
 		var recentNews []models.News
 
@@ -105,6 +113,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		config.DB.Model(&models.BKKJob{}).Count(&totalJobs)
 		config.DB.Model(&models.BKKPartner{}).Count(&totalPartners)
 		config.DB.Model(&models.Document{}).Count(&totalDocuments)
+		config.DB.Model(&models.DigitalTalent{}).Count(&totalDtp)
 
 		config.DB.Order("created_at DESC").Limit(10).Find(&recentLogs)
 		config.DB.Order("id DESC").Limit(5).Find(&recentNews)
@@ -121,6 +130,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			"totalJobs":      totalJobs,
 			"totalPartners":  totalPartners,
 			"totalDocuments": totalDocuments,
+			"totalDtp":        totalDtp,
 			"recentLogs":     recentLogs,
 			"recentNews":     recentNews,
 		})
@@ -616,7 +626,27 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 
-		// Validasi tipe berkas harus gambar
+		// Validasi tipe berkas dan ekstensi gambar aman
+		ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
+		allowedImgExts := map[string]bool{
+			".jpg":  true,
+			".jpeg": true,
+			".png":  true,
+			".webp": true,
+			".gif":  true,
+		}
+		if !allowedImgExts[ext] {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Format ekstensi gambar tidak didukung. Format yang diizinkan: JPG, JPEG, PNG, WEBP, GIF.",
+			})
+		}
+
+		if fileHeader.Size <= 0 || fileHeader.Size > 10*1024*1024 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Ukuran berkas gambar tidak valid atau melebihi batas maksimum 10 MB.",
+			})
+		}
+
 		contentType := fileHeader.Header.Get("Content-Type")
 		if !strings.HasPrefix(contentType, "image/") {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -647,7 +677,6 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		// Fallback simpan lokal jika koneksi Cloudinary offline
-		ext := filepath.Ext(fileHeader.Filename)
 		uniqueName := fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), slugify(strings.TrimSuffix(fileHeader.Filename, ext)), ext)
 		localDir := os.Getenv("UPLOAD_DIR")
 		if localDir == "" {
@@ -700,6 +729,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		if !allowedExts[ext] {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Format berkas tidak didukung. Format yang diizinkan: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, ZIP, RAR, TXT, CSV.",
+			})
+		}
+
+		if fileHeader.Size <= 0 || fileHeader.Size > 15*1024*1024 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Ukuran berkas dokumen tidak valid atau melebihi batas maksimum 15 MB.",
 			})
 		}
 

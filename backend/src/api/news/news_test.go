@@ -79,7 +79,7 @@ func TestGetNewsBySlug(t *testing.T) {
 	setupTestDB()
 	router := setupTestRouter()
 
-	slug := "tidak-sekadar-ziarah-siswa-smk-telkom-sidoarjo-hidupkan-semangat-kepahlawanan-di-tmp"
+	slug := "penuh-dedikasi-siswa-dan-guru-smk-telkom-sidoarjo-peringati-hari-kemerdekaan-ri-ke-81"
 	req, _ := http.NewRequest(http.MethodGet, "/api/news/"+slug, nil)
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
