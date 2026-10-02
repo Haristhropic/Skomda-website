@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ArrowRight, ChevronRight, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { VIRTUAL_CLASS_DATA, VirtualClassDtpItem } from "@/data/virtualClassData";
+import { VIRTUAL_CLASS_DATA, VirtualClassDtpItem, getLocalizedVirtualClassItem } from "@/data/virtualClassData";
 import VirtualClassDetailPanel from "./VirtualClassDetailPanel";
 
 interface VirtualClassDtpGridProps {
@@ -23,10 +23,11 @@ export default function VirtualClassDtpGrid({
   ticketCode,
   userName,
 }: VirtualClassDtpGridProps) {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
 
-  const activeItem = VIRTUAL_CLASS_DATA.find((x) => x.id === selectedClassId) || null;
+  const rawActiveItem = VIRTUAL_CLASS_DATA.find((x) => x.id === selectedClassId) || null;
+  const activeItem = rawActiveItem ? getLocalizedVirtualClassItem(rawActiveItem, isEn) : null;
 
   const handleSelect = (item: VirtualClassDtpItem) => {
     onSelectClass(item);
@@ -77,7 +78,9 @@ export default function VirtualClassDtpGrid({
               transition={{ duration: 0.3 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
             >
-              {VIRTUAL_CLASS_DATA.map((item, idx) => (
+              {VIRTUAL_CLASS_DATA.map((rawItem, idx) => {
+                const item = getLocalizedVirtualClassItem(rawItem, isEn);
+                return (
                 <motion.div
                   key={item.id}
                   layoutId={`dtp-card-${item.id}`}
@@ -115,7 +118,8 @@ export default function VirtualClassDtpGrid({
                     <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </div>
                 </motion.div>
-              ))}
+              );
+              })}
             </motion.div>
           ) : (
             /* ─── Split View Layout (Figma Node 525:684) ─── */
@@ -136,18 +140,19 @@ export default function VirtualClassDtpGrid({
               >
                 <div className="flex items-center justify-between pb-1 px-1">
                   <span className="font-jakarta font-semibold text-xs text-gray-500 uppercase tracking-wider">
-                    Pilihan DTP ({VIRTUAL_CLASS_DATA.length})
+                    {isEn ? "DTP Choices" : "Pilihan DTP"} ({VIRTUAL_CLASS_DATA.length})
                   </span>
                   <button
                     type="button"
                     onClick={onDeselectClass}
                     className="font-jakarta text-xs text-[#bc0c11] hover:underline font-semibold cursor-pointer"
                   >
-                    Lihat Grid Penuh
+                    {isEn ? "View Full Grid" : "Lihat Grid Penuh"}
                   </button>
                 </div>
 
-                {VIRTUAL_CLASS_DATA.map((item) => {
+                {VIRTUAL_CLASS_DATA.map((rawItem) => {
+                  const item = getLocalizedVirtualClassItem(rawItem, isEn);
                   const isActive = item.id === activeItem.id;
                   return (
                     <div

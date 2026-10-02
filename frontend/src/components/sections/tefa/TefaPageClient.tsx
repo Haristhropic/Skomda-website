@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import TefaHeroSection from "./TefaHeroSection";
 import TefaNeedSection from "./TefaNeedSection";
 import TefaCatalogSection, { TefaProductItem } from "./TefaCatalogSection";
 import TefaCtaBanner from "./TefaCtaBanner";
-import TefaProductDetailModal from "./TefaProductDetailModal";
+
+const TefaProductDetailModal = dynamic(
+  () => import("./TefaProductDetailModal"),
+  { ssr: false }
+);
 
 export default function TefaPageClient() {
   const [selectedProductForDetail, setSelectedProductForDetail] =

@@ -112,6 +112,74 @@ export const DOWNLOAD_DOCUMENTS: DownloadDoc[] = [
   },
 ];
 
+export const DOWNLOAD_DOCUMENTS_EN: Record<
+  string,
+  {
+    titleEn: string;
+    groupEn: string;
+    uploadDateEn: string;
+    descriptionEn: string;
+  }
+> = {
+  "brosur-ppdb-2026": {
+    titleEn: "SMK Telkom Sidoarjo 2026/2027 PPDB Brochure",
+    groupEn: "PPDB Brochure & Information",
+    uploadDateEn: "May 04, 2026",
+    descriptionEn:
+      "Complete admissions roadmap, SIJA & TJAT vocational competency profiles, scholarships, fee breakdown, and campus facilities.",
+  },
+  "sertifikat-akreditasi": {
+    titleEn: "SMK Telkom Sidoarjo Accreditation 'A' Certificate",
+    groupEn: "School Accreditation & Certifications",
+    uploadDateEn: "May 04, 2026",
+    descriptionEn:
+      "Official 'A' Superior Accreditation Certificate from National Accreditation Board (BAN-SM) Decree No: 1336/BAN-SM/SK/2021 with distinction.",
+  },
+  "sertifikat-iso-21001": {
+    titleEn: "SMK Telkom Sidoarjo ISO 21001:2018 Certificate",
+    groupEn: "School Accreditation & Certifications",
+    uploadDateEn: "May 04, 2026",
+    descriptionEn:
+      "International standard for Educational Organizations Management Systems (EOMS) ensuring modern vocational governance and quality assurance.",
+  },
+  "persekjen-17-2022": {
+    titleEn: "MoECRT Secretary General Regulation No. 17 of 2022",
+    groupEn: "Violence & Sexual Harassment Prevention",
+    uploadDateEn: "May 04, 2026",
+    descriptionEn:
+      "Technical guidelines for the prevention and handling of sexual harassment in educational units to foster a safe, inclusive learning environment.",
+  },
+  "permendikbudristek-30-2021": {
+    titleEn: "MoECRT Ministerial Regulation No. 30 of 2021",
+    groupEn: "Violence & Sexual Harassment Prevention",
+    uploadDateEn: "May 04, 2026",
+    descriptionEn:
+      "Official copy of the Ministerial Regulation on Prevention and Management of Violence and Sexual Harassment in Educational Institutions.",
+  },
+  "permendikbud-82-2015": {
+    titleEn: "MoEC Ministerial Regulation No. 82 of 2015",
+    groupEn: "Violence & Sexual Harassment Prevention",
+    uploadDateEn: "May 04, 2026",
+    descriptionEn:
+      "Ministerial Regulation regarding Prevention and Countermeasures of Violent Acts within Educational Unit Environments.",
+  },
+};
+
+export function getLocalizedDownloadDoc(
+  doc: DownloadDoc,
+  isEn: boolean
+): DownloadDoc {
+  if (!isEn) return doc;
+  const trans = DOWNLOAD_DOCUMENTS_EN[doc.id];
+  return {
+    ...doc,
+    title: trans?.titleEn || doc.title,
+    group: trans?.groupEn || doc.group,
+    uploadDate: trans?.uploadDateEn || doc.uploadDate,
+    description: trans?.descriptionEn || doc.description,
+  };
+}
+
 const CATEGORY_OPTIONS = [
   { key: "Semua", id: "Semua", en: "All" },
   { key: "Brosur PPDB", id: "Brosur PPDB", en: "PPDB Brochure" },
@@ -301,7 +369,9 @@ export default function UnduhInformasiClient() {
         {/* ─── Documents Cards Grid ─── */}
         {filteredDocs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-            {filteredDocs.map((doc, idx) => (
+            {filteredDocs.map((rawDoc, idx) => {
+              const doc = getLocalizedDownloadDoc(rawDoc, isEn);
+              return (
               <motion.div
                 key={doc.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -376,7 +446,8 @@ export default function UnduhInformasiClient() {
                   </a>
                 </div>
               </motion.div>
-            ))}
+            );
+            })}
           </div>
         ) : (
           /* Empty Search State */
@@ -424,7 +495,9 @@ export default function UnduhInformasiClient() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-xs sm:text-sm text-[#364153]">
-                {DOWNLOAD_DOCUMENTS.map((doc, i) => (
+                {DOWNLOAD_DOCUMENTS.map((rawDoc, i) => {
+                  const doc = getLocalizedDownloadDoc(rawDoc, isEn);
+                  return (
                   <tr key={doc.id} className="hover:bg-gray-50/80 transition-colors">
                     <td className="py-4 px-3 font-semibold text-gray-500">{i + 1}</td>
                     <td className="py-4 px-4 font-bold text-[#101828]">
@@ -461,7 +534,8 @@ export default function UnduhInformasiClient() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                );
+                })}
               </tbody>
             </table>
           </div>
@@ -470,7 +544,9 @@ export default function UnduhInformasiClient() {
 
       {/* ─── Fullscreen Document Preview Modal ─── */}
       <AnimatePresence>
-        {previewDoc && (
+        {previewDoc && (() => {
+          const displayDoc = getLocalizedDownloadDoc(previewDoc, isEn);
+          return (
           <div
             className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/70 backdrop-blur-xs"
             onClick={() => setPreviewDoc(null)}
@@ -488,13 +564,13 @@ export default function UnduhInformasiClient() {
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-gray-200 gap-4">
                 <h3 className="font-jakarta font-bold text-base sm:text-lg text-[#101828] leading-snug truncate min-w-0 flex-1">
-                  {previewDoc.title}
+                  {displayDoc.title}
                 </h3>
 
                 {/* Header Action Buttons */}
                 <div className="flex items-center gap-2 shrink-0">
                   <a
-                    href={previewDoc.fileUrl}
+                    href={displayDoc.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-secondary !h-10 !min-h-[40px] !px-4 !py-2 !text-xs sm:!text-sm cursor-pointer"
@@ -505,7 +581,7 @@ export default function UnduhInformasiClient() {
                   </a>
 
                   <a
-                    href={previewDoc.fileUrl}
+                    href={displayDoc.fileUrl}
                     download
                     className="btn-primary group !h-10 !min-h-[40px] !px-4 !py-2 !text-xs sm:!text-sm cursor-pointer"
                   >
@@ -527,21 +603,21 @@ export default function UnduhInformasiClient() {
               {/* Modal Document Area (Interactive Multi-page PDF Viewer with Native Zoom & Scroll) */}
               <div className="relative flex-1 w-full mt-3 overflow-hidden rounded-xl bg-gray-100 border border-gray-200/90 shadow-inner">
                 <iframe
-                  src={`${previewDoc.fileUrl}#view=FitH&toolbar=1&navpanes=1`}
+                  src={`${displayDoc.fileUrl}#view=FitH&toolbar=1&navpanes=1`}
                   className="w-full h-full border-0 rounded-xl bg-white"
-                  title={previewDoc.title}
+                  title={displayDoc.title}
                 />
               </div>
 
               {/* Modal Footer Info */}
               <div className="mt-3 pt-2.5 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between text-xs font-jakarta text-[#6a7282] gap-2">
                 <div className="flex items-center gap-2">
-                  <span>{isEn ? "Size:" : "Ukuran:"} <strong className="text-[#101828]">{previewDoc.fileSize}</strong></span>
+                  <span>{isEn ? "Size:" : "Ukuran:"} <strong className="text-[#101828]">{displayDoc.fileSize}</strong></span>
                   <span className="text-gray-300">•</span>
-                  <span>{isEn ? "Pages:" : "Jumlah:"} <strong className="text-[#101828]">{previewDoc.pageCount} {isEn ? "Pages" : "Halaman"}</strong></span>
+                  <span>{isEn ? "Pages:" : "Jumlah:"} <strong className="text-[#101828]">{displayDoc.pageCount} {isEn ? "Pages" : "Halaman"}</strong></span>
                 </div>
                 <a
-                  href={previewDoc.fileUrl}
+                  href={displayDoc.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-[#bc0c11] font-bold hover:underline shrink-0"
@@ -552,7 +628,8 @@ export default function UnduhInformasiClient() {
               </div>
             </motion.div>
           </div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </div>
   );

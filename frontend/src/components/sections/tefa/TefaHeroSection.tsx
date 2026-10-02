@@ -21,12 +21,7 @@ export default function TefaHeroSection({
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8 relative">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-8 items-center relative z-10">
           {/* Left Column: Text & CTA */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="lg:col-span-6 flex flex-col items-start"
-          >
+          <div className="lg:col-span-6 flex flex-col items-start">
             {/* Standard Breadcrumb Navigation */}
             <nav
               aria-label="Breadcrumb"
@@ -148,7 +143,7 @@ export default function TefaHeroSection({
                 </svg>
               </Link>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Visual Artwork Collage */}
           <div className="lg:col-span-6 relative flex items-end justify-center lg:justify-end select-none mt-4 sm:mt-6 lg:mt-0">

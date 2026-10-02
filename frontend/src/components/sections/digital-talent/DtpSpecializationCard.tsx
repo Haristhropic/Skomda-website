@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { DtpSpecialization } from "@/data/dtpData";
+import { DtpSpecialization, getLocalizedDtp } from "@/data/dtpData";
 import { getCloudinaryUrl } from "@/lib/cloudinary";
 
 interface DtpSpecializationCardProps {
@@ -27,7 +27,8 @@ export default function DtpSpecializationCard({
   item,
   onSelect,
 }: DtpSpecializationCardProps) {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
+  const localizedItem = getLocalizedDtp(item, isEn);
 
   const renderCategoryIcon = () => {
     switch (item.id) {
@@ -103,13 +104,13 @@ export default function DtpSpecializationCard({
           <div className="flex items-center gap-2 mb-2">
             <div className="shrink-0">{renderCategoryIcon()}</div>
             <h3 className="font-jakarta font-bold text-lg sm:text-xl text-[#101828] group-hover:text-[#bc0c11] transition-colors leading-snug line-clamp-1">
-              {item.title}
+              {localizedItem.title}
             </h3>
           </div>
 
           {/* Short Description */}
           <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed line-clamp-3">
-            {item.shortDesc}
+            {localizedItem.shortDesc}
           </p>
         </div>
       </div>
@@ -117,12 +118,14 @@ export default function DtpSpecializationCard({
       {/* Card Footer */}
       <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-0">
         <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-          <span className="text-xs text-gray-400 font-medium">Kurikulum Industri</span>
+          <span className="text-xs text-gray-400 font-medium">
+            {isEn ? "Industry Curriculum" : "Kurikulum Industri"}
+          </span>
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onSelect(item);
+              onSelect(localizedItem);
             }}
             className="min-h-[44px] inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#bc0c11] group-hover:translate-x-1 transition-transform cursor-pointer"
           >

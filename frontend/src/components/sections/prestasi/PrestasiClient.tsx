@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { PRESTASI_LIST, PrestasiItem } from "@/data/prestasiData";
+import { PRESTASI_LIST, PrestasiItem, getLocalizedPrestasi } from "@/data/prestasiData";
 import { getPrestasiList } from "@/services/prestasi";
 import PrestasiHeroSection from "./PrestasiHeroSection";
 import PrestasiCard from "./PrestasiCard";
@@ -162,17 +162,20 @@ export default function PrestasiClient() {
                 dir="ltr"
                 className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none"
               >
-                {filteredItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none"
-                  >
-                    <PrestasiCard
-                      item={item}
-                      onSelect={setActiveModalItem}
-                    />
-                  </div>
-                ))}
+                {filteredItems.map((item) => {
+                  const localizedItem = getLocalizedPrestasi(item, isEn);
+                  return (
+                    <div
+                      key={item.id}
+                      className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none"
+                    >
+                      <PrestasiCard
+                        item={localizedItem}
+                        onSelect={setActiveModalItem}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -181,7 +184,7 @@ export default function PrestasiClient() {
 
       {/* 3. Detail Modal */}
       <PrestasiDetailModal
-        item={activeModalItem}
+        item={activeModalItem ? getLocalizedPrestasi(activeModalItem, isEn) : null}
         isOpen={Boolean(activeModalItem)}
         onClose={() => setActiveModalItem(null)}
       />

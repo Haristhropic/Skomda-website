@@ -108,12 +108,115 @@ export const TEFA_PRODUCTS: TefaProductItem[] = [
   },
 ];
 
+export const TEFA_PRODUCTS_EN: Record<
+  string,
+  {
+    titleEn: string;
+    descEn: string;
+    majorBadgeEn: string;
+    durationEn: string;
+    featuresEn: string[];
+    deliverablesEn: string[];
+  }
+> = {
+  "company-profile": {
+    titleEn: "Website Company Profile",
+    descEn:
+      "Professional website helping businesses, organizations, or institutions build an informative and trustworthy digital presence.",
+    majorBadgeEn: "Created by SIJA Students (4-Year Program)",
+    durationEn: "2 - 4 Weeks",
+    featuresEn: [
+      "Responsive Design (Mobile, Tablet, Desktop)",
+      "SEO Friendly & Ultra-Fast Load Times",
+      "Intuitive Admin CMS Panel",
+      "WhatsApp & Business Contact Integration",
+    ],
+    deliverablesEn: [
+      "Source Code & Technical Documentation",
+      "Domain & Cloud Hosting Setup",
+      "Admin User Manual Guide",
+    ],
+  },
+  "uiux-design": {
+    titleEn: "UI/UX & Digital Design",
+    descEn:
+      "User interface design and custom digital assets tailored to elevate your product experience.",
+    majorBadgeEn: "Created by SIJA & DTP Students",
+    durationEn: "1 - 3 Weeks",
+    featuresEn: [
+      "User Research & Wireframing",
+      "Interactive High-Fidelity Prototype (Figma)",
+      "Comprehensive Design System & Style Guide",
+      "Vector Icon Assets & Digital Illustrations",
+    ],
+    deliverablesEn: [
+      "Complete Figma Source File",
+      "Design Tokens & Component Documentation",
+      "Production-Ready Code Assets (SVG, PNG)",
+    ],
+  },
+  "network-install": {
+    titleEn: "Network Installation & Setup",
+    descEn:
+      "End-to-end network deployment and routing configuration supporting schools, corporate offices, and institutions.",
+    majorBadgeEn: "Created by TJAT Students (3-Year Program)",
+    durationEn: "According to Site Scale",
+    featuresEn: [
+      "Topology Planning & Structured Cabling Scheme",
+      "Server Rack, Switch & MikroTik/Cisco Router Setup",
+      "High-Quality Enterprise Wi-Fi Access Points",
+      "Bandwidth Throughput Testing & Network Security",
+    ],
+    deliverablesEn: [
+      "Network Floorplan & Port Mapping Documentation",
+      "Router Backup & Firewall Configuration",
+      "Installation Warranty & Periodic Supervision",
+    ],
+  },
+  "it-maintenance": {
+    titleEn: "IT Maintenance & Support",
+    descEn:
+      "Preventive device maintenance, periodic hardware tuning, and swift network troubleshooting.",
+    majorBadgeEn: "Created by TJAT & SIJA Students",
+    durationEn: "On-Demand / Monthly Retainer",
+    featuresEn: [
+      "Hardware Cleaning & Computer Preventive Maintenance",
+      "Operating System Updates & Antivirus Hardening",
+      "Traffic Monitoring & Network Issue Troubleshooting",
+      "Periodic Cloud Data Backups & Disaster Recovery",
+    ],
+    deliverablesEn: [
+      "Hardware Health Check & Diagnostic Report",
+      "Hardware Upgrade & Efficiency Recommendations",
+      "Rapid Response from Dedicated On-Call Technicians",
+    ],
+  },
+};
+
+export function getLocalizedTefaProduct(
+  product: TefaProductItem,
+  isEn: boolean
+): TefaProductItem {
+  if (!isEn) return product;
+  const trans = TEFA_PRODUCTS_EN[product.id];
+  if (!trans) return product;
+  return {
+    ...product,
+    title: trans.titleEn || product.title,
+    desc: trans.descEn || product.desc,
+    majorBadge: trans.majorBadgeEn || product.majorBadge,
+    duration: trans.durationEn || product.duration,
+    features: trans.featuresEn || product.features,
+    deliverables: trans.deliverablesEn || product.deliverables,
+  };
+}
+
 export default function TefaCatalogSection({
   selectedCategory = "Semua",
   onSelectProduct,
   onRequestProduct,
 }: TefaCatalogSectionProps) {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
   const [activeFilter, setActiveFilter] = useState<string>(selectedCategory);
 
   const categories = [
@@ -175,7 +278,9 @@ export default function TefaCatalogSection({
           dir="ltr"
           className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none"
         >
-          {filteredProducts.map((product) => (
+          {filteredProducts.map((rawProduct) => {
+            const product = getLocalizedTefaProduct(rawProduct, isEn);
+            return (
             <div
               key={product.id}
               className="w-[84vw] max-w-[320px] shrink-0 snap-start sm:w-auto sm:max-w-none group relative rounded-[25px] neu-card-interactive overflow-hidden flex flex-col"
@@ -222,7 +327,8 @@ export default function TefaCatalogSection({
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
         </motion.div>
       </div>
     </section>

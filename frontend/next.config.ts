@@ -26,10 +26,19 @@ function getLocalDevOrigins(): string[] {
 
 const nextConfig: NextConfig = {
   experimental: {
-    optimizePackageImports: ["lucide-react"],
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
+  compiler: {
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? { exclude: ["error", "warn"] }
+        : false,
+  },
+  poweredByHeader: false,
+  compress: true,
   allowedDevOrigins: getLocalDevOrigins(),
   images: {
+    unoptimized: true,
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {

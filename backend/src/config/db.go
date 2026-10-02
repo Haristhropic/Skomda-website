@@ -61,6 +61,7 @@ func InitDB(cfg Config) *gorm.DB {
 		&models.SiteSetting{},
 		&models.Alumni{},
 		&models.DigitalTalent{},
+		&models.TrialClassRegistration{},
 	); err != nil {
 		log.Fatalf("fatal: gagal auto migrate database: %v", err)
 	}

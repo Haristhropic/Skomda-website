@@ -13,6 +13,14 @@ frontend/out/
 backend/tmp/
 backend/*.exe
 
+# TypeScript & Build Caches
+*.tsbuildinfo
+frontend/*.tsbuildinfo
+
+# Test & Report Artifacts
+lighthouse-report*.json
+frontend/lighthouse-report*.json
+
 # SQLite & Databases
 *.db
 backend/*.db

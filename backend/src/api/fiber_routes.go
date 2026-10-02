@@ -98,6 +98,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		var totalPartners int64
 		var totalDocuments int64
 		var totalDtp int64
+		var totalTrialClass int64
 		var recentLogs []models.AuditLog
 		var recentNews []models.News
 
@@ -114,25 +115,27 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		config.DB.Model(&models.BKKPartner{}).Count(&totalPartners)
 		config.DB.Model(&models.Document{}).Count(&totalDocuments)
 		config.DB.Model(&models.DigitalTalent{}).Count(&totalDtp)
+		config.DB.Model(&models.TrialClassRegistration{}).Count(&totalTrialClass)
 
 		config.DB.Order("created_at DESC").Limit(10).Find(&recentLogs)
 		config.DB.Order("id DESC").Limit(5).Find(&recentNews)
 
 		return c.JSON(fiber.Map{
-			"totalNews":      totalNews,
-			"publishedNews":  publishedNews,
-			"draftNews":      draftNews,
-			"totalUsers":     totalUsers,
-			"totalTeachers":  totalTeachers,
-			"totalPrestasi":  totalPrestasi,
-			"totalEkskul":    totalEkskul,
-			"totalFasilitas": totalFasilitas,
-			"totalJobs":      totalJobs,
-			"totalPartners":  totalPartners,
-			"totalDocuments": totalDocuments,
+			"totalNews":       totalNews,
+			"publishedNews":   publishedNews,
+			"draftNews":       draftNews,
+			"totalUsers":      totalUsers,
+			"totalTeachers":   totalTeachers,
+			"totalPrestasi":   totalPrestasi,
+			"totalEkskul":     totalEkskul,
+			"totalFasilitas":  totalFasilitas,
+			"totalJobs":       totalJobs,
+			"totalPartners":   totalPartners,
+			"totalDocuments":  totalDocuments,
 			"totalDtp":        totalDtp,
-			"recentLogs":     recentLogs,
-			"recentNews":     recentNews,
+			"totalTrialClass": totalTrialClass,
+			"recentLogs":      recentLogs,
+			"recentNews":      recentNews,
 		})
 	})
 
@@ -512,6 +515,60 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			}
 		}
 
+		// Tangani pertanyaan seputar DTP (Digital Talent Program) secara langsung agar jawaban akurat dengan 9 spesialisasi lengkap
+		if isDtpQuery(trimmed) {
+			dtpResp := getDtpKnowledgeResponse()
+			dtpSources := []fiber.Map{
+				{
+					"title":    "Digital Talent Program (DTP) - 9 Spesialisasi Industri",
+					"url":      "/program/digital-talent",
+					"category": "Program Unggulan",
+				},
+				{
+					"title":    "Kurikulum & Sertifikasi Internasional DTP",
+					"url":      "/program/digital-talent#kurikulum",
+					"category": "Sertifikasi",
+				},
+			}
+
+			if req.Stream {
+				c.Set("Content-Type", "text/event-stream")
+				c.Set("Cache-Control", "no-cache")
+				c.Set("Connection", "keep-alive")
+				c.Set("Transfer-Encoding", "chunked")
+				c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
+					words := strings.Split(dtpResp, " ")
+					chunkSize := 5
+					for i := 0; i < len(words); i += chunkSize {
+						end := i + chunkSize
+						if end > len(words) {
+							end = len(words)
+						}
+						chunk := strings.Join(words[i:end], " ")
+						if i > 0 {
+							chunk = " " + chunk
+						}
+						payload, _ := json.Marshal(fiber.Map{
+							"delta":   fiber.Map{"content": chunk},
+							"sources": dtpSources,
+						})
+						_, _ = w.Write([]byte("data: " + string(payload) + "\n\n"))
+						_ = w.Flush()
+						time.Sleep(15 * time.Millisecond)
+					}
+					_, _ = w.Write([]byte("data: [DONE]\n\n"))
+					_ = w.Flush()
+				})
+				return nil
+			}
+
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{
+				"response": dtpResp,
+				"sources":  dtpSources,
+				"model":    "Skomda Knowledge Base (DTP 9 Specializations)",
+			})
+		}
+
 		// Kirim pesan murni pengguna tanpa polusi prefix agar RAG retrieval & instruction-following akurat
 		processedMessage := trimmed
 
@@ -816,3 +873,72 @@ func slugify(s string) string {
 	s = reg.ReplaceAllString(s, "-")
 	return strings.Trim(s, "-")
 }
+
+func isDtpQuery(msg string) bool {
+	lower := strings.ToLower(strings.TrimSpace(msg))
+	matched, _ := regexp.MatchString(`\bdtp\b`, lower)
+	if matched {
+		return true
+	}
+	if strings.Contains(lower, "digital talent") {
+		return true
+	}
+	if (strings.Contains(lower, "9") || strings.Contains(lower, "sembilan")) &&
+		(strings.Contains(lower, "spesialisasi") || strings.Contains(lower, "peminatan") || strings.Contains(lower, "keahlian") || strings.Contains(lower, "track")) {
+		return true
+	}
+	if strings.Contains(lower, "spesialisasi") && (strings.Contains(lower, "skomda") || strings.Contains(lower, "telkom") || strings.Contains(lower, "program")) {
+		return true
+	}
+	return false
+}
+
+func getDtpKnowledgeResponse() string {
+	return `### Digital Talent Program (DTP) SMK Telkom Sidoarjo
+
+**Digital Talent Program (DTP)** adalah program unggulan dan inisiatif strategis di SMK Telkom Sidoarjo yang dirancang untuk membekali siswa dengan kompetensi teknologi digital mutakhir berstandar industri global serta sertifikasi internasional resmi.
+
+Melalui DTP, siswa tidak hanya belajar teori di kelas, tetapi juga langsung mempraktikkan keahliannya melalui project nyata (*Project-Based Learning*), inkubasi karya digital, dan pendampingan intensif dari mentor praktisi industri.
+
+Di SMK Telkom Sidoarjo, terdapat **9 Pilihan Spesialisasi / Peminatan DTP**:
+
+1. **Software Developer** (*Kategori: Software & AI*)
+   Fokus pada pembuatan website dan aplikasi modern: perancangan database terstruktur, arsitektur RESTful API, penguasaan framework modern (Laravel, React, Node.js), hingga deployment aplikasi berbasis container (Docker & Linux Server).
+
+2. **Network System Administrator** (*Kategori: Network & Cloud*)
+   Pengelolaan dan pemeliharaan server fisik maupun virtual (Linux Server, Windows Server, Proxmox, VMware) agar operasional sistem enterprise berjalan aman, stabil, dan memiliki ketersediaan tinggi (*high availability*).
+
+3. **Network Infrastructure Engineer** (*Kategori: Network & Cloud*)
+   Pembangunan dan pengelolaan infrastruktur jaringan telekomunikasi berkecepatan tinggi: terminasi & penyambungan kabel fiber optic (*splicing*), pengukuran OTDR, konfigurasi perangkat OLT/ONT, serta routing & switching MikroTik.
+
+4. **Visual Communication Designer** (*Kategori: Design & Creative*)
+   Eksplorasi komunikasi visual terpadu: perancangan identitas brand, desain antarmuka pengguna (UI/UX Design & interactive prototyping Figma), motion graphics, videografi & fotografi profesional, serta produksi konten digital kreatif.
+
+5. **Internet of Things (IoT) Engineer** (*Kategori: Hardware & Security*)
+   Integrasi perangkat keras dan internet: pemrograman mikrokontroler (ESP32 / MicroPython), sensor cerdas dan aktuator industri, komunikasi data protokol IoT (MQTT & HTTP), serta dashboard monitoring real-time.
+
+6. **Cloud Engineer** (*Kategori: Network & Cloud*)
+   Penyusunan dan pengelolaan arsitektur cloud computing (AWS, Google Cloud Platform, Microsoft Azure): virtualisasi, containerization Docker, otomasi pipeline CI/CD (GitHub Actions), dan sistem observabilitas/monitoring server.
+
+7. **Artificial Intelligence (AI) Specialist** (*Kategori: Software & AI*)
+   Pengembangan kecerdasan buatan terapan: pemrograman Python untuk data & AI, analisis data (EDA), Machine Learning, Deep Learning, Natural Language Processing (NLP), Computer Vision, serta implementasi model AI siap pakai untuk kebutuhan industri.
+
+8. **Digital Marketing Specialist** (*Kategori: Design & Creative*)
+   Strategi pemasaran digital komprehensif: riset pasar dan buyer persona, creative copywriting, optimasi mesin pencari (SEO & SEM Google Ads), periklanan berbayar media sosial (Meta Ads Manager), dan analitik performa konversi.
+
+9. **Cyber Security Specialist** (*Kategori: Hardware & Security*)
+   Keamanan sistem informasi dan infrastruktur data: identifikasi kerentanan (*vulnerability assessment*), pengujian penetrasi keamanan (*penetration testing* web & network), pertahanan jaringan, ethical hacking, serta pemahaman fondasi Security Operations Center (SOC).
+
+---
+
+**Dukungan Sertifikasi Internasional & Industri:**
+Siswa DTP dipersiapkan untuk meraih sertifikasi keahlian berstandar global yang diakui industri:
+- **Cisco Certified** (CCNA & CCST Networking / CyberOps)
+- **AWS Certified** (AWS Cloud Practitioner & Architecting via AWS Academy)
+- **MikroTik Certified** (MTCNA: MikroTik Certified Network Associate)
+- **Oracle Academy** (Java & Database Foundations)
+- **Sertifikasi Kompetensi BNSP**
+
+Pelajari silabus lengkap, portofolio karya, dan prospek karir di halaman resmi [Digital Talent Program](/program/digital-talent).`
+}
+

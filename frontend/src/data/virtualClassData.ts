@@ -282,3 +282,272 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
     },
   },
 ];
+
+export const VIRTUAL_CLASS_DATA_EN: Record<
+  string,
+  {
+    titleEn: string;
+    descEn: string;
+    durationEn: string;
+    lessonTitleEn: string;
+    lessonDescEn: string;
+    mentorEn: string;
+    topicsEn: string[];
+    quizEn: QuizItem;
+  }
+> = {
+  "cyber-security": {
+    titleEn: "Cyber Security",
+    descEn: "Explore fundamentals of cybersecurity & data protection",
+    durationEn: "3 mins",
+    lessonTitleEn: "Introduction to Cybersecurity & Data Protection",
+    lessonDescEn:
+      "Learn the CIA Triad principles (confidentiality, integrity, availability), vulnerability detection techniques, and best practices for safeguarding network infrastructure.",
+    mentorEn: "SKOMDA Cybersecurity Lab Faculty",
+    topicsEn: [
+      "Vulnerability Scanning & Penetration Testing Basics",
+      "Network Security & Student Data Encryption",
+      "Cyber Defense Practical Simulation",
+    ],
+    quizEn: {
+      question: "What is the primary purpose of vulnerability scanning in cybersecurity?",
+      options: [
+        "Delete all files and operating systems on the server",
+        "Identify security flaws and weaknesses before malicious actors exploit them",
+        "Increase user internet connection speed",
+        "Create automated social media accounts for testing",
+      ],
+      correctIndex: 1,
+      explanation:
+        "Vulnerability scanning proactively detects vulnerabilities and system flaws before they can be compromised by attackers.",
+    },
+  },
+  "artificial-intelligence": {
+    titleEn: "Artificial Intelligence",
+    descEn: "Explore core concepts and practical applications of AI",
+    durationEn: "3 mins",
+    lessonTitleEn: "Introduction to Artificial Intelligence & Machine Learning",
+    lessonDescEn:
+      "Understand how artificial intelligence models are trained with datasets, how generative AI works, and how it automates modern industries.",
+    mentorEn: "SKOMDA AI & Data Science Instructor",
+    topicsEn: [
+      "Introduction to Machine Learning & Deep Learning",
+      "Prompt Engineering & Generative AI Applications",
+      "Live Demo: Computer Vision & Image Recognition",
+    ],
+    quizEn: {
+      question: "Which of the following is an example of Machine Learning in daily life?",
+      options: [
+        "Content recommendation systems on YouTube or Netflix",
+        "A phone charging cable conducting electrical current",
+        "A mechanical keyboard on a laptop",
+        "A high-resolution monitor display",
+      ],
+      correctIndex: 0,
+      explanation:
+        "Recommendation algorithms learn viewing habits and user patterns using Machine Learning models.",
+    },
+  },
+  iot: {
+    titleEn: "Internet of Things",
+    descEn: "Discover smart devices and connected IoT telemetry",
+    durationEn: "3 mins",
+    lessonTitleEn: "Introduction to Internet of Things & Smart Devices",
+    lessonDescEn:
+      "Learn IoT architecture, interfacing ESP32 microcontrollers with various environmental sensors, and streaming telemetry to real-time cloud dashboards.",
+    mentorEn: "IoT & Embedded Systems Lab Team",
+    topicsEn: [
+      "Introduction to Sensors & ESP32 Microcontrollers",
+      "MQTT Protocols & Realtime Cloud Dashboards",
+      "Case Studies: Smart School & Home Automation",
+    ],
+    quizEn: {
+      question: "Which component detects physical environmental conditions such as temperature or light in an IoT system?",
+      options: [
+        "Sensor",
+        "3D Printer",
+        "External Speaker",
+        "HDMI Cable",
+      ],
+      correctIndex: 0,
+      explanation:
+        "Sensors convert physical variables (temperature, humidity, light intensity) into electrical signals readable by microcontrollers.",
+    },
+  },
+  "software-developer": {
+    titleEn: "Software Developer",
+    descEn: "Learn to build modern web and mobile applications",
+    durationEn: "3 mins",
+    lessonTitleEn: "Introduction to Modern Web Development",
+    lessonDescEn:
+      "Learn the fundamentals of building websites, from HTML semantics and CSS styling to interactive JavaScript logic.",
+    mentorEn: "Senior Software Engineer / SKOMDA Software Faculty",
+    topicsEn: [
+      "Modern Web Architecture Using Next.js & Tailwind CSS",
+      "Algorithmic Problem Solving & RESTful APIs",
+      "Hands-on Mini Project: Interactive Web Application",
+    ],
+    quizEn: {
+      question: "What is the purpose of the <html> tag in an HTML document?",
+      options: [
+        "To create the title of the webpage",
+        "To display images on the webpage",
+        "To define and wrap the entire HTML document",
+        "To create a numbered list on the webpage",
+      ],
+      correctIndex: 2,
+      explanation:
+        "The <html> tag serves as the root element enclosing all content and document hierarchy on a webpage.",
+    },
+  },
+  "cloud-engineer": {
+    titleEn: "Cloud Engineer",
+    descEn: "Understand cloud architecture and scalable services",
+    durationEn: "3 mins",
+    lessonTitleEn: "Fundamentals of Cloud Computing & Virtualization",
+    lessonDescEn:
+      "Understand cloud infrastructure architectures, IaaS/PaaS/SaaS models, and how virtual servers are provisioned to run high-availability applications.",
+    mentorEn: "Cloud Computing Instructor (AWS/GCP Certified)",
+    topicsEn: [
+      "Introduction to Cloud Infrastructure & Virtualization",
+      "Deploying Virtual Servers, Storage, & Networking",
+      "Managing Cloud Scalability & Reliability",
+    ],
+    quizEn: {
+      question: "What is a primary advantage of Cloud Computing over on-premise physical servers?",
+      options: [
+        "Instant scalability and pay-as-you-go cost structure",
+        "Requires a dedicated air-conditioned server room at home",
+        "Requires no internet connectivity whatsoever",
+        "Can only be accessed from one specific designated computer",
+      ],
+      correctIndex: 0,
+      explanation:
+        "Cloud computing delivers instant elasticity and scale without upfront physical hardware investments.",
+    },
+  },
+  "network-system-admin": {
+    titleEn: "Network System Administrator",
+    descEn: "Master enterprise system administration and network operations",
+    durationEn: "3 mins",
+    lessonTitleEn: "Network Systems Administration & Linux Server",
+    lessonDescEn:
+      "Learn Linux terminal navigation, user privilege controls, DNS & DHCP service configuration, and centralized systems maintenance.",
+    mentorEn: "SKOMDA TJAT Systems & Server Instructor",
+    topicsEn: [
+      "Linux Server Administration & Terminal Commands",
+      "User Management, Permissions, & Server Hardening",
+      "Server Performance Monitoring & Network Troubleshooting",
+    ],
+    quizEn: {
+      question: "Which Linux terminal command lists files and folders in a directory?",
+      options: [
+        "ls",
+        "delete",
+        "shutdown",
+        "exit",
+      ],
+      correctIndex: 0,
+      explanation:
+        "The 'ls' (list) command outputs the files and subfolders located in the current working directory.",
+    },
+  },
+  "visual-designer": {
+    titleEn: "Visual Communication Designer",
+    descEn: "Craft impactful visual communication and UI assets",
+    durationEn: "3 mins",
+    lessonTitleEn: "Principles of Visual Communication & UI Design",
+    lessonDescEn:
+      "Study visual hierarchy, color contrast, grid layouts, and typographic harmony to deliver engaging and communicative visual experiences.",
+    mentorEn: "SKOMDA Creative Design Lead",
+    topicsEn: [
+      "Fundamentals of UI/UX, Layouts, & Visual Composition",
+      "Color Harmony, Typographic Hierarchy, & Grid Systems",
+      "Hands-on Practice: Digital Content & Interactive Posters",
+    ],
+    quizEn: {
+      question: "What is the primary function of typographic hierarchy in interface design?",
+      options: [
+        "Guiding the viewer's eyes to absorb key information first",
+        "Filling up empty space on the design canvas",
+        "Making all text elements the exact same font size",
+        "Randomizing text colors across sections",
+      ],
+      correctIndex: 0,
+      explanation:
+        "Typographic hierarchy directs the reader's eye through headlines, subheadings, and body copy in a clear order of importance.",
+    },
+  },
+  "network-infrastructure": {
+    titleEn: "Network Infrastructure Engineer",
+    descEn: "Explore physical networking infrastructure and fiber optics",
+    durationEn: "3 mins",
+    lessonTitleEn: "Network Infrastructure & Fiber Optics",
+    lessonDescEn:
+      "Examine fiber optic cabling media, enterprise switches and routers, and routing protocol setups connecting campus facilities.",
+    mentorEn: "SKOMDA Fiber Optic & Routing Specialist",
+    topicsEn: [
+      "Enterprise & Campus Network Topology Design",
+      "Routing Configuration on MikroTik & Cisco Hardware",
+      "Fiber Optic Transmission Fundamentals & Cable Splicing",
+    ],
+    quizEn: {
+      question: "What medium is used by Fiber Optic cables to transmit data?",
+      options: [
+        "Light pulses",
+        "Acoustic sound waves",
+        "High-voltage electrical current",
+        "Magnetic fluid",
+      ],
+      correctIndex: 0,
+      explanation:
+        "Fiber Optic cables transmit digital data as pulses of light through ultra-pure glass strands at high speeds.",
+    },
+  },
+  "digital-marketing": {
+    titleEn: "Digital Marketing Specialist",
+    descEn: "Master modern digital marketing and growth strategies",
+    durationEn: "3 mins",
+    lessonTitleEn: "Digital Marketing Strategy & Social Media Growth",
+    lessonDescEn:
+      "Learn audience targeting, creative content creation for social platforms, digital advertising optimization, and conversion analytics.",
+    mentorEn: "Growth & Digital Marketing Lead",
+    topicsEn: [
+      "Social Media Marketing & Content Planning Strategy",
+      "Target Audience Research & Paid Ads Optimization",
+      "Conversion Funnel Analysis & Brand Positioning",
+    ],
+    quizEn: {
+      question: "In digital marketing, what does 'Target Audience' refer to?",
+      options: [
+        "The specific group of consumers most likely to be interested in your product or service",
+        "The server computer used to transmit marketing emails",
+        "Competitors selling similar items in the market",
+        "The total number of all internet users regardless of interest",
+      ],
+      correctIndex: 0,
+      explanation:
+        "A target audience is a specific consumer demographic whose needs align directly with the product or service offered.",
+    },
+  },
+};
+
+export function getLocalizedVirtualClassItem(
+  item: VirtualClassDtpItem,
+  isEn: boolean
+): VirtualClassDtpItem {
+  if (!isEn) return item;
+  const trans = VIRTUAL_CLASS_DATA_EN[item.id];
+  if (!trans) return item;
+  return {
+    ...item,
+    title: trans.titleEn || item.title,
+    desc: trans.descEn || item.desc,
+    duration: trans.durationEn || item.duration,
+    lessonTitle: trans.lessonTitleEn || item.lessonTitle,
+    lessonDesc: trans.lessonDescEn || item.lessonDesc,
+    mentor: trans.mentorEn || item.mentor,
+    topics: trans.topicsEn || item.topics,
+    quiz: trans.quizEn || item.quiz,
+  };
+}

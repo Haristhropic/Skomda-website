@@ -25,12 +25,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
         {/* Top Hero Row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
           {/* Left Text & CTA Column */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="lg:col-span-7 flex flex-col items-start z-10"
-          >
+          <div className="lg:col-span-7 flex flex-col items-start z-10">
             {/* Breadcrumb Path */}
             <nav
               aria-label="Breadcrumb"
@@ -78,11 +73,11 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
             <div className="flex flex-wrap items-center gap-3.5">
               <button
                 type="button"
-                onClick={handleScrollToEvent}
+                onClick={onOpenRegister}
                 className="btn-primary group !px-7 !h-[50px] !min-h-[48px]"
               >
                 <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
-                  {t("trialClassPage.seeUpcoming", "Lihat Event Terdekat")}
+                  {t("trialClassPage.registerNow", "Daftar Sekarang")}
                 </span>
                 <svg
                   width="18"
@@ -102,25 +97,18 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                 </svg>
               </button>
 
-              <Link
-                href="/trial-class/virtual-class"
+              <button
+                type="button"
+                onClick={handleScrollToEvent}
                 className="btn-secondary !h-[50px] !min-h-[48px] !px-6 text-sm"
               >
-                <span>{t("virtualClass.breadcrumb", "Virtual Class")}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </Link>
+                <span>{t("trialClassPage.seeUpcoming", "Lihat Jadwal Event")}</span>
+              </button>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Visual Composition */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-            className="lg:col-span-5 relative flex items-center justify-center lg:justify-end"
-          >
+          <div className="lg:col-span-5 relative flex items-center justify-center lg:justify-end">
             <div className="relative w-[300px] sm:w-[360px] lg:w-[390px] xl:w-[410px] h-[360px] sm:h-[420px] lg:h-[440px] flex items-center justify-center">
               {/* Background Grey Polygonal Shape */}
               <div className="absolute left-0 bottom-4 w-40 sm:w-48 h-48 sm:h-56 opacity-80 pointer-events-none -rotate-6 z-0">
@@ -148,7 +136,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                 />
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Integrated Upcoming Event Card (Combined in Hero as in */}

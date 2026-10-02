@@ -15,10 +15,15 @@ import {
   DTP_COLLABORATION_PROJECTS,
   DTP_WEEKLY_SCHEDULE,
   DtpSpecialization,
+  getLocalizedDtpProject,
 } from "@/data/dtpData";
 import { getDtpList } from "@/services/dtp";
+import dynamic from "next/dynamic";
 import DtpSpecializationCard from "./DtpSpecializationCard";
-import DtpDetailModal from "./DtpDetailModal";
+
+const DtpDetailModal = dynamic(() => import("./DtpDetailModal"), {
+  ssr: false,
+});
 
 export default function DigitalTalentClient() {
   const { t, isEn } = useLanguage();
@@ -289,7 +294,9 @@ export default function DigitalTalentClient() {
           </div>
 
           <div dir="ltr" className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
-            {DTP_COLLABORATION_PROJECTS.slice(0, 6).map((proj) => (
+            {DTP_COLLABORATION_PROJECTS.slice(0, 6).map((rawProj) => {
+              const proj = getLocalizedDtpProject(rawProj, isEn);
+              return (
               <div
                 key={proj.id}
                 className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] neu-card-interactive p-6 sm:p-7 flex flex-col justify-between"
@@ -313,7 +320,8 @@ export default function DigitalTalentClient() {
                   </p>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </div>
       </section>

@@ -227,11 +227,14 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		existing.Status = strings.ToLower(strings.TrimSpace(input.Status))
 		config.DB.Save(&existing)
 
-		actionDesc := fmt.Sprintf("Memperbarui status lowongan '%s' dari %s menjadi %s", existing.Title, oldStatus, existing.Status)
-		if existing.Status == "active" {
+		var actionDesc string
+		switch existing.Status {
+		case "active":
 			actionDesc = fmt.Sprintf("Menyetujui (ACC) lowongan: %s (%s)", existing.Title, existing.Company)
-		} else if existing.Status == "rejected" {
+		case "rejected":
 			actionDesc = fmt.Sprintf("Menolak pengajuan lowongan: %s (%s)", existing.Title, existing.Company)
+		default:
+			actionDesc = fmt.Sprintf("Memperbarui status lowongan '%s' dari %s menjadi %s", existing.Title, oldStatus, existing.Status)
 		}
 		recordAudit(c, "STATUS_UPDATE", "bkk_job", fmt.Sprint(id), actionDesc)
 		return c.JSON(fiber.Map{"message": "Status lowongan berhasil diperbarui", "data": existing})
@@ -730,6 +733,136 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		config.DB.Delete(&existing)
 		recordAudit(c, "DELETE", "dtp", fmt.Sprint(id), fmt.Sprintf("Menghapus spesialisasi DTP: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Program Digital Talent berhasil dihapus"})
+	})
+
+	// ==================== 11. TRIAL CLASS REGISTRATIONS ====================
+	trialGroup := api.Group("/trial-class")
+
+	// Public: Register for Trial Class
+	trialGroup.Post("/register", func(c *fiber.Ctx) error {
+		var req struct {
+			FullName     string `json:"fullName"`
+			SchoolOrigin string `json:"schoolOrigin"`
+			Whatsapp     string `json:"whatsapp"`
+			Email        string `json:"email"`
+			Major        string `json:"major"`
+		}
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		if strings.TrimSpace(req.FullName) == "" || strings.TrimSpace(req.SchoolOrigin) == "" || strings.TrimSpace(req.Whatsapp) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nama lengkap, asal sekolah, dan nomor WhatsApp wajib diisi"})
+		}
+		if strings.TrimSpace(req.Major) == "" {
+			req.Major = "SIJA"
+		}
+
+		// Generate random 6-digit ticket code
+		ticketCode := fmt.Sprintf("TC-%d", time.Now().UnixNano()%900000+100000)
+
+		item := models.TrialClassRegistration{
+			TicketCode:   ticketCode,
+			FullName:     strings.TrimSpace(req.FullName),
+			SchoolOrigin: strings.TrimSpace(req.SchoolOrigin),
+			Whatsapp:     strings.TrimSpace(req.Whatsapp),
+			Email:        strings.TrimSpace(req.Email),
+			Major:        strings.TrimSpace(req.Major),
+			Status:       "registered",
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+		}
+
+		if err := config.DB.Create(&item).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan pendaftaran trial class"})
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"message": "Pendaftaran Trial Class berhasil",
+			"data":    item,
+		})
+	})
+
+	// Public: Verify / Check Ticket
+	trialGroup.Get("/check-ticket", func(c *fiber.Ctx) error {
+		code := strings.TrimSpace(c.Query("code"))
+		if code == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Kode tiket wajib disertakan"})
+		}
+		var item models.TrialClassRegistration
+		if err := config.DB.Where("ticket_code = ?", code).First(&item).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Tiket tidak ditemukan"})
+		}
+		return c.JSON(fiber.Map{"data": item})
+	})
+
+	// Admin: List all registrations
+	trialGroup.Get("", authGuard, func(c *fiber.Ctx) error {
+		q := strings.TrimSpace(c.Query("q"))
+		major := strings.TrimSpace(c.Query("major"))
+		status := strings.TrimSpace(c.Query("status"))
+
+		dbQuery := config.DB.Model(&models.TrialClassRegistration{}).Order("created_at DESC")
+		if q != "" {
+			searchVal := "%" + strings.ToLower(q) + "%"
+			dbQuery = dbQuery.Where("LOWER(full_name) LIKE ? OR LOWER(school_origin) LIKE ? OR LOWER(ticket_code) LIKE ? OR whatsapp LIKE ?", searchVal, searchVal, searchVal, searchVal)
+		}
+		if major != "" && !strings.EqualFold(major, "semua") {
+			dbQuery = dbQuery.Where("major = ?", major)
+		}
+		if status != "" && !strings.EqualFold(status, "semua") {
+			dbQuery = dbQuery.Where("status = ?", status)
+		}
+
+		var list []models.TrialClassRegistration
+		var total int64
+		dbQuery.Count(&total)
+		if err := dbQuery.Find(&list).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memuat data pendaftar"})
+		}
+		return c.JSON(fiber.Map{"data": list, "total": total})
+	})
+
+	// Admin: Update status / notes
+	trialGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
+		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		var existing models.TrialClassRegistration
+		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data pendaftar tidak ditemukan"})
+		}
+
+		var payload struct {
+			Status string `json:"status"`
+			Notes  string `json:"notes"`
+			Major  string `json:"major"`
+		}
+		if err := c.BodyParser(&payload); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		if payload.Status != "" {
+			existing.Status = payload.Status
+		}
+		if payload.Notes != "" {
+			existing.Notes = payload.Notes
+		}
+		if payload.Major != "" {
+			existing.Major = payload.Major
+		}
+		existing.UpdatedAt = time.Now()
+		config.DB.Save(&existing)
+		recordAudit(c, "UPDATE", "trial_class", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui status pendaftar: %s (%s)", existing.FullName, existing.Status))
+		return c.JSON(fiber.Map{"message": "Data pendaftar berhasil diperbarui", "data": existing})
+	})
+
+	// Admin: Delete participant
+	trialGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		var existing models.TrialClassRegistration
+		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data pendaftar tidak ditemukan"})
+		}
+		config.DB.Delete(&existing)
+		recordAudit(c, "DELETE", "trial_class", fmt.Sprint(id), fmt.Sprintf("Menghapus pendaftar trial class: %s (%s)", existing.FullName, existing.TicketCode))
+		return c.JSON(fiber.Map{"message": "Pendaftar berhasil dihapus"})
 	})
 }
 

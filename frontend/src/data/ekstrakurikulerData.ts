@@ -113,3 +113,96 @@ export const EKSKUL_LIST: EkstrakurikulerItem[] = [
     image: "/images/program/ekstrakurikuler/ekskul-silat.png",
   },
 ];
+
+export const EKSKUL_TRANSLATIONS_EN: Record<
+  string,
+  { nameEn: string; descriptionEn: string; categoryEn?: string }
+> = {
+  pramuka: {
+    nameEn: "Scouts (Pramuka)",
+    descriptionEn:
+      "Activities designed to build discipline, self-reliance, teamwork, and leadership responsibility through scouting adventures and collaborative group projects.",
+    categoryEn: "National Defense & Leadership",
+  },
+  paskibra: {
+    nameEn: "Flag Raising Troop (Paskibra)",
+    descriptionEn:
+      "Activities focusing on precision drill marching, ceremonial protocols, teamwork, physical discipline, and character building.",
+    categoryEn: "National Defense & Leadership",
+  },
+  kir: {
+    nameEn: "Youth Scientific Club (KIR)",
+    descriptionEn:
+      "A platform for students interested in applied research and scientific innovation, fostering data discovery, experiment design, paper writing, and symposium presentation.",
+    categoryEn: "Academic & Language",
+  },
+  pmr: {
+    nameEn: "Youth Red Cross (PMR)",
+    descriptionEn:
+      "Training students in vital first-aid skills, emergency health responses, community humanitarian services, and environmental care.",
+    categoryEn: "National Defense & Leadership",
+  },
+  voli: {
+    nameEn: "Volleyball Club",
+    descriptionEn:
+      "Sports program developing fundamental volleyball techniques, physical fitness, tactical team coordination, and sportsmanship.",
+    categoryEn: "Sports & Martial Arts",
+  },
+  futsal: {
+    nameEn: "Futsal Club",
+    descriptionEn:
+      "Athletic extracurricular developing ball control, strategic team formations, tactical play, endurance, and competitive tournament readiness.",
+    categoryEn: "Sports & Martial Arts",
+  },
+  bdi: {
+    nameEn: "Islamic Studies Community (BDI)",
+    descriptionEn:
+      "Extracurricular fostering Islamic spiritual growth, religious study circles, moral development, and organizing Islamic festive commemorations.",
+    categoryEn: "National Defense & Leadership",
+  },
+  basket: {
+    nameEn: "Basketball Club",
+    descriptionEn:
+      "Competitive basketball program developing shooting, dribbling, offensive/defensive strategies, athletic stamina, and teamwork.",
+    categoryEn: "Sports & Martial Arts",
+  },
+  musik: {
+    nameEn: "Music & Band",
+    descriptionEn:
+      "Creative music collective for students exploring vocal training, instrument mastery (drums, guitar, keyboard, bass), songwriting, and performance.",
+    categoryEn: "Arts & Creativity",
+  },
+  "english-club": {
+    nameEn: "English Club",
+    descriptionEn:
+      "Interactive English language society practicing public speaking, debate, conversational fluency, storytelling, and international communication skills.",
+    categoryEn: "Academic & Language",
+  },
+  "e-sport": {
+    nameEn: "Esports Club",
+    descriptionEn:
+      "Competitive gaming team developing strategic coordination, rapid communication, analytical game sense, and professional esports ethics.",
+    categoryEn: "Technology & Gaming",
+  },
+  silat: {
+    nameEn: "Pencak Silat Martial Arts",
+    descriptionEn:
+      "Traditional Indonesian martial arts training focusing on physical self-defense techniques, agility, mental discipline, and cultural heritage.",
+    categoryEn: "Sports & Martial Arts",
+  },
+};
+
+export function getLocalizedEkskul(item: EkstrakurikulerItem, isEn: boolean): EkstrakurikulerItem {
+  if (!isEn) return item;
+  const trans =
+    EKSKUL_TRANSLATIONS_EN[item.id] ||
+    Object.values(EKSKUL_TRANSLATIONS_EN).find(
+      (t) => t.nameEn.toLowerCase() === item.name.toLowerCase()
+    );
+
+  return {
+    ...item,
+    name: trans?.nameEn || (item as any).nameEn || item.name,
+    description: trans?.descriptionEn || (item as any).descriptionEn || item.description,
+  };
+}

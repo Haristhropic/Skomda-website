@@ -291,3 +291,175 @@ export const MITRA_BKK_LOGOS = [
   { name: "ZTE Corporation", src: "/images/partners/logo_zte.webp" },
   { name: "Schneider Electric", src: "/images/partners/logo_schneider.svg" },
 ];
+
+export const PELUANG_KARIER_EN: Record<
+  string,
+  {
+    titleEn?: string;
+    salaryRangeEn?: string;
+    postedDateEn?: string;
+    deadlineEn?: string;
+    descriptionEn?: string;
+    responsibilitiesEn?: string[];
+    requirementsEn?: string[];
+  }
+> = {
+  "telkom-frontend-dev": {
+    titleEn: "Frontend Developer",
+    salaryRangeEn: "Competitive / Industry Standard",
+    postedDateEn: "September 10, 2026",
+    deadlineEn: "September 30, 2026",
+    descriptionEn:
+      "Develop and maintain modern web application user interfaces using React, Next.js, and Tailwind CSS within the Telkom Group digital ecosystem.",
+    responsibilitiesEn: [
+      "Develop responsive, modular, and high-performance web UI components.",
+      "Integrate RESTful APIs with backend engineering teams.",
+      "Ensure web accessibility compliance and cross-browser compatibility.",
+      "Perform automated UI testing and peer code reviews regularly.",
+    ],
+    requirementsEn: [
+      "Graduate of SMK Telkom Sidoarjo majoring in SIJA or final-year job-ready student.",
+      "Proficient in JavaScript / TypeScript, React or Next.js, and Tailwind CSS.",
+      "Understand Git version control and collaborative workflows.",
+      "Possess a demonstrable portfolio of web projects.",
+    ],
+  },
+  "indosat-network-technician": {
+    titleEn: "Network Technician",
+    salaryRangeEn: "Allowance & Transport",
+    postedDateEn: "September 8, 2026",
+    deadlineEn: "September 25, 2026",
+    descriptionEn:
+      "Support installation operations, fiber optic transmission link monitoring, and network BTS infrastructure maintenance across the Sidoarjo area.",
+    responsibilitiesEn: [
+      "Assist senior technicians in routine maintenance of network devices and BTS cells.",
+      "Document fiber optic cable measurements (OTDR & optical power meter).",
+      "Provide prompt field troubleshooting and network disruption resolution.",
+      "Compile technical inspection reports for transmission links.",
+    ],
+    requirementsEn: [
+      "Active student or graduate of TJAT SMK Telkom Sidoarjo.",
+      "Understand fundamentals of wireless network transmission and fiber optics.",
+      "High attention to detail and good field operational communication.",
+      "Willing to comply with industrial Occupational Health and Safety (K3) protocols.",
+    ],
+  },
+  "lintasarta-it-support": {
+    titleEn: "IT Support Specialist",
+    salaryRangeEn: "Competitive / Industry Standard",
+    postedDateEn: "September 5, 2026",
+    deadlineEn: "September 28, 2026",
+    descriptionEn:
+      "Provide technical support for computer hardware, operating systems, local area network (LAN/WLAN) configuration, and enterprise partner application troubleshooting.",
+    responsibilitiesEn: [
+      "Handle IT technical support requests from internal users and clients.",
+      "Perform installation and configuration of PCs/laptops, printers, and office network equipment.",
+      "Monitor stability of internet connections and local on-premise servers.",
+      "Manage information technology asset inventory.",
+    ],
+    requirementsEn: [
+      "Graduate of SMK Telkom Sidoarjo majoring in SIJA or TJAT.",
+      "Solid understanding of hardware troubleshooting, Windows/Linux OS, and basic routing.",
+      "Friendly demeanor, communicative, and solutions-driven attitude.",
+      "MikroTik (MTCNA) or Cisco (CCNA) certification is an advantage.",
+    ],
+  },
+  "bdx-cloud-infrastructure": {
+    titleEn: "Data Center Infrastructure Specialist",
+    salaryRangeEn: "Competitive",
+    postedDateEn: "September 1, 2026",
+    deadlineEn: "September 24, 2026",
+    descriptionEn:
+      "Manage data center facilities, server virtualization nodes, and monitoring of high-voltage power delivery and ultra-high-speed network backbones.",
+    responsibilitiesEn: [
+      "Monitor environmental health of data center suites, cooling units, and server racks.",
+      "Assist with routing, switching, and Tier-3 interconnection configuration.",
+      "Collaborate with 24/7 operations teams to mitigate disruption risks.",
+    ],
+    requirementsEn: [
+      "SIJA or TJAT graduate with knowledge of IT electrical loads, rack servers, and fiber optics.",
+      "Disciplined, meticulous, and ready to comply with global data center SOPs.",
+      "Strong technical documentation capabilities.",
+    ],
+  },
+  "cisco-network-engineer": {
+    titleEn: "Junior Network Engineer",
+    salaryRangeEn: "Stipend & Mentorship",
+    postedDateEn: "August 28, 2026",
+    deadlineEn: "September 20, 2026",
+    descriptionEn:
+      "Support Cisco enterprise switching & routing deployments, VLAN architecture, and network throughput testing for enterprise partners.",
+    responsibilitiesEn: [
+      "Assist with initial setup of Cisco IOS routers and switches.",
+      "Perform packet capture analysis and network latency diagnostic benchmarks.",
+      "Assist in preparing project network topology diagrams.",
+    ],
+    requirementsEn: [
+      "Active student or graduate of TJAT SMK Telkom Sidoarjo.",
+      "Master basic Cisco Networking Academy fundamentals (CCNA modules).",
+      "High motivation to grow in professional network engineering.",
+    ],
+  },
+};
+
+export function getLocalizedPeluangKarier(
+  item: PeluangKarierItem,
+  isEn: boolean
+): PeluangKarierItem {
+  if (!isEn) return item;
+  const trans =
+    PELUANG_KARIER_EN[item.id] ||
+    Object.values(PELUANG_KARIER_EN).find(
+      (v) => v.titleEn?.toLowerCase() === item.title.toLowerCase()
+    );
+  if (!trans) return item;
+  return {
+    ...item,
+    title: trans.titleEn || item.title,
+    salaryRange: trans.salaryRangeEn || item.salaryRange,
+    postedDate: trans.postedDateEn || item.postedDate,
+    deadline: trans.deadlineEn || item.deadline,
+    description: trans.descriptionEn || item.description,
+    responsibilities: trans.responsibilitiesEn || item.responsibilities,
+    requirements: trans.requirementsEn || item.requirements,
+  };
+}
+
+export const ALUMNI_STORIES_EN: Record<
+  string,
+  {
+    alumniInfoEn: string;
+    quoteEn: string;
+    storyEn: string;
+  }
+> = {
+  olvan: {
+    alumniInfoEn: "TJAT Alumni 2024",
+    quoteEn:
+      "The knowledge and hands-on experience at SKOMDA gave me confidence when stepping into the information technology industry.",
+    storyEn:
+      "During his studies in TJAT at SMK Telkom Sidoarjo, Olvan was active in practical network labs and BKK career mentorship. Through the school's recruitment network, Olvan was immediately hired by Telkom Indonesia's infrastructure operations unit upon graduation.",
+  },
+  quinnsachi: {
+    alumniInfoEn: "SIJA Alumni 2023",
+    quoteEn:
+      "The 4-year SIJA curriculum provided deep coding and cloud computing expertise that aligned directly with professional industry standards.",
+    storyEn:
+      "Quinnsachi's career accelerated thanks to industry certifications earned at school. BKK facilitated an industrial internship that seamlessly converted into a full-time contract offer.",
+  },
+};
+
+export function getLocalizedAlumniStory(
+  item: AlumniStoryItem,
+  isEn: boolean
+): AlumniStoryItem {
+  if (!isEn) return item;
+  const trans = ALUMNI_STORIES_EN[item.id];
+  if (!trans) return item;
+  return {
+    ...item,
+    alumniInfo: trans.alumniInfoEn || item.alumniInfo,
+    quote: trans.quoteEn || item.quote,
+    story: trans.storyEn || item.story,
+  };
+}

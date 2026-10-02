@@ -39,12 +39,7 @@ export default function Ts21HeroSection() {
         {/* Hero Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-14 items-center">
           {/* Left: Text Content & Breadcrumbs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="lg:col-span-6 flex flex-col items-start"
-          >
+          <div className="lg:col-span-6 flex flex-col items-start">
             {/* Breadcrumbs - placed tightly right above the heading */}
             <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm font-jakarta text-[#4a5565] mb-2.5 sm:mb-3">
               <Link href="/" className="hover:text-[#bc0c11] transition-colors">
@@ -109,15 +104,10 @@ export default function Ts21HeroSection() {
                 </svg>
               </button>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right: Signature Framed Diagram Image with Interactive Lightbox Zoom */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="lg:col-span-6 flex items-center justify-center relative"
-          >
+          <div className="lg:col-span-6 flex items-center justify-center relative">
             <div className="relative w-full max-w-[580px]">
               {/* Main Image Container */}
               <div
@@ -144,7 +134,7 @@ export default function Ts21HeroSection() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 

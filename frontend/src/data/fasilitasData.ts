@@ -177,3 +177,121 @@ export const FASILITAS_LIST: FasilitasItem[] = [
     badge: "Gedung Utama",
   },
 ];
+
+export const FASILITAS_TRANSLATIONS_EN: Record<
+  string,
+  { nameEn: string; descriptionEn: string; badgeEn?: string }
+> = {
+  "ruang-kelas-modern": {
+    nameEn: "Classrooms",
+    descriptionEn:
+      "Air-conditioned classrooms for daily teaching and learning equipped with interactive presentation screens/TVs, ergonomic student desks, and high-speed Wi-Fi.",
+    badgeEn: "Learning Space",
+  },
+  "gedung-rps-2-lantai": {
+    nameEn: "Vocational Practice Building (RPS)",
+    descriptionEn:
+      "A two-story dedicated practical facility used for vocational practicums, student software & network projects, and industry work simulations.",
+    badgeEn: "Practicum Building",
+  },
+  "aula-videotron": {
+    nameEn: "School Multi-purpose Hall",
+    descriptionEn:
+      "Versatile convention and event hall for parent assemblies, industry seminars, indoor ceremonies, and large-scale student exhibitions.",
+    badgeEn: "Assembly Hall",
+  },
+  "lab-fiber-optic": {
+    nameEn: "Fiber Optic (FO) Laboratory",
+    descriptionEn:
+      "Specialized TJAT telecommunication lab equipped with fusion splicers, OTDR measurement tools, and modern optical network access trainers.",
+    badgeEn: "TJAT Practicum",
+  },
+  "lab-ai": {
+    nameEn: "Artificial Intelligence (AI) Laboratory",
+    descriptionEn:
+      "High-spec computing facility for artificial intelligence training, data modeling experiments, and modern machine learning development.",
+    badgeEn: "Research & AI",
+  },
+  "lab-iot": {
+    nameEn: "Internet of Things (IoT) Laboratory",
+    descriptionEn:
+      "Hands-on engineering lab for assembling, prototyping, and testing microcontrollers, electronics sensors, and smart IoT device programming.",
+    badgeEn: "IoT Practicum",
+  },
+  "lab-jaringan": {
+    nameEn: "Computer Networking Laboratory",
+    descriptionEn:
+      "Practicum laboratory for enterprise network simulation, router & switch configuration, local server management, and LAN cabling.",
+    badgeEn: "Networking Lab",
+  },
+  "lab-komputer": {
+    nameEn: "Computer Laboratories",
+    descriptionEn:
+      "Air-conditioned modern PC workstations used for coding, digital design, software productivity training, and computer-based examinations.",
+    badgeEn: "Computer Lab",
+  },
+  "outdoor-class": {
+    nameEn: "Outdoor Learning Space",
+    descriptionEn:
+      "Open-air landscaped learning area for collaborative group discussions, student study sessions, and creative outdoor workshops.",
+    badgeEn: "Open Area",
+  },
+  "kantin-cashless": {
+    nameEn: "School Cafeteria",
+    descriptionEn:
+      "Clean and hygienic dining area offering nutritious food, healthy snacks, and beverages for students, teachers, and school staff.",
+    badgeEn: "Cafeteria",
+  },
+  "lapangan-olahraga-utama": {
+    nameEn: "Main Sports & Assembly Field",
+    descriptionEn:
+      "Spacious central field for Monday flag ceremonies, physical education classes, mass workouts, and extracurricular sports.",
+    badgeEn: "Multi-purpose Field",
+  },
+  "lapangan-basket": {
+    nameEn: "Basketball Court",
+    descriptionEn:
+      "Regulation basketball court used for physical education, school basketball team training, and inter-class tournaments.",
+    badgeEn: "Sports Facility",
+  },
+  "perpustakaan-digital": {
+    nameEn: "School Library",
+    descriptionEn:
+      "Peaceful reading room and study center providing vocational literature, general references, digital resources, and quiet study spaces.",
+    badgeEn: "Reading Center",
+  },
+  "ruang-uks": {
+    nameEn: "School Health Unit (UKS)",
+    descriptionEn:
+      "First-aid medical room providing recovery beds, essential medications, and healthcare assistance for students and school personnel.",
+    badgeEn: "Health Services",
+  },
+  "smc-center": {
+    nameEn: "Student Media Center (SMC)",
+    descriptionEn:
+      "Creative production hub for student journalists and media teams managing event documentation, videography, photography, and social publishing.",
+    badgeEn: "Media Studio",
+  },
+  "gedung-kampus-skomda": {
+    nameEn: "SMK Telkom Sidoarjo Campus Buildings",
+    descriptionEn:
+      "The main integrated school campus complex housing modern administrative offices, student administration, and secure educational facilities.",
+    badgeEn: "Main Campus",
+  },
+};
+
+export function getLocalizedFasilitas(item: FasilitasItem, isEn: boolean): FasilitasItem {
+  if (!isEn) return item;
+  const trans =
+    FASILITAS_TRANSLATIONS_EN[item.id] ||
+    Object.values(FASILITAS_TRANSLATIONS_EN).find(
+      (t) => t.nameEn.toLowerCase() === item.name.toLowerCase()
+    );
+
+  return {
+    ...item,
+    name: trans?.nameEn || (item as any).nameEn || item.name,
+    description: trans?.descriptionEn || (item as any).descriptionEn || item.description,
+    badge: trans?.badgeEn || item.badge,
+  };
+}

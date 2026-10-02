@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import TrialClassHero from "./TrialClassHero";
 import TrialClassFeelingsSection from "./TrialClassFeelingsSection";
 import TrialClassStepsSection from "./TrialClassStepsSection";
-import TrialClassRegistrationModal from "./TrialClassRegistrationModal";
+
+const TrialClassRegistrationModal = dynamic(
+  () => import("./TrialClassRegistrationModal"),
+  { ssr: false }
+);
 
 export default function TrialClassClient() {
   const [isModalOpen, setIsModalOpen] = useState(false);

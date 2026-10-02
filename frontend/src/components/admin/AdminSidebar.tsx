@@ -19,6 +19,7 @@ import {
   LogOut,
   X,
   Sparkles,
+  Ticket,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -45,6 +46,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: "Akademik & Siswa",
     items: [
+      { title: "Pendaftar Trial Class", href: "/admin/trial-class", icon: Ticket },
       { title: "Digital Talent (DTP)", href: "/admin/dtp", icon: Sparkles },
       { title: "Kelulusan & Alumni", href: "/admin/kelulusan", icon: GraduationCap },
       { title: "Guru & Tenaga Kependidikan", href: "/admin/guru", icon: Users },

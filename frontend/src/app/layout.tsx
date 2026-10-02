@@ -33,8 +33,8 @@ export const metadata: Metadata = {
 
 import { LanguageProvider } from "@/context/LanguageContext";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
-import SkomdaChatWidget from "@/components/chatbot/SkomdaChatWidget";
 import ScrollToTop from "@/components/common/ScrollToTop";
+import SkomdaChatWidget from "@/components/chatbot/SkomdaChatWidget";
 
 export default function RootLayout({
   children,
@@ -44,6 +44,11 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${jakarta.variable} ${poppins.variable}`}>
       <head>
+        <link
+          rel="preconnect"
+          href="https://res.cloudinary.com"
+          crossOrigin="anonymous"
+        />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://maps.google.com" />
       </head>
@@ -52,7 +57,7 @@ export default function RootLayout({
           <AdminAuthProvider>
             <ScrollToTop />
             {children}
-            {/* Floating AI Chatbot Widget (Skomda Intelligence via NexusRouter) */}
+            {/* Floating AI Chatbot Widget (Loaded on client without blocking initial paint) */}
             <SkomdaChatWidget />
           </AdminAuthProvider>
         </LanguageProvider>

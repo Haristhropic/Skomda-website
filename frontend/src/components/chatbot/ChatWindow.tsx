@@ -21,12 +21,7 @@ import {
 } from "lucide-react";
 
 import { useLanguage } from "@/context/LanguageContext";
-
-interface ChatSource {
-  title: string;
-  url: string;
-  category?: string;
-}
+import { isDtpQuery, getDtpChatbotResponse, type ChatSource } from "./dtpChatbotKnowledge";
 
 interface Message {
   id: string;
@@ -39,14 +34,14 @@ interface Message {
 
 const QUICK_PROMPTS_ID = [
   "Apa saja pilar Program BMW di SMK Telkom Sidoarjo?",
-  "Sebutkan jalur dan sertifikasi Digital Talent Program (DTP)!",
+  "Apa itu Digital Talent Program (DTP) dan 9 spesialisasinya?",
   "Apa perbedaan jurusan SIJA (4 tahun) dan TJAT (3 tahun)?",
   "Berapa estimasi biaya hidup dan sewa kos di sekitar sekolah?",
 ];
 
 const QUICK_PROMPTS_EN = [
   "What are the pillars of the BMW Program at SMK Telkom Sidoarjo?",
-  "List the tracks and certifications in the Digital Talent Program (DTP)!",
+  "What is the Digital Talent Program (DTP) and its 9 specializations?",
   "What is the difference between SIJA (4-year) and TJAT (3-year)?",
   "What is the estimated cost of living and student boarding near school?",
 ];
@@ -104,6 +99,15 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const activeStreamIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (activeStreamIntervalRef.current) {
+        clearInterval(activeStreamIntervalRef.current);
+      }
+    };
+  }, []);
 
   // Restore chat messages from localStorage on mount (hydration safe)
   useEffect(() => {
@@ -228,6 +232,67 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
     setIsLoading(true);
 
     setTimeout(() => scrollToBottom(true), 50);
+
+    if (activeStreamIntervalRef.current) {
+      clearInterval(activeStreamIntervalRef.current);
+      activeStreamIntervalRef.current = null;
+    }
+
+    if (isDtpQuery(query)) {
+      const dtpData = getDtpChatbotResponse(isEn);
+      const words = dtpData.content.split(" ");
+      let currentWordIndex = 0;
+      let streamedText = "";
+
+      activeStreamIntervalRef.current = setInterval(() => {
+        const chunkSize = 5;
+        const nextWords = words.slice(currentWordIndex, currentWordIndex + chunkSize);
+
+        if (nextWords.length === 0) {
+          if (activeStreamIntervalRef.current) {
+            clearInterval(activeStreamIntervalRef.current);
+            activeStreamIntervalRef.current = null;
+          }
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === botMsgId
+                ? {
+                    ...msg,
+                    content: dtpData.content,
+                    sources: dtpData.sources,
+                    isStreaming: false,
+                  }
+                : msg
+            )
+          );
+          setIsLoading(false);
+          setTimeout(() => scrollToBottom(true), 50);
+          return;
+        }
+
+        streamedText += (currentWordIndex === 0 ? "" : " ") + nextWords.join(" ");
+        currentWordIndex += chunkSize;
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMsgId
+              ? {
+                  ...msg,
+                  content: streamedText,
+                  sources: dtpData.sources,
+                  isStreaming: true,
+                }
+              : msg
+          )
+        );
+
+        if (scrollContainerRef.current && isAutoScrollActiveRef.current) {
+          scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+        }
+      }, 20);
+
+      return;
+    }
 
     const promptPayload = query.trim();
 
@@ -436,8 +501,13 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       const lower = query.toLowerCase();
       let offlineReply =
         "Halo! Saat ini sistem kami sedang dalam pemeliharaan berkala. Untuk informasi resmi, silakan hubungi Humas SMK Telkom Sidoarjo di **0811-3021-919** atau kunjungi halaman **PPDB**.";
+      let fallbackSources: ChatSource[] = [];
 
-      if (lower.includes("sija") || lower.includes("rekayasa")) {
+      if (isDtpQuery(query)) {
+        const dtpData = getDtpChatbotResponse(isEn);
+        offlineReply = dtpData.content;
+        fallbackSources = dtpData.sources;
+      } else if (lower.includes("sija") || lower.includes("rekayasa")) {
         offlineReply =
           "**Jurusan SIJA (Sistem Informatika, Jaringan, dan Aplikasi)** merupakan program keahlian unggulan 4 tahun yang mencakup pengembangan Full-Stack Web & Mobile, Cloud Computing (AWS/GCP), Cybersecurity, dan Internet of Things. Lulusan dipersiapkan setara D1/D2 dengan sertifikasi industri AWS Academy dan BNSP.";
       } else if (lower.includes("tjat") || lower.includes("telekomunikasi") || lower.includes("fiber")) {
@@ -454,6 +524,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             ? {
               ...msg,
               content: offlineReply,
+              sources: fallbackSources,
               isStreaming: false,
             }
             : msg
@@ -474,6 +545,10 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
   };
 
   const handleConfirmReset = () => {
+    if (activeStreamIntervalRef.current) {
+      clearInterval(activeStreamIntervalRef.current);
+      activeStreamIntervalRef.current = null;
+    }
     setMessages([initialWelcome]);
     setErrorStatus(null);
     setInputMessage("");

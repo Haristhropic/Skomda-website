@@ -6,7 +6,7 @@ import { Search, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import PageHeroSection from "@/components/sections/common/PageHeroSection";
-import { FASILITAS_LIST, FasilitasItem } from "@/data/fasilitasData";
+import { FASILITAS_LIST, FasilitasItem, getLocalizedFasilitas } from "@/data/fasilitasData";
 import { getFasilitasList } from "@/services/fasilitas";
 import { getCloudinaryUrl } from "@/lib/cloudinary";
 
@@ -160,37 +160,40 @@ export default function FasilitasClient() {
                 dir="ltr"
                 className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none"
               >
-                {filteredItems.map((facility) => (
-                  <motion.div
-                    key={facility.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] neu-card-interactive overflow-hidden flex flex-col"
-                  >
-                    {/* Image */}
-                    <div className="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
-                      <Image
-                        src={getCloudinaryUrl(facility.image, { width: 720, quality: "auto:good" })}
-                        alt={facility.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 768px) 84vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    </div>
+                {filteredItems.map((rawFacility) => {
+                  const facility = getLocalizedFasilitas(rawFacility, isEn);
+                  return (
+                    <motion.div
+                      key={facility.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group rounded-[24px] neu-card-interactive overflow-hidden flex flex-col"
+                    >
+                      {/* Image */}
+                      <div className="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden">
+                        <Image
+                          src={getCloudinaryUrl(facility.image, { width: 720, quality: "auto:good" })}
+                          alt={facility.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(max-width: 768px) 84vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
 
-                    {/* Body */}
-                    <div className="p-5 sm:p-6 flex-1 flex flex-col">
-                      <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">
-                        {facility.name}
-                      </h3>
-                      <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed">
-                        {facility.description}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
+                      {/* Body */}
+                      <div className="p-5 sm:p-6 flex-1 flex flex-col">
+                        <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">
+                          {facility.name}
+                        </h3>
+                        <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed">
+                          {facility.description}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
             )}
         </div>

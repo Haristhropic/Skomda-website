@@ -19,7 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import Image from "next/image";
-import { DtpSpecialization } from "@/data/dtpData";
+import { DtpSpecialization, getLocalizedDtp } from "@/data/dtpData";
 import { useLanguage } from "@/context/LanguageContext";
 import { getCloudinaryUrl } from "@/lib/cloudinary";
 
@@ -35,6 +35,7 @@ export default function DtpDetailModal({
   onClose,
 }: DtpDetailModalProps) {
   const { t, isEn } = useLanguage();
+  const localizedItem = item ? getLocalizedDtp(item, isEn) : null;
   // Close on Escape key & Lock body scroll
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -105,13 +106,13 @@ export default function DtpDetailModal({
 
   return (
     <AnimatePresence>
-      {isOpen && item && (
+      {isOpen && localizedItem && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/70 backdrop-blur-xs"
           onClick={onClose}
           role="dialog"
           aria-modal="true"
-          aria-label={item.title}
+          aria-label={localizedItem.title}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0, y: 10 }}
@@ -128,7 +129,7 @@ export default function DtpDetailModal({
                   {renderIcon()}
                 </div>
                 <h3 className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828] leading-snug">
-                  {item.title}
+                  {localizedItem.title}
                 </h3>
               </div>
 
@@ -148,7 +149,7 @@ export default function DtpDetailModal({
               <div className="relative w-full aspect-[21/9] sm:aspect-[24/9] rounded-[20px] overflow-hidden bg-gray-100 shadow-inner">
                 <Image
                   src={getCloudinaryUrl(displayImage, { width: 900, quality: "auto:good" })}
-                  alt={item.title}
+                  alt={localizedItem.title}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 768px"
@@ -161,7 +162,7 @@ export default function DtpDetailModal({
                   {t("digitalTalent.specDescription", "Deskripsi Spesialisasi")}
                 </h4>
                 <p className="font-jakarta text-sm sm:text-base text-[#4a5565] leading-relaxed">
-                  {item.fullDesc}
+                  {localizedItem.fullDesc}
                 </p>
               </div>
 
@@ -176,7 +177,7 @@ export default function DtpDetailModal({
                     </h5>
                   </div>
                   <ul className="space-y-2">
-                    {item.coreSkills.map((skill, idx) => (
+                    {localizedItem.coreSkills.map((skill, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-[#4a5565] font-jakarta">
                         <CheckCircle2 className="size-4 text-[#bc0c11] shrink-0 mt-0.5" />
                         <span>{skill}</span>
@@ -194,7 +195,7 @@ export default function DtpDetailModal({
                     </h5>
                   </div>
                   <ul className="space-y-2">
-                    {item.supportingSkills.map((skill, idx) => (
+                    {localizedItem.supportingSkills.map((skill, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-[#4a5565] font-jakarta">
                         <span className="size-1.5 rounded-full bg-[#bc0c11] shrink-0 mt-2" />
                         <span>{skill}</span>
@@ -213,7 +214,7 @@ export default function DtpDetailModal({
                   </h5>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {item.careerProspects.map((career, idx) => (
+                  {localizedItem.careerProspects.map((career, idx) => (
                     <span
                       key={idx}
                       className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-gray-200"
@@ -233,7 +234,7 @@ export default function DtpDetailModal({
                   </h5>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {item.tools.map((tool, idx) => (
+                  {localizedItem.tools.map((tool, idx) => (
                     <span
                       key={idx}
                       className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium font-jakarta bg-[#f3f4f6] text-[#364153] border border-gray-200"

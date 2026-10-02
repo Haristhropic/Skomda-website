@@ -696,3 +696,140 @@ export const DTP_LONG_ROADMAP: DtpLongRoadmapItem[] = [
     description: "Tujuan akhir DTP: melahirkan lulusan unggul yang adaptif, berdaya saing tinggi, dan siap menapaki karir impian.",
   },
 ];
+
+export const DTP_COLLAB_TRANSLATIONS_EN: Record<string, { titleEn: string; descEn: string }> = {
+  "smart-school-ecosystem": {
+    titleEn: "Smart School Ecosystem",
+    descEn: "Building an integrated smart school system connecting intelligent attendance, room sensors, community service portals, resilient connectivity, and enterprise data protection.",
+  },
+  "smart-parking": {
+    titleEn: "Smart Parking System",
+    descEn: "Automated parking guidance using ultrasonic/magnetic sensors, AI-based license plate recognition, mobile driver companion app, and cloud analytics dashboard.",
+  },
+  "smart-attendance": {
+    titleEn: "Smart Attendance",
+    descEn: "High-speed facial recognition attendance platform with end-to-end encrypted telemetry and stringent security compliance auditing.",
+  },
+  "smart-classroom": {
+    titleEn: "Smart Classroom Monitoring",
+    descEn: "Intelligent classroom condition monitoring: temperature, humidity, automated lighting control, and stable high-capacity network connectivity for digital learning.",
+  },
+  "school-digital-service": {
+    titleEn: "School Digital Services",
+    descEn: "Unified institutional digital portal for academic administration, digital library lending, and student counseling with intuitive UX and secure role-based access.",
+  },
+  "smart-cctv-analytics": {
+    titleEn: "Smart CCTV Analytics",
+    descEn: "AI-enhanced surveillance with automatic object and crowd anomaly detection, integrated early warning alerts, and real-time operations dashboard.",
+  },
+  "digital-company-profile": {
+    titleEn: "Digital Company Profile & Branding",
+    descEn: "Comprehensive corporate brand identity creation, high-performance interactive profile web application, and multi-channel digital growth marketing strategy.",
+  },
+  "smart-greenhouse": {
+    titleEn: "Smart Greenhouse Automation",
+    descEn: "Automated agricultural environment monitoring soil moisture, ambient temperature, smart irrigation cycles, and AI crop harvest forecasting.",
+  },
+  "cyber-security-audit": {
+    titleEn: "Cyber Security Audit & Hardening",
+    descEn: "Regular penetration testing, vulnerability assessment on web and cloud servers, and actionable enterprise cyber threat mitigation strategies.",
+  },
+  "ecommerce-digital-campaign": {
+    titleEn: "E-Commerce & Digital Campaign",
+    descEn: "Complete online retail portal featuring AI-driven product recommendations, premium creative marketing assets, and high-conversion ad funnel architecture.",
+  },
+};
+
+export function getLocalizedDtpProject(proj: DtpProjectCollaboration, isEn: boolean): DtpProjectCollaboration {
+  if (!isEn) return proj;
+  const trans = DTP_COLLAB_TRANSLATIONS_EN[proj.id];
+  return {
+    ...proj,
+    title: trans?.titleEn || proj.title,
+    description: trans?.descEn || proj.description,
+  };
+}
+
+export const DTP_TRANSLATIONS_EN: Record<
+  string,
+  {
+    titleEn: string;
+    shortDescEn: string;
+    fullDescEn: string;
+  }
+> = {
+  "software-developer": {
+    titleEn: "Software Developer",
+    shortDescEn:
+      "Modern web and application development spanning database architecture, RESTful API design, and container-based deployment.",
+    fullDescEn:
+      "Learn how to build full-scale web and mobile applications from database design, writing scalable code, interconnecting services via APIs, to deploying production systems with industry best practices.",
+  },
+  "network-sysadmin": {
+    titleEn: "Network System Administrator",
+    shortDescEn:
+      "Management of physical and virtual servers to ensure security, high availability, and operational stability for enterprise services.",
+    fullDescEn:
+      "Learn how to administer shared, resilient, and secure servers supporting school and enterprise operational infrastructure with high reliability.",
+  },
+  "network-infrastructure": {
+    titleEn: "Network Infrastructure Engineer",
+    shortDescEn:
+      "Construction and maintenance of fiber optic infrastructure, routing, switching, and high-speed enterprise data transmission.",
+    fullDescEn:
+      "Building and managing telecommunications and computer networking infrastructure, from fiber optic splicing and network device configuration to industry-standard testing and preventive maintenance.",
+  },
+  "visual-communication-design": {
+    titleEn: "UI/UX & Digital Brand Designer",
+    shortDescEn:
+      "Creating intuitive user interfaces, digital graphics, brand identities, and commercial multimedia assets.",
+    fullDescEn:
+      "Mastering user experience (UX) research, interactive UI wireframing, high-fidelity prototypes in Figma, and digital branding assets designed for modern digital products.",
+  },
+  "iot-engineer": {
+    titleEn: "IoT & Embedded Systems Engineer",
+    shortDescEn:
+      "Prototyping smart hardware, sensor telemetry, microcontroller programming, and cloud-integrated automation devices.",
+    fullDescEn:
+      "Designing and engineering connected smart physical devices, assembling microcontrollers (ESP32/Arduino), integrating sensor arrays, and automating cloud telemetry.",
+  },
+  "cloud-engineer": {
+    titleEn: "Cloud & DevOps Engineer",
+    shortDescEn:
+      "Deployment and orchestration of cloud infrastructure, CI/CD pipelines, containerization, and scalable web platforms.",
+    fullDescEn:
+      "Designing and maintaining modern cloud services, automated deployment pipelines, microservices architecture, and enterprise cloud reliability engineering.",
+  },
+  "ai-specialist": {
+    titleEn: "Artificial Intelligence & Data Specialist",
+    shortDescEn:
+      "Data modeling, machine learning algorithms, prompt engineering, and generative AI workflow automation.",
+    fullDescEn:
+      "Hands-on implementation of machine learning models, computer vision systems, prompt engineering, and deploying AI-driven solutions for real-world automation.",
+  },
+  "digital-marketing": {
+    titleEn: "Digital Marketing & Growth Specialist",
+    shortDescEn:
+      "Data-driven marketing, search engine optimization (SEO), digital advertising campaigns, and social brand acceleration.",
+    fullDescEn:
+      "Developing measurable multi-channel marketing campaigns, search engine optimization, content marketing funnels, and data analytics to drive digital business growth.",
+  },
+  "cyber-security": {
+    titleEn: "Cyber Security Analyst",
+    shortDescEn:
+      "Vulnerability analysis, threat mitigation, network traffic inspection, and cryptographic data protection.",
+    fullDescEn:
+      "Guarding enterprise infrastructure against cyber threats, performing penetration testing, security audits, and implementing robust defense-in-depth protection.",
+  },
+};
+
+export function getLocalizedDtp(item: DtpSpecialization, isEn: boolean): DtpSpecialization {
+  if (!isEn) return item;
+  const trans = DTP_TRANSLATIONS_EN[item.id];
+  return {
+    ...item,
+    title: trans?.titleEn || item.title,
+    shortDesc: trans?.shortDescEn || item.shortDesc,
+    fullDesc: trans?.fullDescEn || item.fullDesc,
+  };
+}

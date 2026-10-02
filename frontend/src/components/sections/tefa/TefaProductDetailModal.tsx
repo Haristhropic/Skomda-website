@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { TefaProductItem } from "./TefaCatalogSection";
+import { TefaProductItem, getLocalizedTefaProduct } from "./TefaCatalogSection";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface TefaProductDetailModalProps {
@@ -22,6 +22,7 @@ export default function TefaProductDetailModal({
 }: TefaProductDetailModalProps) {
   const { lang, language } = useLanguage();
   const isEn = lang === "EN" || language === "en";
+  const localizedProduct = product ? getLocalizedTefaProduct(product, isEn) : null;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -39,7 +40,7 @@ export default function TefaProductDetailModal({
 
   return (
     <AnimatePresence>
-      {isOpen && product && (
+      {isOpen && localizedProduct && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs"
           role="dialog"
@@ -70,8 +71,8 @@ export default function TefaProductDetailModal({
           {/* Modal Header Image */}
           <div className="relative w-full h-[190px] sm:h-[230px] bg-gray-100 shrink-0">
             <Image
-              src={product.image}
-              alt={product.title}
+              src={localizedProduct.image}
+              alt={localizedProduct.title}
               fill
               className="object-cover"
             />
@@ -79,7 +80,7 @@ export default function TefaProductDetailModal({
             <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between">
               <div>
                 <h3 id="detail-modal-title" className="font-jakarta font-bold text-2xl sm:text-3xl text-white">
-                  {product.title}
+                  {localizedProduct.title}
                 </h3>
               </div>
             </div>
@@ -91,34 +92,34 @@ export default function TefaProductDetailModal({
               {/* Description & Badge */}
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                  {product.majorBadge && (
+                  {localizedProduct.majorBadge && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-jakarta font-semibold bg-[#ffebed] text-[#bc0c11]">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                       </svg>
-                      {product.majorBadge}
+                      {localizedProduct.majorBadge}
                     </span>
                   )}
-                  {product.duration && (
+                  {localizedProduct.duration && (
                     <span className="inline-block px-3 py-1 rounded-md text-xs font-jakarta font-medium bg-gray-100 text-[#4a5565]">
-                      {isEn ? "Estimated: " : "Estimasi: "}{product.duration}
+                      {isEn ? "Estimated: " : "Estimasi: "}{localizedProduct.duration}
                     </span>
                   )}
                 </div>
                 <p className="font-jakarta text-sm sm:text-base text-[#364153] leading-relaxed">
-                  {product.desc}
+                  {localizedProduct.desc}
                 </p>
               </div>
 
               {/* Features Included */}
-              {product.features && (
+              {localizedProduct.features && (
                 <div>
                   <h4 className="font-jakarta font-bold text-sm text-[#101828] uppercase tracking-wider mb-3 flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#bc0c11]" />
                     {isEn ? "Features & Scope of Work" : "Fitur & Lingkup Kerja"}
                   </h4>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {product.features.map((feat, idx) => (
+                    {localizedProduct.features.map((feat, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm font-jakarta text-[#4a5565]">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#bc0c11] mt-0.5">
                           <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -131,13 +132,13 @@ export default function TefaProductDetailModal({
               )}
 
               {/* Deliverables */}
-              {product.deliverables && (
+              {localizedProduct.deliverables && (
                 <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                   <h4 className="font-jakarta font-bold text-xs text-[#364153] uppercase tracking-wider mb-2">
                     {isEn ? "What You Receive:" : "Apa yang Anda Dapatkan:"}
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {product.deliverables.map((deliv, idx) => (
+                    {localizedProduct.deliverables.map((deliv, idx) => (
                       <span key={idx} className="px-2.5 py-1 rounded-lg text-xs font-jakarta bg-white border border-gray-200 text-[#364153]">
                         ✓ {deliv}
                       </span>
@@ -159,7 +160,7 @@ export default function TefaProductDetailModal({
             </button>
 
             <Link
-              href={`/tefa/request?service=${encodeURIComponent(product.title)}`}
+              href={`/tefa/request?service=${encodeURIComponent(localizedProduct.title)}`}
               onClick={onClose}
               className="btn-primary w-full sm:w-auto !h-[46px] !px-6 sm:!px-7 !text-sm sm:!text-[15px] cursor-pointer text-center"
             >

@@ -16,11 +16,17 @@ const ROLE_MAP_EN: Record<string, string> = {
   "Kepala Administrasi": "Head of Administration",
   "Kepala Program Studi": "Head of Study Program",
   "Kepala Urusan": "Head of Affairs",
+  "Guru Mata Pelajaran": "Subject Teacher",
   "Guru Produktif SIJA": "SIJA Vocational Teacher",
   "Guru Produktif TJAT": "TJAT Vocational Teacher",
   "Guru Umum": "General Subject Teacher",
   "Guru Bimbingan Konseling": "Guidance & Counseling Counselor",
   "Staff Administrasi": "Administrative Staff",
+  "Staff HC, Logistik, dan Kesekretariatan": "HC, Logistics & Secretarial Staff",
+  "Staff Administrasi Bidang Hubin": "Industry Relations Administrative Staff",
+  "Staff Keuangan": "Financial Staff",
+  "Tenaga Kebersihan": "Facilities & Sanitation Staff",
+  "Tenaga Keamanan": "Campus Security Personnel",
 };
 
 function translateTeacherRole(role: string, isEn: boolean): string {

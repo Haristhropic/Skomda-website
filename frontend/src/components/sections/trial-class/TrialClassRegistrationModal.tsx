@@ -31,11 +31,13 @@ const MAJOR_OPTIONS_EN = [
 interface TrialClassRegistrationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: (ticketCode: string, fullName: string, major: string) => void;
 }
 
 export default function TrialClassRegistrationModal({
   isOpen,
   onClose,
+  onSuccess,
 }: TrialClassRegistrationModalProps) {
   const { lang, language, t } = useLanguage();
   const isEn = lang === "EN" || language === "en";
@@ -98,14 +100,38 @@ export default function TrialClassRegistrationModal({
     }
   }, [isOpen]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !schoolOrigin || !whatsapp) return;
 
     setIsSubmitting(true);
-    // Simulate submission & save to session
-    setTimeout(() => {
-      const code = "TC-" + Math.floor(100000 + Math.random() * 900000);
+    let code = "TC-" + Math.floor(100000 + Math.random() * 900000);
+
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+      const res = await fetch(`${apiBase}/trial-class/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          schoolOrigin,
+          whatsapp,
+          email,
+          major,
+        }),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        if (result?.data?.ticketCode) {
+          code = result.data.ticketCode;
+        }
+      }
+    } catch (err) {
+      console.warn("Registrasi trial class fallback lokal:", err);
+    } finally {
       setTicketCode(code);
       if (typeof window !== "undefined") {
         sessionStorage.setItem("trial_pass_code", code);
@@ -114,7 +140,8 @@ export default function TrialClassRegistrationModal({
       }
       setIsSubmitting(false);
       setIsSuccess(true);
-    }, 800);
+      onSuccess?.(code, fullName, major);
+    }
   };
 
   const handleReset = () => {

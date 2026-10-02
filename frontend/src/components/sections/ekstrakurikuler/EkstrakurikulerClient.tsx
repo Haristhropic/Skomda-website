@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Search, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import PageHeroSection from "@/components/sections/common/PageHeroSection";
-import { EKSKUL_LIST, EkstrakurikulerItem } from "@/data/ekstrakurikulerData";
+import { EKSKUL_LIST, EkstrakurikulerItem, getLocalizedEkskul } from "@/data/ekstrakurikulerData";
 import { getEkskulList } from "@/services/ekskul";
 
 export default function EkstrakurikulerClient() {
@@ -131,51 +131,54 @@ export default function EkstrakurikulerClient() {
             </div>
           ) : (
               <div dir="ltr" className="flex justify-start overflow-x-auto pb-5 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 snap-x snap-proximity scroll-pl-4 sm:scroll-pl-0 overscroll-x-contain scrollbar-none">
-                {filteredItems.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group neu-card-interactive rounded-[24px] overflow-hidden flex flex-col"
-                  >
-                    {/* Header or Image (No Category Span Tag) */}
-                    {item.image ? (
-                    <div className="relative w-full aspect-[16/10] bg-gray-900 overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                    </div>
-                  ) : (
-                    <div className="p-6 bg-gradient-to-br from-[#101828] to-[#1f2937] text-white flex items-center justify-between border-b border-gray-100">
-                      <h4 className="font-jakarta font-bold text-xl text-white">
-                        {item.name}
-                      </h4>
-                      <div className="size-10 rounded-full bg-white/10 text-[#bc0c11] font-extrabold text-sm flex items-center justify-center">
-                        {String(index + 1).padStart(2, "0")}
+                {filteredItems.map((rawItem, index) => {
+                  const item = getLocalizedEkskul(rawItem, isEn);
+                  return (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-[84vw] max-w-[340px] shrink-0 snap-start sm:w-auto sm:max-w-none group neu-card-interactive rounded-[24px] overflow-hidden flex flex-col"
+                    >
+                      {/* Header or Image (No Category Span Tag) */}
+                      {item.image ? (
+                      <div className="relative w-full aspect-[16/10] bg-gray-900 overflow-hidden">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                       </div>
-                    </div>
-                  )}
-
-                  {/* Body (No Category Span Tag & No Tanya Info Button) */}
-                  <div className="p-5 sm:p-6 flex-1 flex flex-col">
-                    {item.image && (
-                      <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">
-                        {item.name}
-                      </h3>
+                    ) : (
+                      <div className="p-6 bg-gradient-to-br from-[#101828] to-[#1f2937] text-white flex items-center justify-between border-b border-gray-100">
+                        <h4 className="font-jakarta font-bold text-xl text-white">
+                          {item.name}
+                        </h4>
+                        <div className="size-10 rounded-full bg-white/10 text-[#bc0c11] font-extrabold text-sm flex items-center justify-center">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+                      </div>
                     )}
-                    <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Body (No Category Span Tag & No Tanya Info Button) */}
+                    <div className="p-5 sm:p-6 flex-1 flex flex-col">
+                      {item.image && (
+                        <h3 className="font-jakarta font-bold text-lg text-[#101828] mb-2 group-hover:text-[#bc0c11] transition-colors">
+                          {item.name}
+                        </h3>
+                      )}
+                      <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
               </div>
             )}
 

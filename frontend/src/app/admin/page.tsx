@@ -16,6 +16,7 @@ import {
   Shield,
   ArrowRight,
   Sparkles,
+  Ticket,
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAdminAuth } from "@/context/AdminAuthContext";
@@ -33,6 +34,7 @@ interface DashboardStats {
   totalPartners?: number;
   totalDocuments?: number;
   totalDtp?: number;
+  totalTrialClass?: number;
   recentLogs: Array<{
     id: number;
     user_name: string;
@@ -170,7 +172,23 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Quick Shortcut Panels */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <Link
+            href="/admin/trial-class"
+            className="group flex items-center justify-between rounded-2xl border border-red-100 bg-red-50/50 p-4 shadow-2xs transition-all hover:bg-red-50 hover:border-red-200"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-[#bc0c11] text-white">
+                <Ticket className="size-4.5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Trial Class</p>
+                <p className="text-xs text-slate-500">{stats?.totalTrialClass ?? 0} Pendaftar</p>
+              </div>
+            </div>
+            <ArrowRight className="size-4 text-[#bc0c11] group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+
           <Link
             href="/admin/berita"
             className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs transition-all hover:border-slate-300"
@@ -192,7 +210,7 @@ export default function AdminDashboardPage() {
             className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs transition-all hover:border-slate-300"
           >
             <div className="flex items-center gap-3">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-red-50 text-[#bc0c11]">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700">
                 <Sparkles className="size-4.5" />
               </div>
               <div>

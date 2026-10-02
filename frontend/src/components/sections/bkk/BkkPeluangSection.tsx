@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
-import { PELUANG_KARIER_ITEMS, PeluangKarierItem } from "@/data/bkkData";
+import { PELUANG_KARIER_ITEMS, PeluangKarierItem, getLocalizedPeluangKarier } from "@/data/bkkData";
 import { getBKKJobs } from "@/services/bkk";
 import { useLanguage } from "@/context/LanguageContext";
 import { Search, MapPin, Briefcase, ChevronRight, ChevronDown, ChevronUp, X, Copy, Check, Send, RotateCcw } from "lucide-react";
@@ -260,7 +260,9 @@ export default function BkkPeluangSection() {
         {/* Job Opportunity Cards List */}
         <div className="flex flex-col gap-4 mb-8">
           {displayedJobs.length > 0 ? (
-            displayedJobs.map((job) => (
+            displayedJobs.map((rawJob) => {
+              const job = getLocalizedPeluangKarier(rawJob, isEn);
+              return (
               <div
                 key={job.id}
                 className="rounded-[24px] neu-card-interactive px-5 sm:px-7 py-5 sm:py-6 group transition-all duration-200 animate-in fade-in-0"
@@ -371,7 +373,8 @@ export default function BkkPeluangSection() {
                 </div>
 
               </div>
-            ))
+            );
+            })
           ) : (
             <div className="neu-inset-panel rounded-[24px] p-10 text-center">
               <p className="font-jakarta font-semibold text-base text-[#101828] mb-1">
@@ -458,7 +461,9 @@ export default function BkkPeluangSection() {
       </div>
 
       {/* Modal Dialog for Job Details */}
-      {selectedJob && (
+      {selectedJob && (() => {
+        const modalJob = getLocalizedPeluangKarier(selectedJob, isEn);
+        return (
         <div
           role="dialog"
           aria-modal="true"
@@ -486,8 +491,8 @@ export default function BkkPeluangSection() {
             <div className="flex items-start gap-4 mb-6 pr-8">
               <div className="w-32 h-10 shrink-0 flex items-center">
                 <Image
-                  src={selectedJob.logo}
-                  alt={selectedJob.company}
+                  src={modalJob.logo}
+                  alt={modalJob.company}
                   width={120}
                   height={36}
                   className="object-contain object-left"
@@ -495,20 +500,20 @@ export default function BkkPeluangSection() {
               </div>
               <div>
                 <h3 id="modal-job-title" className="font-jakarta font-bold text-xl sm:text-2xl text-[#101828]">
-                  {selectedJob.title}
+                  {modalJob.title}
                 </h3>
                 <p className="font-jakarta text-sm font-medium text-[#4a5565]">
-                  {selectedJob.company}
+                  {modalJob.company}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2 text-xs font-jakarta">
                   <span className="bg-gray-100 text-[#4a5565] px-2.5 py-1 rounded-md font-medium">
-                    {selectedJob.location}
+                    {modalJob.location}
                   </span>
                   <span className="bg-gray-100 text-[#4a5565] px-2.5 py-1 rounded-md font-medium">
-                    {selectedJob.type}
+                    {modalJob.type}
                   </span>
                   <span className="bg-red-50 text-[#bc0c11] px-2.5 py-1 rounded-md font-bold">
-                    {isEn ? "Major: " : "Jurusan: "}{selectedJob.jurusan}
+                    {isEn ? "Major: " : "Jurusan: "}{modalJob.jurusan}
                   </span>
                 </div>
               </div>
@@ -518,16 +523,16 @@ export default function BkkPeluangSection() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl neu-inset-panel mb-6 text-xs font-jakarta">
               <div>
                 <span className="text-gray-400 block mb-0.5">{isEn ? "Deadline" : "Batas Lamaran"}</span>
-                <span className="font-semibold text-[#101828]">{selectedJob.deadline}</span>
+                <span className="font-semibold text-[#101828]">{modalJob.deadline}</span>
               </div>
               <div>
                 <span className="text-gray-400 block mb-0.5">{isEn ? "Posted Date" : "Tanggal Terbit"}</span>
-                <span className="font-semibold text-[#101828]">{selectedJob.postedDate}</span>
+                <span className="font-semibold text-[#101828]">{modalJob.postedDate}</span>
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <span className="text-gray-400 block mb-0.5">{isEn ? "Salary Range" : "Kisaran Gaji"}</span>
                 <span className="font-semibold text-[#bc0c11]">
-                  {selectedJob.salaryRange || (isEn ? "Standard / Competitive" : "Sesuai Standar")}
+                  {modalJob.salaryRange || (isEn ? "Standard / Competitive" : "Sesuai Standar")}
                 </span>
               </div>
             </div>
@@ -538,7 +543,7 @@ export default function BkkPeluangSection() {
                 {isEn ? "Job Description" : "Deskripsi Pekerjaan"}
               </h4>
               <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed">
-                {selectedJob.description}
+                {modalJob.description}
               </p>
             </div>
 
@@ -548,7 +553,7 @@ export default function BkkPeluangSection() {
                 {isEn ? "Key Responsibilities" : "Tanggung Jawab Utama"}
               </h4>
               <ul className="space-y-1.5 list-disc list-inside font-jakarta text-xs sm:text-sm text-[#4a5565] leading-relaxed">
-                {selectedJob.responsibilities.map((resp, idx) => (
+                {modalJob.responsibilities.map((resp, idx) => (
                   <li key={idx}>{resp}</li>
                 ))}
               </ul>
@@ -560,7 +565,7 @@ export default function BkkPeluangSection() {
                 {isEn ? "Qualifications & Requirements" : "Kualifikasi & Persyaratan"}
               </h4>
               <ul className="space-y-1.5 list-disc list-inside font-jakarta text-xs sm:text-sm text-[#4a5565] leading-relaxed">
-                {selectedJob.requirements.map((req, idx) => (
+                {modalJob.requirements.map((req, idx) => (
                   <li key={idx}>{req}</li>
                 ))}
               </ul>
@@ -569,7 +574,7 @@ export default function BkkPeluangSection() {
             {/* Action Bar */}
             <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
               <button
-                onClick={() => copyEmail(selectedJob.applyEmail)}
+                onClick={() => copyEmail(modalJob.applyEmail)}
                 className="btn-secondary w-full sm:w-auto !h-[44px] !px-5 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>
@@ -585,7 +590,7 @@ export default function BkkPeluangSection() {
               </button>
 
               <a
-                href={`mailto:${selectedJob.applyEmail}?subject=Lamaran%20Posisi%20${encodeURIComponent(selectedJob.title)}%20-%20Alumni%20SMK%20Telkom%20Sidoarjo`}
+                href={`mailto:${modalJob.applyEmail}?subject=Lamaran%20Posisi%20${encodeURIComponent(modalJob.title)}%20-%20Alumni%20SMK%20Telkom%20Sidoarjo`}
                 className="btn-primary w-full sm:w-auto !h-[44px] !px-6 !text-xs sm:!text-sm cursor-pointer"
               >
                 <span>{isEn ? "Submit Application / CV" : "Kirim Lamaran / CV"}</span>
@@ -596,7 +601,8 @@ export default function BkkPeluangSection() {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
     </section>
   );

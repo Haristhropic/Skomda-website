@@ -13,6 +13,16 @@ const ITEMS_PER_PAGE = 15;
 export default function PengumumanKelulusanClient() {
   const { lang, language, t } = useLanguage();
   const isEn = lang === "EN" || language === "en";
+
+  const formatKeterangan = (text?: string) => {
+    if (!text) return "";
+    if (!isEn) return text;
+    return text
+      .replace(/Lulusan Tahun Ajaran\s*/gi, "Graduate of Academic Year ")
+      .replace(/Lulusan\s*/gi, "Graduate of ")
+      .replace(/Tahun Ajaran\s*/gi, "Academic Year ");
+  };
+
   const [alumniList, setAlumniList] = useState<AlumniItem[]>(initialAlumniData as AlumniItem[]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
@@ -255,7 +265,7 @@ export default function PengumumanKelulusanClient() {
                               {item.name}
                             </p>
                             <p className="text-xs text-[#6a7282] md:hidden mt-0.5 truncate font-normal">
-                              {item.keterangan}
+                              {formatKeterangan(item.keterangan)}
                             </p>
                           </td>
                           <td className="py-4 px-4 hidden sm:table-cell">
@@ -265,7 +275,7 @@ export default function PengumumanKelulusanClient() {
                           </td>
                           <td className="py-4 px-4 hidden md:table-cell text-xs sm:text-sm text-[#364153]">
                             <p className="line-clamp-1 font-medium text-[#364153]">
-                              {item.keterangan}
+                              {formatKeterangan(item.keterangan)}
                             </p>
                           </td>
                           <td className="py-4 px-4 sm:px-6 text-center" onClick={(e) => e.stopPropagation()}>
@@ -464,7 +474,7 @@ export default function PengumumanKelulusanClient() {
                   <div className="flex justify-between items-start py-1.5">
                     <span className="text-gray-500 shrink-0">{isEn ? "Activity & Placement" : "Aktivitas & Penempatan"}</span>
                     <span className="font-semibold text-[#101828] text-right ml-4">
-                      {selectedAlumni.keterangan}
+                      {formatKeterangan(selectedAlumni.keterangan)}
                     </span>
                   </div>
                 </div>

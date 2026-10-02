@@ -49,8 +49,8 @@ export default function HeroSection() {
 
             {/* CTA Button */}
             <div className="mt-4 sm:mt-5 xl:mt-6">
-              <Link href="#sambutan" className="btn-primary group !px-6 xl:!px-7">
-                <span className="font-jakarta font-medium text-[14px] xl:text-[15px] leading-none whitespace-nowrap">
+              <Link href="#sambutan" className="btn-primary neu-btn-primary group !px-6 xl:!px-7">
+                <span className="font-jakarta font-semibold text-[14px] xl:text-[15px] leading-none whitespace-nowrap">
                   {t("hero.exploreMore", "Jelajahi Lebih Lanjut")}
                 </span>
                 <svg
@@ -58,7 +58,7 @@ export default function HeroSection() {
                   height="16"
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="transition-transform duration-200 group-hover:translate-x-0.5 xl:group-hover:translate-x-1"
+                  className="transition-transform duration-200 group-hover:translate-x-1"
                 >
                   <path
                     d="M5 12H19M19 12L12 5M19 12L12 19"
@@ -78,7 +78,7 @@ export default function HeroSection() {
           <div className="relative z-10 w-full mt-2 sm:mt-3 xl:mt-0 xl:absolute xl:right-0 xl:bottom-[16px] 2xl:bottom-[18px] xl:top-auto xl:w-[720px] 2xl:w-[770px] xl:h-[470px] 2xl:h-[500px] pointer-events-none flex items-end justify-center xl:justify-end">
             <div className="relative w-full h-[190px] sm:h-[240px] xl:h-full">
               <Image
-                src={getCloudinaryUrl("/images/home/hero/home-hero-students.png", { width: 1400, quality: "auto:good" })}
+                src={getCloudinaryUrl("/images/home/hero/home-hero-students.png", { width: 900, quality: "auto:good" })}
                 alt="Siswa-Siswi SMK Telkom Sidoarjo"
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 560px, 770px"

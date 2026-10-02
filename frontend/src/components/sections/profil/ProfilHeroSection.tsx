@@ -21,12 +21,7 @@ export default function ProfilHeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
           {/* Left Column: Visual Artwork */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="lg:col-span-5 flex justify-center lg:justify-start order-2 lg:order-1"
-          >
+          <div className="lg:col-span-5 flex justify-center lg:justify-start order-2 lg:order-1">
             <div className="relative w-full max-w-[360px] sm:max-w-[400px] aspect-[1122/1402] select-none flex items-center justify-center">
               <Image
                 src="/images/tentang-kami/profil-sekolah/profil-hero-character.png"
@@ -37,15 +32,10 @@ export default function ProfilHeroSection() {
                 className="object-contain drop-shadow-xl"
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Column: Information Content */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-            className="lg:col-span-7 flex flex-col items-start order-1 lg:order-2"
-          >
+          <div className="lg:col-span-7 flex flex-col items-start order-1 lg:order-2">
             {/* Breadcrumbs */}
             <div className="flex items-center gap-2 mb-4 text-sm font-jakarta">
               <Link
@@ -136,7 +126,7 @@ export default function ProfilHeroSection() {
                 />
               </svg>
             </button>
-          </motion.div>
+          </div>
 
         </div>
       </div>

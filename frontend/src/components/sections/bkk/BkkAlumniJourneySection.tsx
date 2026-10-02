@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ALUMNI_STORIES_ITEMS } from "@/data/bkkData";
+import { ALUMNI_STORIES_ITEMS, getLocalizedAlumniStory } from "@/data/bkkData";
 import { useLanguage } from "@/context/LanguageContext";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
@@ -13,7 +13,8 @@ export default function BkkAlumniJourneySection() {
 
   const totalStories = ALUMNI_STORIES_ITEMS.length;
   const safeIndex = totalStories > 0 ? ((currentIndex % totalStories) + totalStories) % totalStories : 0;
-  const currentStory = ALUMNI_STORIES_ITEMS[safeIndex];
+  const rawStory = ALUMNI_STORIES_ITEMS[safeIndex];
+  const currentStory = rawStory ? getLocalizedAlumniStory(rawStory, isEn) : null;
 
   const handlePrev = () => {
     if (totalStories === 0) return;

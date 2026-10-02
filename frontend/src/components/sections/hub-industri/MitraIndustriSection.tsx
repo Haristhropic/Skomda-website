@@ -267,6 +267,129 @@ const mitraList: MitraPartner[] = [
   },
 ];
 
+const MITRA_TRANSLATIONS_EN: Record<string, { focusEn: string; descEn: string }> = {
+  "Politeknik Elektronika Negeri Surabaya (PENS)": {
+    focusEn: "Vocational Higher Education & Engineering",
+    descEn: "Strategic partnership for applied advanced study programs, informatics engineering curriculum synchronization, and joint applied research.",
+  },
+  "Axelbit (Accelerate You BIT-by-BIT)": {
+    focusEn: "Networking & MikroTik Certification",
+    descEn: "Professional training and certification programs for MikroTik and Ubiquiti, along with enterprise wireless network technology transfer.",
+  },
+  "PT. RADNET DIGITAL INDONESIA (Radnext)": {
+    focusEn: "Internet Service & Data Center",
+    descEn: "Partnership in organizing ISP industrial classes, bandwidth & server management training, and data communication certification.",
+  },
+  "Wowrack Indonesia": {
+    focusEn: "Cloud Computing & Data Center",
+    descEn: "Mentorship in cloud computing technologies, server virtualization, and modern data center infrastructure management.",
+  },
+  "Markaz Design": {
+    focusEn: "UI/UX Design & Digital Creativity",
+    descEn: "Enhancement of user interface (UI/UX) design competencies, digital product research, and creative student branding innovation.",
+  },
+  "DigiPrener": {
+    focusEn: "Information Systems & Digital Solutions",
+    descEn: "Facilitating technical mentorship for information system development, enterprise database design, and software industry workflows.",
+  },
+  "PT. Garuda Telekomunikasi Indonesia": {
+    focusEn: "Telecommunications & Fiber Optics",
+    descEn: "Strategic collaboration in developing fiber optic network competencies, broadband transmission, and internship placement for TJAT students.",
+  },
+  "Slash (/. SLASH)": {
+    focusEn: "Digital Product Agency & Software Engineering",
+    descEn: "Web application project incubation, agile development mentorship, and implementation of modern industry front-end/back-end technologies.",
+  },
+  "PT. TelkoMedika Indonesia (TBA)": {
+    focusEn: "Healthcare IT & Telemedicine Services",
+    descEn: "Integration of digital health service management information systems, secure medical databases, and healthcare IoT implementation.",
+  },
+  "Jagoan Hosting": {
+    focusEn: "Web Cloud & DevOps Architecture",
+    descEn: "Web deployment skills training, cloud server management, and modern DevOps concepts through practitioner guest lectures and internships.",
+  },
+  "Sana Sini Creative Space": {
+    focusEn: "Creative Space & Multimedia Production",
+    descEn: "Creative studio for digital multimedia production, motion graphics, commercial creative video, and modern visual marketing strategies.",
+  },
+  "PT Digdaya Olah Teknologi (DOT Indonesia)": {
+    focusEn: "Custom Software & Mobile App Solutions",
+    descEn: "Enterprise software engineering collaboration, multi-platform mobile application development, and intensive internships for SIJA students.",
+  },
+  "LSP P1 / Jejaring Vokasi Sidoarjo": {
+    focusEn: "Professional Certification & Standards",
+    descEn: "Partnership in BNSP-standardized vocational competency testing, industry certification schemes synchronization, and professional assessments.",
+  },
+  "PT. Saka Global Perkasa (SGP)": {
+    focusEn: "Engineering & IT Infrastructure",
+    descEn: "Support for vocational laboratory equipment, plant network installation, and introduction to modern industrial supply chains.",
+  },
+  "Jobnation IT Outsource": {
+    focusEn: "IT Talent Sourcing & Outsource",
+    descEn: "Facilitating graduate placement in the technology sector, professional recruitment prep, and high-achiever talent mapping.",
+  },
+  "PT. Indev Solusi Digital (indev)": {
+    focusEn: "Web System & Enterprise Solutions",
+    descEn: "Development of Enterprise Resource Planning (ERP) systems, payment gateway integration, and large-scale database architecture.",
+  },
+  "PT. Global Infra Teknologi (GIT)": {
+    focusEn: "IT Infrastructure & Enterprise Network",
+    descEn: "Access to real-world enterprise-scale network infrastructure projects, mentorship for young technicians, and skill certification.",
+  },
+  "Weza Group": {
+    focusEn: "Software House & B2B Solutions",
+    descEn: "Collaboration on project-based digital apps and B2B systems (Teaching Factory), and incubating student software engineering talent.",
+  },
+  "PT. Widatra Bhakti": {
+    focusEn: "Pharmaceutical Industry & Smart Manufacturing",
+    descEn: "Implementation of international standard manufacturing automation, digital production instruments maintenance, and industrial internships.",
+  },
+  "PT. Woodone Integra Tbk": {
+    focusEn: "Smart Manufacturing & Automated Production",
+    descEn: "Digitalization of export manufacturing plants, industrial systems automation, and smart operational systems internship programs.",
+  },
+  "PT. Trijaya Grafika Solutindo (TGS)": {
+    focusEn: "Digital Printing & Creative Packaging",
+    descEn: "Application of high-precision digital graphics, commercial color reproduction, and creative product packaging design for student innovations.",
+  },
+  "Lasambara Karya Cipta": {
+    focusEn: "Creative Craft & Digital Merchandising",
+    descEn: "Development of creative product entrepreneurship (Teaching Factory), school merchandise branding, and student startup incubation.",
+  },
+  "Purnama Hotel Batu": {
+    focusEn: "Hospitality IT & Smart Hotel Systems",
+    descEn: "Management of large-scale hospitality Wi-Fi networks, digital reservation systems implementation, and room IoT integration.",
+  },
+  "RS Islam Surabaya Jemursari (KODI)": {
+    focusEn: "Hospital Information Systems & Health Tech",
+    descEn: "Hospital infrastructure server management, electronic medical record security (cybersecurity), and healthcare intranet maintenance.",
+  },
+  "PT. Efortech (Technology for Solver)": {
+    focusEn: "Industrial IoT & Embedded Systems",
+    descEn: "Applied research in Internet of Things (IoT), industrial sensor microcontroller integration, and smart telemetry automation control.",
+  },
+  "Alfath Corp": {
+    focusEn: "Corporate Business & Digital Services",
+    descEn: "Corporate technology events organization, strategic partnership management, and modern digital entrepreneurship prep for students.",
+  },
+  "UBIG.CO.ID": {
+    focusEn: "Software Development & SaaS Platform",
+    descEn: "Software as a Service (SaaS) product incubation, microservices cloud architecture, and coaching for high-achieving student startups.",
+  },
+  "PT Javacreatiox Network Intermedia": {
+    focusEn: "Software Development & Teaching Factory",
+    descEn: "Commercial software product development collaboration, industry standard code review mentorship, and career placement for top students.",
+  },
+  "Moksha Indonesia (Event Producer)": {
+    focusEn: "Creative Production & Event Technology",
+    descEn: "Operation of concert/national-scale digital audio-visual tech, multi-camera broadcast live streaming, and digital stage lighting.",
+  },
+  "HAI (Himpunan Ahli Informatika)": {
+    focusEn: "Professional Association & IT Standards",
+    descEn: "Standardization of national IT graduate competency curricula, cutting-edge technology seminars, and professional skill certification.",
+  },
+};
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -294,7 +417,7 @@ function getSafeUrl(url?: string): string {
 }
 
 export default function MitraIndustriSection() {
-  const { t } = useLanguage();
+  const { t, isEn } = useLanguage();
   const [partnerItems, setPartnerItems] = useState<MitraPartner[]>(mitraList);
 
   useEffect(() => {
@@ -396,22 +519,29 @@ export default function MitraIndustriSection() {
                     </div>
 
                     {/* Content Body */}
-                    <div className="flex flex-col gap-1 pt-1">
-                      {/* Subtitle / Focus */}
-                      <span className="text-xs font-semibold text-[#bc0c11] tracking-wide font-jakarta">
-                        {mitra.focus}
-                      </span>
+                    {(() => {
+                      const trans = isEn ? MITRA_TRANSLATIONS_EN[mitra.name] : null;
+                      const displayFocus = trans?.focusEn || mitra.focus;
+                      const displayDesc = trans?.descEn || mitra.description;
+                      return (
+                        <div className="flex flex-col gap-1 pt-1">
+                          {/* Subtitle / Focus */}
+                          <span className="text-xs font-semibold text-[#bc0c11] tracking-wide font-jakarta">
+                            {displayFocus}
+                          </span>
 
-                      {/* Company Name */}
-                      <h3 className="font-jakarta font-bold text-lg text-[#101828] leading-snug group-hover:text-[#bc0c11] transition-colors mt-0.5">
-                        {mitra.name}
-                      </h3>
+                          {/* Company Name */}
+                          <h3 className="font-jakarta font-bold text-lg text-[#101828] leading-snug group-hover:text-[#bc0c11] transition-colors mt-0.5">
+                            {mitra.name}
+                          </h3>
 
-                      {/* Description */}
-                      <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed mt-2">
-                        {mitra.description}
-                      </p>
-                    </div>
+                          {/* Description */}
+                          <p className="font-jakarta text-sm text-[#4a5565] leading-relaxed mt-2">
+                            {displayDesc}
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </Link>
               </motion.div>

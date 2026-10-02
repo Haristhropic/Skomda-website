@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Clock, CheckCircle2, XCircle, RotateCcw, ExternalLink, Sparkles, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { VirtualClassDtpItem } from "@/data/virtualClassData";
+import { VirtualClassDtpItem, getLocalizedVirtualClassItem } from "@/data/virtualClassData";
 
 interface VirtualClassDetailPanelProps {
   item: VirtualClassDtpItem;
@@ -15,13 +15,14 @@ interface VirtualClassDetailPanelProps {
 }
 
 export default function VirtualClassDetailPanel({
-  item,
+  item: rawItem,
   onBack,
   onNextClass,
   ticketCode,
   userName,
 }: VirtualClassDetailPanelProps) {
   const { isEn } = useLanguage();
+  const item = getLocalizedVirtualClassItem(rawItem, isEn);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [hasCheckedAnswer, setHasCheckedAnswer] = useState<boolean>(false);
   const [videoError, setVideoError] = useState<boolean>(false);
@@ -93,12 +94,12 @@ export default function VirtualClassDetailPanel({
                 src={`/api/virtual-class/video?id=${item.driveVideoId}`}
                 type="video/mp4"
               />
-              Browser Anda tidak mendukung pemutar video HTML5.
+              {isEn ? "Your browser does not support the HTML5 video player." : "Browser Anda tidak mendukung pemutar video HTML5."}
             </video>
           ) : (
             <iframe
               src={`https://drive.google.com/file/d/${item.driveVideoId}/preview`}
-              title={`Video Pembelajaran: ${item.title}`}
+              title={isEn ? `Learning Video: ${item.title}` : `Video Pembelajaran: ${item.title}`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
               allowFullScreen
               className="w-full h-full border-0"

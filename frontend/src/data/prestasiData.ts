@@ -188,3 +188,128 @@ export const PRESTASI_LIST: PrestasiItem[] = [
       "Bagaimana jika kecanggihan teknologi bertemu dengan kekuatan sebuah cerita? Agung Dwi Saputra dan Gregorius Olvans A.W menjawabnya melalui karya yang berhasil meraih Juara 1 AI Video Storytelling pada FICPACT CUP 2026 yang diselenggarakan oleh BEM FIKOM Universitas Katolik Soegijapranata (SCU). Sebuah karya yang memadukan storytelling dan teknologi AI dalam satu gagasan kreatif.",
   },
 ];
+
+export const PRESTASI_TRANSLATIONS_EN: Record<
+  string,
+  {
+    titleEn: string;
+    awardEn: string;
+    competitionEn: string;
+    organizerEn?: string;
+    descriptionEn: string;
+  }
+> = {
+  "iitc-web-design-2026": {
+    titleEn: "Digital Creativity Yields Success: SKOMDA Wins 2nd Place in Web Design",
+    awardEn: "2nd Place",
+    competitionEn: "Intermedia Information Technology Competition (IITC) 2026",
+    organizerEn: "Amikom University Purwokerto",
+    descriptionEn:
+      "Zaina Fildza Ghaisani won 2nd Place in Web Design at the Intermedia Information Technology Competition (IITC) 2026 hosted by Amikom University Purwokerto. This achievement demonstrates her ability to develop creative ideas into attractive and innovative digital works.",
+  },
+  "iitc-generative-ai-2026": {
+    titleEn: "Creating with Generative AI: SKOMDA Students Secure 3rd Place at IITC 2026",
+    awardEn: "3rd Place",
+    competitionEn: "Intermedia Information Technology Competition (IITC) 2026",
+    organizerEn: "Amikom University Purwokerto",
+    descriptionEn:
+      "Agung Dwi Saputra and Masnuril Rayya Tsabita achieved 3rd Place in Generative AI at the Intermedia Information Technology Competition (IITC) 2026. By blending creativity and technology, both delivered compelling work capable of competing at the highest level.",
+  },
+  "beefest-sdlc-binus-2026": {
+    titleEn: "Coding Skills Earn Gold Medal: SKOMDA Student Wins 1st Place in BINUS SDLC",
+    awardEn: "Gold Medal (1st Place)",
+    competitionEn: "Beefest: Software Development Logical Competition (SDLC)",
+    organizerEn: "School of Computer Science, BINUS University",
+    descriptionEn:
+      "Revano Satya Pandega earned the Gold Medal (1st Place) in the Beefest: Software Development Logical Competition (SDLC) hosted by BINUS University School of Computer Science, proving his mastery in developing logical and technological solutions.",
+  },
+  "lks-dikmen-nasional-ai-2026": {
+    titleEn: "Shining on the National Stage: SKOMDA Team Takes 1st Place in National LKS DIKMEN 2026",
+    awardEn: "1st Place",
+    competitionEn: "National LKS DIKMEN 2026 in Artificial Intelligence",
+    organizerEn: "National LKS DIKMEN Committee",
+    descriptionEn:
+      "Ilham Yudistira S. A., Nabil Fauzan A., and Revano Satya Pandega secured 1st Place in the National LKS DIKMEN 2026 in Artificial Intelligence, representing the school proudly on the national stage.",
+  },
+  "kejurprov-u17-speed-2026": {
+    titleEn: "Speed Built Through Perseverance",
+    awardEn: "3rd Place",
+    competitionEn: "East Java Provincial Championship - U17 Speed Category",
+    organizerEn: "KONI East Java",
+    descriptionEn:
+      "Billal Habibulloh Arrasyid won 3rd Place in the East Java Provincial Championship U17 Speed category organized by KONI East Java, proving the power of consistent training and athletic dedication.",
+  },
+  "pelajar-pelopor-llaj-2026": {
+    titleEn: "When Students Drive Meaningful Change",
+    awardEn: "2nd Place",
+    competitionEn: "2026 Sidoarjo Regency Student Pioneer for Road Traffic and Transportation Safety",
+    organizerEn: "Sidoarjo Regency Government",
+    descriptionEn:
+      "Charen Jullieta Kertiyasa won 2nd Place in the 2026 Sidoarjo Regency Road Traffic and Transportation Safety Student Pioneer selection, showing civic commitment and leadership.",
+  },
+  "porkab-renang-kupu-kupu-2026": {
+    titleEn: "50 Meters That Brought Home Victory",
+    awardEn: "3rd Place",
+    competitionEn: "50M Butterfly Stroke KU Open - PORKAB Sidoarjo 2026",
+    organizerEn: "PORKAB Sidoarjo",
+    descriptionEn:
+      "Muhammad Nabil Putra R achieved 3rd Place in the 50M Butterfly Stroke KU Open at PORKAB Sidoarjo 2026, delivering outstanding athletic performance through rigorous training.",
+  },
+  "content-creator-competition-2026": {
+    titleEn: "From an Idea to a Compelling Story",
+    awardEn: "3rd Place",
+    competitionEn: "Content Creator Competition - Sidoarjo School Fest 2026",
+    organizerEn: "Sidoarjo School Fest 2026",
+    descriptionEn:
+      "Ahmad Rico Raharjo, Rahardian Surya Darmawan, Aura Luthfia Annisa, and Daffa Zayyan Aryabima won 3rd Place in the Sidoarjo School Fest 2026 Content Creator Competition through collaborative storytelling.",
+  },
+  "lafest-telkom-university-2026": {
+    titleEn: "Taking Creative Works Further",
+    awardEn: "2nd Place",
+    competitionEn: "National LAFEST 2026",
+    organizerEn: "Telkom University Bandung",
+    descriptionEn:
+      "Muhammad Afgan Gahzy won 2nd Place in National LAFEST 2026 organized by Telkom University Bandung, demonstrating creative digital talent on a national platform.",
+  },
+  "fls2n-film-pendek-2026": {
+    titleEn: "When a Story Becomes an Award-Winning Film",
+    awardEn: "1st Place",
+    competitionEn: "FLS2N Short Film 2026 - Sidoarjo Regency",
+    organizerEn: "FLS2N Sidoarjo Regency Committee",
+    descriptionEn:
+      "Ghulam Nawwaf, Rahardian Surya Darmawan, and Ahmad Rico Raharjo won 1st Place in the FLS2N Short Film Competition 2026 in Sidoarjo Regency with their captivating cinematic narrative.",
+  },
+  "ficpact-cup-ai-storytelling-2026": {
+    titleEn: "When Technology Has a Story to Tell",
+    awardEn: "1st Place",
+    competitionEn: "AI Video Storytelling at FICPACT CUP 2026",
+    organizerEn: "BEM FIKOM Soegijapranata Catholic University (SCU)",
+    descriptionEn:
+      "Agung Dwi Saputra and Gregorius Olvans A.W won 1st Place in AI Video Storytelling at FICPACT CUP 2026, seamlessly blending creative storytelling and AI technology.",
+  },
+};
+
+export function getLocalizedPrestasi(item: PrestasiItem, isEn: boolean): PrestasiItem {
+  if (!isEn) return item;
+  const trans =
+    PRESTASI_TRANSLATIONS_EN[item.id] ||
+    Object.values(PRESTASI_TRANSLATIONS_EN).find(
+      (t) => t.titleEn.toLowerCase() === item.title.toLowerCase()
+    );
+
+  const awardEn =
+    trans?.awardEn ||
+    item.award
+      .replace(/Juara 1/gi, "1st Place")
+      .replace(/Juara 2/gi, "2nd Place")
+      .replace(/Juara 3/gi, "3rd Place");
+
+  return {
+    ...item,
+    title: trans?.titleEn || (item as any).titleEn || item.title,
+    award: awardEn,
+    competition: trans?.competitionEn || (item as any).competitionEn || item.competition,
+    organizer: trans?.organizerEn || (item as any).organizerEn || item.organizer,
+    description: trans?.descriptionEn || (item as any).descriptionEn || item.description,
+  };
+}

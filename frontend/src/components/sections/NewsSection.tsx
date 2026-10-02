@@ -10,7 +10,7 @@ import {
   NewsCategory,
   getNewsList,
 } from "@/services/news";
-import { getLocalizedNewsItem } from "@/services/newsLocalization";
+import { getLocalizedNewsItem, NEWS_CATEGORY_EN } from "@/services/newsLocalization";
 import { useLanguage } from "@/context/LanguageContext";
 import { getNewsImageUrl } from "@/lib/cloudinary";
 
@@ -29,20 +29,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
 
   const getCategoryLabel = (cat: NewsCategory) => {
     if (!isEn) return cat;
-    switch (cat) {
-      case "Semua":
-        return "All";
-      case "Prestasi":
-        return "Achievements";
-      case "Kegiatan Sekolah":
-        return "School Activities";
-      case "Pengumuman":
-        return "Announcements";
-      case "Artikel & Edukasi":
-        return "Articles & Education";
-      default:
-        return cat;
-    }
+    return NEWS_CATEGORY_EN[cat] || cat;
   };
 
   // Fetch live news from API when activeCategory changes
