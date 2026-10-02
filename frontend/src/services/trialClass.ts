@@ -128,3 +128,72 @@ export async function deleteTrialClassParticipant(
     return { success: false, error: message };
   }
 }
+
+export interface TrialClassEvent {
+  id?: number;
+  title: string;
+  badge: string;
+  dateDay: string;
+  dateFull: string;
+  timeRange: string;
+  timezone: string;
+  mode: string;
+  submode: string;
+  status: "open" | "closing_soon" | "closed" | string;
+  quota?: number;
+  description?: string;
+  isActive?: boolean;
+}
+
+export const DEFAULT_TRIAL_CLASS_EVENT: TrialClassEvent = {
+  title: "Virtual Trial Class 2026",
+  badge: "EVENT TERDEKAT",
+  dateDay: "Sabtu,",
+  dateFull: "26 September 2026",
+  timeRange: "09.00 - 11.00",
+  timezone: "WIB",
+  mode: "Online",
+  submode: "(Virtual Class)",
+  status: "open",
+  quota: 100,
+  description: "Sesi simulasi interaktif pembelajaran vokasi SIJA & TJAT bersama mentor industri dan guru kejuruan.",
+  isActive: true,
+};
+
+export async function getUpcomingTrialClassEvent(): Promise<TrialClassEvent> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/trial-class/event`, {
+      cache: "no-store",
+    });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.data) return json.data;
+    }
+    return DEFAULT_TRIAL_CLASS_EVENT;
+  } catch (err) {
+    console.error("Gagal mengambil event trial class terdekat:", err);
+    return DEFAULT_TRIAL_CLASS_EVENT;
+  }
+}
+
+export async function updateTrialClassEvent(
+  data: Partial<TrialClassEvent>
+): Promise<{ success: boolean; data?: TrialClassEvent; error?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/trial-class/event`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      return { success: false, error: json.error || "Gagal memperbarui jadwal event" };
+    }
+    return { success: true, data: json.data };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Gagal terhubung ke server";
+    return { success: false, error: message };
+  }
+}
+

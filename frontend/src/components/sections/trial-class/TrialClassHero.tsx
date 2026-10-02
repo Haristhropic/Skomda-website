@@ -1,9 +1,15 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  TrialClassEvent,
+  DEFAULT_TRIAL_CLASS_EVENT,
+  getUpcomingTrialClassEvent,
+} from "@/services/trialClass";
 
 interface TrialClassHeroProps {
   onOpenRegister?: () => void;
@@ -11,6 +17,13 @@ interface TrialClassHeroProps {
 
 export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) {
   const { t } = useLanguage();
+  const [event, setEvent] = useState<TrialClassEvent>(DEFAULT_TRIAL_CLASS_EVENT);
+
+  useEffect(() => {
+    getUpcomingTrialClassEvent().then((data) => {
+      if (data) setEvent(data);
+    });
+  }, []);
 
   const handleScrollToEvent = () => {
     const el = document.getElementById("event-terdekat");
@@ -151,24 +164,37 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
               {/* Left: Event Details (6 cols) */}
               <div className="lg:col-span-6 flex flex-col justify-between">
-                {/* Event Tag */}
-                <div className="flex items-center gap-2 text-[#bc0c11]">
-                  <div className="relative size-5 shrink-0">
-                    <Image
-                      src="/images/trial-class/icon-date.png"
-                      alt=""
-                      fill
-                      className="object-contain"
-                    />
+                {/* Event Tag & Status */}
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <div className="flex items-center gap-2 text-[#bc0c11]">
+                    <div className="relative size-5 shrink-0">
+                      <Image
+                        src="/images/trial-class/icon-date.png"
+                        alt=""
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                    <span className="font-jakarta text-xs sm:text-sm font-bold tracking-wider uppercase">
+                      {event.badge || t("trialClassPage.upcomingBadge", "EVENT TERDEKAT")}
+                    </span>
                   </div>
-                  <span className="font-jakarta text-xs sm:text-sm font-bold tracking-wider uppercase">
-                    {t("trialClassPage.upcomingBadge", "EVENT TERDEKAT")}
-                  </span>
+
+                  {event.status === "closing_soon" && (
+                    <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-200">
+                      Segera Ditutup
+                    </span>
+                  )}
+                  {event.status === "closed" && (
+                    <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-800 border border-red-200">
+                      Pendaftaran Ditutup
+                    </span>
+                  )}
                 </div>
 
                 {/* Title */}
                 <h2 className="font-jakarta text-2xl sm:text-3xl lg:text-[32px] font-bold text-[#101828] mt-2 mb-6">
-                  {t("trialClassPage.eventTitle", "Virtual Trial Class 2026")}
+                  {event.title || t("trialClassPage.eventTitle", "Virtual Trial Class 2026")}
                 </h2>
 
                 {/* 3 Details in a single row */}
@@ -185,10 +211,10 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="font-jakarta text-xs sm:text-sm font-bold text-[#101828] whitespace-nowrap">
-                        {t("trialClassPage.eventDateDay", "Sabtu,")}
+                        {event.dateDay || t("trialClassPage.eventDateDay", "Sabtu,")}
                       </span>
                       <span className="font-jakarta text-[11px] sm:text-xs text-[#6a7282] whitespace-nowrap">
-                        {t("trialClassPage.eventDateFull", "26 September 2026")}
+                        {event.dateFull || t("trialClassPage.eventDateFull", "26 September 2026")}
                       </span>
                     </div>
                   </div>
@@ -205,10 +231,10 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="font-jakarta text-xs sm:text-sm font-bold text-[#101828] whitespace-nowrap">
-                        {t("trialClassPage.eventTime", "09.00 - 11.00")}
+                        {event.timeRange || t("trialClassPage.eventTime", "09.00 - 11.00")}
                       </span>
                       <span className="font-jakarta text-[11px] sm:text-xs text-[#6a7282] whitespace-nowrap">
-                        {t("trialClassPage.eventTimezone", "WIB")}
+                        {event.timezone || t("trialClassPage.eventTimezone", "WIB")}
                       </span>
                     </div>
                   </div>
@@ -225,10 +251,10 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="font-jakarta text-xs sm:text-sm font-bold text-[#101828] whitespace-nowrap">
-                        {t("trialClassPage.eventMode", "Online")}
+                        {event.mode || t("trialClassPage.eventMode", "Online")}
                       </span>
                       <span className="font-jakarta text-[11px] sm:text-xs text-[#6a7282] whitespace-nowrap">
-                        {t("trialClassPage.eventSubmode", "(Virtual Class)")}
+                        {event.submode || t("trialClassPage.eventSubmode", "(Virtual Class)")}
                       </span>
                     </div>
                   </div>
@@ -241,19 +267,26 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                 <button
                   type="button"
                   onClick={onOpenRegister}
-                  className="btn-primary group w-full sm:w-auto lg:w-[200px]"
+                  disabled={event.status === "closed"}
+                  className="btn-primary group w-full sm:w-auto lg:w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span className="whitespace-nowrap">{t("trialClassPage.registerNow", "Daftar Sekarang")}</span>
-                  <svg
-                    className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
+                  <span className="whitespace-nowrap">
+                    {event.status === "closed"
+                      ? "Pendaftaran Ditutup"
+                      : t("trialClassPage.registerNow", "Daftar Sekarang")}
+                  </span>
+                  {event.status !== "closed" && (
+                    <svg
+                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1 shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      aria-hidden="true"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  )}
                 </button>
               </div>
 

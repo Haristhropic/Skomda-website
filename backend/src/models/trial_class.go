@@ -21,3 +21,23 @@ type TrialClassRegistration struct {
 	UpdatedAt    time.Time      `json:"updatedAt"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 }
+
+// TrialClassEvent merepresentasikan informasi sesi event terdekat pada halaman Trial Class.
+type TrialClassEvent struct {
+	ID          uint           `gorm:"primaryKey" json:"id"`
+	Title       string         `gorm:"size:255;not null" json:"title"`
+	Badge       string         `gorm:"size:100;default:'EVENT TERDEKAT'" json:"badge"`
+	DateDay     string         `gorm:"size:50;not null" json:"dateDay"`
+	DateFull    string         `gorm:"size:100;not null" json:"dateFull"`
+	TimeRange   string         `gorm:"size:100;not null" json:"timeRange"`
+	Timezone    string         `gorm:"size:50;default:'WIB'" json:"timezone"`
+	Mode        string         `gorm:"size:100;default:'Online'" json:"mode"`
+	Submode     string         `gorm:"size:100;default:'(Virtual Class)'" json:"submode"`
+	Status      string         `gorm:"size:50;default:'open'" json:"status"` // open, closing_soon, closed
+	Quota       int            `gorm:"default:100" json:"quota"`
+	Description string         `gorm:"type:text" json:"description"`
+	IsActive    bool           `gorm:"default:true;index" json:"isActive"`
+	CreatedAt   time.Time      `json:"createdAt"`
+	UpdatedAt   time.Time      `json:"updatedAt"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+}

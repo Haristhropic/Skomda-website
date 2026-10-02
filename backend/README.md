@@ -1,24 +1,35 @@
 # Backend: SMK Telkom Sidoarjo (Go High-Performance API)
 
-Service REST API backend untuk website resmi **SMK Telkom Sidoarjo**, dibangun menggunakan **Go (Golang) 1.25** dengan arsitektur **Dual-Engine (Fiber v2 & Gin)**, **GORM ORM**, dan integrasi cloud (Supabase PostgreSQL, Cloudinary, serta NexusRouter AI Gateway).
+Service REST API backend untuk website resmi **SMK Telkom Sidoarjo**, dibangun menggunakan **Go (Golang) 1.23+** dengan arsitektur **Dual-Engine (Fiber v2 & Gin)**, **GORM ORM**, dan integrasi cloud (Supabase PostgreSQL, Cloudinary, serta NexusRouter AI Gateway).
 
 ---
 
 ## ⚡ Fitur Utama
 
 - **Dual-Engine Switchable**:
-  - **Fiber v2 (Default / Rekomendasi)**: Engine web berkecepatan tinggi berbasis Fasthttp dengan alokasi memori minimal.
+  - **Fiber v2 (Default & Rekomendasi)**: Engine web berkecepatan tinggi berbasis Fasthttp dengan alokasi memori minimal.
   - **Gin**: Engine alternatif yang stabil dan kompatibel penuh dengan middleware standar HTTP.
   - Berganti engine secara instan hanya dengan mengatur environment variable `SERVER_ENGINE=fiber` atau `SERVER_ENGINE=gin`.
 - **Database & Auto-Migration (GORM)**:
   - Terhubung ke **Supabase PostgreSQL** untuk lingkungan staging dan produksi.
   - Fallback otomatis ke **Pure-Go SQLite** (`smktelkom_dev.db` via `github.com/glebarez/sqlite`) saat `DATABASE_URL` kosong, sehingga local development dapat langsung berjalan tanpa perlu menginstal server database eksternal.
-  - Auto-seeding otomatis untuk data resmi Program Keahlian (**SIJA 4 Tahun** & **TJAT 3 Tahun**) serta artikel berita awal.
-- **Modul Berita & Kegiatan (CRUD Penuh)**:
-  - Pencarian fleksibel (`?search=...`) dan filter berdasarkan kategori (`?category=...`).
-  - Dukungan penambahan dan penghapusan artikel oleh staff humas/admin.
+  - Auto-seeding otomatis untuk data resmi Program Keahlian (**SIJA 4 Tahun** & **TJAT 3 Tahun**), akun Super Admin awal, artikel berita, data DTP, dan fasilitas.
+- **Autentikasi JWT & Otorisasi Role-Based**:
+  - Proteksi rute admin menggunakan token JWT (`golang-jwt/jwt/v5`).
+  - Verifikasi identitas user, enkripsi password via `bcrypt`, dan audit logging aktivitas.
+- **Modul Layanan Lengkap (CRUD Penuh)**:
+  - **Berita & Artikel**: Pencarian teks (`?search=...`), filter kategori (`?category=...`), dan manajemen publikasi.
+  - **Digital Talent Program (DTP)**: Pengelolaan 9 track spesialisasi, roadmap materi, mentor, dan kuota.
+  - **Prestasi Siswa & Guru**: Pencatatan kejuaraan tingkat kota, provinsi, nasional, dan internasional.
+  - **Direktori Guru & Tendik**: Data kepegawaian, mata pelajaran, NIP, foto, dan bidang kompetensi.
+  - **Bursa Kerja Khusus (BKK)**: Lowongan kerja aktif, mitra industri terpercaya, dan kualifikasi pelamar.
+  - **Trial Class & Tiket Masuk**: Pendaftaran calon siswa baru secara interaktif, penerbitan tiket unik (`TC-SIJA-XXXX` / `TC-TJAT-XXXX`), filter status, direct WhatsApp contact link, dan ekspor CSV.
+  - **Dokumen Publik**: Manajemen unduhan brosur PPDB, kurikulum, dan panduan K3.
+  - **Ekstrakurikuler & Fasilitas**: Data klub kesiswaan dan inventaris sarana prasarana sekolah.
+  - **Kelulusan Siswa**: Pengecekan kelulusan berbasis NISN dan tanggal lahir secara real-time.
+  - **Audit Logs**: Rekam jejak seluruh mutasi data oleh akun admin.
 - **AI Chatbot Gateway Proxy**:
-  - Endpoint `/api/chatbot/message` yang meneruskan query ke gateway AI NexusRouter (`https://fahlyce.vercel.app`).
+  - Endpoint `/api/chatbot/message` yang meneruskan query ke gateway AI NexusRouter (`https://fahlyce.vercel.app`) dengan model `llama-3.3-70b-versatile`.
   - Fallback bawaan otomatis jika gateway offline: memberikan informasi kontak resmi Humas dan tautan unduh brosur PPDB tanpa error 500.
 - **Cloudinary Media Service**:
   - Endpoint tanda tangan aman (`/api/cloudinary/sign`) untuk upload langsung dari sisi klien/admin tanpa membocorkan API Secret.
@@ -31,26 +42,41 @@ Service REST API backend untuk website resmi **SMK Telkom Sidoarjo**, dibangun m
 backend/
 ├── src/
 │   ├── api/
-│   │   ├── chatbot/          # Handler & routing AI chatbot (Gin)
-│   │   ├── health/           # Handler health check (Gin)
-│   │   ├── jurusan/          # Handler data program keahlian (Gin)
-│   │   ├── news/             # Handler CRUD berita & artikel (Gin)
-│   │   └── fiber_routes.go   # Router & handler komprehensif untuk engine Fiber v2
+│   │   ├── admin_crud_routes.go  # Controller & CRUD handler lengkap untuk CMS admin
+│   │   ├── fiber_routes.go       # Registrasi seluruh rute & middleware engine Fiber v2
+│   │   ├── auth/                 # Handler login & claims JWT
+│   │   ├── chatbot/              # Handler AI chatbot & fallback logic
+│   │   ├── health/               # Health check status handler
+│   │   ├── jurusan/              # Handler data jurusan SIJA & TJAT
+│   │   ├── middleware/           # JWT auth guard, CORS, logger, recovery
+│   │   └── news/                 # Handler berita & artikel publik
 │   ├── client/
-│   │   └── cloudinary/       # Klien Cloudinary API, signature generator, & uploader
+│   │   └── cloudinary/           # Klien Cloudinary API, signature generator, & uploader
 │   ├── cmd/
-│   │   ├── fiber/            # Dedicated entrypoint Fiber: main.go
-│   │   └── server/           # Unified entrypoint: main.go (mendukung switch Fiber & Gin)
+│   │   ├── fiber/                # Dedicated entrypoint Fiber: main.go
+│   │   └── server/               # Unified entrypoint: main.go (mendukung switch Fiber & Gin)
 │   ├── config/
-│   │   ├── config.go         # Environment variable loader via godotenv
-│   │   └── db.go             # Inisialisasi GORM, koneksi Postgres/SQLite, & data seeders
-│   └── models/
-│       ├── jurusan.go        # Skema database program keahlian SIJA & TJAT
-│       └── news.go           # Skema database berita & kegiatan
-├── smktelkom_dev.db          # Database SQLite lokal (dibuat otomatis untuk dev)
-├── Dockerfile                # Konfigurasi container backend
-├── go.mod                    # Modul Go & dependensi
-└── go.sum                    # Checksum dependensi Go
+│   │   ├── config.go             # Environment variable loader via godotenv
+│   │   └── db.go                 # Inisialisasi GORM, koneksi Postgres/SQLite, & data seeders
+│   └── models/                   # Definisi skema GORM
+│       ├── alumni.go             # Skema data alumni & tracer study
+│       ├── audit_log.go          # Skema jejak audit aktivitas admin
+│       ├── bkk.go                # Skema lowongan kerja & mitra BKK
+│       ├── document.go           # Skema dokumen publik & brosur
+│       ├── dtp.go                # Skema Digital Talent Program
+│       ├── ekskul.go             # Skema kegiatan ekstrakurikuler
+│       ├── fasilitas.go          # Skema sarana & fasilitas
+│       ├── jurusan.go            # Skema program keahlian SIJA & TJAT
+│       ├── news.go               # Skema artikel berita
+│       ├── prestasi.go           # Skema prestasi siswa & guru
+│       ├── site_setting.go       # Skema konfigurasi identitas situs
+│       ├── teacher.go            # Skema direktori guru & tendik
+│       ├── trial_class.go        # Skema pendaftaran Trial Class & tiket masuk
+│       └── user.go               # Skema akun admin & password hash
+├── smktelkom_dev.db              # Database SQLite lokal (dibuat otomatis untuk dev)
+├── Dockerfile                    # Konfigurasi container backend
+├── go.mod                        # Modul Go & dependensi
+└── go.sum                        # Checksum dependensi Go
 ```
 
 ---
@@ -58,7 +84,7 @@ backend/
 ## 🚀 Panduan Menjalankan Backend
 
 ### 1. Prasyarat
-- Go 1.22 atau yang lebih baru (proyek menggunakan Go 1.25.0).
+- Go 1.23 atau yang lebih baru.
 - Git.
 
 ### 2. Konfigurasi Environment (`.env`)
@@ -75,7 +101,7 @@ PORT=8080
 DATABASE_URL=                          # Kosongkan untuk menggunakan SQLite lokal otomatis
 CLOUDINARY_URL=cloudinary://<key>:<secret>@<cloud_name>
 LLM_API_KEY=
-JWT_SECRET=rahasia-jwt-skomda
+JWT_SECRET=rahasia-jwt-skomda-2026
 ALLOWED_ORIGIN=http://localhost:3001
 NEXUS_ROUTER_URL=https://fahlyce.vercel.app
 CHATBOT_MODEL=llama-3.3-70b-versatile    # Model chatbot cepat (Groq Llama 3.3 70B)
@@ -84,11 +110,11 @@ SERVER_ENGINE=fiber                    # Pilihan: fiber (default) atau gin
 
 ### 3. Menjalankan Server
 
-**Opsi A: Menggunakan Engine Fiber (Rekomendasi)**
+**Opsi A: Menggunakan Engine Fiber (Rekomendasi Default)**
 ```bash
-go run ./src/cmd/fiber
-# atau:
 go run ./src/cmd/server
+# atau jalankan runner khusus fiber:
+# go run ./src/cmd/fiber
 ```
 
 **Opsi B: Menggunakan Engine Gin**
@@ -108,61 +134,65 @@ Server akan aktif dan mendengarkan pada `http://localhost:8080`.
 
 Semua endpoint berada di bawah prefix `/api`:
 
-### 1. Sistem & Kesehatan
-- `GET /api/health`
-  - Mengecek status kesehatan service backend dan engine aktif.
-  - Response: `{"engine": "fiber-v2", "service": "smktelkom-web-backend", "status": "ok"}`
+### 1. Endpoint Publik
 
-### 2. Program Keahlian (Jurusan)
-- `GET /api/jurusan`
-  - Mengambil daftar semua jurusan resmi (SIJA & TJAT).
-- `GET /api/jurusan/:slug`
-  - Mengambil detail jurusan spesifik berdasarkan slug (contoh: `sija` atau `tjat`).
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| `GET` | `/api/health` | Status kesehatan service backend dan engine aktif |
+| `GET` | `/api/jurusan` | Daftar program keahlian (SIJA & TJAT) |
+| `GET` | `/api/jurusan/:slug` | Detail program keahlian berdasarkan slug |
+| `GET` | `/api/news` | Daftar artikel berita dengan query `?category=` dan `?search=` |
+| `GET` | `/api/news/:slug` | Detail artikel berdasarkan slug judul |
+| `GET` | `/api/bkk/jobs` | Daftar lowongan kerja aktif |
+| `GET` | `/api/bkk/partners` | Daftar mitra industri BKK |
+| `GET` | `/api/dtp` | Data 9 spesialisasi Digital Talent Program |
+| `GET` | `/api/teachers` | Direktori guru dan tenaga kependidikan |
+| `GET` | `/api/achievements` | Galeri prestasi siswa dan guru |
+| `GET` | `/api/facilities` | Daftar sarana dan fasilitas sekolah |
+| `GET` | `/api/extracurriculars` | Katalog kegiatan ekstrakurikuler |
+| `GET` | `/api/documents` | Dokumen dan brosur yang dapat diunduh |
+| `POST` | `/api/graduation/check` | Pengecekan kelulusan (body: `nisn`, `birth_date`) |
+| `POST` | `/api/trial-class/register` | Pendaftaran peserta Trial Class & generate kode tiket |
+| `POST` | `/api/chatbot/message` | Kirim pertanyaan ke asisten cerdas Skomda Intelligence |
+| `GET` | `/api/settings/public` | Informasi kontak, jam operasional, dan sosial media |
+| `GET` | `/api/cloudinary/sign` | Generate parameter tanda tangan untuk direct upload |
 
-### 3. Berita & Kegiatan (News)
-- `GET /api/news`
-  - Query parameters:
-    - `category`: Filter berdasarkan kategori (contoh: `Prestasi`, `Kegiatan Sekolah`, `Pengumuman`).
-    - `search`: Pencarian kata kunci pada judul, ringkasan, atau isi berita.
-  - Response: `{"data": [...], "total": 10}`
-- `GET /api/news/:slug`
-  - Mengambil detail artikel berdasarkan slug judul.
-- `POST /api/news`
-  - Menerbitkan artikel baru (digunakan oleh Admin CMS).
-  - Request Body (JSON): `title`, `category`, `summary`, `content`, `image`, `author`, dll.
-- `DELETE /api/news/:id`
-  - Menghapus artikel berdasarkan ID berita.
+### 2. Endpoint Admin (Memerlukan `Authorization: Bearer <TOKEN>`)
 
-### 4. Asisten Virtual (AI Chatbot)
-- `GET /api/chatbot/health`
-  - Memeriksa konektivitas gateway asisten cerdas.
-- `POST /api/chatbot/message`
-  - Mengirimkan pertanyaan pengunjung ke gateway AI.
-  - Request Body:
-    ```json
-    {
-      "message": "Apa saja syarat pendaftaran PPDB?",
-      "history": [],
-      "stream": false,
-      "model": "Emberock"
-    }
-    ```
-  - Jika gateway AI tidak dapat dihubungi, backend secara otomatis membalas dengan pesan bantuan resmi serta link alternatif.
-
-### 5. Media & Upload (Cloudinary)
-- `GET /api/cloudinary/sign?folder=skomda/uploads`
-  - Menghasilkan parameter tanda tangan (timestamp, signature, api_key) untuk direct-upload dari browser ke Cloudinary.
+| Method | Endpoint | Deskripsi |
+|---|---|---|
+| `POST` | `/api/auth/login` | Login admin dan mendapatkan token JWT |
+| `GET` | `/api/auth/me` | Memeriksa user profil yang sedang login |
+| `GET` | `/api/admin/stats` | Statistik ringkas seluruh modul data untuk dashboard |
+| `GET, POST` | `/api/admin/news` | Ambil semua berita / Buat artikel baru |
+| `PUT, DELETE` | `/api/admin/news/:id` | Update / Hapus artikel berita |
+| `GET, POST` | `/api/admin/dtp` | Ambil data DTP / Tambah spesialisasi baru |
+| `PUT, DELETE` | `/api/admin/dtp/:id` | Update / Hapus spesialisasi DTP |
+| `GET, POST` | `/api/admin/achievements` | Ambil data prestasi / Tambah prestasi baru |
+| `PUT, DELETE` | `/api/admin/achievements/:id` | Update / Hapus data prestasi |
+| `GET, POST` | `/api/admin/teachers` | Ambil data guru / Tambah guru baru |
+| `PUT, DELETE` | `/api/admin/teachers/:id` | Update / Hapus data guru |
+| `GET, POST` | `/api/admin/bkk` | Ambil data lowongan / Tambah lowongan baru |
+| `PUT, DELETE` | `/api/admin/bkk/:id` | Update / Hapus data lowongan BKK |
+| `GET` | `/api/admin/trial-class` | Ambil data pendaftar Trial Class (dukung `?search=`, `?major=`, `?status=`) |
+| `PUT, DELETE` | `/api/admin/trial-class/:id` | Update status (Terdaftar/Hadir/Selesai) atau hapus |
+| `GET, POST` | `/api/admin/documents` | Kelola file dokumen unduhan |
+| `GET, POST` | `/api/admin/extracurriculars` | Kelola kegiatan ekstrakurikuler |
+| `GET, POST` | `/api/admin/facilities` | Kelola sarana prasarana sekolah |
+| `GET, POST` | `/api/admin/graduation` | Kelola database kelulusan siswa |
+| `GET, PUT` | `/api/admin/settings` | Kelola konfigurasi dan kontak website |
+| `GET` | `/api/admin/audit-logs` | Lihat riwayat audit trail aktivitas admin |
 
 ---
 
 ## 🧪 Pengujian Kode (Testing)
 
-Jalankan suite pengujian unit dan verifikasi sintaksis:
+Jalankan pengujian sintaksis dan unit test:
 
 ```bash
-# Verifikasi kode & analisis statis
+# Analisis statis sintaksis kode
 go vet ./...
 
-# Jalankan semua unit test
+# Jalankan seluruh unit test
 go test -v ./...
 ```

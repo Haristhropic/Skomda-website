@@ -822,6 +822,121 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"data": list, "total": total})
 	})
 
+	// Public: Get Active Upcoming Event
+	trialGroup.Get("/event", func(c *fiber.Ctx) error {
+		var event models.TrialClassEvent
+		if err := config.DB.Where("is_active = ?", true).Order("id DESC").First(&event).Error; err != nil {
+			event = models.TrialClassEvent{
+				Title:       "Virtual Trial Class 2026",
+				Badge:       "EVENT TERDEKAT",
+				DateDay:     "Sabtu,",
+				DateFull:    "26 September 2026",
+				TimeRange:   "09.00 - 11.00",
+				Timezone:    "WIB",
+				Mode:        "Online",
+				Submode:     "(Virtual Class)",
+				Status:      "open",
+				Quota:       100,
+				Description: "Sesi simulasi interaktif pembelajaran vokasi SIJA & TJAT bersama mentor industri dan guru kejuruan.",
+				IsActive:    true,
+			}
+		}
+		return c.JSON(fiber.Map{"data": event})
+	})
+
+	// Admin: Update / Save Active Upcoming Event
+	trialGroup.Put("/event", authGuard, func(c *fiber.Ctx) error {
+		var payload struct {
+			Title       string `json:"title"`
+			Badge       string `json:"badge"`
+			DateDay     string `json:"dateDay"`
+			DateFull    string `json:"dateFull"`
+			TimeRange   string `json:"timeRange"`
+			Timezone    string `json:"timezone"`
+			Mode        string `json:"mode"`
+			Submode     string `json:"submode"`
+			Status      string `json:"status"`
+			Quota       int    `json:"quota"`
+			Description string `json:"description"`
+			IsActive    *bool  `json:"isActive"`
+		}
+		if err := c.BodyParser(&payload); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		if strings.TrimSpace(payload.Title) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Judul event wajib diisi"})
+		}
+
+		var event models.TrialClassEvent
+		err := config.DB.Order("id DESC").First(&event).Error
+		if err != nil {
+			event = models.TrialClassEvent{
+				Title:       strings.TrimSpace(payload.Title),
+				Badge:       strings.TrimSpace(payload.Badge),
+				DateDay:     strings.TrimSpace(payload.DateDay),
+				DateFull:    strings.TrimSpace(payload.DateFull),
+				TimeRange:   strings.TrimSpace(payload.TimeRange),
+				Timezone:    strings.TrimSpace(payload.Timezone),
+				Mode:        strings.TrimSpace(payload.Mode),
+				Submode:     strings.TrimSpace(payload.Submode),
+				Status:      payload.Status,
+				Quota:       payload.Quota,
+				Description: payload.Description,
+				IsActive:    true,
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			}
+			if payload.IsActive != nil {
+				event.IsActive = *payload.IsActive
+			}
+			if err := config.DB.Create(&event).Error; err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal membuat event"})
+			}
+			recordAudit(c, "CREATE", "trial_class_event", fmt.Sprint(event.ID), fmt.Sprintf("Membuat jadwal event terdekat: %s", event.Title))
+			return c.JSON(fiber.Map{"message": "Jadwal event berhasil dibuat", "data": event})
+		}
+
+		event.Title = strings.TrimSpace(payload.Title)
+		if payload.Badge != "" {
+			event.Badge = strings.TrimSpace(payload.Badge)
+		}
+		if payload.DateDay != "" {
+			event.DateDay = strings.TrimSpace(payload.DateDay)
+		}
+		if payload.DateFull != "" {
+			event.DateFull = strings.TrimSpace(payload.DateFull)
+		}
+		if payload.TimeRange != "" {
+			event.TimeRange = strings.TrimSpace(payload.TimeRange)
+		}
+		if payload.Timezone != "" {
+			event.Timezone = strings.TrimSpace(payload.Timezone)
+		}
+		if payload.Mode != "" {
+			event.Mode = strings.TrimSpace(payload.Mode)
+		}
+		if payload.Submode != "" {
+			event.Submode = strings.TrimSpace(payload.Submode)
+		}
+		if payload.Status != "" {
+			event.Status = payload.Status
+		}
+		if payload.Quota > 0 {
+			event.Quota = payload.Quota
+		}
+		event.Description = payload.Description
+		if payload.IsActive != nil {
+			event.IsActive = *payload.IsActive
+		}
+		event.UpdatedAt = time.Now()
+
+		if err := config.DB.Save(&event).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan perubahan event"})
+		}
+		recordAudit(c, "UPDATE", "trial_class_event", fmt.Sprint(event.ID), fmt.Sprintf("Memperbarui jadwal event terdekat: %s (%s %s)", event.Title, event.DateDay, event.DateFull))
+		return c.JSON(fiber.Map{"message": "Jadwal event berhasil diperbarui", "data": event})
+	})
+
 	// Admin: Update status / notes
 	trialGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)

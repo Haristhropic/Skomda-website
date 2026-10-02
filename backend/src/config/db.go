@@ -62,6 +62,7 @@ func InitDB(cfg Config) *gorm.DB {
 		&models.Alumni{},
 		&models.DigitalTalent{},
 		&models.TrialClassRegistration{},
+		&models.TrialClassEvent{},
 	); err != nil {
 		log.Fatalf("fatal: gagal auto migrate database: %v", err)
 	}
@@ -74,6 +75,7 @@ func InitDB(cfg Config) *gorm.DB {
 		DB.Exec("ALTER TABLE IF EXISTS public.audit_logs ENABLE ROW LEVEL SECURITY;")
 		DB.Exec("ALTER TABLE IF EXISTS public.alumnis ENABLE ROW LEVEL SECURITY;")
 		DB.Exec("ALTER TABLE IF EXISTS public.digital_talents ENABLE ROW LEVEL SECURITY;")
+		DB.Exec("ALTER TABLE IF EXISTS public.trial_class_events ENABLE ROW LEVEL SECURITY;")
 	}
 
 	// Inisialisasi akun Super Admin default hanya jika tabel users kosong (0 user)
@@ -86,9 +88,8 @@ func InitDB(cfg Config) *gorm.DB {
 	// Inisialisasi spesialisasi Digital Talent Program jika tabel masih kosong
 	SeedDtpIfEmpty(DB)
 
-	// CATATAN: Seluruh seeder konten otomatis telah dinonaktifkan permanen sesuai instruksi.
-	// Seluruh data (Jurusan, Berita, Guru, Prestasi, Ekskul, Fasilitas, BKK, Dokumen)
-	// kini 100% bersumber dari dan dikelola melalui Panel Admin tanpa overwrite seeder.
+	// Inisialisasi event terdekat Trial Class jika masih kosong
+	SeedTrialClassEventIfEmpty(DB)
 
 	return DB
 }
@@ -446,6 +447,38 @@ func SeedAlumniIfEmpty(db *gorm.DB) {
 			return
 		}
 		log.Printf("berhasil seed %d data alumni ke database.", len(records))
+	}
+}
+
+// SeedTrialClassEventIfEmpty menginisialisasi jadwal sesi default Trial Class jika tabel kosong.
+func SeedTrialClassEventIfEmpty(db *gorm.DB) {
+	var count int64
+	db.Model(&models.TrialClassEvent{}).Count(&count)
+	if count > 0 {
+		return
+	}
+
+	initialEvent := models.TrialClassEvent{
+		Title:       "Virtual Trial Class 2026",
+		Badge:       "EVENT TERDEKAT",
+		DateDay:     "Sabtu,",
+		DateFull:    "26 September 2026",
+		TimeRange:   "09.00 - 11.00",
+		Timezone:    "WIB",
+		Mode:        "Online",
+		Submode:     "(Virtual Class)",
+		Status:      "open",
+		Quota:       100,
+		Description: "Sesi simulasi interaktif pembelajaran vokasi SIJA & TJAT bersama mentor industri dan guru kejuruan.",
+		IsActive:    true,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	if err := db.Create(&initialEvent).Error; err != nil {
+		log.Printf("peringatan: gagal seed event trial class default: %v", err)
+	} else {
+		log.Println("berhasil menginisialisasi jadwal default Event Terdekat Trial Class.")
 	}
 }
 
