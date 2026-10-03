@@ -1,7 +1,9 @@
 # Rancangan Arsitektur Production SKOMDA
 
-**Status:** Baseline disetujui; implementasi bertahap  
-**Tanggal:** 2 Oktober 2026  
+**Status:** Baseline disetujui; implementasi bertahap
+
+**Tanggal:** 3 Oktober 2026
+
 **Target awal:** Demo terkontrol pada subdomain `linear.smktelkom-sidoarjo.my.id`
 
 Panduan konfigurasi manual VPS dan GitHub ada di [`demo-vps-runbook.md`](demo-vps-runbook.md).
@@ -20,10 +22,10 @@ Dokumen ini menjadikan daftar kebutuhan infrastruktur sebagai cakupan arsitektur
 ```mermaid
 flowchart LR
   V[Pengunjung] --> CF[Cloudflare DNS, TLS, WAF, CDN]
-  CF -->|linear host| RPFE[Webuzo reverse proxy]
-  CF -->|api-linear host| RPAPI[Webuzo reverse proxy]
-  RPFE --> FE[Frontend Next.js]
-  RPAPI --> API[Go API: Fiber]
+  CF -->|linear host| T[Cloudflare Tunnel]
+  CF -->|api-linear host| T
+  T -->|HTTP internal Docker network| FE[Frontend Next.js]
+  T -->|HTTP internal Docker network| API[Go API: Fiber]
   API --> PG[(Supabase PostgreSQL)]
   API --> MED[Cloudinary media]
   API --> AI[NexusRouter]
@@ -31,10 +33,10 @@ flowchart LR
   FE --> UX[Clarity with masking]
   GH[GitHub Actions] --> REG[GHCR: image bertag commit]
   REG --> VPS[Docker Compose di VPS]
-  VPS --> RP
+  VPS --> T
 ```
 
-Production menjalankan satu frontend Next.js dan satu Go API container di Docker Compose. Keduanya hanya bind ke loopback host ports; reverse proxy Webuzo menjadi jalur masuk HTTP(S). Go API menggunakan Supabase PostgreSQL melalui `DATABASE_URL`, Cloudinary untuk media, dan NexusRouter untuk chatbot. Cloudflare berada di depan proxy untuk DNS, TLS/proxy, proteksi dasar, dan cache aset yang aman.
+Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compose. Keduanya hanya bind ke loopback host ports dan juga berada pada network Docker privat. Connector `cloudflared` bergabung ke network tersebut; Cloudflare Tunnel merutekan hostname frontend ke `http://frontend:3000` dan hostname API ke `http://backend:8080`. TLS publik berakhir di Cloudflare, sedangkan HTTP dipakai pada koneksi internal Docker. Webuzo tetap mengelola panel server dan bukan reverse proxy untuk dua hostname demo ini. Go API menggunakan Supabase PostgreSQL melalui `DATABASE_URL`, Cloudinary untuk media, dan NexusRouter untuk chatbot.
 
 ## Cakupan komponen
 
@@ -44,9 +46,9 @@ Production menjalankan satu frontend Next.js dan satu Go API container di Docker
 | APIs & Backend Logic | Go API, Fiber sebagai engine production; Gin tetap alternatif yang diuji | Kedua entrypoint tersedia. Production menjalankan satu engine saja. API tetap menjadi jalur mutasi dan akses data. |
 | Database & Storage | Supabase PostgreSQL untuk staging/production; Cloudinary untuk gambar/dokumen media | Backend mewajibkan Postgres di Compose production. SQLite dipilih eksplisit via `DATABASE_DRIVER=sqlite` hanya pada `development` atau `test`; tidak ada fallback koneksi. |
 | Auth & Permissions | JWT backend, password bcrypt, role checks API, cookie httpOnly untuk admin | Auth dan role guards ada. Middleware Next.js hanya memeriksa keberadaan cookie untuk menyamarkan route; validasi otorisasi wajib tetap di API. |
-| Hosting & Deployment | Ubuntu VPS + Docker Compose; Webuzo reverse proxy; `linear` frontend and `api-linear` API demo hosts | Compose, container, dan skrip deployment demo telah disiapkan. DNS `api-linear` belum dikonfirmasi tersedia dan perlu dibuat pemilik; konfigurasi VPS, DNS/proxy dan sertifikat dilakukan pemilik. |
+| Hosting & Deployment | Ubuntu VPS + Docker Compose + Cloudflare Tunnel; `linear` frontend dan `api-linear` API demo hosts | Published routes `linear` dan `api-linear` mengarah ke container yang sesuai. Homepage merespons HTTP 200 dan API health mengonfirmasi database PostgreSQL sehat. Panel Webuzo tetap pada hostname `server`; resolver DNS bawaan komputer pemilik sempat memberi `NXDOMAIN` sementara resolver publik berhasil. |
 | Cloud & Compute | VPS saat ini; Supabase dan Cloudinary sebagai layanan terkelola | Kapasitas awal cukup untuk satu replica per aplikasi menurut spesifikasi VPS yang diberikan. Batasi CPU/RAM container dan pantau pemakaian. |
-| CI/CD & Version Control | GitHub Actions untuk pemeriksaan, build, image GHCR immutable SHA, deploy demo opsional | Workflow sudah disiapkan di branch `deploy`; deployment dikendalikan GitHub Environment/Variables dan belum boleh diarahkan ke domain utama. |
+| CI/CD & Version Control | GitHub Actions untuk pemeriksaan, build, image GHCR immutable SHA, deploy demo opsional | Workflow disiapkan di branch `deploy`; deploy memakai secrets dan variables pada environment `demo`, sedangkan sakelar job `DEMO_DEPLOY_ENABLED` harus berupa repository variable. Pipeline demo tidak mengubah domain utama. |
 | Security & RLS | Secret di VPS/GitHub Secrets; TLS; CORS allowlist; JWT; least privilege; kebijakan RLS yang terverifikasi | CORS/JWT tersedia dan beberapa tabel mengaktifkan RLS dari startup code. RLS belum boleh dianggap perlindungan efektif sebelum policy, grants, dan role koneksi diverifikasi. |
 | Rate Limiting | Batas khusus endpoint sensitif; Cloudflare edge rules ditambahkan untuk abuse umum | Login 5 request/menit dan chatbot 15 request/menit tercatat di kode. Chatbot limiter bersifat in-memory dan tidak berbagi counter antar replica. |
 | Caching & CDN | Cloudflare untuk aset publik yang aman; Cloudinary untuk media; cache API/Next ditentukan per route | Cloudinary sudah digunakan. Jangan cache respons admin, auth, personal data, atau API mutasi. Mulai dengan cache statis dan aturan eksplisit untuk GET publik. |
@@ -71,7 +73,7 @@ Production menjalankan satu frontend Next.js dan satu Go API container di Docker
 ### Tahap A — Demo aman di subdomain
 
 - Pertahankan driver lokal yang eksplisit; production tetap PostgreSQL-only dan pastikan `.env` VPS menggunakan `DATABASE_DRIVER=postgres`.
-- Bereskan kontrak konfigurasi Compose/API/frontend, validasi health check, dan dokumentasikan manual setup Webuzo/Cloudflare untuk `linear` dan API subdomainnya.
+- Bereskan kontrak konfigurasi Compose/API/frontend, validasi health check, dan dokumentasikan setup Cloudflare Tunnel untuk `linear` dan `api-linear`.
 - Jalankan CI build/test, publish image bertag commit ke GHCR, lalu aktifkan deploy demo hanya setelah pemilik mengisi secrets/variables VPS.
 - Uji smoke test frontend, API, auth admin, penyimpanan data, dan rollback image.
 
