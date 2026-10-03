@@ -191,15 +191,24 @@ jobs:
           : "${VPS_DEPLOY_PATH:?Set VPS_DEPLOY_PATH in the demo environment variables}"
 
           install -d -m 700 "$HOME/.ssh"
-          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > "$HOME/.ssh/deploy_key"
-          printf '%s\n' "$VPS_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          key_content="${VPS_SSH_PRIVATE_KEY//$'\r'/}"
+          key_content="${key_content//\\n/$'\n'}"
+          printf '%s\n' "$key_content" > "$HOME/.ssh/deploy_key"
+          unset key_content
+          printf '%s\n' "$VPS_KNOWN_HOSTS" | tr -d '\r' > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/deploy_key" "$HOME/.ssh/known_hosts"
+          if ! ssh-keygen -y -f "$HOME/.ssh/deploy_key" >/dev/null 2>&1; then
+            echo "VPS_SSH_PRIVATE_KEY is not a parseable OpenSSH private key. Use the complete private key, not a .pub/authorized_keys file or PuTTY .ppk; keep the BEGIN/END lines." >&2
+            exit 1
+          fi
           deploy_path_b64="$(printf '%s' "$VPS_DEPLOY_PATH" | base64 -w 0)"
 
           ssh -i "$HOME/.ssh/deploy_key" \
             -p "$VPS_SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
             "$VPS_USER@$VPS_HOST" \
             "DEPLOY_PATH_B64=$deploy_path_b64 IMAGE_TAG=$IMAGE_TAG bash -s" \
             < scripts/deploy-demo.sh
