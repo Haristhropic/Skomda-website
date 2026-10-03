@@ -37,7 +37,7 @@ Panduan alur kerja pengembangan, status pencapaian fase, dan checklist jaminan k
    - Logika integrasi pihak ketiga di `src/client/`.
    - Skema database di `src/models/` dengan validasi tag struct yang jelas.
 2. **Kesesuaian Database**:
-   - Pastikan kompatibel baik di Supabase PostgreSQL maupun SQLite lokal (`smktelkom_dev.db`).
+   - Gunakan PostgreSQL untuk staging/production; SQLite hanya sebagai driver eksplisit pada `development`/`test`, tanpa fallback saat PostgreSQL gagal.
    - Gunakan `serializer:json` untuk data array seperti daftar keahlian atau prospek karier.
 3. **Verifikasi Sebelum Selesai**:
    ```bash

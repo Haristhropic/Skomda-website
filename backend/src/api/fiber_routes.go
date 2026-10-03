@@ -5,6 +5,7 @@ package api
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -61,10 +62,33 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 	// 1. Health check
 	api.Get("/health", func(c *fiber.Ctx) error {
+		if config.DB == nil {
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"status":   "unavailable",
+				"database": "unavailable",
+			})
+		}
+		sqlDB, err := config.DB.DB()
+		if err != nil {
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"status":   "unavailable",
+				"database": "unavailable",
+			})
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		if err := sqlDB.PingContext(ctx); err != nil {
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"status":   "unavailable",
+				"database": "unavailable",
+			})
+		}
+
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"status":  "ok",
-			"service": "smktelkom-web-backend",
-			"engine":  "fiber-v2",
+			"status":   "ok",
+			"service":  "smktelkom-web-backend",
+			"engine":   "fiber-v2",
+			"database": "ok",
 		})
 	})
 
@@ -941,4 +965,3 @@ Siswa DTP dipersiapkan untuk meraih sertifikasi keahlian berstandar global yang 
 
 Pelajari silabus lengkap, portofolio karya, dan prospek karir di halaman resmi [Digital Talent Program](/program/digital-talent).`
 }
-

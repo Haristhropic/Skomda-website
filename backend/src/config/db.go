@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"gorm.io/driver/postgres"
 	"github.com/glebarez/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
 	"github.com/nademmm/smktelkom-web/backend/src/models"
@@ -19,29 +19,38 @@ var DB *gorm.DB
 // InitDB menginisialisasi koneksi database GORM, melakukan migrasi otomatis, dan seeder data awal.
 func InitDB(cfg Config) *gorm.DB {
 	var err error
-	if cfg.DatabaseURL != "" {
-		log.Println("menghubungkan ke Postgres DB via DATABASE_URL...")
-		DB, err = gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
-		if err != nil {
-			log.Printf("peringatan: gagal terhubung ke Postgres DB: %v. Menggunakan SQLite in-memory fallback untuk local dev.", err)
-			DB, err = gorm.Open(sqlite.Open("file:smktelkom_dev.db?cache=shared"), &gorm.Config{})
+	switch strings.ToLower(strings.TrimSpace(cfg.DatabaseDriver)) {
+	case "postgres":
+		if strings.TrimSpace(cfg.DatabaseURL) == "" {
+			log.Fatal("fatal: DATABASE_URL wajib diatur saat DATABASE_DRIVER=postgres")
 		}
-	} else {
-		log.Println("info: DATABASE_URL tidak di-set. Menggunakan SQLite (smktelkom_dev.db) fallback untuk local dev.")
-		log.Println("catatan: Untuk production, silakan setup Supabase dan tambahkan DATABASE_URL ke .env")
+		log.Println("menghubungkan ke PostgreSQL via DATABASE_URL...")
+		DB, err = gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
+	case "sqlite":
+		env := strings.ToLower(strings.TrimSpace(cfg.Env))
+		if env != "development" && env != "test" {
+			log.Fatalf("fatal: SQLite hanya diizinkan untuk development/test, bukan ENV=%q; gunakan DATABASE_DRIVER=postgres", cfg.Env)
+		}
+		log.Println("menggunakan SQLite lokal sesuai DATABASE_DRIVER=sqlite (tanpa fallback otomatis)")
 		DB, err = gorm.Open(sqlite.Open("file:smktelkom_dev.db?cache=shared"), &gorm.Config{})
+	default:
+		log.Fatalf("fatal: DATABASE_DRIVER tidak valid (%q); gunakan postgres atau sqlite", cfg.DatabaseDriver)
 	}
-
 	if err != nil {
-		log.Fatalf("fatal: gagal inisialisasi database: %v", err)
+		log.Fatalf("fatal: gagal inisialisasi database %s: %v", cfg.DatabaseDriver, err)
 	}
 
-	// Konfigurasi connection pooling untuk mencegah kebocoran koneksi di bawah beban tinggi
-	if sqlDB, err := DB.DB(); err == nil {
-		sqlDB.SetMaxOpenConns(25)
-		sqlDB.SetMaxIdleConns(5)
-		sqlDB.SetConnMaxLifetime(15 * time.Minute)
-		sqlDB.SetConnMaxIdleTime(5 * time.Minute)
+	// Pastikan koneksi benar-benar tersedia sebelum migrasi atau seeding berjalan.
+	sqlDB, err := DB.DB()
+	if err != nil {
+		log.Fatalf("fatal: gagal mendapatkan database connection pool: %v", err)
+	}
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxIdleConns(5)
+	sqlDB.SetConnMaxLifetime(15 * time.Minute)
+	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
+	if err := sqlDB.Ping(); err != nil {
+		log.Fatalf("fatal: database %s tidak dapat dijangkau; backend tidak akan berjalan: %v", cfg.DatabaseDriver, err)
 	}
 
 	// Migration tabel
@@ -347,6 +356,11 @@ func SeedDefaultAdminIfEmpty(db *gorm.DB) {
 	if count > 0 {
 		return
 	}
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = os.Getenv("APP_ENV")
+	}
+	isProduction := strings.EqualFold(strings.TrimSpace(env), "production")
 
 	admin := models.User{
 		Name:   "Super Admin SKOMDA",
@@ -357,7 +371,13 @@ func SeedDefaultAdminIfEmpty(db *gorm.DB) {
 
 	adminPassword := os.Getenv("ADMIN_DEFAULT_PASSWORD")
 	if adminPassword == "" {
+		if isProduction {
+			log.Fatal("[FATAL SECURITY] ADMIN_DEFAULT_PASSWORD wajib diatur (minimal 16 karakter) saat membuat akun admin awal di production")
+		}
 		adminPassword = "SkomdaAdmin2026!"
+	}
+	if isProduction && len(strings.TrimSpace(adminPassword)) < 16 {
+		log.Fatal("[FATAL SECURITY] ADMIN_DEFAULT_PASSWORD harus minimal 16 karakter saat membuat akun admin awal di production")
 	}
 
 	// Password default pengembang aman di-hash dengan bcrypt
@@ -481,4 +501,3 @@ func SeedTrialClassEventIfEmpty(db *gorm.DB) {
 		log.Println("berhasil menginisialisasi jadwal default Event Terdekat Trial Class.")
 	}
 }
-

@@ -100,7 +100,7 @@ Skomda-website/
 | HTTP Framework (Alternatif) | **Gin** | v1.10.0 | Switchable via SERVER_ENGINE=gin |
 | ORM | **GORM** | v1.31.2 | Auto-migrate, serializer JSON |
 | DB Driver (Production) | **gorm/driver/postgres** | v1.6.2 | via pgx v5 |
-| DB Driver (Development) | **glebarez/sqlite** | v1.11.0 | Pure-Go SQLite, tanpa CGO/GCC |
+| DB Driver (Development/Test) | **glebarez/sqlite** | v1.11.0 | Opt-in (`DATABASE_DRIVER=sqlite`); bukan fallback |
 | Autentikasi | **golang-jwt/jwt** | v5.3.1 | JWT Bearer token, HS256 |
 | Password Hashing | **golang.org/x/crypto** | v0.23.0 | bcrypt cost 12 |
 | Env Loader | **joho/godotenv** | v1.5.1 | Load .env ke os.Getenv |
@@ -115,9 +115,10 @@ Skomda-website/
 | Lingkungan | Database | Provider | Cara Koneksi |
 |---|---|---|---|
 | Production / Staging | **PostgreSQL** | Supabase | DATABASE_URL (connection string) |
-| Local Development | **SQLite** | File lokal | file:smktelkom_dev.db?cache=shared |
+| Local Development | **PostgreSQL (default) / SQLite (opt-in)** | Lokal atau Supabase / file lokal | `DATABASE_DRIVER` |
 
-> SQLite menggunakan driver `github.com/glebarez/sqlite` (Pure-Go, tanpa CGO/GCC). Jika DATABASE_URL di-set tapi koneksi ke Postgres gagal, backend **otomatis fallback** ke SQLite.
+> Staging dan production membutuhkan PostgreSQL yang dapat dijangkau saat startup. Koneksi gagal atau `DATABASE_URL` kosong akan menghentikan backend; tidak ada fallback otomatis.
+> SQLite hanya dapat dipilih secara eksplisit dengan `DATABASE_DRIVER=sqlite` untuk `development` atau `test`.
 
 ### 2.4. Infrastructure & Tooling
 
@@ -161,8 +162,7 @@ Skomda-website/
           v                    v                   v
    [ PostgreSQL      [ Cloudinary API    [ NexusRouter AI
      Supabase ]      Upload/Transform/    fahlyce.vercel.app ]
-     (fallback:         CDN Delivery ]
-      SQLite .db) ]
+                    CDN Delivery ]
 
           v
    [ Media Delivery ke Browser ]
@@ -174,7 +174,7 @@ Skomda-website/
 
 1. **Pemisahan Peran**: Frontend menangani UI, rendering, i18n. Seluruh mutasi data & komunikasi pihak ketiga via Backend Go.
 2. **Keamanan Kredensial**: Cloudinary Secret, JWT Secret, DATABASE_URL hanya di backend `.env`.
-3. **Ketahanan Layanan**: Postgres gagal - otomatis SQLite. AI gateway error - chatbot berikan info kontak sekolah.
+3. **Ketahanan Layanan**: Database utama gagal - backend tidak start dan health check gagal; AI gateway error - chatbot memberi info kontak sekolah.
 4. **Stealth Admin**: `/admin/*` tampil sebagai `404` untuk user tanpa token.
 
 ---
@@ -326,17 +326,16 @@ Request masuk
 ### 6.1. Konfigurasi
 
 ```
-Production:   PostgreSQL (Supabase)
+Production:   PostgreSQL (Supabase), DATABASE_DRIVER=postgres
               Driver: gorm.io/driver/postgres via jackc/pgx v5
               Koneksi: DATABASE_URL
               RLS: Row Level Security aktif di tabel utama
 
-Development:  SQLite (Pure-Go)
-              Driver: github.com/glebarez/sqlite
-              File: backend/smktelkom_dev.db
-              Mode: file:smktelkom_dev.db?cache=shared
+Development:  PostgreSQL (default) atau SQLite (hanya jika dipilih eksplisit)
+              PostgreSQL: DATABASE_URL
+              SQLite: DATABASE_DRIVER=sqlite
 
-Fallback:     DATABASE_URL di-set tapi koneksi gagal -> auto SQLite
+Startup:      database yang dipilih tidak tersedia -> backend berhenti; tidak ada fallback
 ```
 
 ### 6.2. Skema 14 Model GORM
@@ -687,7 +686,8 @@ Backend: simpan URL/public_id ke database via GORM
 | Variable | Contoh Nilai | Wajib | Deskripsi |
 |---|---|---|---|
 | `PORT` | `8080` | Ya | Port server backend |
-| `DATABASE_URL` | `postgres://user:pass@host:5432/db` | Ya (prod) | PostgreSQL connection string; kosong = SQLite |
+| `DATABASE_DRIVER` | `postgres` | Ya | `postgres` untuk production; `sqlite` hanya untuk development/test |
+| `DATABASE_URL` | `postgres://user:pass@host:5432/db` | Ya jika postgres | PostgreSQL connection string; wajib di staging/production |
 | `CLOUDINARY_URL` | `cloudinary://api_key:secret@cloud` | Ya | Credential Cloudinary |
 | `LLM_API_KEY` | `sk-ant-xxxxx` | Ya | API key NexusRouter AI |
 | `JWT_SECRET` | `min-32-char-random-string` | Ya | Secret sign & verify JWT (HS256) |
@@ -772,6 +772,6 @@ npm run start      # Jalankan production build
 | **Bahasa Backend** | Go 1.25.0 |
 | **Framework Frontend** | Next.js 16.3.0 |
 | **Database Primary** | PostgreSQL (Supabase) |
-| **Database Development** | SQLite (Pure-Go, file lokal) |
+| **Database Development/Test** | PostgreSQL default; SQLite opt-in |
 | **Total Model GORM** | 14 (termasuk 3 sub-model BKK) |
 | **Terakhir Diperbarui** | September 2026 |

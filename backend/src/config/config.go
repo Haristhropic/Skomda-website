@@ -12,16 +12,17 @@ import (
 )
 
 type Config struct {
-	Env             string // development | production | test
-	Port            string
-	DatabaseURL     string
-	CloudinaryURL   string
-	LLMAPIKey       string
-	JWTSecret       string
-	AllowedOrigin   string // origin frontend Next.js, untuk CORS
-	NexusRouterURL  string // URL NexusRouter AI gateway (default: http://localhost:3000)
-	ServerEngine    string // gin | fiber (default: gin)
-	ChatbotModel    string // Model AI untuk chatbot (default: llama-3.3-70b-versatile)
+	Env            string // development | production | test
+	Port           string
+	DatabaseDriver string // postgres | sqlite (sqlite hanya untuk development/test)
+	DatabaseURL    string
+	CloudinaryURL  string
+	LLMAPIKey      string
+	JWTSecret      string
+	AllowedOrigin  string // origin frontend Next.js, untuk CORS
+	NexusRouterURL string // URL NexusRouter AI gateway (default: http://localhost:3000)
+	ServerEngine   string // gin | fiber (default: gin)
+	ChatbotModel   string // Model AI untuk chatbot (default: llama-3.3-70b-versatile)
 }
 
 // Load membaca .env (kalau ada, biasanya cuma di local dev) lalu env var asli.
@@ -31,8 +32,9 @@ func Load() Config {
 	}
 
 	cfg := Config{
-		Env:            getEnv("ENV", getEnv("APP_ENV", "development")),
+		Env:            strings.ToLower(strings.TrimSpace(getEnv("ENV", getEnv("APP_ENV", "development")))),
 		Port:           getEnv("PORT", "8080"),
+		DatabaseDriver: strings.ToLower(getEnv("DATABASE_DRIVER", "postgres")),
 		DatabaseURL:    getEnv("DATABASE_URL", ""),
 		CloudinaryURL:  getEnv("CLOUDINARY_URL", ""),
 		LLMAPIKey:      getEnv("LLM_API_KEY", ""),

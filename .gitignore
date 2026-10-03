@@ -4,6 +4,8 @@
 *.env
 backend/.env
 frontend/.env*.local
+deploy.env
+.deployed-image-tag
 
 # Dependencies & Build Outputs
 node_modules/

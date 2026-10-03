@@ -8,7 +8,7 @@
 ![Fiber v2](https://img.shields.io/badge/Fiber_v2-High_Performance-00ACD7?style=for-the-badge)
 ![GORM](https://img.shields.io/badge/GORM-v1.31-7B1FA2?style=for-the-badge)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-336791?style=for-the-badge&logo=postgresql)
-![SQLite](https://img.shields.io/badge/SQLite-Dev_Fallback-003B57?style=for-the-badge&logo=sqlite)
+![PostgreSQL Required](https://img.shields.io/badge/PostgreSQL-Required-336791?style=for-the-badge&logo=postgresql)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-Media_CDN-3448C5?style=for-the-badge&logo=cloudinary)
 
 Web portal resmi dan Content Management System (CMS) terintegrasi untuk **SMK Telkom Sidoarjo (SKOMDA)**. Platform ini dirancang dengan standar industri modern untuk menghadirkan pengalaman pengguna berkecepatan tinggi (Core Web Vitals optimal), desain visual editorial modern berbasis neumorphism tactile, manajemen data sekolah yang menyeluruh, serta fitur inovasi pembelajaran vokasi digital.
@@ -35,6 +35,8 @@ Web portal resmi dan Content Management System (CMS) terintegrasi untuk **SMK Te
 
 ## 🏗️ Arsitektur Sistem
 
+Rancangan deployment production dan cakupan operasional (termasuk analitik, backup, security, dan scaling) ada di [`docs/production-architecture-design.md`](docs/production-architecture-design.md). Checklist setup VPS demo ada di [`docs/demo-vps-runbook.md`](docs/demo-vps-runbook.md).
+
 Platform ini mengadopsi pola arsitektur **Monorepo Terpisah (Decoupled Client-Server)** yang menghubungkan antarmuka web modern dengan service API backend berkecepatan tinggi:
 
 ```mermaid
@@ -47,8 +49,7 @@ graph TD
     FE -->|AI Chat Inquiries| Chatbot[Skomda Intelligence Chatbot]
     
     BE -->|Query & Mutations| GORM[GORM ORM Engine]
-    GORM -->|Production DB| PG[(Supabase PostgreSQL)]
-    GORM -->|Local Dev Fallback| SQLite[(Pure-Go SQLite: smktelkom_dev.db)]
+    GORM -->|DATABASE_URL in all environments| PG[(PostgreSQL: Supabase or local instance)]
     
     BE -->|Proxy Prompt| AI[NexusRouter AI Gateway]
     BE -->|Direct Upload Signatures| CDN
@@ -57,7 +58,7 @@ graph TD
 ### Keunggulan Arsitektur:
 - **Server-Side Rendering (SSR) & Static Generation (SSG)**: Rendering halaman instan dengan skor performa Lighthouse dan Core Web Vitals yang tinggi.
 - **Dual-Engine Backend**: Mengutamakan Go Fiber v2 (berbasis Fasthttp) untuk throughput request maksimal dengan latensi rendah, serta kompatibilitas alternatif Gin engine.
-- **Resilient Database Layer**: Transisi otomatis tanpa konfigurasi rumit; berjalan mulus pada SQLite lokal saat tahap pengembangan dan terkoneksi ke Supabase PostgreSQL saat tahap deployment produksi.
+- **Database Layer**: SQLite hanya dapat dipilih eksplisit untuk development/test; staging dan production wajib PostgreSQL. Koneksi gagal tidak pernah memicu perpindahan database otomatis.
 - **Hybrid Media Delivery**: Aset gambar diproses dinamis oleh Cloudinary dengan optimasi format otomatis (AVIF/WebP) dan smart face detection (`g_face`), sementara ikon SVG penting disajikan secara lokal.
 
 ---
@@ -206,7 +207,7 @@ sequenceDiagram
 | **Web Framework** | Fiber v2 | `v2.52.5` | Framework web Go berbasis Fasthttp dengan performa tinggi |
 | **ORM Database** | GORM | `v1.31` | Object-Relational Mapping dengan auto-migration |
 | **Database Produksi** | PostgreSQL (Supabase) | Cloud | Penyimpanan relasional terpusat untuk staging dan production |
-| **Database Lokal** | SQLite (Pure-Go) | Driver `glebarez` | Database lokal tanpa dependensi CGO untuk kemudahan setup |
+| **Database Development** | PostgreSQL (default) / SQLite (opt-in) | Drivers GORM | SQLite hanya dengan `DATABASE_DRIVER=sqlite` dan hanya pada `development` atau `test` |
 | **Media CDN** | Cloudinary API | V2 SDK | Optimasi gambar dinamis, deteksi wajah, dan direct upload signing |
 | **AI Gateway** | NexusRouter / Groq | Llama 3.3 70B | Pemrosesan asisten cerdas Skomda Intelligence |
 | **Autentikasi** | Golang-JWT | `v5` | Token-based authentication untuk proteksi admin panel |
@@ -323,7 +324,7 @@ cd Skomda-website
    go run ./src/cmd/server
    ```
    Server backend akan aktif di `http://localhost:8080`.
-   *(Catatan: Jika `DATABASE_URL` tidak diisi, backend otomatis menggunakan file SQLite lokal `smktelkom_dev.db` dan melakukan auto-seed data default).*
+   *(Gunakan `DATABASE_DRIVER=postgres` dan isi `DATABASE_URL`; atau pilih `DATABASE_DRIVER=sqlite` secara eksplisit hanya untuk development lokal/test. Backend tidak berpindah database otomatis.)*
 
 ---
 
@@ -364,8 +365,9 @@ cd Skomda-website
 ENV=development
 PORT=8080
 
-# Kosongkan DATABASE_URL untuk menggunakan SQLite lokal secara otomatis
-DATABASE_URL=
+# PostgreSQL untuk staging/production; SQLite hanya jika sengaja dipilih di development/test.
+DATABASE_DRIVER=postgres
+DATABASE_URL=postgres://user:password@localhost:5432/smktelkom
 
 # Konfigurasi Cloudinary Media Storage
 CLOUDINARY_URL=cloudinary://<API_KEY>:<API_SECRET>@<CLOUD_NAME>

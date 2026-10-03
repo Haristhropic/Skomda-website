@@ -11,8 +11,9 @@ Service REST API backend untuk website resmi **SMK Telkom Sidoarjo**, dibangun m
   - **Gin**: Engine alternatif yang stabil dan kompatibel penuh dengan middleware standar HTTP.
   - Berganti engine secara instan hanya dengan mengatur environment variable `SERVER_ENGINE=fiber` atau `SERVER_ENGINE=gin`.
 - **Database & Auto-Migration (GORM)**:
-  - Terhubung ke **Supabase PostgreSQL** untuk lingkungan staging dan produksi.
-  - Fallback otomatis ke **Pure-Go SQLite** (`smktelkom_dev.db` via `github.com/glebarez/sqlite`) saat `DATABASE_URL` kosong, sehingga local development dapat langsung berjalan tanpa perlu menginstal server database eksternal.
+  - Terhubung ke **PostgreSQL** melalui `DATABASE_URL` (Supabase untuk staging dan produksi).
+  - PostgreSQL wajib untuk staging dan production; backend mengecek koneksi saat startup dan berhenti jika database tidak tersedia.
+  - SQLite lokal hanya bisa dipilih eksplisit dengan `DATABASE_DRIVER=sqlite` di luar production. Kegagalan koneksi Postgres tidak pernah memicu fallback otomatis.
   - Auto-seeding otomatis untuk data resmi Program Keahlian (**SIJA 4 Tahun** & **TJAT 3 Tahun**), akun Super Admin awal, artikel berita, data DTP, dan fasilitas.
 - **Autentikasi JWT & Otorisasi Role-Based**:
   - Proteksi rute admin menggunakan token JWT (`golang-jwt/jwt/v5`).
@@ -57,7 +58,7 @@ backend/
 │   │   └── server/               # Unified entrypoint: main.go (mendukung switch Fiber & Gin)
 │   ├── config/
 │   │   ├── config.go             # Environment variable loader via godotenv
-│   │   └── db.go                 # Inisialisasi GORM, koneksi Postgres/SQLite, & data seeders
+│   │   └── db.go                 # Inisialisasi GORM, koneksi PostgreSQL/SQLite lokal, & data seeders
 │   └── models/                   # Definisi skema GORM
 │       ├── alumni.go             # Skema data alumni & tracer study
 │       ├── audit_log.go          # Skema jejak audit aktivitas admin
@@ -73,7 +74,6 @@ backend/
 │       ├── teacher.go            # Skema direktori guru & tendik
 │       ├── trial_class.go        # Skema pendaftaran Trial Class & tiket masuk
 │       └── user.go               # Skema akun admin & password hash
-├── smktelkom_dev.db              # Database SQLite lokal (dibuat otomatis untuk dev)
 ├── Dockerfile                    # Konfigurasi container backend
 ├── go.mod                        # Modul Go & dependensi
 └── go.sum                        # Checksum dependensi Go
@@ -98,10 +98,12 @@ Contoh konfigurasi `.env`:
 ```env
 ENV=development
 PORT=8080
-DATABASE_URL=                          # Kosongkan untuk menggunakan SQLite lokal otomatis
+DATABASE_DRIVER=postgres          # postgres; pilih sqlite hanya eksplisit untuk pengembangan lokal
+DATABASE_URL=postgres://user:password@localhost:5432/smktelkom
 CLOUDINARY_URL=cloudinary://<key>:<secret>@<cloud_name>
 LLM_API_KEY=
-JWT_SECRET=rahasia-jwt-skomda-2026
+JWT_SECRET=                         # Isi random secret kuat; wajib minimal 16 karakter di production
+ADMIN_DEFAULT_PASSWORD=             # Isi password acak minimal 16 karakter sebelum startup production pertama
 ALLOWED_ORIGIN=http://localhost:3001
 NEXUS_ROUTER_URL=https://fahlyce.vercel.app
 CHATBOT_MODEL=llama-3.3-70b-versatile    # Model chatbot cepat (Groq Llama 3.3 70B)

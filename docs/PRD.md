@@ -116,5 +116,5 @@ Website resmi SMK Telkom Sidoarjo sebelumnya menghadapi sejumlah tantangan opera
 
 1. **Konfirmasi Program Keahlian**: Resmi disepakati dan dikunci pada 2 program keahlian vokasi: **SIJA (4 Tahun)** dan **TJAT (3 Tahun)**. Informasi lama mengenai TKJ/RPL/TAV telah diperbarui di seluruh basis kode.
 2. **Arsitektur Backend**: Backend menggunakan **Go dengan arsitektur Dual-Engine (Fiber v2 default & Gin)** serta GORM untuk kecepatan eksekusi tinggi dan efisiensi memori.
-3. **Database Local vs Cloud**: Menggunakan **Supabase PostgreSQL** untuk produksi dan **Pure-Go SQLite** untuk lokal tanpa dependensi tambahan.
+3. **Database Local vs Cloud**: Staging/production memakai **Supabase PostgreSQL**. SQLite hanya boleh dipilih eksplisit untuk `development`/`test`; kegagalan PostgreSQL tidak pernah memicu fallback otomatis.
 4. **Strategi Media**: Menggunakan strategi hibrida Cloudinary (CDN foto konten, lokal untuk SVG dan ikon).

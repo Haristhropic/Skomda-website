@@ -1,0 +1,58 @@
+name: skomda-demo
+
+services:
+  backend:
+    image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER in deploy.env}/skomda-backend:${IMAGE_TAG:-demo-latest}
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      ENV: production
+      DATABASE_DRIVER: postgres
+      SERVER_ENGINE: fiber
+      PORT: "8080"
+      ALLOWED_ORIGIN: ${FRONTEND_ORIGIN:-https://linear.smktelkom-sidoarjo.my.id}
+    ports:
+      - "127.0.0.1:${BACKEND_HOST_PORT:-8080}:8080"
+    mem_limit: ${BACKEND_MEMORY_LIMIT:-512m}
+    cpus: ${BACKEND_CPU_LIMIT:-0.75}
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    networks:
+      - app
+
+  frontend:
+    image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER in deploy.env}/skomda-frontend:${IMAGE_TAG:-demo-latest}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      BACKEND_API_URL: http://backend:8080/api
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${FRONTEND_HOST_PORT:-3000}:3000"
+    mem_limit: ${FRONTEND_MEMORY_LIMIT:-768m}
+    cpus: ${FRONTEND_CPU_LIMIT:-1.0}
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
