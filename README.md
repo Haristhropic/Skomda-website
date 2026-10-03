@@ -1,4 +1,4 @@
-# SMK Telkom Sidoarjo: Official Web Portal & School Management System
+# SMK Telkom Sidoarjo: Official Web Portal & Schoo
 
 ![Next.js 16](https://img.shields.io/badge/Next.js-16.3.0-black?style=for-the-badge&logo=next.js)
 ![React 19](https://img.shields.io/badge/React-19.2.8-blue?style=for-the-badge&logo=react)

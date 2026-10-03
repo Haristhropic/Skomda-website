@@ -21,13 +21,19 @@ import {
 } from "lucide-react";
 
 import { useLanguage } from "@/context/LanguageContext";
-import { isDtpQuery, getDtpChatbotResponse, type ChatSource } from "./dtpChatbotKnowledge";
+import {
+  isDtpQuery,
+  getDtpChatbotResponse,
+  getFollowUpSuggestions,
+  type ChatSource,
+} from "./dtpChatbotKnowledge";
 
 interface Message {
   id: string;
   role: "assistant" | "user";
   content: string;
   sources?: ChatSource[];
+  suggestedQuestions?: string[];
   timestamp: string;
   isStreaming?: boolean;
 }
@@ -253,6 +259,12 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             clearInterval(activeStreamIntervalRef.current);
             activeStreamIntervalRef.current = null;
           }
+          const followUps = getFollowUpSuggestions(
+            query,
+            dtpData.content,
+            isEn,
+            messages.map((m) => m.content)
+          );
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === botMsgId
@@ -260,6 +272,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                     ...msg,
                     content: dtpData.content,
                     sources: dtpData.sources,
+                    suggestedQuestions: followUps,
                     isStreaming: false,
                   }
                 : msg
@@ -456,14 +469,22 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
         }
 
         const cleanFinal = accumulatedText.replace(/<think>[\s\S]*?(<\/think>|$)/gi, "").trim();
+        const finalBotText = cleanFinal || accumulatedText || "Halo! Ada yang bisa saya bantu seputar informasi SMK Telkom Sidoarjo?";
+        const followUps = getFollowUpSuggestions(
+          query,
+          finalBotText,
+          isEn,
+          messages.map((m) => m.content)
+        );
 
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === botMsgId
               ? {
                 ...msg,
-                content: cleanFinal || accumulatedText || "Halo! Ada yang bisa saya bantu seputar informasi SMK Telkom Sidoarjo?",
+                content: finalBotText,
                 sources: collectedSources,
+                suggestedQuestions: followUps,
                 isStreaming: false,
               }
               : msg
@@ -482,14 +503,22 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                   ? data.content
                   : "Maaf, tidak ada respon dari sistem.";
         const cleanContent = rawContent.replace(/<think>[\s\S]*?(<\/think>|$)/gi, "").trim();
+        const finalBotText = cleanContent || rawContent;
+        const followUps = getFollowUpSuggestions(
+          query,
+          finalBotText,
+          isEn,
+          messages.map((m) => m.content)
+        );
 
         setMessages((prev) =>
           prev.map((msg) =>
             msg.id === botMsgId
               ? {
                 ...msg,
-                content: cleanContent || rawContent,
+                content: finalBotText,
                 sources: data.sources || [],
+                suggestedQuestions: followUps,
                 isStreaming: false,
               }
               : msg
@@ -501,7 +530,10 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       const lower = query.toLowerCase();
       let offlineReply =
         "Halo! Saat ini sistem kami sedang dalam pemeliharaan berkala. Untuk informasi resmi, silakan hubungi Humas SMK Telkom Sidoarjo di **0811-3021-919** atau kunjungi halaman **PPDB**.";
-      let fallbackSources: ChatSource[] = [];
+      let fallbackSources: ChatSource[] = [
+        { title: "Portal Pendaftaran PPDB", url: "/ppdb" },
+        { title: "Unduh Brosur Informasi", url: "/unduh-informasi" },
+      ];
 
       if (isDtpQuery(query)) {
         const dtpData = getDtpChatbotResponse(isEn);
@@ -510,13 +542,32 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       } else if (lower.includes("sija") || lower.includes("rekayasa")) {
         offlineReply =
           "**Jurusan SIJA (Sistem Informatika, Jaringan, dan Aplikasi)** merupakan program keahlian unggulan 4 tahun yang mencakup pengembangan Full-Stack Web & Mobile, Cloud Computing (AWS/GCP), Cybersecurity, dan Internet of Things. Lulusan dipersiapkan setara D1/D2 dengan sertifikasi industri AWS Academy dan BNSP.";
+        fallbackSources = [
+          { title: "Profil Jurusan SIJA (4 Tahun)", url: "/jurusan/sija" },
+          { title: "Alur PPDB 2026/2027", url: "/ppdb" },
+        ];
       } else if (lower.includes("tjat") || lower.includes("telekomunikasi") || lower.includes("fiber")) {
         offlineReply =
           "**Jurusan TJAT (Teknik Jaringan Akses Telekomunikasi)** adalah program keahlian 3 tahun dengan spesialisasi instalasi fiber optik (FTTH/FTTx), transmisi wireless & seluler 4G/5G, serta konfigurasi jaringan telekomunikasi ISP dengan sertifikasi Telkom Group.";
+        fallbackSources = [
+          { title: "Profil Jurusan TJAT (3 Tahun)", url: "/jurusan/tjat" },
+          { title: "Alur PPDB 2026/2027", url: "/ppdb" },
+        ];
       } else if (lower.includes("daftar") || lower.includes("ppdb") || lower.includes("syarat")) {
         offlineReply =
           "Pendaftaran Peserta Didik Baru (PPDB) SMK Telkom Sidoarjo tahun ajaran 2026/2027 dapat diakses melalui portal resmi atau langsung ke Sekretariat Panitia di Kampus Jl. Pahlawan No. 27 Sekardangan Sidoarjo.";
+        fallbackSources = [
+          { title: "Portal Pendaftaran PPDB", url: "/ppdb" },
+          { title: "Unduh Brosur Informasi", url: "/unduh-informasi" },
+        ];
       }
+
+      const followUps = getFollowUpSuggestions(
+        query,
+        offlineReply,
+        isEn,
+        messages.map((m) => m.content)
+      );
 
       setMessages((prev) =>
         prev.map((msg) =>
@@ -525,6 +576,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
               ...msg,
               content: offlineReply,
               sources: fallbackSources,
+              suggestedQuestions: followUps,
               isStreaming: false,
             }
             : msg
@@ -675,7 +727,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                     return <ThinkingState />;
                   }
                   if (clean) {
-                    return <MarkdownRenderer content={clean} isStreaming={msg.isStreaming} />;
+                    return <MarkdownRenderer content={clean} isStreaming={msg.isStreaming} onClose={onClose} />;
                   }
                   return null;
                 })()}
@@ -684,7 +736,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                   <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-col gap-1.5 text-[11px]">
                     <div className="flex items-center gap-1.5 font-semibold text-slate-500 uppercase tracking-wider text-[10px]">
                       <School className="size-3 text-[#bc0c11]" />
-                      <span>Halaman Terkait:</span>
+                      <span>{isEn ? "Related Pages:" : "Halaman Terkait:"}</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {msg.sources.slice(0, 3).map((src, idx) => (
@@ -692,7 +744,12 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                           key={idx}
                           href={src.url}
                           target={src.url.startsWith("http") ? "_blank" : undefined}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100/90 text-slate-800 hover:bg-red-50 hover:text-[#bc0c11] border border-slate-200/70 hover:border-red-200 transition-all font-medium text-xs shadow-2xs min-h-[32px]"
+                          onClick={() => {
+                            if (!src.url.startsWith("http")) {
+                              onClose();
+                            }
+                          }}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100/90 text-slate-800 hover:bg-red-50 hover:text-[#bc0c11] border border-slate-200/70 hover:border-red-200 transition-all font-medium text-xs shadow-2xs min-h-[36px]"
                         >
                           <span>{src.title}</span>
                           <ExternalLink className="size-2.5 shrink-0 text-[#bc0c11] opacity-75" />
@@ -743,7 +800,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           <div className="pt-2">
             <p className="font-jakarta text-xs font-semibold text-slate-500 mb-2.5 flex items-center gap-1.5">
               <Sparkles className="size-3.5 text-[#bc0c11]" />
-              Pertanyaan Populer:
+              {isEn ? "Popular Questions:" : "Pertanyaan Populer:"}
             </p>
             <div className="flex flex-col gap-2">
               {quickPrompts.map((prompt: string, index: number) => (
@@ -758,6 +815,46 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             </div>
           </div>
         )}
+
+        {messages.length > 1 &&
+          !isLoading &&
+          (() => {
+            const lastMsg = messages[messages.length - 1];
+            if (!lastMsg || lastMsg.role !== "assistant" || lastMsg.isStreaming) {
+              return null;
+            }
+            const suggestions =
+              lastMsg.suggestedQuestions && lastMsg.suggestedQuestions.length > 0
+                ? lastMsg.suggestedQuestions
+                : getFollowUpSuggestions(
+                    "",
+                    lastMsg.content,
+                    isEn,
+                    messages.map((m) => m.content)
+                  );
+            if (!suggestions || suggestions.length === 0) return null;
+
+            return (
+              <div className="pt-2">
+                <p className="font-jakarta text-xs font-semibold text-slate-500 mb-2.5 flex items-center gap-1.5">
+                  <Sparkles className="size-3.5 text-[#bc0c11]" />
+                  {isEn ? "Popular Questions:" : "Pertanyaan Populer:"}
+                </p>
+                <div className="flex flex-col gap-2">
+                  {suggestions.map((prompt: string, index: number) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleSendMessage(prompt)}
+                      className="text-left font-jakarta text-xs text-slate-700 bg-white hover:bg-red-50/70 hover:text-[#bc0c11] hover:border-[#bc0c11]/30 p-3 min-h-[44px] flex items-center rounded-xl border border-slate-200/80 transition-all duration-150 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-[#bc0c11] cursor-pointer"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
         <div ref={messagesEndRef} />
 
@@ -818,9 +915,10 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
 interface MarkdownRendererProps {
   content: string;
   isStreaming?: boolean;
+  onClose?: () => void;
 }
 
-function MarkdownRenderer({ content, isStreaming }: MarkdownRendererProps) {
+function MarkdownRenderer({ content, isStreaming, onClose }: MarkdownRendererProps) {
   const cleanContent = content
     .replace(/<think>[\s\S]*?(<\/think>|$)/gi, "")
     .replace(/—/g, " - ")
@@ -904,6 +1002,11 @@ function MarkdownRenderer({ content, isStreaming }: MarkdownRendererProps) {
                 href={href || "#"}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
+                onClick={() => {
+                  if (!isExternal && onClose) {
+                    onClose();
+                  }
+                }}
                 className="inline-flex items-center gap-0.5 font-semibold text-[#bc0c11] underline underline-offset-2 hover:text-[#990a0e] transition-colors"
               >
                 <span>{children}</span>

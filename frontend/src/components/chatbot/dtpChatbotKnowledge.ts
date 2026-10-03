@@ -168,3 +168,190 @@ export function getDtpChatbotResponse(isEn: boolean) {
     sources: isEn ? DTP_SOURCES_EN : DTP_SOURCES_ID,
   };
 }
+
+interface TopicSuggestion {
+  keywords: string[];
+  id: string[];
+  en: string[];
+}
+
+const TOPIC_SUGGESTIONS: TopicSuggestion[] = [
+  {
+    keywords: ["dtp", "digital talent", "spesialisasi", "peminatan", "software", "cyber", "cloud", "iot", "designer", "specialist"],
+    id: [
+      "Apa saja 9 spesialisasi di Digital Talent Program?",
+      "Sertifikasi industri apa saja yang didapat siswa DTP?",
+      "Bagaimana peluang magang dan prospek karir lulusan DTP?",
+    ],
+    en: [
+      "What are the 9 specializations in the Digital Talent Program?",
+      "What international certifications do DTP students earn?",
+      "What are the internship and career prospects for DTP graduates?",
+    ],
+  },
+  {
+    keywords: ["sija", "rekayasa", "aplikasi", "komputer", "programming", "coding", "developer"],
+    id: [
+      "Apa keunggulan program SIJA 4 tahun dibanding SMK biasa?",
+      "Teknologi dan bahasa pemrograman apa yang dipelajari di SIJA?",
+      "Berapa biaya pendaftaran PPDB untuk jurusan SIJA?",
+    ],
+    en: [
+      "What are the advantages of the 4-year SIJA program?",
+      "What programming languages and tech stacks are taught in SIJA?",
+      "What are the admission fees for the SIJA major?",
+    ],
+  },
+  {
+    keywords: ["tjat", "telekomunikasi", "fiber", "jaringan", "transmisi", "akses", "optik", "wireless"],
+    id: [
+      "Apa perbedaan utama jurusan TJAT dan SIJA?",
+      "Sertifikasi keahlian apa yang diperoleh di jurusan TJAT?",
+      "Bagaimana prospek kerja lulusan TJAT di industri telekomunikasi?",
+    ],
+    en: [
+      "What is the key difference between TJAT and SIJA?",
+      "What professional certifications are earned in TJAT?",
+      "What are the career prospects for TJAT graduates in telecom?",
+    ],
+  },
+  {
+    keywords: ["ppdb", "daftar", "pendaftaran", "syarat", "biaya", "spp", "gelombang", "tes", "jadwal"],
+    id: [
+      "Apa saja persyaratan berkas untuk mendaftar PPDB 2026/2027?",
+      "Berapa rincian biaya pendaftaran dan SPP di SMK Telkom Sidoarjo?",
+      "Bagaimana tahapan tes seleksi dan jalur prestasi PPDB?",
+    ],
+    en: [
+      "What are the document requirements for PPDB 2026/2027?",
+      "What is the breakdown of admission fees and tuition?",
+      "How do the selection test and merit admission pathways work?",
+    ],
+  },
+  {
+    keywords: ["bmw", "bekerja", "kuliah", "melanjutkan", "wirausaha", "karir", "alumni", "lulusan"],
+    id: [
+      "Bagaimana sekolah menyalurkan lulusan yang ingin langsung bekerja?",
+      "Kampus PTN/PTS mana saja yang menjadi mitra jalur kuliah?",
+      "Bagaimana program pembinaan wirausaha siswa di Skomda?",
+    ],
+    en: [
+      "How does the school place graduates who want to work immediately?",
+      "Which universities partner with Skomda for higher education?",
+      "How does the school mentor student entrepreneurs?",
+    ],
+  },
+  {
+    keywords: ["kos", "kost", "asrama", "tinggal", "biaya hidup", "makan", "luar kota", "lokasi", "alamat"],
+    id: [
+      "Berapa estimasi biaya sewa kos dan makan per bulan di sekitar sekolah?",
+      "Apakah ada rekomendasi kos putra/putri yang dekat dan aman?",
+      "Bagaimana akses transportasi umum dari kos ke kampus Skomda?",
+    ],
+    en: [
+      "What is the estimated monthly cost for boarding and meals near school?",
+      "Are there safe boarding recommendations for students near campus?",
+      "What public transit options are available to the school?",
+    ],
+  },
+  {
+    keywords: ["fasilitas", "lab", "gedung", "ekskul", "ekstrakurikuler", "prestasi", "sarana"],
+    id: [
+      "Fasilitas lab teknologi apa saja yang ada di SMK Telkom Sidoarjo?",
+      "Apa saja pilihan ekstrakurikuler bidang IT dan non-IT di Skomda?",
+      "Prestasi membanggakan apa saja yang diraih siswa Skomda?",
+    ],
+    en: [
+      "What technology lab facilities exist at SMK Telkom Sidoarjo?",
+      "What IT and non-IT extracurricular clubs can students join?",
+      "What notable achievements have Skomda students earned?",
+    ],
+  },
+];
+
+const DEFAULT_POOL_ID = [
+  "Apa saja pilar Program BMW di SMK Telkom Sidoarjo?",
+  "Apa itu Digital Talent Program (DTP) dan 9 spesialisasinya?",
+  "Apa perbedaan jurusan SIJA (4 tahun) dan TJAT (3 tahun)?",
+  "Bagaimana alur dan syarat pendaftaran PPDB 2026/2027?",
+  "Berapa estimasi biaya hidup dan sewa kos di sekitar sekolah?",
+  "Fasilitas lab teknologi apa saja yang tersedia di kampus Skomda?",
+];
+
+const DEFAULT_POOL_EN = [
+  "What are the pillars of the BMW Program at SMK Telkom Sidoarjo?",
+  "What is the Digital Talent Program (DTP) and its 9 specializations?",
+  "What is the difference between SIJA (4-year) and TJAT (3-year)?",
+  "How does the admission process for PPDB 2026/2027 work?",
+  "What is the estimated cost of living and boarding near school?",
+  "What technology labs and facilities are available on campus?",
+];
+
+export function getFollowUpSuggestions(
+  query: string,
+  responseContent: string,
+  isEn: boolean,
+  askedQuestions: string[] = []
+): string[] {
+  const combinedText = `${query} ${responseContent}`.toLowerCase();
+  const askedNormalized = new Set(
+    askedQuestions.map((q) => q.toLowerCase().replace(/[^a-z0-9]/g, ""))
+  );
+  if (query) {
+    askedNormalized.add(query.toLowerCase().replace(/[^a-z0-9]/g, ""));
+  }
+
+  const results: string[] = [];
+
+  // Match topic by frequency of keyword hits
+  let bestTopic: TopicSuggestion | null = null;
+  let highestScore = 0;
+
+  for (const topic of TOPIC_SUGGESTIONS) {
+    let score = 0;
+    for (const kw of topic.keywords) {
+      if (combinedText.includes(kw)) {
+        score += 1;
+      }
+    }
+    if (score > highestScore) {
+      highestScore = score;
+      bestTopic = topic;
+    }
+  }
+
+  // Add suggestions from best topic
+  if (bestTopic) {
+    const list = isEn ? bestTopic.en : bestTopic.id;
+    for (const item of list) {
+      const norm = item.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (!askedNormalized.has(norm) && !results.includes(item)) {
+        results.push(item);
+        if (results.length >= 3) break;
+      }
+    }
+  }
+
+  // Backfill with default pool if needed
+  const pool = isEn ? DEFAULT_POOL_EN : DEFAULT_POOL_ID;
+  for (const item of pool) {
+    if (results.length >= 3) break;
+    const norm = item.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!askedNormalized.has(norm) && !results.includes(item)) {
+      results.push(item);
+    }
+  }
+
+  // Ensure at least 2 items even if everything was somehow matched
+  if (results.length < 2) {
+    for (const item of pool) {
+      if (!results.includes(item)) {
+        results.push(item);
+      }
+      if (results.length >= 2) break;
+    }
+  }
+
+  return results.slice(0, 3);
+}
+
