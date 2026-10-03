@@ -25,11 +25,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"gorm.io/gorm"
 
-	"github.com/nademmm/smktelkom-web/backend/src/api/auth"
-	"github.com/nademmm/smktelkom-web/backend/src/api/middleware"
-	"github.com/nademmm/smktelkom-web/backend/src/client/cloudinary"
-	"github.com/nademmm/smktelkom-web/backend/src/config"
-	"github.com/nademmm/smktelkom-web/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/api/auth"
+	"github.com/haristhropic/skomda-website/backend/src/api/middleware"
+	"github.com/haristhropic/skomda-website/backend/src/client/cloudinary"
+	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 )
 
 // NewFiberApp menginisialisasi router Fiber beserta middleware dan seluruh route domain.

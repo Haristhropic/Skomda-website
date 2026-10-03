@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/nademmm/smktelkom-web/backend/src/utils"
+	"github.com/haristhropic/skomda-website/backend/src/utils"
 )
 
 // AuthMiddleware memverifikasi token JWT dari HttpOnly cookie atau header Authorization.

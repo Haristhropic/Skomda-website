@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nademmm/smktelkom-web/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/config"
 )
 
 // ChatMessage merepresentasikan satu pesan dalam riwayat percakapan.

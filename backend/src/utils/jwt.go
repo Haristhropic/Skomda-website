@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/nademmm/smktelkom-web/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 )
 
 // JWTClaims merepresentasikan payload claims untuk otentikasi admin.

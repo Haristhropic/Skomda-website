@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/nademmm/smktelkom-web/backend/src/config"
-	"github.com/nademmm/smktelkom-web/backend/src/models"
-	"github.com/nademmm/smktelkom-web/backend/src/utils"
+	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/utils"
 )
 
 // LoginHandler menangani autentikasi pengguna panel admin dan menerbitkan HttpOnly cookie.

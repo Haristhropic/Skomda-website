@@ -8,9 +8,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
-	"github.com/nademmm/smktelkom-web/backend/src/api/middleware"
-	"github.com/nademmm/smktelkom-web/backend/src/config"
-	"github.com/nademmm/smktelkom-web/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/api/middleware"
+	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 )
 
 // registerCrudRoutes mendaftarkan seluruh endpoint CRUD untuk Guru, Prestasi, BKK, Ekskul, Fasilitas, Dokumen, dan Pengaturan.

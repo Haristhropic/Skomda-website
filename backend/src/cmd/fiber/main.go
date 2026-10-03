@@ -5,8 +5,8 @@ package main
 import (
 	"log"
 
-	"github.com/nademmm/smktelkom-web/backend/src/api"
-	"github.com/nademmm/smktelkom-web/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/api"
+	"github.com/haristhropic/skomda-website/backend/src/config"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/nademmm/smktelkom-web/backend
+module github.com/haristhropic/skomda-website/backend
 
 go 1.25.0
 

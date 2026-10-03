@@ -11,7 +11,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/nademmm/smktelkom-web/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 )
 
 var DB *gorm.DB

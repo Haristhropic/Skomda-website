@@ -12,8 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"github.com/nademmm/smktelkom-web/backend/src/config"
-	"github.com/nademmm/smktelkom-web/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 )
 
 // RegisterRoutes mendaftarkan route CRUD berita ke router group Gin.

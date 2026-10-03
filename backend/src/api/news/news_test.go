@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
-	"github.com/nademmm/smktelkom-web/backend/src/api/news"
-	"github.com/nademmm/smktelkom-web/backend/src/config"
-	"github.com/nademmm/smktelkom-web/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/api/news"
+	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 )
 
 func setupTestDB() {

@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/nademmm/smktelkom-web/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 )
 
 // SeedAllEntities telah dinonaktifkan permanen sesuai instruksi.
