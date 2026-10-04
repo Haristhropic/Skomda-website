@@ -162,6 +162,220 @@ DTP students are prepared for globally recognized certifications:
 
 Explore the full curriculum, project portfolios, and career pathways on our official [Digital Talent Program](/program/digital-talent) page.`;
 
+export const DTP_SPECIALIZATIONS_ID = `### 9 Spesialisasi Industri Digital Talent Program (DTP) SMK Telkom Sidoarjo
+
+SMK Telkom Sidoarjo menyediakan **9 Pilihan Spesialisasi Industri** dalam Digital Talent Program yang dikelompokkan ke dalam 4 klaster keahlian utama:
+
+#### 1. Klaster Software & Artificial Intelligence
+- **Software Developer:** Pembuatan website dan aplikasi modern, perancangan database terstruktur, RESTful API, penguasaan framework modern (Laravel, React, Node.js), hingga deployment aplikasi dengan container Docker di Linux Server.
+- **Artificial Intelligence (AI) Specialist:** Pengembangan kecerdasan buatan terapan, pemrograman Python untuk data & AI, analisis data (EDA), Machine Learning, Deep Learning, Natural Language Processing (NLP), Computer Vision, dan implementasi model AI siap pakai untuk kebutuhan industri.
+
+#### 2. Klaster Network & Cloud Computing
+- **Network System Administrator:** Pengelolaan dan pemeliharaan server fisik maupun virtual (Linux Server, Windows Server, Proxmox, VMware) agar operasional sistem enterprise stabil, aman, dan memiliki ketersediaan tinggi (*high availability*).
+- **Network Infrastructure Engineer:** Pembangunan infrastruktur jaringan telekomunikasi berkecepatan tinggi: terminasi & penyambungan kabel fiber optic (*splicing*), pengukuran OTDR, konfigurasi OLT/ONT, serta routing & switching MikroTik.
+- **Cloud Engineer:** Penyusunan dan pengelolaan arsitektur cloud computing (AWS, Google Cloud Platform, Microsoft Azure), virtualisasi, Docker containerization, otomasi pipeline CI/CD (GitHub Actions), serta sistem observabilitas/monitoring server.
+
+#### 3. Klaster Hardware & Cyber Security
+- **Internet of Things (IoT) Engineer:** Integrasi perangkat keras dan internet: pemrograman mikrokontroler (ESP32 / MicroPython), sensor cerdas & aktuator industri, komunikasi data protokol IoT (MQTT & HTTP), serta dashboard monitoring real-time.
+- **Cyber Security Specialist:** Keamanan sistem informasi dan infrastruktur data: identifikasi kerentanan (*vulnerability assessment*), pengujian penetrasi (*penetration testing* web & network), pertahanan jaringan, ethical hacking, dan pemahaman fondasi Security Operations Center (SOC).
+
+#### 4. Klaster Design & Creative Media
+- **Visual Communication Designer:** Eksplorasi komunikasi visual terpadu: perancangan identitas brand, desain UI/UX & interactive prototyping Figma, motion graphics, videografi & fotografi profesional, serta produksi konten digital kreatif.
+- **Digital Marketing Specialist:** Strategi pemasaran digital komprehensif: riset pasar & buyer persona, creative copywriting, optimasi mesin pencari (SEO & SEM Google Ads), periklanan berbayar media sosial (Meta Ads Manager), dan analitik performa konversi.
+
+Pelajari silabus lengkap dan portofolio karya di halaman resmi [Digital Talent Program](/program/digital-talent).`;
+
+export const DTP_SPECIALIZATIONS_EN = `### 9 Industry Specializations in Digital Talent Program (DTP)
+
+SMK Telkom Sidoarjo provides **9 Industry Specializations** in the Digital Talent Program categorized across 4 main technology clusters:
+
+#### 1. Software & Artificial Intelligence Cluster
+- **Software Developer:** Modern web and mobile development, structured databases, RESTful APIs, Laravel, React, Node.js, and Docker containers on Linux servers.
+- **Artificial Intelligence (AI) Specialist:** Applied AI development, Python, Exploratory Data Analysis, Machine Learning, Deep Learning, NLP, Computer Vision, and production model serving.
+
+#### 2. Network & Cloud Computing Cluster
+- **Network System Administrator:** Enterprise physical and virtual server administration (Linux, Windows Server, Proxmox, VMware) for high-availability production environments.
+- **Network Infrastructure Engineer:** High-speed telecom infrastructure: fiber optic splicing, OTDR measurements, OLT/ONT configuration, and MikroTik routing/switching.
+- **Cloud Engineer:** Cloud architecture (AWS, GCP, Azure), virtualization, Docker containerization, CI/CD automation with GitHub Actions, and observability systems.
+
+#### 3. Hardware & Cyber Security Cluster
+- **Internet of Things (IoT) Engineer:** Microcontroller programming (ESP32), industrial sensors & actuators, MQTT/HTTP protocols, and real-time telemetry dashboards.
+- **Cyber Security Specialist:** Systems defense, vulnerability assessment, web/network penetration testing, network hardening, ethical hacking, and SOC fundamentals.
+
+#### 4. Design & Creative Media Cluster
+- **Visual Communication Designer:** Brand identity design, UI/UX prototyping in Figma, motion graphics, professional videography & photography, and digital creative media.
+- **Digital Marketing Specialist:** Digital growth strategies, persona research, copywriting, SEO/SEM Google Ads, Meta Ads Manager, and conversion analytics.
+
+Explore curriculum and portfolios on the official [Digital Talent Program](/program/digital-talent) page.`;
+
+export const DTP_INTERNSHIP_ID = `### Peluang Magang & Prospek Karir Lulusan DTP SMK Telkom Sidoarjo
+
+Siswa peserta **Digital Talent Program (DTP)** di SMK Telkom Sidoarjo memiliki keunggulan kompetitif tinggi di dunia kerja berkat metode *Project-Based Learning* dan portofolio riil berstandar industri.
+
+#### 1. Peluang Magang Industri (Prakerin 6 Bulan)
+Siswa DTP diterjunkan langsung dalam program Praktik Kerja Industri (PKL) selama 6 bulan penuh di berbagai mitra industri nasional bereputasi tinggi:
+- **Telkom Group Ecosystem:** PT Telkom Indonesia, PT Telkom Akses, Telkomsel, dan PT Infomedia Nusantara.
+- **Penyedia Data Center & Cloud:** Wowrack Indonesia, Jagoan Hosting, dan mitra infrastruktur server.
+- **Internet Service Provider (ISP):** CitraNet, Hypernet, dan penyedia jaringan fiber optic regional/nasional.
+- **Software House & Creative Agency:** Berbagai studio pengembang aplikasi web/mobile, agensi pemasaran digital, dan rumah produksi multimedia.
+
+Selama magang, siswa menangani project riil seperti perancangan API, konfigurasi server, perbaikan redaman fiber optic, hingga pengujian keamanan sistem. Kinerja magang yang unggul membuka peluang rekrutmen kerja langsung (*on-campus recruitment*) oleh industri bahkan sebelum prosesi wisuda.
+
+#### 2. Prospek Karir Berdasarkan Spesialisasi
+Lulusan dibekali sertifikasi global (Cisco CCNA/CCST, AWS Cloud, Oracle Java, MikroTik MTCNA, dan BNSP) yang membuka peluang profesi strategis:
+- **Bidang Software & AI:** Full-Stack Developer, Frontend/Backend Engineer, Mobile App Developer, Junior AI/ML Engineer, dan Data Analyst.
+- **Bidang Network & Cloud:** Cloud Support Associate, DevOps Junior Engineer, Linux System Administrator, Network Operations Center (NOC) Engineer, dan Fiber Optic Specialist.
+- **Bidang Hardware & Keamanan:** IoT Solutions Engineer, Junior Cybersecurity Analyst, Penetration Tester, dan Hardware Integration Specialist.
+- **Bidang Desain & Pemasaran:** UI/UX Designer, Visual Brand Designer, Digital Marketing Strategist, SEO Specialist, dan Content Strategist.
+
+#### 3. Penyaluran Kerja Terpadu via BKK Skomda
+Sekolah memiliki unit resmi **Bursa Kerja Khusus (BKK)** yang secara aktif:
+- Menyelenggarakan seleksi kerja langsung di sekolah (*on-campus recruitment*).
+- Memfasilitasi bimbingan karir, simulasi wawancara kerja, dan uji portofolio profesional.
+- Mendukung siswa yang ingin merintis startup digital mandiri melalui inkubator kewirausahaan **SKOMDA KUBIK**.
+- Memfasilitasi siswa yang ingin melanjutkan kuliah ke perguruan tinggi mitra (seperti Telkom University melalui program beasiswa *One Pipe Education System* / OPES).
+
+Informasi lebih lanjut dapat dilihat di [Profil Jurusan & BKK](/program/profil-jurusan#prospek-karir) serta [Digital Talent Program](/program/digital-talent).`;
+
+export const DTP_INTERNSHIP_EN = `### Internship Opportunities & Career Prospects for DTP Graduates
+
+Students in the **Digital Talent Program (DTP)** at SMK Telkom Sidoarjo gain significant career advantages through hands-on *Project-Based Learning* and industry-standard digital portfolios.
+
+#### 1. 6-Month Industrial Internship
+DTP students undergo full 6-month internships with leading national technology partners:
+- **Telkom Group Ecosystem:** PT Telkom Indonesia, PT Telkom Akses, Telkomsel, and PT Infomedia Nusantara.
+- **Cloud & Data Center Providers:** Wowrack Indonesia, Jagoan Hosting, and data center partners.
+- **Internet Service Providers (ISP):** CitraNet, Hypernet, and fiber optic network operators.
+- **Software Houses & Creative Agencies:** Web and mobile software studios, performance marketing agencies, and creative production firms.
+
+#### 2. Career Pathways by Specialization
+Equipped with global credentials (Cisco CCNA/CCST, AWS, Oracle Java, MikroTik MTCNA, and BNSP):
+- **Software & AI:** Full-Stack Developer, Mobile App Developer, Data Analyst, Junior AI Engineer.
+- **Network & Cloud:** Cloud Support Engineer, Linux Administrator, NOC Engineer, Fiber Optic Engineer.
+- **Hardware & Security:** IoT Engineer, Cybersecurity Analyst, Ethical Hacker.
+- **Design & Marketing:** UI/UX Designer, Brand Designer, SEO Specialist, Performance Marketer.
+
+#### 3. Campus Career Placement (BKK Skomda)
+Our dedicated Career Center (BKK) conducts on-campus recruitment drives, career coaching, entrepreneurship incubation via **SKOMDA KUBIK**, and university scholarship pathways via **Telkom University OPES**.
+
+Learn more on the [Majors & Career Prospects](/program/profil-jurusan#prospek-karir) and [Digital Talent Program](/program/digital-talent) pages.`;
+
+export const DTP_CERTIFICATIONS_ID = `### Sertifikasi Internasional & Industri Digital Talent Program (DTP)
+
+Untuk memastikan kompetensi siswa diakui secara global, setiap peserta DTP di SMK Telkom Sidoarjo dipersiapkan dan difasilitasi meraih sertifikasi resmi:
+
+1. **Cisco Certified (CCNA & CCST)**
+   - *Cisco Certified Support Technician (CCST)* Networking & Cybersecurity.
+   - *Cisco Certified Network Associate (CCNA)* untuk kompetensi routing, switching, dan keamanan jaringan enterprise.
+
+2. **AWS Certified (via AWS Academy)**
+   - *AWS Certified Cloud Practitioner* untuk fondasi arsitektur komputasi awan.
+   - *AWS Academy Cloud Architecting* untuk perancangan sistem cloud skala enterprise.
+
+3. **MikroTik Certified Network Associate (MTCNA)**
+   - Standarisasi internasional pengelolaan jaringan, routing MikroTik RouterOS, firewall, bandwidth management, dan tunneling.
+
+4. **Oracle Academy**
+   - *Java Foundations* dan *Database Foundations* untuk standarisasi pemrograman berorientasi objek dan arsitektur database relasional.
+
+5. **Sertifikasi Kompetensi BNSP (Badan Nasional Sertifikasi Profesi)**
+   - Sertifikasi profesi berstandar nasional Indonesia yang diterbitkan oleh Lembaga Sertifikasi Profesi (LSP) pihak pertama di SMK Telkom Sidoarjo.
+
+Sertifikasi ini menjadi bukti validasi keahlian yang sangat diperhitungkan oleh HRD industri saat rekrutmen kerja maupun seleksi beasiswa kuliah.
+
+Pelajari jadwal dan kurikulum sertifikasi di halaman resmi [Kurikulum DTP](/program/digital-talent#kurikulum).`;
+
+export const DTP_CERTIFICATIONS_EN = `### International & Industry Certifications in DTP
+
+DTP students at SMK Telkom Sidoarjo are prepared and facilitated to earn globally recognized certifications:
+
+1. **Cisco Certified (CCNA & CCST)**
+   - *CCST* Networking & Cybersecurity.
+   - *CCNA* enterprise routing, switching, and network security.
+
+2. **AWS Certified (via AWS Academy)**
+   - *AWS Certified Cloud Practitioner* fundamentals.
+   - *AWS Academy Cloud Architecting* for scalable enterprise architectures.
+
+3. **MikroTik Certified Network Associate (MTCNA)**
+   - Enterprise routing, firewall rules, bandwidth QoS, and tunnel management.
+
+4. **Oracle Academy**
+   - *Java Foundations* and *Database Foundations* for enterprise object-oriented programming.
+
+5. **BNSP National Professional Certification**
+   - Indonesian national vocational qualification issued by First-Party LSP SMK Telkom Sidoarjo.
+
+Explore the curriculum on our official [DTP Curriculum](/program/digital-talent#kurikulum) page.`;
+
+export function getSmartDtpResponse(query: string, isEn: boolean) {
+  const lower = query.toLowerCase().trim();
+
+  // 1. Internship & Career intent
+  if (
+    lower.includes("magang") ||
+    lower.includes("karir") ||
+    lower.includes("karier") ||
+    lower.includes("prospek") ||
+    lower.includes("kerja") ||
+    lower.includes("pkl") ||
+    lower.includes("prakerin") ||
+    lower.includes("bkk") ||
+    lower.includes("lulusan") ||
+    lower.includes("internship") ||
+    lower.includes("career")
+  ) {
+    return {
+      content: isEn ? DTP_INTERNSHIP_EN : DTP_INTERNSHIP_ID,
+      sources: isEn
+        ? [
+            { title: "DTP Internship & Career Prospects", url: "/program/digital-talent", category: "Career" },
+            { title: "Career Center (BKK) & Industry Recruitment", url: "/program/profil-jurusan#prospek-karir", category: "Partnership" },
+          ]
+        : [
+            { title: "Peluang Magang & Prospek Karir Lulusan DTP", url: "/program/digital-talent", category: "Karir & Magang" },
+            { title: "Bursa Kerja Khusus (BKK) & Rekrutmen Industri", url: "/program/profil-jurusan#prospek-karir", category: "Kemitraan" },
+          ],
+    };
+  }
+
+  // 2. Certifications intent
+  if (
+    lower.includes("sertifikasi") ||
+    lower.includes("sertifikat") ||
+    lower.includes("certification") ||
+    lower.includes("certificate") ||
+    lower.includes("ccna") ||
+    lower.includes("aws") ||
+    lower.includes("mtcna") ||
+    lower.includes("oracle") ||
+    lower.includes("bnsp")
+  ) {
+    return {
+      content: isEn ? DTP_CERTIFICATIONS_EN : DTP_CERTIFICATIONS_ID,
+      sources: isEn ? DTP_SOURCES_EN : DTP_SOURCES_ID,
+    };
+  }
+
+  // 3. List of 9 Specializations intent (not general "what is")
+  if (
+    (lower.includes("9") || lower.includes("sembilan") || lower.includes("apa saja") || lower.includes("daftar") || lower.includes("sebutkan") || lower.includes("what are")) &&
+    !lower.includes("apa itu") &&
+    !lower.includes("jelaskan")
+  ) {
+    return {
+      content: isEn ? DTP_SPECIALIZATIONS_EN : DTP_SPECIALIZATIONS_ID,
+      sources: isEn ? DTP_SOURCES_EN : DTP_SOURCES_ID,
+    };
+  }
+
+  // 4. Default / Overview intent
+  return {
+    content: isEn ? DTP_RESPONSE_EN : DTP_RESPONSE_ID,
+    sources: isEn ? DTP_SOURCES_EN : DTP_SOURCES_ID,
+  };
+}
+
 export function getDtpChatbotResponse(isEn: boolean) {
   return {
     content: isEn ? DTP_RESPONSE_EN : DTP_RESPONSE_ID,

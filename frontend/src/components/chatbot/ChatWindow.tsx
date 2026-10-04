@@ -23,7 +23,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import {
   isDtpQuery,
-  getDtpChatbotResponse,
+  getSmartDtpResponse,
   getFollowUpSuggestions,
   type ChatSource,
 } from "./dtpChatbotKnowledge";
@@ -244,69 +244,6 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       activeStreamIntervalRef.current = null;
     }
 
-    if (isDtpQuery(query)) {
-      const dtpData = getDtpChatbotResponse(isEn);
-      const words = dtpData.content.split(" ");
-      let currentWordIndex = 0;
-      let streamedText = "";
-
-      activeStreamIntervalRef.current = setInterval(() => {
-        const chunkSize = 5;
-        const nextWords = words.slice(currentWordIndex, currentWordIndex + chunkSize);
-
-        if (nextWords.length === 0) {
-          if (activeStreamIntervalRef.current) {
-            clearInterval(activeStreamIntervalRef.current);
-            activeStreamIntervalRef.current = null;
-          }
-          const followUps = getFollowUpSuggestions(
-            query,
-            dtpData.content,
-            isEn,
-            messages.map((m) => m.content)
-          );
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === botMsgId
-                ? {
-                    ...msg,
-                    content: dtpData.content,
-                    sources: dtpData.sources,
-                    suggestedQuestions: followUps,
-                    isStreaming: false,
-                  }
-                : msg
-            )
-          );
-          setIsLoading(false);
-          setTimeout(() => scrollToBottom(true), 50);
-          return;
-        }
-
-        streamedText += (currentWordIndex === 0 ? "" : " ") + nextWords.join(" ");
-        currentWordIndex += chunkSize;
-
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === botMsgId
-              ? {
-                  ...msg,
-                  content: streamedText,
-                  sources: dtpData.sources,
-                  isStreaming: true,
-                }
-              : msg
-          )
-        );
-
-        if (scrollContainerRef.current && isAutoScrollActiveRef.current) {
-          scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
-        }
-      }, 20);
-
-      return;
-    }
-
     const promptPayload = query.trim();
 
     try {
@@ -501,7 +438,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       ];
 
       if (isDtpQuery(query)) {
-        const dtpData = getDtpChatbotResponse(isEn);
+        const dtpData = getSmartDtpResponse(query, isEn);
         offlineReply = dtpData.content;
         fallbackSources = dtpData.sources;
       } else if (lower.includes("sija") || lower.includes("rekayasa")) {

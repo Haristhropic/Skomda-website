@@ -119,63 +119,130 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		}
 	}
 
-	// Tangani pertanyaan seputar DTP (Digital Talent Program) secara langsung agar jawaban akurat dengan 9 spesialisasi lengkap
+	// Cek apakah query DTP memiliki intensi spesifik (magang/karir, sertifikasi, daftar 9 spesialisasi, atau overview)
 	if isDtpQuery(trimmedMessage) {
-		dtpResp := getDtpKnowledgeResponse()
-		dtpSources := []gin.H{
-			{
-				"title":    "Digital Talent Program (DTP) - 9 Spesialisasi Industri",
-				"url":      "/program/digital-talent",
-				"category": "Program Unggulan",
-			},
-			{
-				"title":    "Kurikulum & Sertifikasi Internasional DTP",
-				"url":      "/program/digital-talent#kurikulum",
-				"category": "Sertifikasi",
-			},
+		lower := strings.ToLower(trimmedMessage)
+		var targetedResp string
+		var targetedSources []gin.H
+
+		if isDtpInternshipOrCareerQuery(lower) {
+			targetedResp = getDtpInternshipCareerResponse()
+			targetedSources = []gin.H{
+				{
+					"title":    "Peluang Magang & Prospek Karir Lulusan DTP",
+					"url":      "/program/digital-talent",
+					"category": "Karir & Magang",
+				},
+				{
+					"title":    "Bursa Kerja Khusus (BKK) & Rekrutmen Industri",
+					"url":      "/program/profil-jurusan#prospek-karir",
+					"category": "Kemitraan",
+				},
+			}
+		} else if isDtpCertificationsQuery(lower) {
+			targetedResp = getDtpCertificationsResponse()
+			targetedSources = []gin.H{
+				{
+					"title":    "Kurikulum & Sertifikasi Internasional DTP",
+					"url":      "/program/digital-talent#kurikulum",
+					"category": "Sertifikasi",
+				},
+				{
+					"title":    "Digital Talent Program (DTP) SMK Telkom Sidoarjo",
+					"url":      "/program/digital-talent",
+					"category": "Program Unggulan",
+				},
+			}
+		} else if isDtp9SpecializationsListQuery(lower) && !strings.Contains(lower, "apa itu") && !strings.Contains(lower, "jelaskan") {
+			targetedResp = getDtp9SpecializationsListResponse()
+			targetedSources = []gin.H{
+				{
+					"title":    "Digital Talent Program (DTP) - 9 Spesialisasi Industri",
+					"url":      "/program/digital-talent",
+					"category": "Program Unggulan",
+				},
+				{
+					"title":    "Kurikulum & Sertifikasi Internasional DTP",
+					"url":      "/program/digital-talent#kurikulum",
+					"category": "Sertifikasi",
+				},
+			}
+		} else if strings.Contains(lower, "apa itu") || strings.Contains(lower, "jelaskan") || strings.Contains(lower, "tentang") || strings.Contains(lower, "definisi") {
+			targetedResp = getDtpKnowledgeResponse()
+			targetedSources = []gin.H{
+				{
+					"title":    "Digital Talent Program (DTP) - 9 Spesialisasi Industri",
+					"url":      "/program/digital-talent",
+					"category": "Program Unggulan",
+				},
+				{
+					"title":    "Kurikulum & Sertifikasi Internasional DTP",
+					"url":      "/program/digital-talent#kurikulum",
+					"category": "Sertifikasi",
+				},
+			}
 		}
 
-		if req.Stream {
-			c.Header("Content-Type", "text/event-stream")
-			c.Header("Cache-Control", "no-cache")
-			c.Header("Connection", "keep-alive")
-			c.Header("X-Accel-Buffering", "no")
-			c.Writer.Flush()
-
-			words := strings.Split(dtpResp, " ")
-			chunkSize := 5
-			for i := 0; i < len(words); i += chunkSize {
-				end := i + chunkSize
-				if end > len(words) {
-					end = len(words)
-				}
-				chunk := strings.Join(words[i:end], " ")
-				if i > 0 {
-					chunk = " " + chunk
-				}
-				payload, _ := json.Marshal(gin.H{
-					"delta":   gin.H{"content": chunk},
-					"sources": dtpSources,
-				})
-				_, _ = c.Writer.Write([]byte("data: " + string(payload) + "\n\n"))
+		if targetedResp != "" {
+			if req.Stream {
+				c.Header("Content-Type", "text/event-stream")
+				c.Header("Cache-Control", "no-cache")
+				c.Header("Connection", "keep-alive")
+				c.Header("X-Accel-Buffering", "no")
 				c.Writer.Flush()
-				time.Sleep(15 * time.Millisecond)
+
+				words := strings.Split(targetedResp, " ")
+				chunkSize := 8
+				for i := 0; i < len(words); i += chunkSize {
+					end := i + chunkSize
+					if end > len(words) {
+						end = len(words)
+					}
+					chunk := strings.Join(words[i:end], " ")
+					if i > 0 {
+						chunk = " " + chunk
+					}
+					payload, _ := json.Marshal(gin.H{
+						"delta":   gin.H{"content": chunk},
+						"sources": targetedSources,
+					})
+					_, _ = c.Writer.Write([]byte("data: " + string(payload) + "\n\n"))
+					c.Writer.Flush()
+					time.Sleep(5 * time.Millisecond)
+				}
+				_, _ = c.Writer.Write([]byte("data: [DONE]\n\n"))
+				c.Writer.Flush()
+				return
 			}
-			_, _ = c.Writer.Write([]byte("data: [DONE]\n\n"))
-			c.Writer.Flush()
+
+			c.JSON(http.StatusOK, gin.H{
+				"response": targetedResp,
+				"sources":  targetedSources,
+				"model":    "Skomda Knowledge Engine (DTP Curated)",
+			})
 			return
 		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"response": dtpResp,
-			"sources":  dtpSources,
-			"model":    "Skomda Knowledge Base (DTP 9 Specializations)",
-		})
-		return
 	}
 
-	// Kirim pesan murni pengguna tanpa polusi prefix agar RAG retrieval & instruction-following akurat
+	// Siapkan query cerdas dengan injeksi konteks DTP/SKOMDA terkini bila relevan agar AI menjawab akurat dan dinamis
 	processedMessage := trimmedMessage
+	if isDtpQuery(trimmedMessage) {
+		processedMessage = "[INFORMASI RESMI SKOMDA - DIGITAL TALENT PROGRAM (DTP):\n" +
+			"- DTP SMK Telkom Sidoarjo adalah inisiatif strategis akselerasi keahlian teknologi digital berbasis Project-Based Learning dan sertifikasi global.\n" +
+			"- Terdapat 9 Pilihan Spesialisasi Industri resmi:\n" +
+			"  1. Software Developer (Klaster Software & AI): Web modern, RESTful API, React, Laravel, Node.js, Docker, Linux Server.\n" +
+			"  2. Network System Administrator (Klaster Network & Cloud): Linux/Windows Server, Proxmox, VMware, high availability enterprise.\n" +
+			"  3. Network Infrastructure Engineer (Klaster Network & Cloud): Fiber optic splicing, OTDR, OLT/ONT, routing & switching MikroTik.\n" +
+			"  4. Visual Communication Designer (Klaster Design & Creative): UI/UX Figma prototyping, branding, motion graphics, videografi & fotografi.\n" +
+			"  5. Internet of Things (IoT) Engineer (Klaster Hardware & Security): Mikrokontroler ESP32, sensor/aktuator, protokol MQTT & HTTP, dashboard real-time.\n" +
+			"  6. Cloud Engineer (Klaster Network & Cloud): Cloud AWS/GCP/Azure, containerization Docker, CI/CD GitHub Actions, observabilitas server.\n" +
+			"  7. Artificial Intelligence (AI) Specialist (Klaster Software & AI): Python data & AI, EDA, Machine Learning, Deep Learning, NLP, Computer Vision.\n" +
+			"  8. Digital Marketing Specialist (Klaster Design & Creative): Riset pasar & persona, copywriting, SEO & SEM Google Ads, Meta Ads Manager.\n" +
+			"  9. Cyber Security Specialist (Klaster Hardware & Security): Vulnerability assessment, penetration testing web & network, SOC, ethical hacking.\n" +
+			"- Sertifikasi Internasional & Industri Resmi: Cisco (CCNA & CCST), AWS Certified (AWS Cloud Practitioner & Architecting via AWS Academy), MikroTik (MTCNA), Oracle Academy (Java & DB), BNSP.\n" +
+			"- Peluang Magang & Karir: Magang industri 6 bulan di mitra nasional terkemuka (Telkom Group, Wowrack, Jagoan Hosting, ISP CitraNet/Hypernet, software house). Penyaluran kerja difasilitasi penuh oleh Bursa Kerja Khusus (BKK Skomda) dengan on-campus recruitment sebelum wisuda, inkubasi bisnis di SKOMDA KUBIK, dan beasiswa kuliah OPES Telkom University.\n" +
+			"- INSTRUKSI ASISTEN: Jawablah secara cerdas, spesifik, natural, dan langsung menjawab apa yang ditanyakan pengguna tanpa mengulang template yang sama. Jangan gunakan em dash (—). Jika ditanya magang/karir, fokuskan pada peluang magang dan karir; jika ditanya daftar spesialisasi, sebutkan 9 bidangnya secara ringkas dan rapi; jika ditanya pengertian DTP, jelaskan konsep programnya. Selalu berikan respon yang relevan dan variatif.]\n\nPertanyaan: " + trimmedMessage
+	}
 
 	// 3. Siapkan request ke NexusRouter Gateway
 	nexusURL := strings.TrimRight(cfg.NexusRouterURL, "/") + "/api/v1/skomda/chat"
@@ -201,6 +268,9 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 	}
 
 	httpReq.Header.Set("Content-Type", "application/json")
+	if cfg.LLMAPIKey != "" {
+		httpReq.Header.Set("Authorization", "Bearer "+cfg.LLMAPIKey)
+	}
 	httpReq.Header.Set("X-Agent-Name", "Skomda-Website-Bot")
 	httpReq.Header.Set("X-Internal-Client", "skomda")
 	httpReq.Header.Set("X-Virtual-Key", "vk-skomda")
@@ -213,9 +283,34 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 	}
 
 	resp, err := client.Do(httpReq)
-	if err != nil {
-		log.Printf("[Chatbot] Gagal menghubungi NexusRouter di %s: %v", nexusURL, err)
-		// Fallback ramah jika NexusRouter offline
+	if err != nil || (resp != nil && resp.StatusCode != http.StatusOK) {
+		if err != nil {
+			log.Printf("[Chatbot] Gagal menghubungi NexusRouter di %s: %v", nexusURL, err)
+		} else {
+			log.Printf("[Chatbot] NexusRouter status error: %d", resp.StatusCode)
+		}
+
+		// Fallback cerdas jika gateway offline
+		if isDtpQuery(trimmedMessage) {
+			c.JSON(http.StatusOK, gin.H{
+				"response": getDtpKnowledgeResponse(),
+				"sources": []gin.H{
+					{
+						"title":    "Digital Talent Program (DTP) - 9 Spesialisasi Industri",
+						"url":      "/program/digital-talent",
+						"category": "Program Unggulan",
+					},
+					{
+						"title":    "Kurikulum & Sertifikasi Internasional DTP",
+						"url":      "/program/digital-talent#kurikulum",
+						"category": "Sertifikasi",
+					},
+				},
+				"fallback": true,
+			})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
 			"response": "Mohon maaf, asisten virtual SMK Telkom Sidoarjo sedang dalam pemeliharaan berkala.\n\nUntuk informasi pendaftaran PPDB 2026/2027, jurusan, atau konsultasi sekolah, silakan hubungi WhatsApp resmi kami di **0811-3021-919** atau unduh brosur resmi di menu [Unduh Informasi](/unduh-informasi).",
 			"sources": []gin.H{
@@ -285,6 +380,119 @@ func isDtpQuery(msg string) bool {
 		return true
 	}
 	return false
+}
+
+func isDtpInternshipOrCareerQuery(lower string) bool {
+	return strings.Contains(lower, "magang") ||
+		strings.Contains(lower, "karir") ||
+		strings.Contains(lower, "karier") ||
+		strings.Contains(lower, "prospek") ||
+		strings.Contains(lower, "kerja") ||
+		strings.Contains(lower, "pkl") ||
+		strings.Contains(lower, "prakerin") ||
+		strings.Contains(lower, "bkk") ||
+		strings.Contains(lower, "lulusan") ||
+		strings.Contains(lower, "internship") ||
+		strings.Contains(lower, "career")
+}
+
+func isDtpCertificationsQuery(lower string) bool {
+	return strings.Contains(lower, "sertifikasi") ||
+		strings.Contains(lower, "sertifikat") ||
+		strings.Contains(lower, "certification") ||
+		strings.Contains(lower, "certificate") ||
+		strings.Contains(lower, "ccna") ||
+		strings.Contains(lower, "aws") ||
+		strings.Contains(lower, "mtcna") ||
+		strings.Contains(lower, "bnsp")
+}
+
+func isDtp9SpecializationsListQuery(lower string) bool {
+	return (strings.Contains(lower, "9") || strings.Contains(lower, "sembilan") || strings.Contains(lower, "apa saja") || strings.Contains(lower, "daftar") || strings.Contains(lower, "sebutkan") || strings.Contains(lower, "list")) &&
+		(strings.Contains(lower, "spesialisasi") || strings.Contains(lower, "peminatan") || strings.Contains(lower, "specialization") || strings.Contains(lower, "keahlian") || strings.Contains(lower, "track"))
+}
+
+func getDtp9SpecializationsListResponse() string {
+	return `### 9 Spesialisasi Industri Digital Talent Program (DTP) SMK Telkom Sidoarjo
+
+SMK Telkom Sidoarjo menyediakan **9 Pilihan Spesialisasi Industri** dalam Digital Talent Program yang dikelompokkan ke dalam 4 klaster keahlian utama:
+
+#### 1. Klaster Software & Artificial Intelligence
+- **Software Developer:** Pembuatan website dan aplikasi modern, perancangan database terstruktur, RESTful API, penguasaan framework modern (Laravel, React, Node.js), hingga deployment aplikasi dengan container Docker di Linux Server.
+- **Artificial Intelligence (AI) Specialist:** Pengembangan kecerdasan buatan terapan, pemrograman Python untuk data & AI, analisis data (EDA), Machine Learning, Deep Learning, Natural Language Processing (NLP), Computer Vision, dan implementasi model AI siap pakai untuk kebutuhan industri.
+
+#### 2. Klaster Network & Cloud Computing
+- **Network System Administrator:** Pengelolaan dan pemeliharaan server fisik maupun virtual (Linux Server, Windows Server, Proxmox, VMware) agar operasional sistem enterprise stabil, aman, dan memiliki ketersediaan tinggi (*high availability*).
+- **Network Infrastructure Engineer:** Pembangunan infrastruktur jaringan telekomunikasi berkecepatan tinggi: terminasi & penyambungan kabel fiber optic (*splicing*), pengukuran OTDR, konfigurasi OLT/ONT, serta routing & switching MikroTik.
+- **Cloud Engineer:** Penyusunan dan pengelolaan arsitektur cloud computing (AWS, Google Cloud Platform, Microsoft Azure), virtualisasi, Docker containerization, otomasi pipeline CI/CD (GitHub Actions), serta sistem observabilitas/monitoring server.
+
+#### 3. Klaster Hardware & Cyber Security
+- **Internet of Things (IoT) Engineer:** Integrasi perangkat keras dan internet: pemrograman mikrokontroler (ESP32 / MicroPython), sensor cerdas & aktuator industri, komunikasi data protokol IoT (MQTT & HTTP), serta dashboard monitoring real-time.
+- **Cyber Security Specialist:** Keamanan sistem informasi dan infrastruktur data: identifikasi kerentanan (*vulnerability assessment*), pengujian penetrasi (*penetration testing* web & network), pertahanan jaringan, ethical hacking, dan pemahaman fondasi Security Operations Center (SOC).
+
+#### 4. Klaster Design & Creative Media
+- **Visual Communication Designer:** Eksplorasi komunikasi visual terpadu: perancangan identitas brand, desain UI/UX & interactive prototyping Figma, motion graphics, videografi & fotografi profesional, serta produksi konten digital kreatif.
+- **Digital Marketing Specialist:** Strategi pemasaran digital komprehensif: riset pasar & buyer persona, creative copywriting, optimasi mesin pencari (SEO & SEM Google Ads), periklanan berbayar media sosial (Meta Ads Manager), dan analitik performa konversi.
+
+Pelajari silabus lengkap dan portofolio karya di halaman resmi [Digital Talent Program](/program/digital-talent).`
+}
+
+func getDtpInternshipCareerResponse() string {
+	return `### Peluang Magang & Prospek Karir Lulusan DTP SMK Telkom Sidoarjo
+
+Siswa peserta **Digital Talent Program (DTP)** di SMK Telkom Sidoarjo memiliki keunggulan kompetitif tinggi di dunia kerja berkat metode *Project-Based Learning* dan portofolio riil berstandar industri.
+
+#### 1. Peluang Magang Industri (Prakerin 6 Bulan)
+Siswa DTP diterjunkan langsung dalam program Praktik Kerja Industri (PKL) selama 6 bulan penuh di berbagai mitra industri nasional bereputasi tinggi:
+- **Telkom Group Ecosystem:** PT Telkom Indonesia, PT Telkom Akses, Telkomsel, dan PT Infomedia Nusantara.
+- **Penyedia Data Center & Cloud:** Wowrack Indonesia, Jagoan Hosting, dan mitra infrastruktur server.
+- **Internet Service Provider (ISP):** CitraNet, Hypernet, dan penyedia jaringan fiber optic regional/nasional.
+- **Software House & Creative Agency:** Berbagai studio pengembang aplikasi web/mobile, agensi pemasaran digital, dan rumah produksi multimedia.
+
+Selama magang, siswa menangani project riil seperti perancangan API, konfigurasi server, perbaikan redaman fiber optic, hingga pengujian keamanan sistem. Kinerja magang yang unggul membuka peluang rekrutmen kerja langsung (*on-campus recruitment*) oleh industri bahkan sebelum prosesi wisuda.
+
+#### 2. Prospek Karir Berdasarkan Spesialisasi
+Lulusan dibekali sertifikasi global (Cisco CCNA/CCST, AWS Cloud, Oracle Java, MikroTik MTCNA, dan BNSP) yang membuka peluang profesi strategis:
+- **Bidang Software & AI:** Full-Stack Developer, Frontend/Backend Engineer, Mobile App Developer, Junior AI/ML Engineer, dan Data Analyst.
+- **Bidang Network & Cloud:** Cloud Support Associate, DevOps Junior Engineer, Linux System Administrator, Network Operations Center (NOC) Engineer, dan Fiber Optic Specialist.
+- **Bidang Hardware & Keamanan:** IoT Solutions Engineer, Junior Cybersecurity Analyst, Penetration Tester, dan Hardware Integration Specialist.
+- **Bidang Desain & Pemasaran:** UI/UX Designer, Visual Brand Designer, Digital Marketing Strategist, SEO Specialist, dan Content Strategist.
+
+#### 3. Penyaluran Kerja Terpadu via BKK Skomda
+Sekolah memiliki unit resmi **Bursa Kerja Khusus (BKK)** yang secara aktif:
+- Menyelenggarakan seleksi kerja langsung di sekolah (*on-campus recruitment*).
+- Memfasilitasi bimbingan karir, simulasi wawancara kerja, dan uji portofolio profesional.
+- Mendukung siswa yang ingin merintis startup digital mandiri melalui inkubator kewirausahaan **SKOMDA KUBIK**.
+- Memfasilitasi siswa yang ingin melanjutkan kuliah ke perguruan tinggi mitra (seperti Telkom University melalui program beasiswa *One Pipe Education System* / OPES).
+
+Informasi lebih lanjut dapat dilihat di [Profil Jurusan & BKK](/program/profil-jurusan#prospek-karir) serta [Digital Talent Program](/program/digital-talent).`
+}
+
+func getDtpCertificationsResponse() string {
+	return `### Sertifikasi Internasional & Industri Digital Talent Program (DTP)
+
+Untuk memastikan kompetensi siswa diakui secara global, setiap peserta DTP di SMK Telkom Sidoarjo dipersiapkan dan difasilitasi meraih sertifikasi resmi:
+
+1. **Cisco Certified (CCNA & CCST)**
+   - *Cisco Certified Support Technician (CCST)* Networking & Cybersecurity.
+   - *Cisco Certified Network Associate (CCNA)* untuk kompetensi routing, switching, dan keamanan jaringan enterprise.
+
+2. **AWS Certified (via AWS Academy)**
+   - *AWS Certified Cloud Practitioner* untuk fondasi arsitektur komputasi awan.
+   - *AWS Academy Cloud Architecting* untuk perancangan sistem cloud skala enterprise.
+
+3. **MikroTik Certified Network Associate (MTCNA)**
+   - Standarisasi internasional pengelolaan jaringan, routing MikroTik RouterOS, firewall, bandwidth management, dan tunneling.
+
+4. **Oracle Academy**
+   - *Java Foundations* dan *Database Foundations* untuk standarisasi pemrograman berorientasi objek dan arsitektur database relasional.
+
+5. **Sertifikasi Kompetensi BNSP (Badan Nasional Sertifikasi Profesi)**
+   - Sertifikasi profesi berstandar nasional Indonesia yang diterbitkan oleh Lembaga Sertifikasi Profesi (LSP) pihak pertama di SMK Telkom Sidoarjo.
+
+Sertifikasi ini menjadi bukti validasi keahlian yang sangat diperhitungkan oleh HRD industri saat rekrutmen kerja maupun seleksi beasiswa kuliah.
+
+Pelajari jadwal dan kurikulum sertifikasi di halaman resmi [Kurikulum DTP](/program/digital-talent#kurikulum).`
 }
 
 func getDtpKnowledgeResponse() string {
