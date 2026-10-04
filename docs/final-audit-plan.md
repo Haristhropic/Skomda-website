@@ -1,6 +1,6 @@
 # Audit akhir dan bukti kapasitas demo
 
-Status 4 Oktober 2026: prosedur dijalankan pada image `sha-d166a85ee4087fb213604d2d71ebe3044d9b2944` di VPS. Ramp 1.000 VU, soak 100 VU/10 menit, live HTTP audit, availability monitoring, CI/CD, dan dependency/image scans lulus ambang yang dinyatakan. Burst langsung 1.000 VU gagal SLO latency; PID host mencapai 499/500. Lihat [hasil audit final](final-audit-results.md). Domain utama tidak dipromosikan.
+Status 4 Oktober 2026: aplikasi yang diuji ialah image `sha-d166a85ee4087fb213604d2d71ebe3044d9b2944`; release demo aktif setelah perbaikan deploy ialah source commit `a18956bf818d2ac50a12fc63c3fe95217ed37996` (CI run 36). Ramp 1.000 VU berpacing dan soak 100 VU/10 menit lulus ambang agregat. Burst 1.000 VU dalam 100 ms gagal SLO latency; PID host pernah mencapai 499/500. CI run 35 membuktikan docs-only push melewati build/publish/deploy, dan run 36 sukses deploy tanpa approval manual. Probe 10 menit sesudah run 36 lulus 596/596 respons HTTP 200. Lihat [hasil audit final](final-audit-results.md). Domain utama tidak dipromosikan.
 
 ## Urutan
 
@@ -9,7 +9,7 @@ Status 4 Oktober 2026: prosedur dijalankan pada image `sha-d166a85ee4087fb213604
 3. Periksa semua tautan internal Navbar/Footer dan halaman dinamis pada VPS.
 4. Ukur tampilan pada lebar 360, 390, 768, 1280, dan 1440 px: overflow, navigasi, gambar, CLS, LCP, serta interaksi keyboard. HTTP load test tidak menjalankan JavaScript/browser dan tidak membuktikan metrik ini.
 5. Jalankan smoke, ramp bertahap, spike, dan soak. Amati monitor VPS bersamaan. Hentikan ketika ambang gagal atau generator menjadi bottleneck. Spike dihentikan setelah dua window gagal latency; soak dan ramp bertahap lulus agregat.
-6. Lakukan deploy saat traffic probe berjalan; pastikan request tetap sukses dan rollback tidak menghapus data. Release d166a85 terpasang melalui CI/CD; post-deploy probe lulus 298/298 dan spike monitor lulus 179/179.
+6. Lakukan deploy saat traffic probe berjalan; pastikan request tetap sukses dan rollback tidak menghapus data. Release d166a85 dan revisi deploy `a18956b` diterapkan melalui CI/CD. Hasil probe pasca-deploy run 36 dicatat di laporan final.
 7. Rekam hasil, temuan yang diperbaiki, revisi akhir, serta batas yang belum teruji dalam laporan final. Domain utama tetap memerlukan persetujuan promosi.
 
 ## Alat HTTP baca-saja
