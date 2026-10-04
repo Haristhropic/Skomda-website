@@ -58,7 +58,13 @@ def container_snapshot(directory, tunnel_name):
     services = ("backend-a", "backend-b", "frontend-a", "frontend-b") if active else ("backend", "frontend")
     compose = ["docker", "compose"] + (["-f", "compose.release.yaml"] if active else [])
     for service in services:
-        ids = command(compose + ["--env-file", "deploy.env", "ps", "--all", "--quiet", service], directory).split()
+        if active:
+            ids = command(compose + ["--env-file", "deploy.env", "ps", "--all", "--quiet", service], directory).split()
+        else:
+            # During first cutover the new infrastructure Compose no longer owns
+            # the still-serving legacy application containers.
+            ids = command(["docker", "ps", "--all", "--quiet", "--filter",
+                           "name=^/skomda-demo-" + service + "-1$"], directory).split()
         if len(ids) != 1:
             containers.append({"service": service, "status": "missing_or_multiple"})
             continue
@@ -66,6 +72,17 @@ def container_snapshot(directory, tunnel_name):
             "docker", "inspect", "--format", INSPECT_FORMAT, ids[0],
         ], directory))
         container["service"] = service
+        container["requires_health"] = True
+        containers.append(container)
+    for service in ("edge", "redis", "prometheus", "nginx-exporter", "loki", "grafana"):
+        ids = command(["docker", "ps", "--all", "--quiet", "--filter",
+                       "name=^/skomda-infra-" + service + "-1$"], directory).split()
+        if len(ids) != 1:
+            containers.append({"service": service, "status": "missing_or_multiple"})
+            continue
+        container = json.loads(command(["docker", "inspect", "--format", INSPECT_FORMAT, ids[0]], directory))
+        container["service"] = service
+        container["requires_health"] = service in ("edge", "redis")
         containers.append(container)
     # cloudflared is intentionally a separate container in the current deployment.
     ids = command([
@@ -198,7 +215,7 @@ def main():
         service = container["service"]
         if container["status"] != "running" or container.get("oom_killed"):
             findings.append(service + ":not_running_or_oom")
-        elif service != "cloudflared" and container.get("health") != "healthy":
+        elif container.get("requires_health") and container.get("health") != "healthy":
             findings.append(service + ":not_healthy")
     for probe in report["probes"]:
         if not probe["ok"]:

@@ -23,6 +23,7 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NEXT_PUBLIC_CLARITY_PROJECT_ID=${NEXT_PUBLIC_CLARITY_PROJECT_ID}
 
 RUN test -n "$NEXT_PUBLIC_API_URL" \
+    && node scripts/prepare-runtime-public.mjs \
     && npm run build
 
 FROM node:22-alpine AS runner
@@ -38,7 +39,7 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     PORT=3000
 
-COPY --from=build --chown=node:node /app/public ./public
+COPY --from=build --chown=node:node /app/.runtime-public ./public
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 
@@ -46,6 +47,6 @@ USER node
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD node -e "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+    CMD wget -q --spider http://127.0.0.1:3000/
 
 CMD ["node", "server.js"]

@@ -24,17 +24,25 @@ release --profile operations config --quiet
 # Retire only the inactive slot; the currently serving release remains untouched.
 release down --timeout 35
 release --profile operations pull
-release --profile operations run --rm --no-deps migrate
+release --profile operations run --rm --no-deps -T migrate < /dev/null
 release up -d --no-build --wait --wait-timeout 180
 address() { docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' "$(release ps -q "$1")"; }
-frontends=("$(address frontend-a)" "$(address frontend-b)")
-backends=("$(address backend-a)" "$(address backend-b)")
+mkdir -p deploy/nginx/releases/static
+# Chunks use content hashes/build IDs. Retain old browser assets independently
+# of app process lifetime; no credentials or server bundles are copied.
+docker cp "$(release ps -q frontend-a):/app/.next/static/." deploy/nginx/releases/static/
+if docker inspect skomda-demo-frontend-1 >/dev/null 2>&1; then
+  docker cp skomda-demo-frontend-1:/app/.next/static/. deploy/nginx/releases/static/
+fi
+find deploy/nginx/releases/static -type d -exec chmod 755 {} +
+find deploy/nginx/releases/static -type f -exec chmod 644 {} +
+frontends=("$candidate-frontend-a" "$candidate-frontend-b")
+backends=("$candidate-backend-a" "$candidate-backend-b")
 previous=()
 if [[ -n "$active" ]]; then
   previous=(--previous)
   for service in frontend-a frontend-b; do
-    cid="$(RELEASE_SLOT="$active" docker compose -f compose.release.yaml --env-file deploy.env ps -q "$service")"
-    previous+=("$(docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' "$cid")")
+    previous+=("$active-$service")
   done
 elif docker inspect skomda-demo-frontend-1 >/dev/null 2>&1; then
   previous=(--previous "$(docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' skomda-demo-frontend-1)")

@@ -1,0 +1,23 @@
+[Unit]
+Description=SKOMDA private host resource metrics
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/skomda-demo
+ExecStart=/usr/bin/python3 /opt/skomda-demo/host-metrics.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+MemoryMax=48M
+TasksMax=8
+LimitNOFILE=128
+
+[Install]
+WantedBy=multi-user.target

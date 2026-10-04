@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { readBoundedRequestBody, RequestBodyError } from "@/lib/boundedRequestBody";
 
 export const dynamic = "force-dynamic";
 const PREFIX = "/api/observability/grafana";
@@ -41,28 +42,16 @@ async function handle(request: NextRequest, context: Context) {
   headers.set("x-webauth-user", identity.user.email);
   headers.set("x-forwarded-proto", new URL(origin).protocol.replace(":", ""));
   headers.set("x-forwarded-host", new URL(origin).host);
-  let body: Uint8Array | undefined;
-  if (!["GET", "HEAD"].includes(request.method) && request.body) {
-    const reader = request.body.getReader();
-    const chunks: Uint8Array[] = [];
-    let size = 0;
-    while (true) {
-      const chunk = await reader.read();
-      if (chunk.done) break;
-      size += chunk.value.byteLength;
-      if (size > 2 * 1024 * 1024) {
-        await reader.cancel();
-        return NextResponse.json({ error: "Permintaan terlalu besar" }, { status: 413, headers: NO_STORE });
-      }
-      chunks.push(chunk.value);
-    }
-    body = new Uint8Array(size);
-    let offset = 0;
-    for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.length; }
+  let body: Uint8Array<ArrayBuffer> | null;
+  try {
+    body = await readBoundedRequestBody(request, 1024 * 1024);
+  } catch (error) {
+    const status = error instanceof RequestBodyError ? error.status : 400;
+    return NextResponse.json({ error: status === 413 ? "Permintaan melebihi batas 1 MiB" : "Isi permintaan tidak valid" }, { status, headers: NO_STORE });
   }
   try {
     const upstream = await fetch(grafana, {
-      method: request.method, headers, body: body as BodyInit | undefined,
+      method: request.method, headers, body: body ?? undefined,
       redirect: "manual", cache: "no-store", signal: AbortSignal.timeout(20_000),
     });
     const responseHeaders = new Headers(NO_STORE);

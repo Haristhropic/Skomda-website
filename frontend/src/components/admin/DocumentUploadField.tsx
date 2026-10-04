@@ -84,8 +84,8 @@ export default function DocumentUploadField({
     setErrorMsg(null);
 
     // Match the Go API and same-origin proxy body limit.
-    if (file.size > 15 * 1024 * 1024) {
-      setErrorMsg("Ukuran berkas terlalu besar. Maksimal 15MB.");
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMsg("Ukuran berkas terlalu besar. Maksimal 10 MiB.");
       return;
     }
 

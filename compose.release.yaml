@@ -45,8 +45,9 @@ x-frontend: &frontend
     nofile: {soft: 8192, hard: 8192}
   logging: *logging
   healthcheck:
-    test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
-    interval: 10s
+    # BusyBox avoids spawning a multi-threaded Node process per health probe.
+    test: [CMD, wget, -q, --spider, http://127.0.0.1:3000/]
+    interval: 20s
     timeout: 5s
     start_period: 30s
     retries: 6

@@ -1,88 +1,59 @@
-# Backup dan Recovery SKOMDA
+# Backup dan pemulihan SKOMDA
 
-**Status:** desain dan prosedur operator; backup otomatis serta uji restore belum dikonfigurasi
-
-Dokumen ini melengkapi [runbook demo VPS](demo-vps-runbook.md). Jangan menganggap database aman dipulihkan hanya karena aplikasi sehat atau deployment image bisa di-rollback.
-
-## Checkpoint wajib sebelum baseline migrasi
-
-Repo memiliki file `public-schema.sql` hasil dump **schema-only**. File itu membantu membandingkan struktur untuk baseline Goose, tetapi **tidak berisi data dan bukan backup yang bisa memulihkan isi database**. Jangan jalankan `--baseline-existing` sampai ada backup data bertanggal setelah perubahan data terakhir dan pemilik proyek menyetujui pemakaiannya.
-
-Pilih salah satu jalur berikut:
-
-1. **Backup Supabase yang dikelola provider:** pemilik project memeriksa Database → Backups, memastikan backup terbaru mencakup waktu perubahan terakhir, serta memastikan plan tersebut memberi kemampuan restore yang dibutuhkan. Ketersediaan dan retensi berbeda menurut plan; Free tidak menyediakan backup database untuk diunduh. Mengandalkan restore provider saja tidak membuat salinan independen.
-2. **Logical dump lokal:** bila backup provider tidak dapat diunduh/dipulihkan untuk kebutuhan ini, buat dump sebelum migrasi ke komputer tepercaya. Ikuti Tahap 1 pada [`supabase-runtime-role-runbook.md`](supabase-runtime-role-runbook.md). Perintah `pg_dump --format=custom --schema=public` menyertakan data tabel `public` secara default, kecuali ditambahkan `--schema-only` atau `--data-only`. Itu tidak mencadangkan schema Supabase-managed seperti `auth` dan `storage`, atau aset Cloudinary. Pastikan cakupan tersebut sesuai dengan kebutuhan pemulihan aplikasi.
-
-Logical dump dapat memuat data pribadi siswa/pengguna. Simpan di disk lokal terenkripsi dengan akses terbatas; jangan unggah ke chat, GitHub, repo, atau VPS. Catat hanya path lokal, ukuran, waktu, dan SHA-256. `pg_restore --list` dapat memeriksa bahwa arsip dapat dibaca, tetapi **belum membuktikan restore berhasil**; pemulihan tetap perlu diuji ke database/project terisolasi dengan persetujuan pemilik.
-
-**Checkpoint untuk operator:** laporkan plan dan waktu backup provider, atau konfirmasi bahwa logical dump lokal selesai beserta ukuran dan SHA-256. Jangan kirim file dump maupun isi `.env`/connection string. Setelah checkpoint ini diverifikasi, lanjut ke perbandingan schema terbaru dan migrasi ledger.
-
-## Sasaran awal
-
-| Ukuran | Sasaran sementara | Catatan |
-|---|---:|---|
-| RPO database | Maksimum 24 jam kehilangan perubahan | Perlu backup independen harian dan alarm jika gagal. Belum terjamin sekarang. |
-| RTO database | Maksimum 4 jam untuk layanan inti | Target awal yang harus diukur dalam latihan restore. |
-| Salinan independen | Di luar VPS dan akun GitHub repository | Pilihan praktis: private object storage terpisah, misalnya Cloudflare R2. Bucket, kredensial, enkripsi, dan retensi belum disiapkan. |
-| Uji pemulihan | Sebelum promosi ke domain utama dan setelah perubahan prosedur | Restore ke project Supabase baru/terisolasi; jangan bereksperimen di database aktif. |
-
-RPO/RTO di atas adalah target rancangan, bukan jaminan layanan saat ini. Pemilik proyek perlu menyetujuinya setelah meninjau kebutuhan lomba dan kemampuan akun Supabase.
+Panduan operator, 4 Oktober 2026. Backup harian terenkripsi di VPS dan latihan restore terisolasi sudah dijalankan. Salinan independen pertama sudah dipindahkan ke komputer pemilik. Pengiriman offsite otomatis dan notifikasi masih menunggu tujuan serta kredensial yang diperlukan.
 
 ## Cakupan backup
 
-1. **PostgreSQL:** data aplikasi, skema, dan definisi role yang memang perlu dipulihkan. Periksa apakah project menggunakan objek khusus, extension, trigger, atau policy pada skema Supabase-managed.
-2. **Media Cloudinary:** gambar/dokumen tidak ikut di dalam dump PostgreSQL. Database hanya menyimpan URL/identitas media. Pastikan akun Cloudinary dimiliki atau dapat dipulihkan oleh tim, catat cloud name dan asset `public_id`, lalu tentukan apakah perlu salinan file asli ke object storage terpisah.
-3. **Konfigurasi:** simpan salinan konfigurasi non-secret di repo. Secret runtime/tunnel/CI harus punya prosedur rotasi dan pemulihan di password manager pemilik; jangan memasukkannya ke dump, repo, issue, atau artefak CI.
-4. **Image aplikasi:** GHCR berisi image bertag commit untuk rollback aplikasi; ini bukan backup database atau media.
+Perintah `pg_dump --format=custom --no-owner --schema=public --schema=skomda_internal` mencadangkan struktur dan data aplikasi beserta riwayat migrasi Goose. Backup ini tidak menyertakan schema `auth` dan `storage` yang dikelola Supabase, file Cloudinary, secret, konfigurasi runtime, atau seluruh role PostgreSQL. File `public-schema.sql` hanya memuat schema dan bukan backup data.
 
-Fallback upload ke filesystem `/uploads` atau `/documents` hanya digunakan pada development. Endpoint production mengembalikan `503` ketika Cloudinary belum dikonfigurasi atau upload gagal, sehingga file yang hanya ada di filesystem container tidak dianggap berhasil tersimpan. File lokal lama tetap bukan penyimpanan durable dan tidak tercakup backup Cloudinary.
+Archive dienkripsi dengan AES-256-CBC dan PBKDF2, memakai 200.000 iterasi serta salt. HMAC-SHA256 atas ciphertext digunakan untuk memeriksa integritas sebelum dekripsi. Metadata berisi hash, ukuran, dan waktu; tidak memuat data aplikasi. File sementara yang belum terenkripsi dihapus dalam blok `finally`. Kunci pemulihan harus disimpan terpisah dari archive.
 
-## Lapisan backup yang disarankan
+## Jadwal, lokasi, dan hasil latihan
 
-### 1. Backup yang dikelola Supabase
+Cron milik user `deploy` menjalankan `backup-encrypted.py` setiap pukul 02:00 menurut waktu VPS. Backup disimpan selama 7 hari di `/opt/skomda-demo/backups`. Kunci `/opt/skomda-demo/secrets/backup.pass` memiliki permission `600` dan foldernya `700`. Jangan membagikan kunci atau mengirim dump ke chat maupun GitHub.
 
-Pemilik proyek Supabase harus memeriksa di Dashboard: plan aktif, waktu backup, retensi aktual, cakupan restore, dan apakah PITR tersedia/diaktifkan. Ketersediaan dan retensi bergantung pada plan/add-on, jadi jangan mengasumsikannya. Backup provider adalah lapisan pemulihan utama dari kegagalan/kerusakan project, tetapi belum menjadi salinan independen yang dikendalikan tim.
+Backup pertama, `20261004T103808Z.dump.enc` berukuran 134.304 byte, berhasil direstore ke container PostgreSQL 17 tanpa jaringan. Pemeriksaan menemukan 17 tabel aplikasi dan versi migrasi 2. Database production tidak ditimpa. Salinan archive beserta metadata disimpan di `C:\Users\Haris\Downloads\Skomda-backups`. Kunci pemulihan terpisah berada di `C:\Users\Haris\.ssh\skomda-backup-recovery`, dengan ACL Windows untuk pengguna saat ini.
 
-### 2. Dump logis terenkripsi di lokasi independen
+RPO 24 jam dan RTO 4 jam merupakan sasaran. Latihan restore dengan backup kecil ini belum membuktikan waktu pemulihan seluruh VPS, media, atau database yang lebih besar di masa depan. Salinan yang hanya berada di VPS tidak melindungi dari kehilangan VPS.
 
-Setelah pemilik Supabase menyetujui dan lokasi penyimpanan disiapkan:
+## Menjalankan backup manual
 
-1. Jalankan backup harian dari mesin operasional tepercaya dengan Supabase CLI versi tercatat, menggunakan connection string yang diambil pemilik dari Dashboard. Jangan menaruh connection string langsung di command history atau log.
-2. Ambil role, schema, dan data sebagai artefak terpisah sesuai prosedur resmi Supabase CLI. CLI memerlukan koneksi database dan menulis dump SQL; lindungi direktori sementara dengan akses user saja.
-3. Enkripsi segera menggunakan kunci publik backup yang privat dan simpan kunci dekripsi offline pada pemilik. Pastikan ukuran/hash file tercatat; hapus dump plaintext sementara setelah verifikasi enkripsi.
-4. Unggah hanya ciphertext ke bucket privat yang aksesnya minimum, dengan versioning/retensi dan kredensial khusus backup. Jangan simpan satu-satunya salinan di VPS yang sama, repo, atau GitHub Actions artifacts.
-5. Alarm jika job gagal atau backup terakhir melewati 24 jam. Simpan manifest waktu, project-ref, versi CLI, ukuran, hash, dan status enkripsi—tanpa URL database atau data personal.
+Jalankan melalui SSH sebagai user `deploy`:
 
-Cloudflare R2 adalah kandidat tujuan karena Cloudflare sudah digunakan, tetapi belum ada bucket/credential yang dikonfigurasi. Jangan aktifkan job terjadwal sebelum pemilik menentukan bucket, retensi, penerima kunci enkripsi, dan siapa yang memegang kunci dekripsi.
+```bash
+cd /opt/skomda-demo || exit
+python3 ./backup-encrypted.py
+ls -lh backups/*.enc backups/*.json
+```
 
-## Prosedur pemulihan database
+Pastikan output menunjukkan `status: ok`, lalu periksa hasil cron untuk backup terjadwal. Jangan menampilkan isi `migrate.env` atau kunci. Proses backup menggunakan koneksi migrasi atau admin; role runtime aplikasi tidak memiliki hak DDL.
 
-1. **Deklarasikan insiden dan hentikan perubahan berisiko.** Jangan menjalankan migrator, seeder, atau restore ke database aktif saat sumber masalah belum dipahami.
-2. **Tentukan titik pemulihan.** Pilih backup provider atau dump terenkripsi terakhir yang lolos pemeriksaan hash; catat waktu backup dan perkiraan perubahan yang akan hilang.
-3. **Buat project/target PostgreSQL baru yang terisolasi.** Jangan restore langsung ke project sumber sebagai percobaan. Konfigurasi extension, encryption root key, role, dan kebijakan yang diperlukan bersama pemilik Supabase.
-4. **Pulihkan dan validasi** sesuai format backup resmi. Cek tabel inti, jumlah record yang wajar, constraint, grants/RLS, dan koneksi backend melalui smoke check terkontrol. Jangan mencetak isi data siswa ke log.
-5. **Putuskan cutover bersama pemilik.** Perbarui secret `DATABASE_URL` hanya setelah target dipastikan benar, siapkan image rollback dan rencana kembali ke database lama, lalu deploy ketika disetujui.
-6. **Catat hasil latihan/insiden:** backup yang dipakai, RPO aktual, RTO aktual, error, dan tindakan pencegahan.
+## Melakukan latihan restore
 
-Supabase mendokumentasikan dump CLI sebagai file role/schema/data terpisah dan contoh restore manual ke project baru. Restore bukan satu command universal: perlakuan schema/extension, custom roles, Auth/Storage, encryption, dan fungsi/policy khusus perlu diperiksa untuk project terkait. Gunakan instruksi Dashboard/CLI terbaru saat latihan.
+Script restore hanya mengembalikan data ke container PostgreSQL sementara dengan `--network none`. Script membuat role runtime dengan `NOLOGIN` untuk policy, lalu memeriksa jumlah tabel dan riwayat migrasi. Script ini tidak memulihkan data ke Supabase aktif.
 
-## Pemulihan media dan aplikasi
+```bash
+cd /opt/skomda-demo || exit
+python3 ./restore-backup-check.py backups/20261004T103808Z.dump.enc
+```
 
-- **Cloudinary:** pastikan pemilik akun dan akses administrator diketahui minimal dua anggota tepercaya. Inventarisasi aset melalui `scripts/sync-cloudinary.mjs` hanya sebagai audit/manifest; script tersebut bukan backup file. Bila salinan offsite diperlukan, implementasikan ekspor/download dan restore aset secara terpisah, termasuk menjaga `public_id`/URL agar referensi DB tetap valid.
-- **VPS gagal:** buat VPS baru, pasang Docker dan Compose, pulihkan file konfigurasi/secret dari password manager, login GHCR, jalankan image commit yang diketahui sehat, lalu sambungkan Tunnel. GHCR image tidak membawa database.
-- **Skema gagal:** rollback image tidak membalikkan migrasi. Migrasi perlu kompatibel mundur; pulihkan database hanya bila perubahan data/skema tidak dapat diperbaiki secara aman.
+Gunakan nama archive yang hendak diuji. Pastikan metadata pasangannya tersedia dan kuncinya benar. Jika format perintah berubah, periksa `python3 ./restore-backup-check.py --help`. Hash saja tidak membuktikan backup dapat direstore; periksa hasil `restored_in_isolation` dan `production_modified=false`.
 
-## Checklist sebelum otomatisasi dan promosi domain utama
+## Memulihkan setelah insiden
 
-- [ ] Pemilik Supabase mengonfirmasi plan, jadwal/retensi backup, hak restore, project-ref demo/production, dan jalur akses bila pemilik akun tidak tersedia.
-- [ ] Sepakati bucket offsite privat, retensi, enkripsi, pemegang kunci, biaya, serta notifikasi kegagalan.
-- [ ] Sepakati kepemilikan dan pemulihan aset Cloudinary; putuskan nasib fallback `/uploads`.
-- [ ] Buat job backup harian yang menulis ciphertext saja ke tujuan offsite.
-- [ ] Buktikan restore ke target terisolasi; ukur RPO/RTO aktual dan catat hasilnya.
-- [ ] Jangan alihkan domain utama sampai checklist ini, hardening akses database, observability, serta approval rilis terpenuhi.
+1. Hentikan perubahan yang berisiko. Catat nama backup, waktu UTC, dan SHA aplikasi.
+2. Tentukan database tujuan baru dan titik pemulihan bersama pemilik. Jangan melakukan percobaan restore pada database aktif.
+3. Verifikasi HMAC, lalu dekripsi menggunakan kunci pemulihan yang disimpan terpisah. Restore ke tujuan yang sudah ditentukan dan tinjau role, grants, RLS, serta extension.
+4. Validasi aplikasi dan data tanpa menampilkan data pribadi. Pulihkan password role runtime dan secret dari penyimpanan kredensial yang aman.
+5. Alihkan `DATABASE_URL` setelah validasi berhasil. Siapkan cara kembali ke konfigurasi sebelumnya dan rollback aplikasi yang kompatibel.
+6. Catat RPO dan RTO aktual, perubahan yang hilang, hasil pemeriksaan, dan tindakan lanjutan.
 
-## Referensi resmi
+## Media dan akses akun
 
-- [Supabase: Backup and Restore using the CLI](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore)
-- [Supabase: Automated backups using GitHub Actions](https://supabase.com/docs/guides/deployment/ci/backups)
-- [Supabase: Database backups](https://supabase.com/features/database-backups)
+File Cloudinary tidak ikut dalam dump database. Aset asli di repo tetap disimpan; media baru yang diunggah membutuhkan export atau backup media tersendiri. Pemilik perlu menjaga akses pemulihan akun Supabase dan Cloudinary. Manifest Cloudinary bukan salinan file media. Image GHCR membantu rollback aplikasi, tetapi tidak memulihkan database.
+
+## Mengaktifkan offsite otomatis
+
+Pengiriman otomatis memerlukan bucket privat S3 atau R2, atau server lain, kredensial khusus backup dengan hak minimum, kebijakan retensi dan versioning, serta tujuan notifikasi. Unggah ciphertext beserta metadata saja. Jangan simpan kunci dekripsi di bucket yang sama.
+
+Backup harian di VPS dan salinan independen pertama sudah tersedia. Pengiriman offsite otomatis serta notifikasi belum aktif sampai tujuan dan kredensial tersebut dikonfigurasi.

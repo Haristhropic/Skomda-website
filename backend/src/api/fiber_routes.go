@@ -46,7 +46,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		AppName:      "SMK Telkom Sidoarjo API (Fiber Edition)",
 		ServerHeader: "Fiber",
 		ReadTimeout:  10 * time.Second, WriteTimeout: 40 * time.Second, IdleTimeout: 60 * time.Second,
-		BodyLimit: 16 * 1024 * 1024, // 15 MB limit untuk upload gambar dan dokumen
+		BodyLimit: 11 * 1024 * 1024, // File 10 MiB plus multipart overhead.
 	})
 
 	// Middleware
@@ -1137,9 +1137,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 
-		if fileHeader.Size <= 0 || fileHeader.Size > 15*1024*1024 {
+		if fileHeader.Size <= 0 || fileHeader.Size > 10*1024*1024 {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Ukuran berkas dokumen tidak valid atau melebihi batas maksimum 15 MB.",
+				"error": "Ukuran berkas dokumen tidak valid atau melebihi batas maksimum 10 MiB.",
 			})
 		}
 

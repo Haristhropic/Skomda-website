@@ -47,6 +47,10 @@ Tiga foto BKK lokal tidak terdaftar di Cloudinary. Derivative WebP dibuat pada d
 
 Total transfer ketiga file turun dari **2.119.172** menjadi **204.844 byte**, pengurangan **90,3%**. PSNR adalah pembanding numerik, bukan pengganti pemeriksaan visual. Foto asli dipertahankan. Detail audit ada di `frontend-image-audit.json`.
 
+Container sekarang menyiapkan salinan public khusus runtime. Saat cloud konfigurasi cocok dengan manifest (`pyrugvo3`), build memeriksa setiap URL dengan HEAD. Pemeriksaan sesi ini menemukan 204 URL tersedia dan 18 object CDN tidak ada (404). **204 file lokal yang sudah tersedia di CDN**, total **405.942.980 byte**, dikecualikan hanya dari salinan runtime. Folder public runtime turun dari 420.764.624 menjadi 14.821.644 byte. Original dalam repository tetap utuh. Favicon, CSS, URL gambar mentah, serta thumbnail `/documents/thumbnails/` memakai redirect sementara ke URL CDN yang sudah diperiksa; 18 gambar yang belum tersedia di CDN tetap lokal dan loader tidak mengubahnya menjadi URL rusak.
+
+Jika konfigurasi cloud tidak ada/tidak cocok, salinan runtime mempertahankan seluruh aset lokal. Kegagalan verifikasi object CDN juga mempertahankan original object itu. Verifikasi ini membuktikan ketersediaan saat build, bukan jaminan provider selalu tersedia. Build berikutnya mengulangi pemeriksaan. Jalankan `node scripts/prepare-runtime-public.mjs --check` dengan cloud environment yang benar untuk audit tanpa membuat salinan runtime.
+
 Ulangi audit dari folder `frontend`:
 
 ```powershell
@@ -64,6 +68,9 @@ node scripts/audit-images.mjs --convert-local
 - Chat memakai same-origin API, timeout 25 detik, maksimal 40 pesan dalam sesi browser, batas ukuran pesan/SSE, dan menghapus transcript localStorage versi lama pada pembukaan chat. Transcript tidak bertahan setelah sesi tab ditutup.
 - Kegagalan AI tidak diganti dengan klaim statis yang belum diverifikasi. UI meminta pengguna mencoba lagi atau melihat halaman sekolah. Link respons hanya dapat menuju route lokal atau domain sekolah yang diizinkan.
 - API autentikasi/admin serta respons dengan cookie tidak boleh di-cache. Permintaan mutasi memerlukan Origin yang cocok; Origin yang tidak ada atau Host yang mencoba mengganti Origin konfigurasi ditolak.
+- Berkas gambar/dokumen maksimal 10 MiB. Body multipart maksimal 11 MiB, termasuk boundary dan header, sedangkan body endpoint lain/Grafana maksimal 1 MiB. Proxy menghitung byte stream sebenarnya dan menolak Content-Length yang tidak valid/tidak cocok. Satu buffer terbatas dipakai tanpa menahan daftar chunk dan salinan kedua seluruh payload.
+- Sebelum membaca body upload, proxy memverifikasi cookie melalui `/auth/me` dan role harus `editor`. Super admin serta sesi tidak valid ditolak. Maksimal dua upload berlangsung per replika frontend; permintaan berikutnya menerima 429 dengan Retry-After. Slot dilepas pada keberhasilan maupun kegagalan; batas Redis backend tetap berlaku bersama antarreplika.
+- Proxy video Trial Class hanya menerima ID dari daftar materi sekolah dan single byte range. Error/HTML login Google Drive tidak disajikan sebagai video HTTP 200. Waktu tunggu header dibatasi 15 detik; network stream yang tidak mengirim data 30 detik dibatalkan. Proxy berkas menolak traversal path dan redirect upstream.
 
 ## Pemeriksaan
 
@@ -76,4 +83,4 @@ npm run typecheck
 npm run build
 ```
 
-Pemeriksaan runtime mencakup transformasi Cloudinary/responsive width, pemisahan role Grafana, identitas proxy, Origin/CSRF, private caching, dan path cookie. Lint, typecheck, build produksi, serta pemeriksaan runtime lulus pada sesi implementasi ini. Pemeriksaan kode bukan bukti angka LCP/INP/CLS atau kapasitas traffic; itu harus diukur pada deployment VPS dengan browser dan load generator.
+Pemeriksaan runtime mencakup transformasi Cloudinary/responsive width, pemisahan role Grafana, identitas proxy, Origin/CSRF, private caching, path cookie, batas body stream/multipart, autentikasi upload sebelum body dibaca, serta pemulihan slot concurrency setelah kegagalan upstream. Lint, typecheck, build produksi, serta pemeriksaan runtime lulus pada sesi implementasi ini. Pemeriksaan kode bukan bukti angka LCP/INP/CLS atau kapasitas traffic; itu harus diukur pada deployment VPS dengan browser dan load generator.

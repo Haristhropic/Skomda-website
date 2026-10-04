@@ -1,5 +1,21 @@
 import os from "os";
+import fs from "node:fs";
+import path from "node:path";
 import type { NextConfig } from "next";
+
+function runtimeImageConfig(): { redirects: { source: string; destination: string; permanent: false }[]; localAssets: string[] } {
+  try {
+    const prepared = JSON.parse(fs.readFileSync(path.join(process.cwd(), ".runtime-public-assets.json"), "utf8"));
+    if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || prepared.cloud !== process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || !Array.isArray(prepared.redirects)) return { redirects: [], localAssets: [] };
+    const redirects = prepared.redirects.filter((entry: { source: string; destination: string }) => {
+      const url = new URL(entry.destination);
+      return /^\/(?:images|documents\/thumbnails)\/[a-zA-Z0-9_./-]+\.(png|jpe?g|webp|avif)$/i.test(entry.source) && !entry.source.split("/").includes("..") && url.protocol === "https:" && url.hostname === "res.cloudinary.com" && url.pathname.split("/")[1] === prepared.cloud;
+    }).map((entry: { source: string; destination: string }) => ({ ...entry, permanent: false }));
+    const localAssets = Array.isArray(prepared.localAssets) ? prepared.localAssets.filter((key: string) => /^[a-zA-Z0-9_./-]+\.(png|jpe?g|webp|avif)$/i.test(key) && !key.split("/").includes("..")) : [];
+    return { redirects, localAssets };
+  } catch { return { redirects: [], localAssets: [] }; }
+}
+const runtimeImages = runtimeImageConfig();
 
 // Dapatkan semua IPv4 lokal aktif secara otomatis agar bisa diakses dari HP / device lain di jaringan yang sama
 function getLocalDevOrigins(): string[] {
@@ -25,6 +41,7 @@ function getLocalDevOrigins(): string[] {
 }
 
 const nextConfig: NextConfig = {
+  env: { NEXT_PUBLIC_CLOUDINARY_LOCAL_ASSETS: JSON.stringify(runtimeImages.localAssets) },
   output: "standalone",
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
@@ -63,6 +80,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      ...runtimeImages.redirects,
       {
         source: "/akomodasi",
         destination: "/tentang-kami/akomodasi",

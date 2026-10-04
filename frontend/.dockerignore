@@ -8,3 +8,5 @@ coverage/
 .npm/
 npm-debug.log*
 *.tsbuildinfo
+.runtime-public/
+.runtime-public-assets.json

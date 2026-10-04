@@ -28,6 +28,7 @@ PUBLIC_API = (
     "/documents", "/dtp", "/alumni?page=1&limit=10",
 )
 MAX_BODY = 4 * 1024 * 1024
+BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 
 
 def percentile(values, fraction):
@@ -208,7 +209,7 @@ async def run(args):
         "stages": [], "passed": False,
     }
     timeout = aiohttp.ClientTimeout(total=15, connect=10, sock_read=10)
-    async with aiohttp.ClientSession(connector=connector, timeout=timeout, cookie_jar=aiohttp.DummyCookieJar(), headers={"User-Agent": "SKOMDA-Owned-Demo-LoadTest/1.0", "Accept": "text/html,application/json"}) as session:
+    async with aiohttp.ClientSession(connector=connector, timeout=timeout, cookie_jar=aiohttp.DummyCookieJar(), headers={"User-Agent": BROWSER_UA, "Accept": "text/html,application/json"}) as session:
         healthy = await request(session, metrics, API + "/health", "health", record=False)
         frontend_ready = await request(session, metrics, FRONTEND + "/", "frontend", record=False)
         if not healthy or not frontend_ready:

@@ -25,6 +25,9 @@ import manifestData from "./cloudinary-manifest.json";
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "pyrugvo3";
 const CLOUDINARY_BASE = "https://res.cloudinary.com";
+// Generated during container preparation after CDN availability checks.
+// Missing objects retain local originals and must not become broken CDN URLs.
+const LOCAL_ASSETS = new Set<string>(JSON.parse(process.env.NEXT_PUBLIC_CLOUDINARY_LOCAL_ASSETS || "[]"));
 
 const manifest = manifestData as Record<
   string,
@@ -82,6 +85,7 @@ export function getCloudinaryUrl(
 
   // 4. Periksa apakah aset terdaftar di manifest hasil sinkronisasi
   const relKey = imagePath.replace(/^\/+/, "").replace(/^images\//, "");
+  if (LOCAL_ASSETS.has(relKey)) return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   const manifestItem = manifest[relKey];
 
   let targetPublicId = "";

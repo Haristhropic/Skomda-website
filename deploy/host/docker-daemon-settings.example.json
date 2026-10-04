@@ -1,0 +1,5 @@
+{
+  "live-restore": true,
+  "max-concurrent-downloads": 2,
+  "max-concurrent-uploads": 2
+}

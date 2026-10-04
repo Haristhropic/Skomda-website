@@ -195,6 +195,7 @@ jobs:
 
   deploy-demo:
     name: Deploy demo to VPS
+    timeout-minutes: 20
     if: github.event_name == 'push' && github.ref == 'refs/heads/deploy' && vars.DEMO_DEPLOY_ENABLED == 'true'
     needs: container-images
     runs-on: ubuntu-latest
@@ -222,6 +223,9 @@ jobs:
           VPS_SSH_PORT="${VPS_SSH_PORT:-22}"
           [[ "$VPS_SSH_PORT" =~ ^[0-9]+$ ]] || { echo "VPS_SSH_PORT must be numeric" >&2; exit 1; }
           : "${VPS_DEPLOY_PATH:?Set VPS_DEPLOY_PATH in the demo environment variables}"
+          [[ "$VPS_DEPLOY_PATH" =~ ^/[a-zA-Z0-9_/-]+$ ]] || { echo "VPS_DEPLOY_PATH must be an absolute simple path" >&2; exit 1; }
+          # Bound network failures before any mutation; keep long pulls alive.
+          export SSH_OPTIONS='-o ConnectTimeout=15 -o ConnectionAttempts=2 -o ServerAliveInterval=15 -o ServerAliveCountMax=4'
 
           install -d -m 700 "$HOME/.ssh"
           key_content="${VPS_SSH_PRIVATE_KEY//$'\r'/}"
@@ -236,19 +240,19 @@ jobs:
           fi
           deploy_path_b64="$(printf '%s' "$VPS_DEPLOY_PATH" | base64 -w 0)"
 
-          ssh -i "$HOME/.ssh/deploy_key" -p "$VPS_SSH_PORT" \
+          ssh $SSH_OPTIONS -i "$HOME/.ssh/deploy_key" -p "$VPS_SSH_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
             "$VPS_USER@$VPS_HOST" "mkdir -p '$VPS_DEPLOY_PATH/deploy'"
-          scp -i "$HOME/.ssh/deploy_key" -P "$VPS_SSH_PORT" \
+          scp $SSH_OPTIONS -i "$HOME/.ssh/deploy_key" -P "$VPS_SSH_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
-            compose.yaml compose.release.yaml scripts/render-edge.py scripts/forward-safe-logs.py scripts/rollback-demo.sh \
+            compose.yaml compose.release.yaml scripts/deploy-demo.sh scripts/render-edge.py scripts/forward-safe-logs.py scripts/rollback-demo.sh \
             "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/"
-          scp -r -i "$HOME/.ssh/deploy_key" -P "$VPS_SSH_PORT" \
+          scp $SSH_OPTIONS -r -i "$HOME/.ssh/deploy_key" -P "$VPS_SSH_PORT" \
             -o BatchMode=yes -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes \
             deploy/. "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/deploy/"
 
           # Install the read-only operations checker; it is not executed by CI.
-          scp -i "$HOME/.ssh/deploy_key" \
+          scp $SSH_OPTIONS -i "$HOME/.ssh/deploy_key" \
             -P "$VPS_SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
@@ -257,12 +261,13 @@ jobs:
             scripts/vps-status.py \
             "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/vps-status.py"
 
-          ssh -i "$HOME/.ssh/deploy_key" \
+          # Run a saved file with closed stdin: Docker must never consume the
+          # remaining shell program through `ssh ... bash -s`.
+          ssh -n $SSH_OPTIONS -i "$HOME/.ssh/deploy_key" \
             -p "$VPS_SSH_PORT" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             -o IdentitiesOnly=yes \
             -o PreferredAuthentications=publickey \
             "$VPS_USER@$VPS_HOST" \
-            "DEPLOY_PATH_B64=$deploy_path_b64 IMAGE_TAG=$IMAGE_TAG bash -s" \
-            < scripts/deploy-demo.sh
+            "DEPLOY_PATH_B64=$deploy_path_b64 IMAGE_TAG=$IMAGE_TAG bash '$VPS_DEPLOY_PATH/deploy-demo.sh' && grep -Fxq '$IMAGE_TAG' '$VPS_DEPLOY_PATH/.deployed-image-tag'"

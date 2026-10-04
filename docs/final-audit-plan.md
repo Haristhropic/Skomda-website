@@ -21,7 +21,8 @@ python scripts/load-test-demo.py --confirm-owned-demo --profile smoke --revision
 python scripts/load-test-demo.py --confirm-owned-demo --profile stress --max-vus 1000 --revision SHA_IMAGE_AKTIF --output artifacts/load-stress.json
 python scripts/load-test-demo.py --confirm-owned-demo --profile spike --max-vus 1000 --revision SHA_IMAGE_AKTIF --hold-seconds 120 --output artifacts/load-spike.json
 python scripts/load-test-demo.py --confirm-owned-demo --profile soak --max-vus 100 --hold-seconds 1800 --revision SHA_IMAGE_AKTIF --output artifacts/load-soak.json
-python scripts/load-test-audit.py --confirm-owned-demo --revision SHA_IMAGE_AKTIF --output artifacts/live-audit.json
+python scripts/load-test-audit.py --confirm-owned-demo --include-ai-guards --revision SHA_IMAGE_AKTIF --output artifacts/live-audit.json
+python scripts/load-test-availability.py --confirm-owned-demo --old-revision SHA_LAMA --new-revision SHA_BARU --seconds 1800 --output artifacts/deploy-availability.json
 ```
 
 Generator boleh berjalan dari komputer terpisah; **targetnya VPS**, melalui dua hostname demo yang dikunci di script. Menjalankan generator di VPS yang sama dapat menghabiskan CPU/bandwidth aplikasi dan harus dilaporkan bila dilakukan.
@@ -36,6 +37,8 @@ Generator boleh berjalan dari komputer terpisah; **targetnya VPS**, melalui dua 
 - Output JSON berisi agregat, p50/p95/p99, status/error, byte respons, per-endpoint dan per-stage. Isi respons, cookie dan kredensial tidak direkam.
 
 Skenario ini mengukur request HTTP publik. Browser assets, cold image transforms, provider AI, media upload, write throughput dan ketahanan jangka panjang memerlukan skenario terpisah. Kelulusan suatu sesi tidak menjamin semua jenis beban atau tidak pernah down.
+
+Probe kontinuitas deployment berjalan maksimal 1 request/detik, bergantian HTML, API langsung, dan API same-origin. Respons/status/latency dicatat setiap sampel bersama SHA lama/baru. Stop file default `artifacts/deploy-availability.stop` mengakhiri probe dan menulis ringkasan; jangan menyatakan zero downtime bila ada kegagalan dalam rentang pergantian release. Traffic memakai User-Agent browser biasa untuk menghindari salah diagnosis ketika edge memperlakukan User-Agent Python default berbeda; challenge WAF tetap dihitung gagal dan dicatat terpisah.
 
 Referensi: [model API load testing k6](https://grafana.com/docs/k6/latest/testing-guides/api-load-testing/), [batas generator k6](https://grafana.com/docs/k6/latest/testing-guides/running-large-tests/), dan [konfigurasi koneksi aiohttp](https://docs.aiohttp.org/en/stable/client_reference.html).
 

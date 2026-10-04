@@ -4,6 +4,9 @@ type RouteContext = { params: Promise<{ path: string[] }> };
 
 export async function GET(request: NextRequest, context: RouteContext) {
   const { path } = await context.params;
+  if (path.some((part) => part === "." || part === ".." || /[\\/\u0000]/.test(part))) {
+    return new NextResponse("Jalur berkas tidak valid", { status: 400 });
+  }
   const backendBase = process.env.BACKEND_API_URL || "http://localhost:8080/api";
   
   // Ambil host/origin backend (buang akhiran /api)
@@ -14,6 +17,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
   try {
     const upstream = await fetch(targetUrl, {
       cache: "no-store",
+      redirect: "error",
       signal: AbortSignal.timeout(10_000),
     });
 

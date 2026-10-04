@@ -1,6 +1,16 @@
 groups:
   - name: skomda
     rules:
+      - alert: VPSProcessesNearProviderLimit
+        expr: skomda_host_pids_current / skomda_host_pids_max > 0.9
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "Proses/thread VPS mendekati limit provider"}
+      - alert: VPSDiskLow
+        expr: skomda_host_disk_available_bytes / skomda_host_disk_total_bytes < 0.15
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "Ruang disk VPS tersisa di bawah15persen"}
       - alert: APIAllReplicasUnavailable
         expr: sum(up{job="skomda-backend"}) == 0
         for: 1m

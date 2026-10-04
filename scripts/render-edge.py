@@ -2,15 +2,20 @@
 """Render a reviewed Nginx release pointer; no credentials are read or emitted."""
 import argparse
 import ipaddress
+import re
 from pathlib import Path
 
 
 def render(frontends, backends, previous=None):
     def upstream(name, addresses, port):
         for address in addresses:
-            ipaddress.ip_address(address)
-        servers = "\n".join(f"  server {address}:{port} max_fails=2 fail_timeout=5s;" for address in addresses)
-        return f"upstream {name} {{\n  least_conn;\n{servers}\n  keepalive 32;\n}}\n"
+            try:
+                ipaddress.ip_address(address)
+            except ValueError:
+                if not re.fullmatch(r"(?:blue|green)-(?:frontend|backend)-[ab]", address):
+                    raise ValueError("Only private release aliases or IPs are allowed")
+        servers = "\n".join(f"  server {address}:{port} max_fails=2 fail_timeout=5s" + (" resolve" if re.fullmatch(r"(?:blue|green)-(?:frontend|backend)-[ab]", address) else "") + ";" for address in addresses)
+        return f"upstream {name} {{\n  zone {name} 64k;\n  least_conn;\n{servers}\n  keepalive 32;\n}}\n"
     config = upstream("web_release", frontends, 3000) + upstream("api_release", backends, 8080)
     if previous:
         config += upstream("web_previous", previous, 3000)
@@ -20,7 +25,14 @@ def render(frontends, backends, previous=None):
 server {{
   listen 3000;
   location = /edge-health {{ access_log off; return 200 'ready'; }}
-  location /_next/static/ {{ {fallback} proxy_pass http://web_release; }}
+  # Static chunks from verified releases are archived in the existing mount.
+  # Old browser documents still work after the legacy app is retired.
+  location /_next/static/ {{
+    alias /etc/nginx/releases/static/;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    error_page 404 = @current_assets;
+  }}
+  location @current_assets {{ {fallback} proxy_pass http://web_release; }}
   location / {{ proxy_pass http://web_release; }}
   {old_assets}
 }}
