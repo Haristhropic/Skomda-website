@@ -242,9 +242,9 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 	// 3. Siapkan request ke NexusRouter Gateway
 	nexusURL := strings.TrimRight(cfg.NexusRouterURL, "/") + "/api/v1/skomda/chat"
 	forwardPayload, err := json.Marshal(map[string]interface{}{
-		"message":       ProtectedMessage(processedMessage),
+		"message":       ProtectedConversation(processedMessage, req.History),
 		"system_prompt": SafetyPolicy,
-		"history":       req.History,
+		"history":       []ChatMessage{},
 		"stream":        req.Stream,
 		"model":         req.Model,
 	})
