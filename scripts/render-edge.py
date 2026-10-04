@@ -35,6 +35,50 @@ server {{
     add_header Strict-Transport-Security "max-age=31536000" always;
     error_page 404 = @current_assets;
   }}
+  # Short shared page cache absorbs repeat public page views during traffic
+  # peaks and keeps server rendering off the Node workers. Authenticated
+  # requests always bypass it; only these explicitly public routes use it.
+  location = / {{
+    proxy_cache public_pages;
+    proxy_cache_valid 200 15s;
+    proxy_ignore_headers Cache-Control Expires;
+    proxy_hide_header Cache-Control;
+    proxy_cache_bypass $http_cookie $http_authorization $http_rsc $http_next_router_prefetch;
+    proxy_no_cache $http_cookie $http_authorization $http_rsc $http_next_router_prefetch $upstream_http_set_cookie;
+    proxy_cache_lock on;
+    proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+    proxy_cache_background_update on;
+    add_header X-Page-Cache $upstream_cache_status always;
+    add_header Cache-Control "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
+    proxy_pass http://web_release;
+  }}
+  location ~ ^/(?:program/profil-jurusan|informasi/berita|tentang-kami/profil-sekolah)/?$ {{
+    proxy_cache public_pages;
+    proxy_cache_valid 200 15s;
+    proxy_ignore_headers Cache-Control Expires;
+    proxy_hide_header Cache-Control;
+    proxy_cache_bypass $http_cookie $http_authorization $http_rsc $http_next_router_prefetch;
+    proxy_no_cache $http_cookie $http_authorization $http_rsc $http_next_router_prefetch $upstream_http_set_cookie;
+    proxy_cache_lock on;
+    proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+    proxy_cache_background_update on;
+    add_header X-Page-Cache $upstream_cache_status always;
+    add_header Cache-Control "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
+    proxy_pass http://web_release;
+  }}
+  # Route the fixed public, read-only JSON endpoints straight to Fiber. This
+  # keeps high-volume data reads off the Node SSR event loop. Only GET requests
+  # are accelerated; writes and every unlisted/admin route retain the guarded
+  # same-origin Next.js proxy.
+  location ~ ^/api/backend/(?:jurusan|news|teachers|prestasi|bkk/jobs|bkk/partners|ekskul|fasilitas|documents|dtp|alumni|trial-class/event)$ {{
+    error_page 418 = @public_api_read;
+    if ($request_method = GET) {{ return 418; }}
+    proxy_pass http://web_release;
+  }}
+  location @public_api_read {{
+    rewrite ^/api/backend/(.*)$ /api/$1 break;
+    proxy_pass http://api_release;
+  }}
   location @current_assets {{ {fallback} proxy_pass http://web_release; }}
   location / {{ proxy_pass http://web_release; }}
   {old_assets}
