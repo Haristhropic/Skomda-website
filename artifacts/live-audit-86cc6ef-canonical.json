@@ -1,0 +1,916 @@
+{
+  "tested_at_utc": "2026-10-04T11:24:19.683126+00:00",
+  "revision": "sha-86cc6efdac74320fb2e680e1e96f1b40ec4b422b",
+  "passed": true,
+  "checks": [
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/health",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 98,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store",
+        "x-request-id": "2acd3460-c1bd-451e-9e2f-f0225fbe9fe3",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 331.81
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 163342,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 182.35
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tentang-kami/profil-sekolah",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 101899,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 70.01
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tentang-kami/hub-industri",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 188746,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 77.37
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tentang-kami/prestasi",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 145536,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 140.63
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tentang-kami/fasilitas",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 127063,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 121.61
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tentang-kami/profil-guru",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 326560,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 133.22
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tentang-kami/akomodasi",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 108111,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 70.3
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/program/profil-jurusan",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 108619,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 72.7
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/program/ekstrakurikuler",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 112941,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 77.36
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/program/digital-talent",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 93266,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 96.17
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/program/ts21",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 107896,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 90.38
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/program/bkk",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 138251,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 86.77
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/informasi/berita",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 112045,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 524.82
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/informasi/pengumuman-kelulusan",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 83243,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 70.84
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/informasi/penerapan-k3",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 136455,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 74.81
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tefa",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 97423,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 68.17
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tefa/produk",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 107761,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 67.04
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/tefa/request",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 70490,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 66.14
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/trial-class",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 99959,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 71.65
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/ppdb",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 109161,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 87.83
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/unduh-informasi",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 115253,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "s-maxage=31536000",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 72.18
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/gate-internal-skomda",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 25147,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 81.67
+    },
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/admin/users",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "x-request-id": "8cbd055e-608b-4963-b56e-80f4601c0327",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 83.53
+    },
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/admin/news",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "x-request-id": "0947c342-73a3-4ca7-82dc-682b96c65d20",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 55.95
+    },
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/admin/documents",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "x-request-id": "223cb376-0919-4e25-aace-f556cd51f741",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 55.18
+    },
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/admin/alumni",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "x-request-id": "8285841a-4d0f-4412-b44b-136d7ca684f7",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 53.85
+    },
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/admin/audit-logs",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "x-request-id": "b29cea82-49e3-4268-ab3b-752caad60c00",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 56.61
+    },
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/admin/monitoring",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "x-request-id": "57a7c713-ed3b-47d7-b292-a3c0af84aaf3",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 56.77
+    },
+    {
+      "method": "GET",
+      "url": "https://api-linear.smktelkom-sidoarjo.my.id/api/auth/me",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "x-request-id": "ac7e5448-f071-4701-8fd3-1bac8124a374",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 55.11
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/admin/users",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "be5a69fc-9529-4976-af46-e04af003a8f5",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 70.22
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/admin/news",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "da91158a-407e-492d-bae6-b9170deed9c4",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 61.42
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/admin/documents",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "d3b68ee8-9234-4a6f-8ab3-931f87a6a567",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 58.37
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/admin/alumni",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "207ce142-a080-4b6b-a997-d2e1dc034150",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 58.52
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/admin/audit-logs",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "03772ec4-eed6-4dd4-8e0e-7e7d9e2fd57d",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 59.24
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/admin/monitoring",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "9d29d093-9a62-4a94-bbe7-33f356413d69",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 60.16
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/auth/me",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 76,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "a43d2d15-5c23-4801-99fb-eca615a38205",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 60.81
+    },
+    {
+      "method": "POST",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/auth/login",
+      "expected_status": [
+        403
+      ],
+      "status": 403,
+      "bytes": 45,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "2a1138e6-c1bc-4dd7-8baa-b8022f1da97a",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 67.65
+    },
+    {
+      "method": "POST",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/auth/login",
+      "expected_status": [
+        403
+      ],
+      "status": 403,
+      "bytes": 45,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "0f78d449-8e5a-42e5-aba7-71d627bb276d",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 58.95
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/admin/users",
+      "expected_status": [
+        401
+      ],
+      "status": 401,
+      "bytes": 70,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "0cd5aa63-6f37-49ea-8322-a692b1562d55",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 63.19
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/observability/grafana",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 33,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 59.14
+    },
+    {
+      "method": "GET",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/observability/grafana",
+      "expected_status": [
+        401,
+        403
+      ],
+      "status": 401,
+      "bytes": 33,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 73.54
+    },
+    {
+      "method": "POST",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/chatbot/message",
+      "expected_status": [
+        413
+      ],
+      "status": 413,
+      "bytes": 50,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "a520fc6a-5b9f-48ed-b484-55767f7e00c7",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 862.65
+    },
+    {
+      "method": "POST",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/chatbot/message",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 346,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "c1af2e63-129f-4e86-a515-66b5a6229b46",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 66.85
+    },
+    {
+      "method": "POST",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/chatbot/message",
+      "expected_status": [
+        400
+      ],
+      "status": 400,
+      "bytes": 40,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "27e3b8ea-c4e2-4cdf-99c4-0ad1fe4c6ad3",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 72.23
+    },
+    {
+      "method": "POST",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/chatbot/message",
+      "expected_status": [
+        400
+      ],
+      "status": 400,
+      "bytes": 37,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "375217a3-7064-4c7f-a2f3-a50b8fdbc2c3",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 68.56
+    },
+    {
+      "method": "POST",
+      "url": "https://linear.smktelkom-sidoarjo.my.id/api/backend/chatbot/message",
+      "expected_status": [
+        200
+      ],
+      "status": 200,
+      "bytes": 346,
+      "headers": {
+        "content-type": "application/json",
+        "cache-control": "no-store, private",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "x-request-id": "437af04d-dc66-4a87-a6f4-f9ca7908d6c4",
+        "cf-cache-status": "DYNAMIC"
+      },
+      "passed": true,
+      "elapsed_ms": 68.51
+    }
+  ],
+  "missing_homepage_header_warnings": [
+    "strict-transport-security"
+  ],
+  "limitations": [
+    "Anonymous probes only; editor/super-admin sessions require separate functional verification",
+    "No exploit payloads, account guessing, writes, provider AI, upload or confidential response bodies",
+    "Header presence is not proof of complete security"
+  ]
+}

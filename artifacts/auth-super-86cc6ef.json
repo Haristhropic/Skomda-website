@@ -1,0 +1,92 @@
+{
+  "checks": [
+    {
+      "check": "login",
+      "status": 200,
+      "role": "super_admin",
+      "ok": true
+    },
+    {
+      "check": "identity",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "monitoring",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "content_read",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "grafana_health",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "grafana_user",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "grafana_admin_settings",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "grafana_metrics",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "grafana_logs",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "super_content_mutation_post",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "super_content_mutation_put",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "super_content_mutation_delete",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "authenticated_csrf",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "logout",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "timestamp_utc": "2026-10-04T11:25:06.898903+00:00",
+  "revision": "86cc6efdac74320fb2e680e1e96f1b40ec4b422b",
+  "target": "https://linear.smktelkom-sidoarjo.my.id"
+}

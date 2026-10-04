@@ -1,0 +1,71 @@
+{
+  "revision": "86cc6ef",
+  "target": "https://linear.smktelkom-sidoarjo.my.id",
+  "timestamp_utc": "2026-10-04T11:24:02.333881+00:00",
+  "temporary_draft_id": 13,
+  "temporary_draft_slug": "deployment-audit-86cc6ef-7babbd9456034fdf8b490da9ee171394",
+  "checks": [
+    {
+      "check": "editor_login",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "editor_account_provisioning_denied",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "create_draft",
+      "status": 201,
+      "expected": 201,
+      "ok": true
+    },
+    {
+      "check": "editor_read_own_draft",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "update_own_draft",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "anonymous_draft_detail_hidden",
+      "status": 404,
+      "expected": 404,
+      "ok": true
+    },
+    {
+      "check": "anonymous_draft_query_hidden",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "cleanup_own_draft",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "cleanup_readback_absent",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "editor_logout",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "scope": "Only a uniquely named temporary draft was created, updated and deleted; no existing content or student records were changed."
+}

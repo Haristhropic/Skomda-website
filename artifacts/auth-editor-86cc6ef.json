@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "check": "login",
+      "status": 200,
+      "role": "editor",
+      "ok": true
+    },
+    {
+      "check": "identity",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "monitoring",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "content_read",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    },
+    {
+      "check": "grafana_health",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "grafana_user",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "grafana_admin_settings",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "authenticated_csrf",
+      "status": 403,
+      "expected": 403,
+      "ok": true
+    },
+    {
+      "check": "logout",
+      "status": 200,
+      "expected": 200,
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "timestamp_utc": "2026-10-04T11:23:06.706432+00:00",
+  "revision": "86cc6ef",
+  "target": "https://linear.smktelkom-sidoarjo.my.id"
+}

@@ -56,6 +56,20 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(func(c *gin.Context) {
+		timeout := 10 * time.Second
+		if c.Request.Method == http.MethodGet {
+			timeout = 3 * time.Second
+		}
+		if c.Request.URL.Path == "/api/chatbot/message" {
+			timeout = 30 * time.Second
+		}
+		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
+		defer cancel()
+		c.Request = c.Request.WithContext(ctx)
+		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 1024*1024)
+		c.Next()
+	})
+	router.Use(func(c *gin.Context) {
 		requestID := observability.RequestID(c.GetHeader("X-Request-ID"))
 		c.Set("request_id", requestID)
 		c.Header("X-Request-ID", requestID)

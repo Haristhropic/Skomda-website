@@ -32,7 +32,7 @@ Semua container menggunakan jaringan `skomda-runtime`. Route Cloudflare Tunnel t
 
 Commit/push ke branch `deploy` memicu test/vet backend, lint/typecheck/build frontend, scan Trivy, publish image GHCR dengan SHA immutable, lalu deployment SSH otomatis. Required reviewers environment `demo` sudah dihapus sesuai permintaan; kebijakan branch tetap `deploy`. `DEMO_DEPLOY_ENABLED=true` adalah repository variable. Secrets VPS tetap berada di environment `demo`.
 
-CD memakai `flock` untuk mencegah dua deployment berjalan bersamaan. Slot aktif tetap berjalan; migrasi yang kompatibel diterapkan; kandidat ditunggu sampai sehat; lalu Nginx di-reload secara bertahap. Slot lama dipertahankan untuk rollback dan static chunk browser lama. Jangan menjalankan `docker compose down` sebagai bagian release rutin.
+CD memakai `flock` untuk mencegah dua deployment berjalan bersamaan. Slot aktif tetap berjalan; migrasi yang kompatibel diterapkan; kandidat ditunggu sampai sehat; lalu Nginx di-reload secara bertahap. Slot lama dihentikan setelah drain 35 detik; container/image dipertahankan untuk warm rollback dan static chunk diarsipkan terpisah. Target rollback dihidupkan dan ditunggu sehat sebelum traffic berpindah. Jangan menjalankan `docker compose down` sebagai bagian release rutin.
 
 ## Periksa setelah release
 

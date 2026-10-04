@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/haristhropic/skomda-website/backend/src/audit"
 	"github.com/haristhropic/skomda-website/backend/src/config"
 	"github.com/haristhropic/skomda-website/backend/src/models"
 	"github.com/haristhropic/skomda-website/backend/src/utils"
@@ -48,17 +49,15 @@ func LoginHandler(cfg config.Config) fiber.Handler {
 		}
 		if err != nil || !user.CheckPassword(password) {
 			// Rekam percobaan gagal ke audit log untuk pemantauan keamanan
-			go func(ip string) {
-				config.DB.Create(&models.AuditLog{
-					UserID:    0,
-					UserName:  "GUEST",
-					Action:    "LOGIN_FAILED",
-					Entity:    "auth",
-					Details:   "Percobaan login ditolak: kredensial tidak cocok",
-					IPAddress: ip,
-					CreatedAt: time.Now(),
-				})
-			}(c.IP())
+			audit.Enqueue(config.DB, models.AuditLog{
+				UserID:    0,
+				UserName:  "GUEST",
+				Action:    "LOGIN_FAILED",
+				Entity:    "auth",
+				Details:   "Percobaan login ditolak: kredensial tidak cocok",
+				IPAddress: c.IP(),
+				CreatedAt: time.Now(),
+			})
 
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Email atau kata sandi tidak valid. Silakan periksa kembali.",
@@ -92,18 +91,16 @@ func LoginHandler(cfg config.Config) fiber.Handler {
 		})
 
 		// Catat ke audit log
-		go func(uid uint, name, ip string) {
-			config.DB.Create(&models.AuditLog{
-				UserID:    uid,
-				UserName:  name,
-				Action:    "LOGIN",
-				Entity:    "auth",
-				EntityID:  fmt.Sprint(user.ID),
-				Details:   "Login berhasil ke panel admin",
-				IPAddress: ip,
-				CreatedAt: time.Now(),
-			})
-		}(user.ID, user.Name, c.IP())
+		audit.Enqueue(config.DB, models.AuditLog{
+			UserID:    user.ID,
+			UserName:  user.Name,
+			Action:    "LOGIN",
+			Entity:    "auth",
+			EntityID:  fmt.Sprint(user.ID),
+			Details:   "Login berhasil ke panel admin",
+			IPAddress: c.IP(),
+			CreatedAt: time.Now(),
+		})
 
 		return c.JSON(fiber.Map{
 			"message": "Login berhasil",
@@ -169,17 +166,15 @@ func LogoutHandler() fiber.Handler {
 		userName, _ := c.Locals("user_name").(string)
 		userID, _ := c.Locals("user_id").(uint)
 		if userID > 0 {
-			go func(uid uint, name, ip string) {
-				config.DB.Create(&models.AuditLog{
-					UserID:    uid,
-					UserName:  name,
-					Action:    "LOGOUT",
-					Entity:    "auth",
-					Details:   "Logout dari panel admin",
-					IPAddress: ip,
-					CreatedAt: time.Now(),
-				})
-			}(userID, userName, c.IP())
+			audit.Enqueue(config.DB, models.AuditLog{
+				UserID:    userID,
+				UserName:  userName,
+				Action:    "LOGOUT",
+				Entity:    "auth",
+				Details:   "Logout dari panel admin",
+				IPAddress: c.IP(),
+				CreatedAt: time.Now(),
+			})
 		}
 
 		return c.JSON(fiber.Map{

@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/haristhropic/skomda-website/backend/src/api/middleware"
+	"github.com/haristhropic/skomda-website/backend/src/audit"
 	"github.com/haristhropic/skomda-website/backend/src/config"
 	"github.com/haristhropic/skomda-website/backend/src/models"
 )
@@ -660,8 +661,10 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	// ==================== 7. SITE SETTINGS ====================
 	settingsGroup := api.Group("/settings")
 	settingsGroup.Get("", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
-		var list []models.SiteSetting
-		config.DB.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list)
+		list := []models.SiteSetting{}
+		if err := requestDB(c).Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
+			return c.Status(503).JSON(fiber.Map{"error": "Data sementara tidak tersedia"})
+		}
 		settingsMap := make(map[string]string)
 		for _, s := range list {
 			settingsMap[s.Key] = s.Value
@@ -1254,22 +1257,19 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 func recordAudit(c *fiber.Ctx, action, entity, entityID, details string) {
 	userName, _ := c.Locals("user_name").(string)
 	userID, _ := c.Locals("user_id").(uint)
-	ip := c.IP()
 	// Callers may pass names, email addresses, student identifiers, ticket codes,
 	// or setting values. Keep the parameter for call-site compatibility, but do
 	// not persist free-form details in the audit log.
 	safeDetails := "Aktivitas tercatat; detail objek tidak disimpan."
 
-	go func() {
-		config.DB.Create(&models.AuditLog{
-			UserID:    userID,
-			UserName:  userName,
-			Action:    action,
-			Entity:    entity,
-			EntityID:  entityID,
-			Details:   safeDetails,
-			IPAddress: ip,
-			CreatedAt: time.Now(),
-		})
-	}()
+	audit.Enqueue(config.DB, models.AuditLog{
+		UserID:    userID,
+		UserName:  userName,
+		Action:    action,
+		Entity:    entity,
+		EntityID:  entityID,
+		Details:   safeDetails,
+		IPAddress: c.IP(),
+		CreatedAt: time.Now(),
+	})
 }

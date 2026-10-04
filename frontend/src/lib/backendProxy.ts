@@ -26,6 +26,7 @@ const FORWARDED_RESPONSE_HEADERS = [
   "retry-after",
   "vary",
   "x-request-id",
+  "x-accel-buffering",
 ];
 
 function requestError(message: string, status: number, requestId: string) {

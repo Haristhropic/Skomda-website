@@ -14,13 +14,15 @@ def render(frontends, backends, previous=None):
             except ValueError:
                 if not re.fullmatch(r"(?:blue|green)-(?:frontend|backend)-[ab]", address):
                     raise ValueError("Only private release aliases or IPs are allowed")
-        servers = "\n".join(f"  server {address}:{port} max_fails=2 fail_timeout=5s" + (" resolve" if re.fullmatch(r"(?:blue|green)-(?:frontend|backend)-[ab]", address) else "") + ";" for address in addresses)
+        failures = "max_fails=1 fail_timeout=1s" if name == "web_release" else "max_fails=2 fail_timeout=5s"
+        servers = "\n".join(f"  server {address}:{port} {failures}" + (" resolve" if re.fullmatch(r"(?:blue|green)-(?:frontend|backend)-[ab]", address) else "") + ";" for address in addresses)
         return f"upstream {name} {{\n  zone {name} 64k;\n  least_conn;\n{servers}\n  keepalive 32;\n}}\n"
     config = upstream("web_release", frontends, 3000) + upstream("api_release", backends, 8080)
-    if previous:
-        config += upstream("web_previous", previous, 3000)
-    fallback = "proxy_intercept_errors on; error_page 404 = @previous_assets;" if previous else ""
-    old_assets = "location @previous_assets { proxy_pass http://web_previous; }" if previous else ""
+    # Archived content-hashed chunks are the rollback compatibility layer.
+    # Never route an old browser to a stopped prior slot; an unarchived asset
+    # should be a plain 404 rather than turning the site into a 502.
+    fallback = ""
+    old_assets = ""
     config += f"""
 server {{
   listen 3000;
@@ -30,6 +32,7 @@ server {{
   location /_next/static/ {{
     alias /etc/nginx/releases/static/;
     add_header Cache-Control "public, max-age=31536000, immutable";
+    add_header Strict-Transport-Security "max-age=31536000" always;
     error_page 404 = @current_assets;
   }}
   location @current_assets {{ {fallback} proxy_pass http://web_release; }}

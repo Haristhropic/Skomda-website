@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Blue/green on one VPS. Existing healthy release stays up until candidate readiness.
 set -Eeuo pipefail
+export COMPOSE_PARALLEL_LIMIT=1
 : "${DEPLOY_PATH_B64:?Missing deployment path}"
 : "${IMAGE_TAG:?Missing immutable tag}"
 [[ "$IMAGE_TAG" =~ ^sha-[0-9a-f]{40}$ ]] || { echo 'An immutable SHA tag is required' >&2; exit 1; }
@@ -21,8 +22,39 @@ case "$active" in blue) candidate=green;; green|'') candidate=blue;; *) echo 'In
 export RELEASE_SLOT="$candidate"
 release() { docker compose -f compose.release.yaml --env-file deploy.env "$@"; }
 release --profile operations config --quiet
+switched=false
+committed=false
+reduced_active=false
+recover_candidate() {
+  local result=$?
+  if [[ "$switched" == true ]]; then
+    cp deploy/nginx/releases/rollback.conf deploy/nginx/releases/active.conf
+    docker compose --env-file deploy.env exec -T edge nginx -t && docker compose --env-file deploy.env exec -T edge nginx -s reload
+    echo 'Traffic pointer restored to the previous release' >&2
+  fi
+  if [[ "$committed" != true ]]; then
+    release stop --timeout 35 || true
+    if [[ "$reduced_active" == true ]]; then
+      RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env up -d --no-build --wait --wait-timeout 120 frontend-b backend-b || true
+    fi
+  fi
+  exit "$result"
+}
+trap recover_candidate ERR
 # Retire only the inactive slot; the currently serving release remains untouched.
 release down --timeout 35
+pid_file=/sys/fs/cgroup/pids/pids.current
+if [[ -n "$active" && -r "$pid_file" && "$(cat "$pid_file")" -gt 370 ]]; then
+  # On this provider a global 500-thread limit applies to the whole VPS.
+  # Keep one verified serving pair while warming the new four containers.
+  # Nginx retries a connection failure before forwarding a mutating request.
+  for service in frontend-a backend-a; do
+    [[ "$(docker inspect --format '{{.State.Health.Status}}' "skomda-$active-$service-1")" == healthy ]] || { echo 'Serving pair is not healthy; refusing capacity reduction' >&2; exit 1; }
+  done
+  reduced_active=true
+  RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 35 frontend-b backend-b
+  echo 'One healthy serving pair retained during candidate warm-up due to provider PID budget.'
+fi
 release --profile operations pull
 release --profile operations run --rm --no-deps -T migrate < /dev/null
 release up -d --no-build --wait --wait-timeout 180
@@ -38,26 +70,9 @@ find deploy/nginx/releases/static -type d -exec chmod 755 {} +
 find deploy/nginx/releases/static -type f -exec chmod 644 {} +
 frontends=("$candidate-frontend-a" "$candidate-frontend-b")
 backends=("$candidate-backend-a" "$candidate-backend-b")
-previous=()
-if [[ -n "$active" ]]; then
-  previous=(--previous)
-  for service in frontend-a frontend-b; do
-    previous+=("$active-$service")
-  done
-elif docker inspect skomda-demo-frontend-1 >/dev/null 2>&1; then
-  previous=(--previous "$(docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' skomda-demo-frontend-1)")
-fi
 mkdir -p deploy/nginx/releases
-python3 render-edge.py --frontend "${frontends[@]}" --backend "${backends[@]}" "${previous[@]}" --output deploy/nginx/releases/candidate.conf
+python3 render-edge.py --frontend "${frontends[@]}" --backend "${backends[@]}" --output deploy/nginx/releases/candidate.conf
 cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
-switched=false
-restore_pointer() {
-  cp deploy/nginx/releases/rollback.conf deploy/nginx/releases/active.conf
-  docker compose --env-file deploy.env exec -T edge nginx -t
-  docker compose --env-file deploy.env exec -T edge nginx -s reload
-  echo 'Traffic pointer restored to the previous healthy release' >&2
-}
-trap 'if [[ "$switched" == true ]]; then restore_pointer; fi' ERR
 mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
 switched=true
 docker compose --env-file deploy.env exec -T edge nginx -t
@@ -72,7 +87,13 @@ if [[ -n "$active" ]]; then
 fi
 printf '%s\n' "$IMAGE_TAG" > .deployed-image-tag
 switched=false
+committed=true
 trap - ERR
-# Keep the previous slot for instant rollback and old browser static chunks.
-echo "Deployed $IMAGE_TAG to $candidate; previous slot retained for rollback."
+# Drain old workers before releasing scarce VPS PID/memory capacity. The old
+# containers/images and archived chunks remain available for warm rollback.
+if [[ -n "$active" ]]; then
+  sleep 35
+  RELEASE_SLOT="$active" IMAGE_TAG="$(cat .previous-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 35
+fi
+echo "Deployed $IMAGE_TAG to $candidate; previous slot stopped and retained for warm rollback."
 release ps

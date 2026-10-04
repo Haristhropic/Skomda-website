@@ -2,6 +2,7 @@ package observability
 
 import (
 	"fmt"
+	"github.com/haristhropic/skomda-website/backend/src/audit"
 	"log"
 	"net/http"
 	"os"
@@ -138,6 +139,7 @@ func StartPrivateServer(port string) {
 		var memory runtime.MemStats
 		runtime.ReadMemStats(&memory)
 		fmt.Fprintf(w, "skomda_process_uptime_seconds %f\nskomda_go_goroutines %d\nskomda_go_memory_bytes %d\n", time.Since(metrics.Started).Seconds(), runtime.NumGoroutine(), memory.Alloc)
+		fmt.Fprintf(w, "# TYPE skomda_audit_dropped_total counter\nskomda_audit_dropped_total %d\n", audit.Dropped())
 	})
 	server := &http.Server{Addr: ":" + port, Handler: mux, ReadHeaderTimeout: 3 * time.Second, ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second}
 	go func() {

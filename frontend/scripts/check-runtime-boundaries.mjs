@@ -9,7 +9,7 @@ const root = path.resolve(import.meta.dirname, "..");
 function load(relative, mocks = {}) {
   const file = path.join(root, relative);
   const localRequire = createRequire(file);
-  const compiled = ts.transpileModule(fs.readFileSync(file, "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;
+  const compiled = ts.transpileModule(fs.readFileSync(file, "utf8"), { fileName: file, compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   const module = { exports: {} };
   new Function("require", "module", "exports", compiled)((name) => mocks[name] || localRequire(name), module, module.exports);
   return module.exports;
@@ -31,6 +31,32 @@ if (originalLocalAssets === undefined) delete process.env.NEXT_PUBLIC_CLOUDINARY
 else process.env.NEXT_PUBLIC_CLOUDINARY_LOCAL_ASSETS = originalLocalAssets;
 
 const { NextRequest } = require("next/server");
+const React = require("react");
+const { renderToStaticMarkup } = require("react-dom/server");
+const adminLocales = {
+  id: require(path.join(root, "src/locales/id.json")),
+  en: require(path.join(root, "src/locales/en.json")),
+};
+assert.deepEqual(Object.keys(adminLocales.id.adminOperations), Object.keys(adminLocales.en.adminOperations));
+for (const isEn of [false, true]) {
+  const mocks = {
+    "@/components/admin/AdminLayout": { __esModule: true, default: ({ title, children }) => React.createElement("section", {}, React.createElement("h1", {}, title), children) },
+    "@/context/AdminAuthContext": { useAdminAuth: () => ({ user: { role: "super_admin" } }) },
+    "@/context/LanguageContext": { useLanguage: () => ({ isEn, t: (key) => key.split(".").reduce((value, part) => value[part], adminLocales[isEn ? "en" : "id"]) }) },
+    "@/services/adminApi": { adminApiUrl: (value) => `/api/backend/${value}` },
+  };
+  const monitoringPage = load("src/app/admin/monitoring/page.tsx", mocks).default;
+  const usersPage = load("src/app/admin/users/page.tsx", mocks).default;
+  const monitoringMarkup = renderToStaticMarkup(React.createElement(monitoringPage));
+  const usersMarkup = renderToStaticMarkup(React.createElement(usersPage));
+  assert.ok(monitoringMarkup.includes(isEn ? "Website Monitoring" : "Monitoring Website"));
+  assert.ok(monitoringMarkup.includes(isEn ? "Recent request logs" : "Log permintaan terbaru"));
+  assert.match(monitoringMarkup, /aria-expanded="false"/);
+  assert.match(monitoringMarkup, /role="status"/);
+  assert.ok(usersMarkup.includes(isEn ? "Editor Accounts" : "Akun Editor"));
+  assert.ok(usersMarkup.includes(isEn ? "New password" : "Kata sandi baru"));
+  assert.match(usersMarkup, /aria-busy="false"/);
+}
 const boundedBody = load("src/lib/boundedRequestBody.ts");
 const grafana = load("src/app/api/observability/grafana/[[...path]]/route.ts", { "@/lib/boundedRequestBody": boundedBody });
 const proxy = load("src/lib/backendProxy.ts", { "./boundedRequestBody": boundedBody });

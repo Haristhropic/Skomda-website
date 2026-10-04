@@ -57,7 +57,7 @@ func getNewsList(c *gin.Context) {
 	category := strings.TrimSpace(c.Query("category"))
 	search := strings.TrimSpace(c.Query("search"))
 
-	query := config.DB.Model(&models.News{}).Where("LOWER(status) = ?", "published").Order("id DESC")
+	query := config.DB.WithContext(c.Request.Context()).Model(&models.News{}).Where("LOWER(status) = ?", "published").Order("id DESC")
 
 	if category != "" && !strings.EqualFold(category, "semua") {
 		query = query.Where("LOWER(category) = ?", strings.ToLower(category))
@@ -93,7 +93,7 @@ func getNewsBySlug(c *gin.Context) {
 	}
 
 	var item models.News
-	err := config.DB.Where("LOWER(slug) = ? AND LOWER(status) = ?", strings.ToLower(slugParam), "published").First(&item).Error
+	err := config.DB.WithContext(c.Request.Context()).Where("LOWER(slug) = ? AND LOWER(status) = ?", strings.ToLower(slugParam), "published").First(&item).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -133,7 +133,7 @@ func createNews(c *gin.Context) {
 
 	// Cek apakah slug sudah ada, jika ada tambahkan suffix timestamp
 	var count int64
-	config.DB.Model(&models.News{}).Where("slug = ?", slug).Count(&count)
+	config.DB.WithContext(c.Request.Context()).Model(&models.News{}).Where("slug = ?", slug).Count(&count)
 	if count > 0 {
 		slug = fmt.Sprintf("%s-%d", slug, time.Now().Unix()%10000)
 	}
@@ -180,7 +180,7 @@ func createNews(c *gin.Context) {
 		Author:        author,
 	}
 
-	if err := config.DB.Create(&news).Error; err != nil {
+	if err := config.DB.WithContext(c.Request.Context()).Create(&news).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Gagal menyimpan berita ke database",
 		})
@@ -205,7 +205,7 @@ func updateNews(c *gin.Context) {
 	}
 
 	var existing models.News
-	if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+	if err := config.DB.WithContext(c.Request.Context()).First(&existing, uint(id)).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{
 				"error": "Berita tidak ditemukan",
@@ -253,7 +253,7 @@ func updateNews(c *gin.Context) {
 		existing.Author = input.Author
 	}
 
-	if err := config.DB.Save(&existing).Error; err != nil {
+	if err := config.DB.WithContext(c.Request.Context()).Save(&existing).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Gagal memperbarui berita",
 		})
@@ -277,7 +277,7 @@ func deleteNews(c *gin.Context) {
 		return
 	}
 
-	result := config.DB.Delete(&models.News{}, uint(id))
+	result := config.DB.WithContext(c.Request.Context()).Delete(&models.News{}, uint(id))
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Gagal menghapus berita dari database",

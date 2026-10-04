@@ -3,6 +3,8 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import shutil
+import time
+import re
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -26,6 +28,9 @@ class Handler(BaseHTTPRequestHandler):
         for name in ('current','max'):
             value=Path('/sys/fs/cgroup/pids/pids.'+name).read_text().strip()
             if value.isdigit(): rows.append(f'skomda_host_pids_{name} {value}')
+        backups = [item.stat().st_mtime for item in Path('/opt/skomda-demo/backups').glob('*.dump.enc')
+                   if re.fullmatch(r'\d{8}T\d{6}Z\.dump\.enc', item.name)]
+        rows.append(f'skomda_host_backup_age_seconds {max(0, time.time() - max(backups)) if backups else 1e9}')
         data=('\n'.join(rows)+'\n').encode()
         self.send_response(200); self.send_header('Content-Type','text/plain; version=0.0.4')
         self.send_header('Content-Length',str(len(data))); self.end_headers(); self.wfile.write(data)

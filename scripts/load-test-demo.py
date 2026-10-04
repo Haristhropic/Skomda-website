@@ -45,6 +45,8 @@ class Measurements:
         self.inflight = 0
         self.peak_inflight = 0
         self.loop_lag = []
+        self.windows = []
+        self.failure_samples = []
         self.abort = asyncio.Event()
         self.abort_reason = None
 
@@ -96,11 +98,16 @@ class Measurements:
 async def request(session, metrics, url, target, *, record=True):
     started = time.perf_counter()
     status, okay, size = 0, False, 0
+    edge = {}
+    transport_error = None
     metrics.inflight += 1
     metrics.peak_inflight = max(metrics.peak_inflight, metrics.inflight)
     try:
         async with session.get(url, allow_redirects=False) as response:
             status = response.status
+            # Only public diagnostic headers: never capture cookies, auth, bodies,
+            # client IPs or arbitrary headers in failure evidence.
+            edge = {name: response.headers[name] for name in ("Server", "CF-Ray", "CF-Mitigated") if name in response.headers}
             chunks = []
             async for chunk in response.content.iter_chunked(64 * 1024):
                 size += len(chunk)
@@ -125,13 +132,17 @@ async def request(session, metrics, url, target, *, record=True):
                         okay = okay and isinstance(parsed, dict) and "error" not in parsed and isinstance(parsed.get("data"), (list, type(None))) and "data" in parsed
                 except (ValueError, AttributeError):
                     okay = False
-    except (aiohttp.ClientError, asyncio.TimeoutError, ValueError, OSError):
+    except (aiohttp.ClientError, asyncio.TimeoutError, ValueError, OSError) as error:
         okay = False
+        transport_error = type(error).__name__
     finally:
         metrics.inflight -= 1
     duration_ms = (time.perf_counter() - started) * 1000
     if record:
-        metrics.rows.append((target, urlparse(url).path + ("?" + urlparse(url).query if urlparse(url).query else ""), status, okay, duration_ms, size))
+        path = urlparse(url).path + ("?" + urlparse(url).query if urlparse(url).query else "")
+        metrics.rows.append((target, path, status, okay, duration_ms, size))
+        if not okay and len(metrics.failure_samples) < 100:
+            metrics.failure_samples.append({"observed_at_utc": datetime.now(timezone.utc).isoformat(), "target": target, "endpoint": path, "status": status, "duration_ms": round(duration_ms, 2), "public_edge_headers": edge, "transport_error_type": transport_error})
     return okay
 
 
@@ -185,6 +196,7 @@ async def monitor(metrics, args):
         summary = metrics.summarize(window, 10)
         problems = violations(summary, args) if len(window) >= 50 else []
         bad_windows = bad_windows + 1 if problems else 0
+        metrics.windows.append({"observed_at_utc": datetime.now(timezone.utc).isoformat(), "requests": summary["requests"], "rps": summary["requests_per_second"], "error_rate": summary["error_rate"], "status_counts": summary["status_counts"], "inflight": metrics.inflight, "per_target": summary["per_target"], "violations": problems})
         print(json.dumps({"progress_requests": len(metrics.rows), "window_rps": summary["requests_per_second"], "window_error_rate": summary["error_rate"], "inflight": metrics.inflight, "loop_lag_ms": round(lag, 2), "violations": problems}), flush=True)
         if bad_windows >= 2:
             metrics.fail("two consecutive 10-second windows exceeded thresholds: " + ", ".join(problems))
@@ -247,6 +259,8 @@ async def run(args):
     report["aggregate"] = metrics.summarize()
     report["peak_inflight_requests"] = metrics.peak_inflight
     report["generator_loop_lag_p95_ms"] = percentile(metrics.loop_lag, 0.95)
+    report["ten_second_windows"] = metrics.windows
+    report["first_failure_samples"] = metrics.failure_samples
     report["abort_reason"] = metrics.abort_reason
     report["passed"] = bool(report["stages"]) and all(stage["passed"] for stage in report["stages"]) and not metrics.abort.is_set()
     write_report(args.output, report)

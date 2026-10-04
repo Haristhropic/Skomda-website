@@ -24,7 +24,7 @@ func RegisterRoutes(r *gin.RouterGroup) {
 // getJurusanList mengembalikan daftar semua jurusan.
 func getJurusanList(c *gin.Context) {
 	var jurusanList []models.Jurusan
-	if err := config.DB.Find(&jurusanList).Error; err != nil {
+	if err := config.DB.WithContext(c.Request.Context()).Find(&jurusanList).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Gagal mengambil data jurusan dari server",
 		})
@@ -47,7 +47,7 @@ func getJurusanBySlug(c *gin.Context) {
 	}
 
 	var item models.Jurusan
-	err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(slugParam)).First(&item).Error
+	err := config.DB.WithContext(c.Request.Context()).Where("LOWER(slug) = ?", strings.ToLower(slugParam)).First(&item).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{

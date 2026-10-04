@@ -15,6 +15,8 @@ Login tetap melalui `/gate-internal-skomda`. Sidebar dan halaman mengarahkan pen
 
 Monitoring ringkas berasal dari satu replika backend dan menampilkan nama instance. Total dan rate dihitung sejak proses dimulai; p95 memakai maksimal 2.048 request terbaru. Grafana menggabungkan metrics dari replika. Jumlah request bukan jumlah pengunjung unik. Log permintaan tidak membawa IP, query, isi formulir, atau token.
 
+Halaman monitoring dan akun editor mengikuti pilihan bahasa ID/EN yang sudah tersimpan pada konteks website, termasuk label, bantuan, error, serta format angka/waktu. Sebanyak 59 pasangan teks didaftarkan pada namespace `adminOperations` di `src/locales/id.json` dan `src/locales/en.json`. Loading diumumkan dengan status aksesibilitas dan aria-busy. Tombol Grafana menyatakan kondisi terbuka/tertutup; iframe mempunyai judul, focus outline, serta tautan keyboard untuk melewati dashboard menuju log. Link dashboard penuh menjelaskan pembukaan tab baru.
+
 ## Grafana
 
 Grafana berjalan di Docker privat tanpa port publik. Frontend mem-proxy `/api/observability/grafana/` setelah sesi diverifikasi melalui `/auth/me` dan role pengguna masih `super_admin`.

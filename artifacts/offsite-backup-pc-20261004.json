@@ -1,0 +1,23 @@
+{
+  "verified_at_utc": "2026-10-04T11:31:53.4225631Z",
+  "status": "partial",
+  "verified_archives": 2,
+  "downloaded_archives": 1,
+  "archives": [
+    "20261004T103808Z.dump.enc",
+    "20261004T112819Z.dump.enc"
+  ],
+  "retention_days": 30,
+  "task": "Skomda encrypted backup pull",
+  "task_state": "Ready",
+  "last_task_result": 2147942667,
+  "principal_logon": "Interactive",
+  "principal_run_level": "Limited",
+  "trigger_count": 2,
+  "start_when_available": true,
+  "execution_limit": "PT10M",
+  "key_copied": false,
+  "decrypted": false,
+  "manual_transfer_status": "verified",
+  "scheduler_execution_status": "failed_invalid_directory"
+}

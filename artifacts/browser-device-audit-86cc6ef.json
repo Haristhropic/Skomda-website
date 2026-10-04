@@ -1,0 +1,74 @@
+{
+  "revision": "sha-86cc6efdac74320fb2e680e1e96f1b40ec4b422b",
+  "target": "https://linear.smktelkom-sidoarjo.my.id",
+  "method": "Manual browser observations through Codex CUA, Edge desktop; viewport override; VPS public target",
+  "viewport_requested_widths": [
+    360,
+    390,
+    768,
+    1280,
+    1440
+  ],
+  "css_client_widths": [
+    345,
+    375,
+    753,
+    1265,
+    1425
+  ],
+  "homepage_observations": {
+    "horizontal_document_overflow": false,
+    "completed_broken_images_observed": 0,
+    "console_error_or_warning_observed": 0,
+    "mobile_menu_opened": true,
+    "analytics_reject_clicked": true,
+    "responsive_hero": {
+      "mime": "image/webp",
+      "transforms": "q_85,f_auto",
+      "mobile_rendered_width": 313,
+      "mobile_natural_width": 360,
+      "desktop_rendered_width": 720,
+      "desktop_natural_width": 770,
+      "desktop_url_transform_width": 828
+    },
+    "observed_app_asset_response_statuses": [
+      200
+    ],
+    "cloudflare_rum_status": 204
+  },
+  "admin_observations": {
+    "editor_monitoring_navigation_redirect": "/admin",
+    "editor_monitoring_menu_absent": true,
+    "super_login_redirect": "/admin/monitoring",
+    "super_menu": [
+      "monitoring",
+      "audit logs",
+      "editor accounts"
+    ],
+    "monitoring_backend_database_redis": "ok",
+    "document_overflow_at_widths_390_1440": false,
+    "grafana_authenticated_iframe_rendered": true,
+    "grafana_dashboard": "SKOMDA operations",
+    "grafana_panels_with_data_observed": [
+      "API requests per second",
+      "API p95 latency",
+      "Nginx connections"
+    ],
+    "grafana_mobile_chart_one_column": true,
+    "grafana_initial_welcome_instead_of_dashboard": true,
+    "grafana_http_5xx_panel_no_data": true,
+    "request_log_sanitization_visible": "No IP, query URL, token or form body shown"
+  },
+  "limitations": [
+    "No measured LCP, CLS or INP; PerformanceTimeline CDP unavailable and read-only scope does not expose Performance API",
+    "No Lighthouse score, physical Android/iOS device, CPU throttling or slow-network trace",
+    "Complete keyboard navigation audit not performed",
+    "Visual screenshot captures displayed through CUA; no saved local screenshot artifact",
+    "Responsive inspection on this revision does not certify later runtime-public asset changes",
+    "No real content or student record mutations; separate temporary draft API audit recorded by frontend agent"
+  ],
+  "cleanup": {
+    "audit_tab_closed": true,
+    "viewport_override_reset": true
+  }
+}

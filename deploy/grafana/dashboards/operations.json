@@ -64,7 +64,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "100 * sum(rate(skomda_http_requests_total{status=~\"5..\"}[5m])) / clamp_min(sum(rate(skomda_http_requests_total[5m])), 0.01)",
+          "expr": "100 * (sum(rate(skomda_http_requests_total{status=~\"5..\"}[5m])) or vector(0)) / clamp_min(sum(rate(skomda_http_requests_total[5m])), 0.01)",
           "legendFormat": "{{instance}}"
         }
       ],
@@ -355,6 +355,74 @@
     },
     {
       "id": 11,
+      "title": "Encrypted database backup age",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "skomda_host_backup_age_seconds",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "Available backend replicas",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 40,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(up{job=\"skomda-backend\"})",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 13,
       "title": "Safe HTTP metadata (no paths, identities, bodies, or IPs)",
       "type": "logs",
       "datasource": {
@@ -363,7 +431,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 40,
+        "y": 48,
         "w": 24,
         "h": 10
       },

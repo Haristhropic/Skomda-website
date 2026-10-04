@@ -28,6 +28,7 @@ import (
 
 	"github.com/haristhropic/skomda-website/backend/src/api/auth"
 	"github.com/haristhropic/skomda-website/backend/src/api/middleware"
+	"github.com/haristhropic/skomda-website/backend/src/audit"
 	"github.com/haristhropic/skomda-website/backend/src/client/cloudinary"
 	"github.com/haristhropic/skomda-website/backend/src/config"
 	"github.com/haristhropic/skomda-website/backend/src/models"
@@ -51,6 +52,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 	// Middleware
 	app.Use(recover.New())
+
 	app.Use(func(c *fiber.Ctx) error {
 		timeout := 10 * time.Second
 		if c.Method() == fiber.MethodGet {
@@ -87,6 +89,14 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		log.Printf("request_id=%s method=%s route=%q status=%d duration_ms=%d",
 			requestID, c.Method(), route, status, time.Since(startedAt).Milliseconds())
 		return err
+	})
+
+	app.Use(func(c *fiber.Ctx) error {
+		// Direct API requests obey the same cap as the same-origin proxy.
+		if c.Path() != "/api/upload/image" && c.Path() != "/api/upload/document" && len(c.Body()) > 1024*1024 {
+			return c.Status(fiber.StatusRequestEntityTooLarge).JSON(fiber.Map{"error": "Permintaan maksimal 1 MiB"})
+		}
+		return c.Next()
 	})
 
 	allowedOrigins := make([]string, 0, 10)
@@ -260,7 +270,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		var existing models.User
-		if err := config.DB.Unscoped().Where("LOWER(email) = ?", input.Email).First(&existing).Error; err == nil {
+		if err := requestDB(c).Unscoped().Where("LOWER(email) = ?", input.Email).First(&existing).Error; err == nil {
 			return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "Email sudah digunakan"})
 		} else if err != gorm.ErrRecordNotFound {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memeriksa email akun"})
@@ -531,7 +541,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			Status:        status,
 		}
 
-		if err := config.DB.Create(&news).Error; err != nil {
+		if err := requestDB(c).Create(&news).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal menyimpan berita",
 			})
@@ -539,18 +549,16 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 		userName, _ := c.Locals("user_name").(string)
 		userID, _ := c.Locals("user_id").(uint)
-		go func(uid uint, uname, ip string) {
-			config.DB.Create(&models.AuditLog{
-				UserID:    uid,
-				UserName:  uname,
-				Action:    "CREATE",
-				Entity:    "news",
-				EntityID:  fmt.Sprint(news.ID),
-				Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
-				IPAddress: ip,
-				CreatedAt: time.Now(),
-			})
-		}(userID, userName, c.IP())
+		audit.Enqueue(config.DB, models.AuditLog{
+			UserID:    userID,
+			UserName:  userName,
+			Action:    "CREATE",
+			Entity:    "news",
+			EntityID:  fmt.Sprint(news.ID),
+			Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
+			IPAddress: c.IP(),
+			CreatedAt: time.Now(),
+		})
 
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"message": "Berita berhasil diterbitkan",
@@ -616,18 +624,16 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 		userName, _ := c.Locals("user_name").(string)
 		userID, _ := c.Locals("user_id").(uint)
-		go func(uid uint, uname, ip string) {
-			config.DB.Create(&models.AuditLog{
-				UserID:    uid,
-				UserName:  uname,
-				Action:    "UPDATE",
-				Entity:    "news",
-				EntityID:  fmt.Sprint(existing.ID),
-				Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
-				IPAddress: ip,
-				CreatedAt: time.Now(),
-			})
-		}(userID, userName, c.IP())
+		audit.Enqueue(config.DB, models.AuditLog{
+			UserID:    userID,
+			UserName:  userName,
+			Action:    "UPDATE",
+			Entity:    "news",
+			EntityID:  fmt.Sprint(existing.ID),
+			Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
+			IPAddress: c.IP(),
+			CreatedAt: time.Now(),
+		})
 
 		return c.JSON(fiber.Map{
 			"message": "Berita berhasil diperbarui",
@@ -659,18 +665,16 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 		userName, _ := c.Locals("user_name").(string)
 		userID, _ := c.Locals("user_id").(uint)
-		go func(uid uint, uname, ip string) {
-			config.DB.Create(&models.AuditLog{
-				UserID:    uid,
-				UserName:  uname,
-				Action:    "DELETE",
-				Entity:    "news",
-				EntityID:  fmt.Sprint(existing.ID),
-				Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
-				IPAddress: ip,
-				CreatedAt: time.Now(),
-			})
-		}(userID, userName, c.IP())
+		audit.Enqueue(config.DB, models.AuditLog{
+			UserID:    userID,
+			UserName:  userName,
+			Action:    "DELETE",
+			Entity:    "news",
+			EntityID:  fmt.Sprint(existing.ID),
+			Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
+			IPAddress: c.IP(),
+			CreatedAt: time.Now(),
+		})
 
 		return c.JSON(fiber.Map{"message": "Berita berhasil dihapus"})
 	})
@@ -727,6 +731,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 		if chatbot.Suspicious(trimmed) || chatbot.UnsafeHistory(req.History) {
 			return c.JSON(fiber.Map{"response": chatbot.SafetyReply, "sources": []fiber.Map{}, "fallback": true})
+		}
+		if reply, source := chatbot.LocalFAQ(trimmed); reply != "" {
+			return c.JSON(fiber.Map{"response": reply, "sources": []fiber.Map{{"title": "Informasi resmi sekolah", "url": source}}, "model": "Skomda Verified FAQ"})
 		}
 		req.Model = cfg.ChatbotModel
 		leaseID := observability.RequestID("")
@@ -810,6 +817,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				if req.Stream {
 					c.Set("Content-Type", "text/event-stream")
 					c.Set("Cache-Control", "no-cache")
+					c.Set("X-Accel-Buffering", "no")
 					c.Set("Connection", "keep-alive")
 					c.Set("Transfer-Encoding", "chunked")
 					streamingResponse = true
@@ -830,8 +838,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 								"delta":   fiber.Map{"content": chunk},
 								"sources": targetedSources,
 							})
-							_, _ = w.Write([]byte("data: " + string(payload) + "\n\n"))
-							_ = w.Flush()
+							if _, err := w.Write([]byte("data: " + string(payload) + "\n\n")); err != nil {
+								return
+							}
+							if err := w.Flush(); err != nil {
+								return
+							}
 
 						}
 						_, _ = w.Write([]byte("data: [DONE]\n\n"))
@@ -882,7 +894,15 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 
-		httpReq, err := http.NewRequestWithContext(c.Context(), http.MethodPost, targetURL, bytes.NewBuffer(forwardPayload))
+		// fasthttp request contexts are pooled and finish before deferred stream
+		// writers execute. Keep the gateway lifetime independent of DB middleware.
+		gatewayCtx, gatewayCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer func() {
+			if !streamingResponse {
+				gatewayCancel()
+			}
+		}()
+		httpReq, err := http.NewRequestWithContext(gatewayCtx, http.MethodPost, targetURL, bytes.NewBuffer(forwardPayload))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal menghubungkan ke gateway AI.",
@@ -902,8 +922,17 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 		client := chatbot.GatewayClient
 
-		resp, err := client.Do(httpReq)
+		attempted := chatbot.ProviderAvailable(targetURL)
+		var resp *http.Response
+		if attempted {
+			resp, err = client.Do(httpReq)
+		} else {
+			err = chatbot.ErrProviderUnavailable
+		}
 		if err != nil || (resp != nil && resp.StatusCode != fiber.StatusOK) {
+			if attempted {
+				chatbot.ProviderFailed(targetURL)
+			}
 			requestID := c.Locals("request_id")
 			if err != nil {
 				log.Printf("[Fiber Chatbot] upstream tidak tersedia request_id=%v", requestID)
@@ -934,33 +963,40 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 			// Fallback digunakan saat upstream tidak tersedia atau mengembalikan error.
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{
-				"response": "Mohon maaf, layanan asisten virtual sedang dalam pemeliharaan berkala.\n\nUntuk pertanyaan seputar PPDB 2026/2027 atau konsultasi jurusan SIJA & TJAT, silakan hubungi WhatsApp Humas resmi SMK Telkom Sidoarjo di 0811-3021-919 atau unduh brosur resmi di menu [Unduh Informasi](/unduh-informasi).",
+				"response": chatbot.UnavailableReply,
 				"sources": []fiber.Map{
 					{
-						"title":    "Unduh Brosur PPDB & Informasi",
-						"url":      "/unduh-informasi",
-						"category": "PPDB & Regulasi",
+						"title":    "Profil sekolah",
+						"url":      "/tentang-kami/profil-sekolah",
+						"category": "Informasi sekolah",
 					},
 				},
 				"fallback": true,
 			})
 		}
+		chatbot.ProviderRecovered(targetURL)
 
 		if req.Stream && strings.Contains(resp.Header.Get("Content-Type"), "text/event-stream") {
 			c.Set("Content-Type", "text/event-stream")
 			c.Set("Cache-Control", "no-cache")
+			c.Set("X-Accel-Buffering", "no")
 			c.Set("Connection", "keep-alive")
 			c.Set("Transfer-Encoding", "chunked")
 			streamingResponse = true
 			c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
+				defer gatewayCancel()
 				defer func() { <-chatbotSlots; shared.Current.ReleaseAI(leaseID) }()
 				defer resp.Body.Close()
 				reader := bufio.NewReader(io.LimitReader(resp.Body, 512*1024))
 				for {
 					line, readErr := reader.ReadBytes('\n')
 					if len(line) > 0 {
-						_, _ = w.Write(line)
-						_ = w.Flush()
+						if _, err := w.Write(line); err != nil {
+							break
+						}
+						if err := w.Flush(); err != nil {
+							break
+						}
 					}
 					if readErr != nil {
 						break
@@ -1018,7 +1054,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 		if !allowedImgExts[ext] {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Format ekstensi gambar tidak didukung. Format yang diizinkan: JPG, JPEG, PNG, WEBP, GIF.",
+				"error": "Format ekstensi gambar tidak didukung. Format yang diizinkan: JPG, JPEG, PNG, WEBP.",
 			})
 		}
 
@@ -1031,7 +1067,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		contentType := fileHeader.Header.Get("Content-Type")
 		if !strings.HasPrefix(contentType, "image/") {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Format berkas harus berupa gambar (JPG, PNG, WebP, atau GIF).",
+				"error": "Format berkas harus berupa gambar (JPG, PNG, atau WebP).",
 			})
 		}
 

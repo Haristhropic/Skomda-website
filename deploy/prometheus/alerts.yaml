@@ -1,6 +1,11 @@
 groups:
   - name: skomda
     rules:
+      - alert: EncryptedDatabaseBackupStale
+        expr: skomda_host_backup_age_seconds > 90000
+        for: 5m
+        labels: {severity: critical}
+        annotations: {summary: "Backup database terenkripsi terakhir lebih dari 25 jam"}
       - alert: VPSProcessesNearProviderLimit
         expr: skomda_host_pids_current / skomda_host_pids_max > 0.9
         for: 1m

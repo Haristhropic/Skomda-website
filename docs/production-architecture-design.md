@@ -66,10 +66,10 @@ Hostname Tunnel `frontend:3000` dan `backend:8080` menunjuk ke Nginx pada jaring
 1. CI membuat image immutable `sha-<commit penuh>`, scan sebelum publish.
 2. VPS mengunci deploy dengan `flock`; file environment wajib memakai mode `600`.
 3. Infrastruktur stabil dan slot aktif tetap berjalan.
-4. Slot tidak aktif dibersihkan; pull image, jalankan migrasi kompatibel.
+4. Slot tidak aktif dibersihkan; pull image, jalankan migrasi kompatibel. Jika PID host di atas 370 dari batas 500, replica b versi aktif dihentikan sementara setelah pair a diverifikasi sehat. Pair a tetap melayani traffic selama pemanasan kandidat; kegagalan menghidupkan kembali replica b. Operasi Compose diserialkan untuk membatasi burst proses.
 5. Dua frontend dan dua backend kandidat harus sehat sebelum traffic dialihkan.
 6. Konfigurasi Nginx divalidasi, lalu di-reload secara bertahap. Probe frontend/API wajib lulus. Kegagalan mengembalikan pointer sebelumnya.
-7. Slot sebelumnya dipertahankan untuk rollback dan fallback `/_next/static/` bagi browser yang masih membuka release lama.
+7. Setelah drain 35 detik, container slot sebelumnya dihentikan untuk memberi ruang PID/RAM. Image/container tetap tersedia untuk warm rollback, dan static chunk terverifikasi diarsipkan di Nginx bagi browser yang masih membuka release lama. Rollback menunggu target sehat sebelum mengalihkan traffic.
 
 Gunakan `scripts/rollback-demo.sh` dari repo, atau `./rollback-demo.sh` pada direktori deployment VPS. Jangan menjalankan `compose down` pada infrastruktur atau slot aktif untuk release rutin. Upgrade proxy, Tunnel, atau infrastruktur memerlukan rencana transisi tersendiri; release aplikasi tidak membuat semua upgrade infrastruktur otomatis bebas gangguan.
 

@@ -109,6 +109,10 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		c.JSON(200, gin.H{"response": SafetyReply, "sources": []gin.H{}, "fallback": true})
 		return
 	}
+	if reply, source := LocalFAQ(trimmedMessage); reply != "" {
+		c.JSON(200, gin.H{"response": reply, "sources": []gin.H{{"title": "Informasi resmi sekolah", "url": source}}, "model": "Skomda Verified FAQ"})
+		return
+	}
 	req.Model = cfg.ChatbotModel
 	// Cek apakah query DTP memiliki intensi spesifik (magang/karir, sertifikasi, daftar 9 spesialisasi, atau overview)
 	if isDtpQuery(trimmedMessage) {
@@ -272,8 +276,17 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 
 	client := GatewayClient
 
-	resp, err := client.Do(httpReq)
+	attempted := ProviderAvailable(nexusURL)
+	var resp *http.Response
+	if attempted {
+		resp, err = client.Do(httpReq)
+	} else {
+		err = ErrProviderUnavailable
+	}
 	if err != nil || (resp != nil && resp.StatusCode != http.StatusOK) {
+		if attempted {
+			ProviderFailed(nexusURL)
+		}
 		requestID, _ := c.Get("request_id")
 		if err != nil {
 			log.Printf("[Chatbot] upstream tidak tersedia request_id=%v", requestID)
@@ -305,18 +318,19 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 
 		// Fallback ramah jika NexusRouter offline atau mengembalikan error.
 		c.JSON(http.StatusOK, gin.H{
-			"response": "Mohon maaf, asisten virtual SMK Telkom Sidoarjo sedang dalam pemeliharaan berkala.\n\nUntuk informasi pendaftaran PPDB 2026/2027, jurusan, atau konsultasi sekolah, silakan hubungi WhatsApp resmi kami di **0811-3021-919** atau unduh brosur resmi di menu [Unduh Informasi](/unduh-informasi).",
+			"response": UnavailableReply,
 			"sources": []gin.H{
 				{
-					"title":    "Unduh Brosur PPDB & Informasi",
-					"url":      "/unduh-informasi",
-					"category": "PPDB & Regulasi",
+					"title":    "Profil sekolah",
+					"url":      "/tentang-kami/profil-sekolah",
+					"category": "Informasi sekolah",
 				},
 			},
 			"fallback": true,
 		})
 		return
 	}
+	ProviderRecovered(nexusURL)
 	defer resp.Body.Close()
 
 	// 4. Handle Streaming SSE atau JSON Response
@@ -331,7 +345,9 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		for {
 			line, readErr := reader.ReadBytes('\n')
 			if len(line) > 0 {
-				_, _ = c.Writer.Write(line)
+				if _, err := c.Writer.Write(line); err != nil {
+					break
+				}
 				c.Writer.Flush()
 			}
 			if readErr != nil {

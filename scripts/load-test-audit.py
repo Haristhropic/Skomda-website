@@ -76,10 +76,12 @@ async def run(args):
         rows.append(await probe(session, "POST", FRONTEND + "/api/backend/auth/login", [403], headers={"Content-Type": "application/json"}, data="{}"))
         # Invalid token cannot grant admin access; no account/login attempts needed.
         rows.append(await probe(session, "GET", FRONTEND + "/api/backend/admin/users", [401], headers={"Authorization": "Bearer invalid-audit-token"}))
-        rows.append(await probe(session, "GET", FRONTEND + "/api/observability/grafana/", [401, 403]))
+        # Next canonicalizes trailing slashes before route authorization. Test
+        # the canonical URL, not the harmless 308 redirect to that URL.
+        rows.append(await probe(session, "GET", FRONTEND + "/api/observability/grafana", [401, 403]))
         # Caller-supplied upstream identity is never a substitute for an admin
         # session. These synthetic identities do not represent real people.
-        rows.append(await probe(session, "GET", FRONTEND + "/api/observability/grafana/", [401, 403], headers={"X-WEBAUTH-USER": "synthetic-audit", "X-WEBAUTH-ROLE": "Admin"}))
+        rows.append(await probe(session, "GET", FRONTEND + "/api/observability/grafana", [401, 403], headers={"X-WEBAUTH-USER": "synthetic-audit", "X-WEBAUTH-ROLE": "Admin"}))
         # Reject excess JSON before touching login state or invoking AI. Use the
         # same-origin proxy with the valid site Origin to isolate the body cap.
         rows.append(await probe(session, "POST", FRONTEND + "/api/backend/chatbot/message", [413], headers={"Origin": FRONTEND, "Content-Type": "application/json"}, data=json.dumps({"message": "a" * (1024 * 1024)})))
