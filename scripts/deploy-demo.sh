@@ -85,10 +85,13 @@ if [[ -n "$active" && -r "$pid_file" && "$(cat "$pid_file")" -gt 370 ]]; then
   cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
   mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
   switched=true
+  # Free host PIDs before the in-container Nginx config check. The current
+  # config still includes this pair, and Nginx retries connection failures to
+  # the verified pair-a upstream while its pair-b containers stop.
+  RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 35 frontend-b backend-b
   docker compose --env-file deploy.env exec -T edge nginx -t
   docker kill --signal HUP "$(docker compose --env-file deploy.env ps -q edge)"
   switched=false
-  RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 35 frontend-b backend-b
   echo 'Traffic is on one verified serving pair during candidate warm-up due to provider PID budget.'
 fi
 release --profile operations pull
