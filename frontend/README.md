@@ -1,4 +1,4 @@
-# Frontend: SMK Telkom Sidoarjo (Next.js 16 App Router)
+# SMK Telkom Sidoarjo
 
 Aplikasi klien web resmi dan portal manajemen konten **SMK Telkom Sidoarjo**, dibangun menggunakan arsitektur modern **Next.js 16 (App Router)**, **React 19**, **TypeScript**, **Tailwind CSS**, dan **Framer Motion**.
 
