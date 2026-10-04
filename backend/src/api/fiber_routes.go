@@ -882,9 +882,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 		targetURL := strings.TrimRight(cfg.NexusRouterURL, "/") + "/api/v1/skomda/chat"
 		forwardPayload, err := json.Marshal(map[string]interface{}{
-			"message":       chatbot.ProtectedMessage(processedMessage),
+			"message":       chatbot.ProtectedConversation(processedMessage, req.History),
 			"system_prompt": chatbot.SafetyPolicy,
-			"history":       req.History,
+			"history":       []chatbot.ChatMessage{},
 			"stream":        req.Stream,
 			"model":         req.Model,
 		})
