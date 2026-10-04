@@ -103,7 +103,7 @@ Jangan menampilkan connection string saat menjalankan pemeriksaan. Jika koneksi 
 
 ## 5. Konteks aplikasi SKOMDA
 
-Backend Go terhubung langsung ke PostgreSQL dengan `DATABASE_URL`; browser tidak memakai Supabase Data API untuk query tabel pada alur yang ditemukan di repository. Skema sekarang dimigrasikan melalui command eksplisit `/app/migrate`, bukan saat HTTP server production startup. Migrator mengaktifkan RLS dan memeriksa error untuk `jurusans`, `news`, `users`, `audit_logs`, `alumnis`, `digital_talents`, dan `trial_class_events`. Model lain yang dimigrasikan—termasuk `trial_class_registrations`, `bkk_jobs`, `bkk_partners`, dan `documents`—tidak menerima perintah enable RLS dari migrator saat ini. Karena itu status aktual tetap harus dibaca dari katalog database dan role koneksi.
+Backend Go terhubung langsung ke PostgreSQL dengan `DATABASE_URL`; browser tidak memakai Supabase Data API untuk query tabel pada alur yang ditemukan di repository. Image VPS saat audit memakai command eksplisit `/app/migrate`, bukan HTTP server startup; versi live tersebut memakai GORM `AutoMigrate` dan mengaktifkan RLS pada `jurusans`, `news`, `users`, `audit_logs`, `alumnis`, `digital_talents`, dan `trial_class_events`. Model lain—termasuk `trial_class_registrations`, `bkk_jobs`, `bkk_partners`, dan `documents`—tidak menerima perintah enable RLS dari migrator live itu. Branch `deploy` yang sedang disiapkan beralih ke SQL migrations Goose berversi; kode baru belum dideploy dan baseline produksinya belum dicatat. Karena itu status aktual tetap harus dibaca dari katalog database dan role koneksi.
 
 Karena koneksi direct Postgres mungkin menggunakan role owner, jangan menganggap aktivasi RLS tersebut otomatis melindungi query backend. Beberapa log startup sebelumnya menampilkan user `postgres`; verifikasi role lewat koneksi yang memakai URL aplikasi saat ini sebelum menarik kesimpulan.
 
@@ -125,6 +125,12 @@ Catatan ini merangkum output audit pemilik database (4 Oktober 2026). Output kat
 - Output sequence yang dibagikan terpotong pada `fasilitas_id_seq`. Pada sequence yang terlihat, `anon`, `authenticated`, dan `service_role` masing-masing memiliki `SELECT`, `UPDATE`, dan `USAGE`. Jangan menganggap daftar itu lengkap sampai output utuh tersedia; pola yang terlihat tetap menunjukkan grants yang perlu ditinjau.
 
 > **Kesimpulan sementara:** Data API yang mati mengurangi permukaan akses HTTP Supabase, tetapi tidak menghapus grants katalog maupun menyelesaikan penggunaan role `postgres` oleh backend. Jangan mengaktifkan Data API kembali sebelum grants, policies, dan role aplikasi dirancang ulang dan diuji.
+
+### Konfirmasi schema-only dump (4 Oktober 2026)
+
+Pemilik menjalankan `pg_dump --schema-only --no-owner --schema=public` dari VPS. Pemeriksaan struktur mengonfirmasi 17 tabel dan 17 sequence di schema `public`, RLS aktif pada 7 tabel, dan hanya 2 policy yang tercantum (`SELECT` publik pada `news` dan `jurusans`). Dump memuat 106 pernyataan `GRANT` (35 masing-masing untuk `anon`, `authenticated`, dan `service_role`, serta satu untuk `postgres`) dan 24 pernyataan default privileges. Angka ini menghitung pernyataan di dump, bukan pengganti audit hak efektif per tabel.
+
+File dump tetap lokal di komputer operator dan tidak dimasukkan ke repository karena memuat detail struktur/grant. Dump PostgreSQL juga memiliki dua perintah khusus `psql`; jangan jalankan langsung lewat migrator `database/sql`. Baseline migrasi harus direview dan dibuat eksplisit. Untuk database yang sudah ada, migrator perlu mem-baseline versi awal setelah pemeriksaan kecocokan, bukan mencoba membuat ulang tabel yang sudah ada.
 
 ### Arah remediasi (belum dijalankan)
 

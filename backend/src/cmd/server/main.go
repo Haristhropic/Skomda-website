@@ -3,11 +3,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +23,7 @@ import (
 	"github.com/haristhropic/skomda-website/backend/src/api/news"
 	"github.com/haristhropic/skomda-website/backend/src/config"
 	"github.com/haristhropic/skomda-website/backend/src/observability"
+	"github.com/haristhropic/skomda-website/backend/src/shared"
 )
 
 func main() {
@@ -26,11 +31,15 @@ func main() {
 
 	// Inisialisasi Database & Seeder
 	config.InitDB(cfg)
+	observability.StartPrivateServer(cfg.MonitoringPort)
 
 	// Default engine: Fiber (mendukung seluruh fitur Auth, Admin, dan CRUD)
 	if cfg.ServerEngine != "gin" {
 		log.Printf("🚀 Memulai backend dengan engine: FIBER (port %s)", cfg.Port)
 		fiberApp := api.NewFiberApp(cfg)
+		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+		defer stop()
+		go func() { <-ctx.Done(); _ = fiberApp.ShutdownWithTimeout(30 * time.Second) }()
 		if err := fiberApp.Listen(":" + cfg.Port); err != nil {
 			log.Fatalf("gagal menjalankan server Fiber: %v", err)
 		}
@@ -39,6 +48,11 @@ func main() {
 
 	// Default: Gunakan engine GIN
 	log.Printf("🚀 Memulai backend dengan engine: GIN (port %s)", cfg.Port)
+	store, redisErr := shared.New(cfg.RedisURL)
+	if redisErr != nil {
+		log.Fatal("invalid Redis configuration")
+	}
+	shared.Current = store
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(func(c *gin.Context) {
@@ -55,6 +69,7 @@ func main() {
 		}
 		log.Printf("request_id=%s method=%s route=%q status=%d duration_ms=%d",
 			requestID, c.Request.Method, route, c.Writer.Status(), time.Since(startedAt).Milliseconds())
+		observability.Record(c.Request.Method, route, c.Writer.Status(), time.Since(startedAt), requestID)
 	})
 	_ = router.SetTrustedProxies(nil)
 	router.Use(corsMiddleware(cfg.AllowedOrigin, cfg.Env))
@@ -66,7 +81,16 @@ func main() {
 	chatbot.RegisterRoutes(apiGroup, cfg)
 
 	log.Printf("backend Gin jalan di port %s", cfg.Port)
-	if err := router.Run(":" + cfg.Port); err != nil {
+	server := &http.Server{Addr: ":" + cfg.Port, Handler: router, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 40 * time.Second, IdleTimeout: 60 * time.Second}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	go func() {
+		<-ctx.Done()
+		drainCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		_ = server.Shutdown(drainCtx)
+	}()
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("gagal menjalankan server: %v", err)
 	}
 }

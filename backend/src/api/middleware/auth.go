@@ -46,7 +46,7 @@ func AuthMiddleware(secret string) fiber.Handler {
 		// Role dalam JWT adalah snapshot saat login. Ambil role terbaru dari database
 		// agar perubahan/penonaktifan akun berlaku tanpa menunggu token 24 jam kedaluwarsa.
 		var user models.User
-		if err := config.DB.Select("id", "email", "name", "role").First(&user, claims.UserID).Error; err != nil {
+		if err := config.DB.WithContext(c.UserContext()).Select("id", "email", "name", "role").First(&user, claims.UserID).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 					"error": "Akun tidak ditemukan atau sudah dinonaktifkan. Silakan login kembali.",
@@ -71,6 +71,11 @@ func AuthMiddleware(secret string) fiber.Handler {
 		c.Locals("user_email", claims.Email)
 		c.Locals("user_name", claims.Name)
 		c.Locals("user_role", claims.Role)
+		// Content belongs to editors; super admins monitor and provision accounts.
+		contentRequest := !strings.HasPrefix(c.Path(), "/api/auth/") && !strings.HasPrefix(c.Path(), "/api/admin/users") && c.Path() != "/api/admin/monitoring" && c.Path() != "/api/admin/audit-logs"
+		if contentRequest && !strings.EqualFold(user.Role, "editor") {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Pengelolaan konten hanya tersedia untuk admin editor"})
+		}
 
 		return c.Next()
 	}

@@ -10,11 +10,11 @@ Service REST API backend untuk website resmi **SMK Telkom Sidoarjo**, dibangun m
   - **Fiber v2 (Default & Rekomendasi)**: Engine web berkecepatan tinggi berbasis Fasthttp dengan alokasi memori minimal.
   - **Gin**: Engine alternatif yang stabil dan kompatibel penuh dengan middleware standar HTTP.
   - Berganti engine secara instan hanya dengan mengatur environment variable `SERVER_ENGINE=fiber` atau `SERVER_ENGINE=gin`.
-- **Database & Auto-Migration (GORM)**:
+- **Database & Migrations**:
   - Terhubung ke **PostgreSQL** melalui `DATABASE_URL` (Supabase untuk staging dan produksi).
   - PostgreSQL wajib untuk staging dan production; backend mengecek koneksi saat startup dan berhenti jika database tidak tersedia.
   - SQLite lokal hanya bisa dipilih eksplisit dengan `DATABASE_DRIVER=sqlite` di luar production. Kegagalan koneksi Postgres tidak pernah memicu fallback otomatis.
-  - Development/test melakukan migrasi dan inisialisasi data saat startup. Production hanya membuka koneksi saat startup; migrasi dijalankan terpisah lewat image command `/app/migrate`, dan seed awal hanya bila operator memberikan `--seed-initial` secara eksplisit.
+  - Development/test menyinkronkan model dan inisialisasi data saat startup. Production hanya membuka koneksi saat startup; perubahan skema dijalankan lewat SQL migrations Goose berversi yang di-embed ke image melalui `/app/migrate`. Database existing harus diadopsi sekali dengan `--baseline-existing` setelah pemeriksaan inventaris dan kecocokan terhadap dump schema terbaru. Seed awal tetap hanya bila operator memberikan `--seed-initial` secara eksplisit.
 - **Autentikasi JWT & Otorisasi Role-Based**:
   - Proteksi rute admin menggunakan token JWT (`golang-jwt/jwt/v5`).
   - Verifikasi identitas user, enkripsi password via `bcrypt`, dan audit logging aktivitas.

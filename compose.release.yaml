@@ -1,0 +1,101 @@
+name: skomda-${RELEASE_SLOT:?Set RELEASE_SLOT}
+
+x-backend: &backend
+  image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER}/skomda-backend:${IMAGE_TAG:?Use an immutable image tag}
+  restart: unless-stopped
+  init: true
+  stop_grace_period: 35s
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  env_file: [./backend/.env]
+  environment:
+    ENV: production
+    DATABASE_DRIVER: postgres
+    SERVER_ENGINE: fiber
+    PORT: "8080"
+    MONITORING_PORT: "9091"
+    GOMAXPROCS: "2"
+    ALLOWED_ORIGIN: ${FRONTEND_ORIGIN:-https://linear.smktelkom-sidoarjo.my.id}
+    DB_MAX_OPEN_CONNS: "8"
+    DB_MAX_IDLE_CONNS: "2"
+  mem_limit: 192m
+  cpus: 1.0
+  ulimits:
+    nofile: {soft: 8192, hard: 8192}
+  logging: &logging
+    driver: local
+    options: {max-size: 10m, max-file: "3"}
+  healthcheck:
+    test: [CMD, wget, -q, --spider, http://127.0.0.1:8080/api/health]
+    interval: 10s
+    timeout: 5s
+    start_period: 30s
+    retries: 6
+
+x-frontend: &frontend
+  image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER}/skomda-frontend:${IMAGE_TAG:?Use an immutable image tag}
+  restart: unless-stopped
+  init: true
+  stop_grace_period: 35s
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  mem_limit: 384m
+  cpus: 1.0
+  ulimits:
+    nofile: {soft: 8192, hard: 8192}
+  logging: *logging
+  healthcheck:
+    test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 10s
+    timeout: 5s
+    start_period: 30s
+    retries: 6
+
+services:
+  backend-a:
+    <<: *backend
+    networks:
+      app: {aliases: ["${RELEASE_SLOT}-backend-a"]}
+  backend-b:
+    <<: *backend
+    networks:
+      app: {aliases: ["${RELEASE_SLOT}-backend-b"]}
+  frontend-a:
+    <<: *frontend
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      BACKEND_API_URL: http://${RELEASE_SLOT}-backend-a:8080/api
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-https://linear.smktelkom-sidoarjo.my.id}
+      GRAFANA_URL: http://grafana:3000
+    depends_on:
+      backend-a: {condition: service_healthy}
+    networks:
+      app: {aliases: ["${RELEASE_SLOT}-frontend-a"]}
+  frontend-b:
+    <<: *frontend
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      BACKEND_API_URL: http://${RELEASE_SLOT}-backend-b:8080/api
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-https://linear.smktelkom-sidoarjo.my.id}
+      GRAFANA_URL: http://grafana:3000
+    depends_on:
+      backend-b: {condition: service_healthy}
+    networks:
+      app: {aliases: ["${RELEASE_SLOT}-frontend-b"]}
+  migrate:
+    profiles: [operations]
+    <<: *backend
+    restart: "no"
+    entrypoint: [/app/migrate]
+    env_file: [./backend/migrate.env]
+    healthcheck: {disable: true}
+    networks: [app]
+
+networks:
+  app:
+    external: true
+    name: skomda-runtime

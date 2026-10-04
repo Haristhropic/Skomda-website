@@ -25,6 +25,8 @@ type Config struct {
 	NexusRouterURL string // URL NexusRouter AI gateway (default: http://localhost:3000)
 	ServerEngine   string // gin | fiber (default: gin)
 	ChatbotModel   string // Model AI untuk chatbot (default: llama-3.3-70b-versatile)
+	RedisURL       string // Private Redis connection; never exposed to clients.
+	MonitoringPort string // Unpublished Docker network port for Prometheus.
 }
 
 // Load membaca .env (kalau ada, biasanya cuma di local dev) lalu env var asli.
@@ -61,6 +63,8 @@ func load(validateRuntimeConfig bool) Config {
 		NexusRouterURL: getEnv("NEXUS_ROUTER_URL", "https://fahlyce.vercel.app"),
 		ServerEngine:   strings.ToLower(getEnv("SERVER_ENGINE", "fiber")),
 		ChatbotModel:   getEnv("CHATBOT_MODEL", "llama-3.3-70b-versatile"),
+		RedisURL:       getEnv("REDIS_URL", ""),
+		MonitoringPort: getEnv("MONITORING_PORT", ""),
 	}
 	if validateRuntimeConfig && strings.EqualFold(cfg.Env, "production") {
 		if err := validateProductionOrigins(cfg.AllowedOrigin); err != nil {

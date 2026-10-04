@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import AdminSidebar from "./AdminSidebar";
 import AdminHeader from "./AdminHeader";
@@ -21,15 +21,20 @@ export default function AdminLayout({
   subtitle,
   actions,
 }: AdminLayoutProps) {
-  const { isAuthenticated, isLoading } = useAdminAuth();
+  const { isAuthenticated, isLoading, user } = useAdminAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const technicalPage = pathname === "/admin/monitoring" || pathname.startsWith("/admin/monitoring/") || pathname === "/admin/audit-logs" || pathname === "/admin/users";
+  const wrongPanel = !!user && (user.role === "super_admin" ? !technicalPage : technicalPage);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace(SECRET_ADMIN_LOGIN_PATH);
+    } else if (!isLoading && wrongPanel) {
+      router.replace(user?.role === "super_admin" ? "/admin/monitoring" : "/admin");
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, wrongPanel, user?.role, router]);
 
   // Loading skeleton state
   if (isLoading) {
@@ -60,7 +65,7 @@ export default function AdminLayout({
   }
 
   // Not authenticated state (redirecting)
-  if (!isAuthenticated) {
+  if (!isAuthenticated || wrongPanel) {
     return null;
   }
 

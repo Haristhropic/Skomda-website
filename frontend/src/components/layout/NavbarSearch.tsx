@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { isAnalyticsExcludedPath } from "@/lib/analyticsRoutes";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { MOCK_NEWS, NewsItem, getNewsList } from "@/services/news";
+import { NewsItem, getNewsList } from "@/services/news";
 import { getLocalizedNewsItem } from "@/services/newsLocalization";
 import { DOWNLOAD_DOCUMENTS } from "@/components/sections/unduh/UnduhInformasiClient";
 import { PRESTASI_LIST } from "@/data/prestasiData";
@@ -557,7 +557,7 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
 
-  const [liveNews, setLiveNews] = useState<NewsItem[]>(MOCK_NEWS);
+  const [liveNews, setLiveNews] = useState<NewsItem[]>([]);
   const [liveAlumni, setLiveAlumni] = useState<AlumniItem[]>([]);
 
   useEffect(() => {
@@ -569,11 +569,9 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
     if (isOpen) {
       getNewsList()
         .then((items) => {
-          if (items && items.length > 0) {
-            setLiveNews(items);
-          }
+          setLiveNews(items);
         })
-        .catch(() => {});
+        .catch(() => setLiveNews([]));
     }
   }, [isOpen]);
 

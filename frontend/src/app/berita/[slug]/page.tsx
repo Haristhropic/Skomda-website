@@ -44,7 +44,7 @@ export default async function NewsDetailPage({ params }: Props) {
   }
 
   // Ambil list berita lain untuk rekomendasi "Berita Terkait"
-  const allNews = await getNewsList();
+  const allNews = await getNewsList().catch(() => []);
   const relatedNews = allNews
     .filter((item) => item.slug !== news.slug)
     .slice(0, 3);

@@ -58,8 +58,10 @@ export default function AdminDashboardPage() {
   const { user } = useAdminAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    if (user?.role !== "editor") return;
     const fetchStats = async () => {
       try {
         const res = await fetch(adminApiUrl("admin/dashboard/stats"), {
@@ -68,20 +70,22 @@ export default function AdminDashboardPage() {
         if (res.ok) {
           const data = await res.json();
           setStats(data);
+        } else {
+          setError("Statistik konten tidak dapat dimuat. Muat ulang halaman untuk mencoba lagi.");
         }
       } catch (err) {
-        console.warn("Statistik dashboard menggunakan data cadangan:", (err as Error)?.message);
+        setError("Tidak dapat terhubung ke layanan statistik. Muat ulang halaman untuk mencoba lagi.");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchStats();
-  }, []);
+  }, [user?.role]);
 
   return (
     <AdminLayout
-      title="Pusat Kendali Admin"
+      title="Editor Konten"
       subtitle={`Selamat bertugas, ${user?.name || "Administrator"}. Kelola seluruh konten situs dari panel ini.`}
       actions={
         <Link
@@ -94,6 +98,7 @@ export default function AdminDashboardPage() {
       }
     >
       <div className="space-y-8">
+        {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">{error}</p>}
         {/* Metric Cards Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {/* Card 1: Berita */}
@@ -106,10 +111,10 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-3">
               <p className="text-2xl font-bold text-slate-900 font-poppins">
-                {stats?.totalNews ?? 12}
+                {stats?.totalNews ?? "—"}
               </p>
               <p className="mt-1 text-xs text-slate-500">
-                {stats?.publishedNews ?? 12} Terbit, {stats?.draftNews ?? 0} Draf
+                {stats?.publishedNews ?? "—"} Terbit, {stats?.draftNews ?? "—"} Draf
               </p>
             </div>
           </div>
@@ -124,7 +129,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-3">
               <p className="text-2xl font-bold text-slate-900 font-poppins">
-                {stats?.totalTeachers ?? 53}
+                {stats?.totalTeachers ?? "—"}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 Pendidik & Staf Terdaftar
@@ -142,7 +147,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-3">
               <p className="text-2xl font-bold text-slate-900 font-poppins">
-                {stats?.totalPrestasi ?? 11}
+                {stats?.totalPrestasi ?? "—"}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 Penghargaan Terverifikasi
@@ -160,7 +165,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="mt-3">
               <p className="text-2xl font-bold text-slate-900 font-poppins">
-                {stats?.totalDocuments ?? 41}
+                {stats?.totalDocuments ?? "—"}
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 Arsip Terbit & SOP Resmi
@@ -181,7 +186,7 @@ export default function AdminDashboardPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-900">Trial Class</p>
-                <p className="text-xs text-slate-500">{stats?.totalTrialClass ?? 0} Pendaftar</p>
+                <p className="text-xs text-slate-500">{stats?.totalTrialClass ?? "—"} Pendaftar</p>
               </div>
             </div>
             <ArrowRight className="size-4 text-[#bc0c11] group-hover:translate-x-0.5 transition-transform" />
@@ -213,7 +218,7 @@ export default function AdminDashboardPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-900">Digital Talent</p>
-                <p className="text-xs text-slate-500">{stats?.totalDtp ?? 9} Spesialisasi DTP</p>
+                <p className="text-xs text-slate-500">{stats?.totalDtp ?? "—"} Spesialisasi DTP</p>
               </div>
             </div>
             <ArrowRight className="size-4 text-slate-400 group-hover:text-slate-700 transition-colors" />

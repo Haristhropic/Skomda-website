@@ -20,6 +20,7 @@ import {
   X,
   Sparkles,
   Ticket,
+  Server,
 } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 
@@ -76,6 +77,15 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const TECHNICAL_NAV_GROUPS: NavGroup[] = [{
+  group: "Operasional Website",
+  items: [
+    { title: "Monitoring & Traffic", href: "/admin/monitoring", icon: Server },
+    { title: "Log Aktivitas", href: "/admin/audit-logs", icon: ShieldCheck },
+    { title: "Akun Editor", href: "/admin/users", icon: Users },
+  ],
+}];
+
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -110,7 +120,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         {/* Header / Brand */}
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-100 px-6">
           <Link
-            href="/admin"
+            href={user?.role === "super_admin" ? "/admin/monitoring" : "/admin"}
             className="flex items-center gap-3 transition-opacity hover:opacity-90"
           >
             <div className="relative flex size-9 shrink-0 items-center justify-center">
@@ -143,7 +153,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
         {/* Navigation Menus with Scroll */}
         <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-5 admin-modal-scrollbar">
-          {NAV_GROUPS.map((group) => {
+          {(user?.role === "super_admin" ? TECHNICAL_NAV_GROUPS : NAV_GROUPS).map((group) => {
             // Saring item berdasarkan role jika diperlukan
             const visibleItems = group.items.filter(
               (item) => !item.role || (user && user.role === item.role)
@@ -176,6 +186,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                             ? "bg-[#bc0c11] text-white shadow-sm"
                             : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                         }`}
+                        aria-current={isActive ? "page" : undefined}
                       >
                         <Icon
                           className={`size-4.5 shrink-0 transition-colors ${
@@ -229,7 +240,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 type="button"
                 onClick={logout}
                 title="Keluar dari Panel Admin"
-                className="flex size-8 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                aria-label="Keluar dari Panel Admin"
+                className="flex size-8 shrink-0 items-center justify-center rounded-lg text-red-700 hover:bg-red-50 hover:text-red-800 transition-colors"
               >
                 <LogOut className="size-4" />
               </button>

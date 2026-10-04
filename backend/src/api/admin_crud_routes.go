@@ -10,7 +10,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"gorm.io/gorm"
+
 	"github.com/haristhropic/skomda-website/backend/src/api/middleware"
 	"github.com/haristhropic/skomda-website/backend/src/config"
 	"github.com/haristhropic/skomda-website/backend/src/models"
@@ -24,12 +25,12 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	teacherGroup := api.Group("/teachers")
 	teacherGroup.Get("", func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
-		query := config.DB.Model(&models.Teacher{}).Order("order_index ASC, id ASC")
+		query := requestDB(c).Model(&models.Teacher{}).Order("order_index ASC, id ASC")
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
 		}
 		var list []models.Teacher
-		if err := query.Find(&list).Error; err != nil {
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data guru"})
 		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
@@ -37,13 +38,13 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	teacherGroup.Post("", authGuard, func(c *fiber.Ctx) error {
 		var item models.Teacher
-		if err := c.BodyParser(&item); err != nil {
+		if err := parseContentBody(c, &item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		if strings.TrimSpace(item.Name) == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nama guru/staf wajib diisi"})
 		}
-		if err := config.DB.Create(&item).Error; err != nil {
+		if err := requestDB(c).Create(&item).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan data guru"})
 		}
 		recordAudit(c, "CREATE", "teacher", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan guru: %s (%s)", item.Name, item.Role))
@@ -51,27 +52,43 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	teacherGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Teacher
-		config.DB.First(&existing, uint(id))
-		if err := c.BodyParser(&existing); err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
+		if err := parseContentBody(c, &existing); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		if id > 0 {
 			existing.ID = uint(id)
 		}
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "teacher", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui profil guru: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Data guru berhasil diperbarui", "data": existing})
 	})
 
-	teacherGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	teacherGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Teacher
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data guru tidak ditemukan"})
 		}
-		config.DB.Delete(&existing)
+		result := requestDB(c).Delete(&existing)
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "teacher", fmt.Sprint(id), fmt.Sprintf("Menghapus data guru: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Data guru berhasil dihapus"})
 	})
@@ -81,7 +98,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	prestasiGroup.Get("", func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
 		year := strings.TrimSpace(c.Query("year"))
-		query := config.DB.Model(&models.Prestasi{}).Order("id DESC")
+		query := requestDB(c).Model(&models.Prestasi{}).Order("id DESC")
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
 		}
@@ -89,7 +106,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			query = query.Where("year = ?", year)
 		}
 		var list []models.Prestasi
-		if err := query.Find(&list).Error; err != nil {
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data prestasi"})
 		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
@@ -97,7 +114,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	prestasiGroup.Post("", authGuard, func(c *fiber.Ctx) error {
 		var item models.Prestasi
-		if err := c.BodyParser(&item); err != nil {
+		if err := parseContentBody(c, &item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		if strings.TrimSpace(item.Title) == "" {
@@ -106,7 +123,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if strings.TrimSpace(item.Slug) == "" {
 			item.Slug = slugify(item.Title)
 		}
-		if err := config.DB.Create(&item).Error; err != nil {
+		if err := requestDB(c).Create(&item).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan prestasi"})
 		}
 		recordAudit(c, "CREATE", "prestasi", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan prestasi: %s (%s)", item.Title, item.Award))
@@ -114,27 +131,43 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	prestasiGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Prestasi
-		config.DB.First(&existing, uint(id))
-		if err := c.BodyParser(&existing); err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
+		if err := parseContentBody(c, &existing); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		if id > 0 {
 			existing.ID = uint(id)
 		}
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "prestasi", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui prestasi: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Data prestasi berhasil diperbarui", "data": existing})
 	})
 
-	prestasiGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	prestasiGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Prestasi
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data prestasi tidak ditemukan"})
 		}
-		config.DB.Delete(&existing)
+		result := requestDB(c).Delete(&existing)
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "prestasi", fmt.Sprint(id), fmt.Sprintf("Menghapus prestasi: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Data prestasi berhasil dihapus"})
 	})
@@ -142,20 +175,20 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	// ==================== 3. BKK (BURSA KERJA & MITRA) ====================
 	bkkGroup := api.Group("/bkk")
 	listBKKJobs := func(c *fiber.Ctx, publicOnly bool) error {
-		query := config.DB.Model(&models.BKKJob{}).Order("id DESC")
+		query := requestDB(c).Model(&models.BKKJob{}).Order("id DESC")
 		if publicOnly {
 			query = query.Where("LOWER(status) = ?", "active")
 		} else if status := strings.TrimSpace(c.Query("status")); status != "" && !strings.EqualFold(status, "semua") {
 			query = query.Where("LOWER(status) = ?", strings.ToLower(status))
 		}
 		var list []models.BKKJob
-		if err := query.Find(&list).Error; err != nil {
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil lowongan kerja"})
 		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	}
 	adminGroup := api.Group("/admin", authGuard)
-	adminGroup.Get("/bkk/jobs", middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	adminGroup.Get("/bkk/jobs", middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		return listBKKJobs(c, false)
 	})
 	bkkGroup.Get("/jobs", func(c *fiber.Ctx) error {
@@ -164,20 +197,10 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	// Public endpoint: Pasang Lowongan oleh Mitra / Perusahaan / Pengguna Publik
 	// Status selalu otomatis 'pending' (menunggu verifikasi admin agar tidak langsung tayang jika tidak valid)
-	bkkSubmitLimiter := limiter.New(limiter.Config{
-		Max:          5,
-		Expiration:   10 * time.Minute,
-		KeyGenerator: middleware.ClientIPKey,
-		LimitReached: func(c *fiber.Ctx) error {
-			c.Set("Retry-After", "600")
-			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Batas frekuensi permohonan lowongan terlampaui. Silakan tunggu beberapa saat sebelum mencoba kembali.",
-			})
-		},
-	})
+	bkkSubmitLimiter := middleware.SharedRateLimit("job-submit", 5, 10*time.Minute)
 	bkkGroup.Post("/jobs/submit", bkkSubmitLimiter, func(c *fiber.Ctx) error {
 		var item models.BKKJob
-		if err := c.BodyParser(&item); err != nil {
+		if err := parseContentBody(c, &item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Format permohonan lowongan tidak valid"})
 		}
 		if strings.TrimSpace(item.Title) == "" || strings.TrimSpace(item.Company) == "" {
@@ -199,7 +222,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			item.Deadline = "Segera"
 		}
 
-		if err := config.DB.Create(&item).Error; err != nil {
+		if err := requestDB(c).Create(&item).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan pengajuan lowongan kerja"})
 		}
 
@@ -211,7 +234,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	bkkGroup.Post("/jobs", authGuard, func(c *fiber.Ctx) error {
 		var item models.BKKJob
-		if err := c.BodyParser(&item); err != nil {
+		if err := parseContentBody(c, &item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		if role, _ := c.Locals("user_role").(string); !strings.EqualFold(role, "super_admin") {
@@ -225,14 +248,17 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if strings.TrimSpace(item.Source) == "" {
 			item.Source = "admin"
 		}
-		config.DB.Create(&item)
+		requestDB(c).Create(&item)
 		recordAudit(c, "CREATE", "bkk_job", fmt.Sprint(item.ID), fmt.Sprintf("Membuat lowongan: %s di %s", item.Title, item.Company))
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Lowongan kerja berhasil ditambahkan", "data": item})
 	})
 
 	// Endpoint khusus update status (ACC/Setujui, Tolak, atau Tutup) oleh Admin
-	bkkGroup.Put("/jobs/:id/status", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	bkkGroup.Put("/jobs/:id/status", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var input struct {
 			Status string `json:"status"`
 		}
@@ -240,13 +266,14 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Status tidak valid"})
 		}
 		var existing models.BKKJob
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Lowongan tidak ditemukan"})
 		}
 		oldStatus := existing.Status
 		existing.Status = strings.ToLower(strings.TrimSpace(input.Status))
-		config.DB.Save(&existing)
-
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		var actionDesc string
 		switch existing.Status {
 		case "active":
@@ -261,53 +288,72 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	bkkGroup.Put("/jobs/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.BKKJob
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Lowongan tidak ditemukan"})
 		}
 		originalStatus, originalSource := existing.Status, existing.Source
-		c.BodyParser(&existing)
+		parseContentBody(c, &existing)
 		existing.ID = uint(id)
 		if role, _ := c.Locals("user_role").(string); !strings.EqualFold(role, "super_admin") {
 			// Status dan asal pengajuan tidak dapat diubah lewat endpoint edit umum.
 			existing.Status = originalStatus
 			existing.Source = originalSource
 		}
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "bkk_job", fmt.Sprint(id), fmt.Sprintf("Memperbarui lowongan: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Lowongan berhasil diperbarui", "data": existing})
 	})
 
-	bkkGroup.Delete("/jobs/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	bkkGroup.Delete("/jobs/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.BKKJob
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Lowongan tidak ditemukan"})
 		}
-		config.DB.Delete(&existing)
+		result := requestDB(c).Delete(&existing)
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "bkk_job", fmt.Sprint(id), fmt.Sprintf("Menghapus lowongan: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Lowongan berhasil dihapus"})
 	})
 
 	bkkGroup.Get("/partners", func(c *fiber.Ctx) error {
 		var list []models.BKKPartner
-		config.DB.Order("order_index ASC, id ASC").Find(&list)
+		if err := requestDB(c).Order("order_index ASC, id ASC").Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
+			return c.Status(503).JSON(fiber.Map{"error": "Data sementara belum dapat dimuat"})
+		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	})
 
 	bkkGroup.Post("/partners", authGuard, func(c *fiber.Ctx) error {
 		var item models.BKKPartner
-		c.BodyParser(&item)
-		config.DB.Create(&item)
+		parseContentBody(c, &item)
+		requestDB(c).Create(&item)
 		recordAudit(c, "CREATE", "bkk_partner", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan mitra industri: %s", item.Name))
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Mitra berhasil ditambahkan", "data": item})
 	})
 
 	bkkGroup.Put("/partners/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.BKKPartner
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Mitra tidak ditemukan"})
 		}
 		var input models.BKKPartner
@@ -322,14 +368,25 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if input.OrderIndex > 0 {
 			existing.OrderIndex = input.OrderIndex
 		}
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "bkk_partner", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui mitra industri: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Mitra berhasil diperbarui", "data": existing})
 	})
 
-	bkkGroup.Delete("/partners/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
-		config.DB.Delete(&models.BKKPartner{}, uint(id))
+	bkkGroup.Delete("/partners/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
+		result := requestDB(c).Delete(&models.BKKPartner{}, uint(id))
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "bkk_partner", fmt.Sprint(id), "Menghapus mitra industri")
 		return c.JSON(fiber.Map{"message": "Mitra berhasil dihapus"})
 	})
@@ -338,35 +395,53 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	ekskulGroup := api.Group("/ekskul")
 	ekskulGroup.Get("", func(c *fiber.Ctx) error {
 		var list []models.Ekstrakurikuler
-		config.DB.Order("order_index ASC, id ASC").Find(&list)
+		if err := requestDB(c).Order("order_index ASC, id ASC").Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
+			return c.Status(503).JSON(fiber.Map{"error": "Data sementara belum dapat dimuat"})
+		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	})
 
 	ekskulGroup.Post("", authGuard, func(c *fiber.Ctx) error {
 		var item models.Ekstrakurikuler
-		c.BodyParser(&item)
+		parseContentBody(c, &item)
 		if item.Slug == "" {
 			item.Slug = slugify(item.Name)
 		}
-		config.DB.Create(&item)
+		requestDB(c).Create(&item)
 		recordAudit(c, "CREATE", "ekskul", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan ekstrakurikuler: %s", item.Name))
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Ekstrakurikuler berhasil ditambahkan", "data": item})
 	})
 
 	ekskulGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Ekstrakurikuler
-		config.DB.First(&existing, uint(id))
-		c.BodyParser(&existing)
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
+		parseContentBody(c, &existing)
 		existing.ID = uint(id)
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "ekskul", fmt.Sprint(id), fmt.Sprintf("Memperbarui ekstrakurikuler: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Ekstrakurikuler berhasil diperbarui", "data": existing})
 	})
 
-	ekskulGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
-		config.DB.Delete(&models.Ekstrakurikuler{}, uint(id))
+	ekskulGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
+		result := requestDB(c).Delete(&models.Ekstrakurikuler{}, uint(id))
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "ekskul", fmt.Sprint(id), "Menghapus ekstrakurikuler")
 		return c.JSON(fiber.Map{"message": "Ekstrakurikuler berhasil dihapus"})
 	})
@@ -375,32 +450,50 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	fasilitasGroup := api.Group("/fasilitas")
 	fasilitasGroup.Get("", func(c *fiber.Ctx) error {
 		var list []models.Fasilitas
-		config.DB.Order("order_index ASC, id ASC").Find(&list)
+		if err := requestDB(c).Order("order_index ASC, id ASC").Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
+			return c.Status(503).JSON(fiber.Map{"error": "Data sementara belum dapat dimuat"})
+		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	})
 
 	fasilitasGroup.Post("", authGuard, func(c *fiber.Ctx) error {
 		var item models.Fasilitas
-		c.BodyParser(&item)
-		config.DB.Create(&item)
+		parseContentBody(c, &item)
+		requestDB(c).Create(&item)
 		recordAudit(c, "CREATE", "fasilitas", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan fasilitas: %s", item.Name))
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Fasilitas berhasil ditambahkan", "data": item})
 	})
 
 	fasilitasGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Fasilitas
-		config.DB.First(&existing, uint(id))
-		c.BodyParser(&existing)
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
+		parseContentBody(c, &existing)
 		existing.ID = uint(id)
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "fasilitas", fmt.Sprint(id), fmt.Sprintf("Memperbarui fasilitas: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Fasilitas berhasil diperbarui", "data": existing})
 	})
 
-	fasilitasGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
-		config.DB.Delete(&models.Fasilitas{}, uint(id))
+	fasilitasGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
+		result := requestDB(c).Delete(&models.Fasilitas{}, uint(id))
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "fasilitas", fmt.Sprint(id), "Menghapus fasilitas")
 		return c.JSON(fiber.Map{"message": "Fasilitas berhasil dihapus"})
 	})
@@ -409,22 +502,24 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	docGroup := api.Group("/documents")
 	docGroup.Get("", func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
-		query := config.DB.Model(&models.Document{}).Where("is_public = ?", true).Order("order_index ASC, id ASC")
+		query := requestDB(c).Model(&models.Document{}).Where("is_public = ?", true).Order("order_index ASC, id ASC")
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
 		}
 		var list []models.Document
-		query.Find(&list)
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
+			return c.Status(503).JSON(fiber.Map{"error": "Data sementara belum dapat dimuat"})
+		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	})
-	api.Get("/admin/documents", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	api.Get("/admin/documents", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
-		query := config.DB.Model(&models.Document{}).Order("order_index ASC, id ASC")
+		query := requestDB(c).Model(&models.Document{}).Order("order_index ASC, id ASC")
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
 		}
 		var list []models.Document
-		if err := query.Find(&list).Error; err != nil {
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil dokumen"})
 		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
@@ -436,10 +531,10 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 		// 1. Cek konfigurasi ppdb_active_brochure_id di SiteSetting
 		var setting models.SiteSetting
-		err := config.DB.Where("key = ?", "ppdb_active_brochure_id").First(&setting).Error
+		err := requestDB(c).Where("key = ?", "ppdb_active_brochure_id").First(&setting).Error
 		if err == nil && setting.Value != "" {
 			if docID, errParse := strconv.ParseUint(setting.Value, 10, 32); errParse == nil && docID > 0 {
-				if errDoc := config.DB.Where("id = ? AND is_public = ?", uint(docID), true).First(&activeDoc).Error; errDoc == nil {
+				if errDoc := requestDB(c).Where("id = ? AND is_public = ?", uint(docID), true).First(&activeDoc).Error; errDoc == nil {
 					return c.JSON(fiber.Map{
 						"success": true,
 						"data":    activeDoc,
@@ -450,7 +545,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 
 		// 2. Jika belum ditentukan, cari berkas publik berkategori Brosur PPDB atau yang judulnya mengandung Brosur
-		err = config.DB.Where("is_public = ? AND (LOWER(category) = ? OR LOWER(title) LIKE ?)", true, "brosur ppdb", "%brosur%").
+		err = requestDB(c).Where("is_public = ? AND (LOWER(category) = ? OR LOWER(title) LIKE ?)", true, "brosur ppdb", "%brosur%").
 			Order("order_index ASC, id DESC").
 			First(&activeDoc).Error
 		if err == nil {
@@ -480,7 +575,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	// Endpoint terproteksi: Menetapkan dokumen tertentu sebagai Brosur PPDB aktif
-	docGroup.Post("/active-brochure", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	docGroup.Post("/active-brochure", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		var payload struct {
 			DocumentID uint `json:"documentId"`
 		}
@@ -489,12 +584,12 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 
 		var targetDoc models.Document
-		if err := config.DB.First(&targetDoc, payload.DocumentID).Error; err != nil {
+		if err := requestDB(c).First(&targetDoc, payload.DocumentID).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Dokumen tidak ditemukan"})
 		}
 
 		var setting models.SiteSetting
-		err := config.DB.Where("key = ?", "ppdb_active_brochure_id").First(&setting).Error
+		err := requestDB(c).Where("key = ?", "ppdb_active_brochure_id").First(&setting).Error
 		valStr := fmt.Sprint(payload.DocumentID)
 		if err != nil {
 			setting = models.SiteSetting{
@@ -504,11 +599,13 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 				Description: "ID Dokumen brosur PPDB resmi yang aktif tampil di halaman PPDB",
 				UpdatedAt:   time.Now(),
 			}
-			config.DB.Create(&setting)
+			requestDB(c).Create(&setting)
 		} else {
 			setting.Value = valStr
 			setting.UpdatedAt = time.Now()
-			config.DB.Save(&setting)
+			if err := requestDB(c).Save(&setting).Error; err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan pengaturan"})
+			}
 		}
 
 		recordAudit(c, "UPDATE", "setting", "ppdb_active_brochure_id", fmt.Sprintf("Menetapkan brosur PPDB aktif: %s (ID: %d)", targetDoc.Title, targetDoc.ID))
@@ -520,35 +617,51 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	docGroup.Post("", authGuard, func(c *fiber.Ctx) error {
 		var item models.Document
-		c.BodyParser(&item)
-		config.DB.Create(&item)
+		parseContentBody(c, &item)
+		requestDB(c).Create(&item)
 		recordAudit(c, "CREATE", "document", fmt.Sprint(item.ID), fmt.Sprintf("Mengunggah dokumen: %s", item.Title))
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Dokumen berhasil disimpan", "data": item})
 	})
 
 	docGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Document
-		config.DB.First(&existing, uint(id))
-		c.BodyParser(&existing)
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
+		parseContentBody(c, &existing)
 		existing.ID = uint(id)
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "document", fmt.Sprint(id), fmt.Sprintf("Memperbarui dokumen: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Dokumen berhasil diperbarui", "data": existing})
 	})
 
-	docGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
-		config.DB.Delete(&models.Document{}, uint(id))
+	docGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
+		result := requestDB(c).Delete(&models.Document{}, uint(id))
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "document", fmt.Sprint(id), "Menghapus dokumen")
 		return c.JSON(fiber.Map{"message": "Dokumen berhasil dihapus"})
 	})
 
 	// ==================== 7. SITE SETTINGS ====================
 	settingsGroup := api.Group("/settings")
-	settingsGroup.Get("", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	settingsGroup.Get("", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		var list []models.SiteSetting
-		config.DB.Find(&list)
+		config.DB.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list)
 		settingsMap := make(map[string]string)
 		for _, s := range list {
 			settingsMap[s.Key] = s.Value
@@ -556,7 +669,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"data": list, "map": settingsMap})
 	})
 
-	settingsGroup.Put("/:key", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	settingsGroup.Put("/:key", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		key := strings.TrimSpace(c.Params("key"))
 		var payload struct {
 			Value string `json:"value"`
@@ -564,14 +677,16 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		c.BodyParser(&payload)
 
 		var item models.SiteSetting
-		err := config.DB.Where("key = ?", key).First(&item).Error
+		err := requestDB(c).Where("key = ?", key).First(&item).Error
 		if err != nil {
 			item = models.SiteSetting{Key: key, Value: payload.Value, UpdatedAt: time.Now()}
-			config.DB.Create(&item)
+			requestDB(c).Create(&item)
 		} else {
 			item.Value = payload.Value
 			item.UpdatedAt = time.Now()
-			config.DB.Save(&item)
+			if err := requestDB(c).Save(&item).Error; err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan pengaturan"})
+			}
 		}
 		recordAudit(c, "UPDATE", "setting", key, fmt.Sprintf("Mengubah pengaturan %s: %s", key, payload.Value))
 		return c.JSON(fiber.Map{"message": "Pengaturan berhasil diperbarui", "data": item})
@@ -585,7 +700,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		limitStr := strings.TrimSpace(c.Query("limit"))
 		offsetStr := strings.TrimSpace(c.Query("offset"))
 
-		query := config.DB.Model(&models.Alumni{}).Order("id ASC")
+		query := requestDB(c).Model(&models.Alumni{}).Order("id ASC")
 
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(kategori) = ?", strings.ToLower(category))
@@ -610,7 +725,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 
 		var list []models.Alumni
-		if err := query.Find(&list).Error; err != nil {
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data alumni"})
 		}
 		publicList := make([]fiber.Map, 0, len(list))
@@ -625,10 +740,10 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 		return c.JSON(fiber.Map{"data": publicList, "total": total})
 	})
-	api.Get("/admin/alumni", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	api.Get("/admin/alumni", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
 		q := strings.TrimSpace(c.Query("q"))
-		query := config.DB.Model(&models.Alumni{}).Order("id ASC")
+		query := requestDB(c).Model(&models.Alumni{}).Order("id ASC")
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(kategori) = ?", strings.ToLower(category))
 		}
@@ -647,24 +762,27 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			query = query.Offset(offset)
 		}
 		var list []models.Alumni
-		if err := query.Find(&list).Error; err != nil {
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data alumni"})
 		}
 		return c.JSON(fiber.Map{"data": list, "total": total})
 	})
 
-	alumniGroup.Get("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	alumniGroup.Get("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var item models.Alumni
-		if err := config.DB.First(&item, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&item, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data siswa kelulusan tidak ditemukan"})
 		}
 		return c.JSON(fiber.Map{"data": item})
 	})
 
-	alumniGroup.Post("", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	alumniGroup.Post("", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		var item models.Alumni
-		if err := c.BodyParser(&item); err != nil {
+		if err := parseContentBody(c, &item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		if strings.TrimSpace(item.Name) == "" {
@@ -686,45 +804,62 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			item.Kategori = "Alumni"
 		}
 
-		if err := config.DB.Create(&item).Error; err != nil {
+		if err := requestDB(c).Create(&item).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan data siswa"})
 		}
 		recordAudit(c, "CREATE", "alumni", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan siswa kelulusan: %s (NISN: %s)", item.Name, item.NISN))
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Data kelulusan siswa berhasil ditambahkan", "data": item})
 	})
 
-	alumniGroup.Put("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	alumniGroup.Put("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Alumni
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data siswa tidak ditemukan"})
 		}
-		if err := c.BodyParser(&existing); err != nil {
+		if err := parseContentBody(c, &existing); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		existing.ID = uint(id)
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "alumni", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui data siswa kelulusan: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Data siswa kelulusan berhasil diperbarui", "data": existing})
 	})
 
-	alumniGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	alumniGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.Alumni
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data siswa tidak ditemukan"})
 		}
-		config.DB.Delete(&existing)
+		result := requestDB(c).Delete(&existing)
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "alumni", fmt.Sprint(id), fmt.Sprintf("Menghapus data siswa kelulusan: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Data siswa kelulusan berhasil dihapus"})
 	})
 
 	// ==================== 9. DIGITAL TALENT PROGRAM (DTP) ====================
 	dtpGroup := api.Group("/dtp")
-	dtpGroup.Get("", func(c *fiber.Ctx) error {
+	listDTP := func(c *fiber.Ctx, publicOnly bool) error {
 		category := strings.TrimSpace(c.Query("category"))
 		q := strings.TrimSpace(c.Query("q"))
-		query := config.DB.Model(&models.DigitalTalent{}).Order("order_index ASC, id ASC")
+		query := requestDB(c).Model(&models.DigitalTalent{}).Order("order_index ASC, id ASC")
+		if publicOnly {
+			query = query.Where("is_active = ?", true)
+		}
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
 		}
@@ -733,21 +868,22 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 				"%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%")
 		}
 		var list []models.DigitalTalent
-		if err := query.Find(&list).Error; err != nil {
+		if err := query.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data program digital talent"})
 		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
-	})
-
+	}
+	dtpGroup.Get("", func(c *fiber.Ctx) error { return listDTP(c, true) })
+	adminGroup.Get("/dtp", middleware.RequireRole("editor"), func(c *fiber.Ctx) error { return listDTP(c, false) })
 	dtpGroup.Get("/:id", func(c *fiber.Ctx) error {
 		param := strings.TrimSpace(c.Params("id"))
 		var item models.DigitalTalent
 		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
-			if err := config.DB.First(&item, uint(id)).Error; err == nil {
+			if err := requestDB(c).Where("is_active = ?", true).First(&item, uint(id)).Error; err == nil {
 				return c.JSON(fiber.Map{"data": item})
 			}
 		}
-		if err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(param)).First(&item).Error; err != nil {
+		if err := requestDB(c).Where("is_active = ?", true).Where("LOWER(slug) = ?", strings.ToLower(param)).First(&item).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Program Digital Talent tidak ditemukan"})
 		}
 		return c.JSON(fiber.Map{"data": item})
@@ -755,7 +891,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	dtpGroup.Post("", authGuard, func(c *fiber.Ctx) error {
 		var item models.DigitalTalent
-		if err := c.BodyParser(&item); err != nil {
+		if err := parseContentBody(c, &item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 		if strings.TrimSpace(item.Title) == "" {
@@ -769,12 +905,12 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 		if item.OrderIndex == 0 {
 			var count int64
-			config.DB.Model(&models.DigitalTalent{}).Count(&count)
+			requestDB(c).Model(&models.DigitalTalent{}).Count(&count)
 			item.OrderIndex = int(count) + 1
 		}
 		item.IsActive = true
 
-		if err := config.DB.Create(&item).Error; err != nil {
+		if err := requestDB(c).Create(&item).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan program digital talent"})
 		}
 		recordAudit(c, "CREATE", "dtp", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan spesialisasi DTP: %s", item.Title))
@@ -787,27 +923,22 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		var found bool
 
 		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
-			if err := config.DB.First(&existing, uint(id)).Error; err == nil {
+			if err := requestDB(c).First(&existing, uint(id)).Error; err == nil {
 				found = true
 			}
 		}
 		if !found {
-			if err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(param)).First(&existing).Error; err == nil {
+			if err := requestDB(c).Where("LOWER(slug) = ?", strings.ToLower(param)).First(&existing).Error; err == nil {
 				found = true
 			}
 		}
 
-		if err := c.BodyParser(&existing); err != nil {
+		if err := parseContentBody(c, &existing); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
 
 		if !found {
-			if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
-				existing.ID = uint(id)
-			}
-			if strings.TrimSpace(existing.Slug) == "" {
-				existing.Slug = param
-			}
+			return c.Status(404).JSON(fiber.Map{"error": "Program Digital Talent tidak ditemukan"})
 		}
 
 		if strings.TrimSpace(existing.Slug) == "" {
@@ -816,33 +947,36 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if strings.TrimSpace(existing.Category) == "" {
 			existing.Category = "Software & AI"
 		}
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "dtp", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui spesialisasi DTP: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Program Digital Talent berhasil diperbarui", "data": existing})
 	})
 
-	dtpGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	dtpGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.DigitalTalent
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Program Digital Talent tidak ditemukan"})
 		}
-		config.DB.Delete(&existing)
+		result := requestDB(c).Delete(&existing)
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "dtp", fmt.Sprint(id), fmt.Sprintf("Menghapus spesialisasi DTP: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Program Digital Talent berhasil dihapus"})
 	})
 
 	// ==================== 11. TRIAL CLASS REGISTRATIONS ====================
 	trialGroup := api.Group("/trial-class")
-	trialRegisterLimiter := limiter.New(limiter.Config{
-		Max:          10,
-		Expiration:   10 * time.Minute,
-		KeyGenerator: middleware.ClientIPKey,
-		LimitReached: func(c *fiber.Ctx) error {
-			c.Set("Retry-After", "600")
-			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{"error": "Batas pendaftaran tercapai. Silakan coba kembali dalam beberapa menit."})
-		},
-	})
+	trialRegisterLimiter := middleware.SharedRateLimit("trial-register", 10, 10*time.Minute)
 
 	// Public: Register for Trial Class
 	trialGroup.Post("/register", trialRegisterLimiter, func(c *fiber.Ctx) error {
@@ -892,7 +1026,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			UpdatedAt:    time.Now(),
 		}
 
-		if err := config.DB.Create(&item).Error; err != nil {
+		if err := requestDB(c).Create(&item).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan pendaftaran trial class"})
 		}
 
@@ -902,15 +1036,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		})
 	})
 
-	trialTicketLimiter := limiter.New(limiter.Config{
-		Max:          30,
-		Expiration:   time.Minute,
-		KeyGenerator: middleware.ClientIPKey,
-		LimitReached: func(c *fiber.Ctx) error {
-			c.Set("Retry-After", "60")
-			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{"error": "Batas verifikasi tiket tercapai. Silakan coba lagi dalam satu menit."})
-		},
-	})
+	trialTicketLimiter := middleware.SharedRateLimit("trial-ticket", 30, time.Minute)
 
 	// Public: Verify / Check Ticket
 	trialGroup.Post("/check-ticket", trialTicketLimiter, func(c *fiber.Ctx) error {
@@ -928,19 +1054,19 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Kode tiket wajib disertakan"})
 		}
 		var item models.TrialClassRegistration
-		if err := config.DB.Select("ticket_code", "major").Where("ticket_code = ?", code).First(&item).Error; err != nil {
+		if err := requestDB(c).Select("ticket_code", "major").Where("ticket_code = ?", code).First(&item).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Tiket tidak ditemukan"})
 		}
 		return c.JSON(fiber.Map{"data": fiber.Map{"ticketCode": item.TicketCode, "major": item.Major}})
 	})
 
 	// Admin: List all registrations
-	trialGroup.Get("", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	trialGroup.Get("", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		q := strings.TrimSpace(c.Query("q"))
 		major := strings.TrimSpace(c.Query("major"))
 		status := strings.TrimSpace(c.Query("status"))
 
-		dbQuery := config.DB.Model(&models.TrialClassRegistration{}).Order("created_at DESC")
+		dbQuery := requestDB(c).Model(&models.TrialClassRegistration{}).Order("created_at DESC")
 		if q != "" {
 			searchVal := "%" + strings.ToLower(q) + "%"
 			dbQuery = dbQuery.Where("LOWER(full_name) LIKE ? OR LOWER(school_origin) LIKE ? OR LOWER(ticket_code) LIKE ? OR whatsapp LIKE ?", searchVal, searchVal, searchVal, searchVal)
@@ -955,7 +1081,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		var list []models.TrialClassRegistration
 		var total int64
 		dbQuery.Count(&total)
-		if err := dbQuery.Find(&list).Error; err != nil {
+		if err := dbQuery.Limit(listLimit(c)).Offset(listOffset(c)).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memuat data pendaftar"})
 		}
 		return c.JSON(fiber.Map{"data": list, "total": total})
@@ -964,21 +1090,11 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	// Public: Get Active Upcoming Event
 	trialGroup.Get("/event", func(c *fiber.Ctx) error {
 		var event models.TrialClassEvent
-		if err := config.DB.Where("is_active = ?", true).Order("id DESC").First(&event).Error; err != nil {
-			event = models.TrialClassEvent{
-				Title:       "Virtual Trial Class 2026",
-				Badge:       "EVENT TERDEKAT",
-				DateDay:     "Sabtu,",
-				DateFull:    "26 September 2026",
-				TimeRange:   "09.00 - 11.00",
-				Timezone:    "WIB",
-				Mode:        "Online",
-				Submode:     "(Virtual Class)",
-				Status:      "open",
-				Quota:       100,
-				Description: "Sesi simulasi interaktif pembelajaran vokasi SIJA & TJAT bersama mentor industri dan guru kejuruan.",
-				IsActive:    true,
+		if err := requestDB(c).Where("is_active = ?", true).Order("id DESC").First(&event).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return c.JSON(fiber.Map{"data": nil})
 			}
+			return c.Status(503).JSON(fiber.Map{"error": "Jadwal belum dapat dimuat"})
 		}
 		return c.JSON(fiber.Map{"data": event})
 	})
@@ -1007,7 +1123,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 
 		var event models.TrialClassEvent
-		err := config.DB.Order("id DESC").First(&event).Error
+		err := requestDB(c).Order("id DESC").First(&event).Error
 		if err != nil {
 			event = models.TrialClassEvent{
 				Title:       strings.TrimSpace(payload.Title),
@@ -1028,7 +1144,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			if payload.IsActive != nil {
 				event.IsActive = *payload.IsActive
 			}
-			if err := config.DB.Create(&event).Error; err != nil {
+			if err := requestDB(c).Create(&event).Error; err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal membuat event"})
 			}
 			recordAudit(c, "CREATE", "trial_class_event", fmt.Sprint(event.ID), fmt.Sprintf("Membuat jadwal event terdekat: %s", event.Title))
@@ -1069,7 +1185,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 		event.UpdatedAt = time.Now()
 
-		if err := config.DB.Save(&event).Error; err != nil {
+		if err := requestDB(c).Save(&event).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan perubahan event"})
 		}
 		recordAudit(c, "UPDATE", "trial_class_event", fmt.Sprint(event.ID), fmt.Sprintf("Memperbarui jadwal event terdekat: %s (%s %s)", event.Title, event.DateDay, event.DateFull))
@@ -1077,10 +1193,13 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	// Admin: Update status / notes
-	trialGroup.Put("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	trialGroup.Put("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.TrialClassRegistration
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data pendaftar tidak ditemukan"})
 		}
 
@@ -1102,19 +1221,30 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			existing.Major = payload.Major
 		}
 		existing.UpdatedAt = time.Now()
-		config.DB.Save(&existing)
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menyimpan perubahan"})
+		}
 		recordAudit(c, "UPDATE", "trial_class", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui status pendaftar: %s (%s)", existing.FullName, existing.Status))
 		return c.JSON(fiber.Map{"message": "Data pendaftar berhasil diperbarui", "data": existing})
 	})
 
 	// Admin: Delete participant
-	trialGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+	trialGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		id, idErr := strconv.ParseUint(c.Params("id"), 10, 32)
+		if idErr != nil || id == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "ID tidak valid"})
+		}
 		var existing models.TrialClassRegistration
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data pendaftar tidak ditemukan"})
 		}
-		config.DB.Delete(&existing)
+		result := requestDB(c).Delete(&existing)
+		if result.Error != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Gagal menghapus data"})
+		}
+		if result.RowsAffected == 0 {
+			return c.Status(404).JSON(fiber.Map{"error": "Data tidak ditemukan"})
+		}
 		recordAudit(c, "DELETE", "trial_class", fmt.Sprint(id), fmt.Sprintf("Menghapus pendaftar trial class: %s (%s)", existing.FullName, existing.TicketCode))
 		return c.JSON(fiber.Map{"message": "Pendaftar berhasil dihapus"})
 	})

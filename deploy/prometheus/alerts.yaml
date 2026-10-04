@@ -1,0 +1,13 @@
+groups:
+  - name: skomda
+    rules:
+      - alert: APIAllReplicasUnavailable
+        expr: sum(up{job="skomda-backend"}) == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "Tidak ada replica API yang dapat dipantau"}
+      - alert: APIErrorRate
+        expr: sum(rate(skomda_http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(skomda_http_requests_total[5m])), 0.01) > 0.01
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "Error HTTP API di atas satu persen"}

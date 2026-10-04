@@ -1,10 +1,69 @@
 # Rancangan Arsitektur Production SKOMDA
 
-**Status:** Baseline demo disepakati; finalisasi arsitektur dan hardening operasi berjalan
+**Status:** Implementasi diperluas sesuai persetujuan 4 Oktober; validasi deployment dan kapasitas VPS berjalan
 
 **Tanggal:** 4 Oktober 2026
 
 **Target awal:** Demo terkontrol pada subdomain `linear.smktelkom-sidoarjo.my.id`
+
+## Keputusan implementasi terbaru — 4 Oktober 2026
+
+Bagian ini menggantikan rencana penundaan Redis/load balancing/monitoring pada baseline di bawah. Bukti hasil pengujian dicatat terpisah; keberadaan konfigurasi tidak berarti kapasitas telah terbukti.
+
+| Area | Implementasi saat ini |
+| --- | --- |
+| Frontend | Next.js standalone, dua replica per release; gambar Cloudinary responsif, WebP kualitas 85–90, original disimpan. |
+| APIs & backend logic | Fiber production, Gin tetap kompatibel; deadline query, validasi input, error DB dilaporkan sebagai kegagalan. |
+| Database & storage | Satu PostgreSQL Supabase melalui session pooler IPv4; Cloudinary media. Production tidak mempunyai fallback SQLite. |
+| Auth & permissions | JWT backend; editor menangani CRUD/data operasional, super admin monitoring/audit/pengelolaan akun. MFA di luar scope sesuai permintaan. |
+| Hosting & deployment | VPS yang sama; Cloudflare Tunnel ke proxy Nginx privat. Tidak ada port aplikasi/Redis/Grafana yang dibuka ke internet. |
+| Cloud & compute | Docker Compose, batas CPU/RAM/thread. Mesin ini tetap merupakan satu titik kegagalan. |
+| CI/CD & version control | Branch `deploy`, lint/typecheck/tests/build/Trivy sebelum publish GHCR. Tag SHA immutable. CD otomatis tanpa required reviewer; hanya branch `deploy` boleh memakai environment demo. |
+| Security & RLS | Migrasi Goose pada schema privat; runtime `skomda_runtime` tanpa CREATE/superuser/BYPASSRLS, credential migrasi terpisah. RLS dan policies runtime eksplisit; grant anon/authenticated dicabut pada tabel aplikasi. |
+| Rate limiting | Redis atomic shared limits untuk login/chat/form/upload dan lease concurrency AI; proteksi yang membutuhkan Redis fail closed saat Redis gagal. |
+| Caching & CDN | Cache Redis public GET 30 detik, invalidasi generasi setelah perubahan, fill lock untuk mencegah stampede. Auth/admin/PII/form/tiket/health tidak di-cache. Cloudinary CDN dan Cloudflare. |
+| Load balancing & scaling | Nginx least-connections ke dua frontend dan dua backend. Blue/green candidate sehat sebelum pointer trafik di-reload. Request mutasi tidak diputar ulang setelah terkirim. |
+| Error tracking & logs | Prometheus, Grafana khusus super admin melalui proxy yang memverifikasi sesi, Loki untuk metadata HTTP tanpa body/URL/IP/kredensial. |
+| Availability & recovery | Release sebelumnya dipertahankan untuk rollback dan static chunk browser lama. Backup terenkripsi + HMAC, retensi lokal tujuh hari, restore ke container terisolasi. Offsite otomatis/notifikasi membutuhkan tujuan yang disediakan pemilik. |
+| Analytics UI/UX | GA4/Clarity hanya setelah persetujuan; admin/form sensitif dikecualikan. Aktivasi menunggu ID yang benar. |
+
+```mermaid
+flowchart LR
+  U[Pengunjung] --> C[Cloudflare TLS/CDN]
+  C --> T[Cloudflare Tunnel]
+  T --> N[Nginx privat]
+  N --> F[2 replica Next.js]
+  N --> B[2 replica Fiber]
+  F --> B
+  B --> R[(Redis)]
+  B --> D[(Satu Supabase PostgreSQL)]
+  B --> M[Cloudinary]
+  B --> A[AI gateway terbatas]
+  P[Prometheus] --> B
+  P --> N
+  G[Grafana Viewer] --> P
+  G --> L[Loki metadata aman]
+  S[Super admin terverifikasi] --> F
+  F --> G
+```
+
+### Deployment dan rollback
+
+`compose.yaml` menampung infrastruktur stabil. `compose.release.yaml` menampung release `blue` atau `green`, masing-masing dua frontend dan dua backend. `scripts/deploy-demo.sh` memakai lock VPS, menjalankan migrasi yang kompatibel dengan versi aktif, menunggu semua health checks candidate, memvalidasi konfigurasi Nginx, lalu reload pointer secara graceful. Kegagalan sebelum switch tidak mengganti release aktif; kegagalan setelah switch mengembalikan pointer.
+
+Keseragaman cookies/JWT, database, Redis, dan origin menghindari sticky session untuk API stateless. Versi frontend/backend harus tetap kompatibel selama pergantian. Database rollback tidak dilakukan otomatis; migrasi selanjutnya wajib bersifat additive/backward-compatible. Static assets versi sebelumnya tetap tersedia selama satu release; tab yang jauh lebih lama perlu refresh.
+
+### Batas nyata VPS
+
+Provider membatasi total proses/thread ke **500**, bukan hanya RAM/CPU. Audit awal menemukan 468 sudah terpakai. Override worker Apache dan GOMAXPROCS containerd menurunkan pemakaian tanpa menghapus layanan lama. Nginx memakai dua worker, nofile 8192; backend GOMAXPROCS 2 dan pool 8/2 per replica. Batas RAM per frontend 384 MiB dan backend 192 MiB, termasuk dua slot saat CD. Monitoring mendapat batas tersendiri.
+
+Target **1.000 pengguna bersamaan** diukur dengan workload, pacing, durasi, error dan p95 yang tercatat. Target ini bukan jaminan 1.000 request berat per detik, 1.000 percakapan AI simultan, atau tahan setiap bentuk serangan. Hasil uji VPS dan batas generator dicatat dalam laporan akhir. Domain utama tetap menunggu persetujuan promosi terpisah.
+
+Tahapan: **B** hardening data/operasi → **C** monitoring/analytics/performa → **D** validasi scaling dan stress test demo. Pekerjaan tidak dinyatakan selesai hanya karena pipeline hijau.
+
+---
+
+## Baseline dan konteks keputusan sebelumnya
 
 Panduan konfigurasi manual VPS dan GitHub ada di [`demo-vps-runbook.md`](demo-vps-runbook.md).
 
@@ -93,7 +152,7 @@ Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compo
 - Pastikan kepemilikan/akses pemulihan project Supabase dan lingkungan demo vs production. Jangan menjadikan project milik pihak lain satu-satunya data produksi tanpa kesepakatan akses, backup, dan pemulihan.
 - Audit role/grants/policies RLS dan izin setiap endpoint. Pisahkan role runtime berhak minimum dari role migrasi; jangan membuka tabel ke Data API tanpa alasan.
 - Audit kode awal menemukan detail audit log sebelumnya dapat menyimpan PII; branch ini meminimalkan detail untuk log baru. Baris historis tetap perlu keputusan pemilik tentang retensi/pembersihan. Verifikasi role endpoint di demo; lihat [`security-authorization-audit.md`](security-authorization-audit.md).
-- Migrasi sudah dipisahkan ke command `/app/migrate` yang dijalankan sebagai service satu kali sebelum aplikasi diperbarui; seed awal hanya melalui flag operator `--seed-initial`. Migrator memakai `backend/migrate.env`, terpisah dari secret runtime; role PostgreSQL-nya belum tentu terpisah. Sebelum domain utama, ganti `AutoMigrate` dengan migrasi SQL berversi yang direview dan pisahkan hak database runtime dari hak migrator.
+- Command `/app/migrate` sekarang memakai SQL migrations Goose berversi yang di-embed di image; GORM `AutoMigrate` hanya dipakai development/test. Baseline versi 1 disusun dari schema-only dump Supabase 4 Oktober 2026 dan tidak menyalin GRANT/default ACL yang luas. Ledger Goose disimpan di schema privat `skomda_internal`. Database existing belum mencatat baseline dan image ini belum dideploy. Untuk adopsi, migrator mencocokkan nama 17 tabel beserta kolomnya, 64 indeks, 17 sequence, 7 tabel RLS, dan 2 policy sebelum menulis versi 1 tanpa menjalankan DDL aplikasi. Pemeriksaan tidak mencocokkan tipe/default kolom atau definisi penuh constraint/index; operator tetap harus membandingkan dump terbaru dan memastikan tak ada perubahan schema setelah dump. Migrator memakai `backend/migrate.env`; role PostgreSQL khusus migrasi belum dipisah dari role runtime.
 - Upload production sekarang fail-closed ke Cloudinary; konfirmasi proteksi efektif login, chatbot, dan endpoint pendaftaran serta limit Cloudflare saat pengujian VPS.
 - Pool koneksi SQL saat ini dibatasi 25 terbuka/5 idle pada satu backend. Cocokkan dengan paket/connection pool Supabase dan jumlah replica sebelum menentukan concurrency stress test atau mengubah batas.
 - Implementasikan backup Postgres terenkripsi di lokasi terpisah, retensi dan alert, lalu lakukan uji restore yang disetujui pemilik database. Runbook sudah tersedia; backup otomatis dan latihan restore belum ada. Backup provider tidak menggantikan salinan independen dan latihan restore.
@@ -128,7 +187,7 @@ Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compo
 - Repo dan dokumentasi lama memiliki beberapa pernyataan yang tidak konsisten soal SQLite, RLS, rate limit, dan status fitur. Dokumen ini adalah target rancangan, bukan bukti semua kontrol telah terpasang.
 - Proyek Supabase dimiliki teman. Ketergantungan akun dan akses pemulihan perlu disepakati agar operasional tidak bergantung pada satu orang.
 - Satu VPS adalah single point of failure; health check dan restart membantu pemulihan proses, tetapi tidak melindungi dari kegagalan host atau jaringan.
-- Migrator terpisah masih memakai `AutoMigrate`; file secret koneksinya sudah terpisah, tetapi role PostgreSQL mungkin masih sama dengan aplikasi. Sebelum domain utama, migrasi harus berversi/reviewed, kredensial runtime perlu hak minimum, dan role migrator perlu hak DDL terbatas khusus.
+- Role PostgreSQL runtime dan migrasi saat ini belum dipisahkan. Siapkan runtime role berhak minimum dan role migrasi DDL terbatas setelah pemilik project menyetujui grants dan backup. Baseline migrasi versi 1 membandingkan nama objek inti; ia tidak memverifikasi setiap tipe/default/constraint/index, sehingga perlu dicocokkan dengan dump schema terbaru sebelum dipakai.
 - Fallback upload ke disk lokal sekarang hanya aktif di development; di production kegagalan Cloudinary menghasilkan `503` agar aplikasi tidak menyimpan URL file sementara sebagai sukses. Filesystem container tetap bukan storage durable dan Cloudinary membutuhkan akses pemulihan akun/offsite media sesuai target RPO.
 - CORS bukan pengganti autentikasi atau otorisasi. Pastikan `ALLOWED_ORIGIN` pada VPS berisi origin frontend production yang tepat (tanpa path), lalu verifikasi setelah deploy.
 - Dokumen ini menggambarkan arsitektur target dan status yang terbaca di branch `deploy`, bukan hasil verifikasi konfigurasi live. Validasi deploy, stress test, backup/restore, dan pemantauan tetap dijalankan pada tahap operasional.

@@ -35,7 +35,16 @@ Panduan ini mengganti koneksi backend dari role admin `postgres` ke role khusus 
      Select-Object FullName, Length, LastWriteTime
    ```
 
-**Berhenti di sini dan laporkan:** plan Supabase, waktu backup terakhir atau lokasi/ukuran file dump. Jangan kirim dump database ke chat karena dapat berisi data pribadi.
+   Pastikan arsipnya terbaca dan simpan checksum untuk verifikasi salinan:
+
+   ```powershell
+   pg_restore --list "$env:USERPROFILE\Downloads\skomda-before-runtime-role.dump" | Select-Object -First 15
+   Get-FileHash "$env:USERPROFILE\Downloads\skomda-before-runtime-role.dump" -Algorithm SHA256
+   ```
+
+   `pg_restore --list` hanya memastikan daftar isi arsip bisa dibaca; ini belum merupakan uji restore. Simpan dump lokal di disk terenkripsi karena arsip berisi data tabel `public`.
+
+**Berhenti di sini dan laporkan:** plan Supabase dan waktu backup terakhir, atau status dump lokal, ukuran, hasil `pg_restore --list`, serta SHA-256. Jangan kirim dump database ke chat karena dapat berisi data pribadi.
 
 ### Tahap 2 — siapkan role tanpa mengubah koneksi live
 

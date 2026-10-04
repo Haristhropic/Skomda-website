@@ -46,24 +46,30 @@ export function getCloudinaryUrl(
     return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   }
 
-  // 2. Jika URL absolut (http/https):
+  // Existing uploaded assets retain their own cloud, version, and crop chain.
+  // Append display transforms before the version/public ID instead of treating
+  // existing transformations as part of a public ID in our default cloud.
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-    // Jika bukan Cloudinary, kembalikan langsung
-    if (!imagePath.includes("res.cloudinary.com")) {
-      return imagePath;
-    }
-    // Jika sudah Cloudinary dan tidak membutuhkan transformasi khusus, kembalikan langsung URL asli
-    const hasTransformOptions =
-      options.width ||
-      options.height ||
-      options.crop ||
-      options.gravity ||
-      options.aspectRatio ||
-      options.blur ||
-      options.dpr;
-    if (!hasTransformOptions) {
-      return imagePath;
-    }
+    try {
+      const url = new URL(imagePath);
+      if (url.protocol !== "https:" || url.hostname !== "res.cloudinary.com") return imagePath;
+      const segments = url.pathname.split("/");
+      const upload = segments.indexOf("upload");
+      if (upload < 0 || segments[upload - 1] !== "image" || segments[upload + 1]?.startsWith("s--")) return imagePath;
+      let asset = upload + 1;
+      while (segments[asset] && /^(?:[a-z]{1,4}_[^/]+)(?:,[a-z]{1,4}_[^/]+)*$/.test(segments[asset]) && !/^v\d+$/.test(segments[asset])) asset++;
+      const transforms = [`f_${options.format || "auto"}`, `q_${options.quality || "auto:good"}`];
+      if (options.width) transforms.push(`w_${options.width}`);
+      if (options.height) transforms.push(`h_${options.height}`);
+      if (options.crop) transforms.push(`c_${options.crop}`);
+      if (options.gravity) transforms.push(`g_${options.gravity}`);
+      if (options.aspectRatio) transforms.push(`ar_${options.aspectRatio}`);
+      if (options.blur) transforms.push(`e_blur:${options.blur}`);
+      if (options.dpr) transforms.push(`dpr_${options.dpr}`);
+      segments.splice(asset, 0, transforms.join(","));
+      url.pathname = segments.join("/");
+      return url.toString();
+    } catch { return imagePath; }
   }
 
   // 3. Fallback jika CLOUD_NAME belum dikonfigurasi
@@ -102,7 +108,7 @@ export function getCloudinaryUrl(
 
   // Format & Kualitas Default (Otomatis AVIF/WebP)
   const format = options.format || "auto";
-  const quality = options.quality || "auto";
+  const quality = options.quality || "auto:good";
   transforms.push(`f_${format}`, `q_${quality}`);
 
   if (options.width) transforms.push(`w_${options.width}`);

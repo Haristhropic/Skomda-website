@@ -48,11 +48,17 @@ def command(arguments, directory):
 
 def container_snapshot(directory, tunnel_name):
     containers = []
-    for service in ("backend", "frontend"):
-        ids = command([
-            "docker", "compose", "--env-file", "deploy.env", "ps",
-            "--all", "--quiet", service,
-        ], directory).split()
+    active_path = directory / ".active-slot"
+    active = active_path.read_text().strip() if active_path.exists() else ""
+    if active and active not in ("blue", "green"):
+        raise CheckError("invalid_active_release_slot")
+    if active:
+        os.environ["RELEASE_SLOT"] = active
+        os.environ["IMAGE_TAG"] = (directory / ".deployed-image-tag").read_text().strip()
+    services = ("backend-a", "backend-b", "frontend-a", "frontend-b") if active else ("backend", "frontend")
+    compose = ["docker", "compose"] + (["-f", "compose.release.yaml"] if active else [])
+    for service in services:
+        ids = command(compose + ["--env-file", "deploy.env", "ps", "--all", "--quiet", service], directory).split()
         if len(ids) != 1:
             containers.append({"service": service, "status": "missing_or_multiple"})
             continue
@@ -87,7 +93,13 @@ def resource_snapshot(directory):
     available = memory.get("MemAvailable")
     if not total or available is None:
         raise CheckError("memory_metrics_unavailable")
+    pid_root = Path("/sys/fs/cgroup/pids")
+    pid_current = int((pid_root / "pids.current").read_text()) if (pid_root / "pids.current").exists() else None
+    pid_limit_text = (pid_root / "pids.max").read_text().strip() if (pid_root / "pids.max").exists() else "max"
+    pid_limit = int(pid_limit_text) if pid_limit_text.isdigit() else None
     return {
+        "pid_current": pid_current,
+        "pid_limit": pid_limit,
         "disk_used_percent": round(disk.used / disk.total * 100, 1),
         "disk_free_bytes": disk.free,
         "memory_available_percent": round(available / total * 100, 1),
@@ -167,9 +179,13 @@ def main():
         print(json.dumps(report, indent=2))
         return 2
 
+    edge = command(["docker", "ps", "--quiet", "--filter", "name=^/skomda-infra-edge-1$"], args.deploy_dir).strip()
+    address = command(["docker", "inspect", "--format", '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}', edge], args.deploy_dir).strip() if edge else "127.0.0.1"
+    frontend_port = 3000 if edge else args.frontend_port
+    backend_port = 8080 if edge else args.backend_port
     report["probes"] = [
-        http_probe("local_frontend", f"http://127.0.0.1:{args.frontend_port}/", local=True),
-        http_probe("local_backend", f"http://127.0.0.1:{args.backend_port}/api/health", database=True, local=True),
+        http_probe("local_frontend", f"http://{address}:{frontend_port}/", local=True),
+        http_probe("local_backend", f"http://{address}:{backend_port}/api/health", database=True, local=True),
     ]
     if args.public:
         report["probes"].extend([
@@ -188,6 +204,8 @@ def main():
         if not probe["ok"]:
             findings.append(probe["check"] + ":failed")
     resources = report["resources"]
+    if resources.get("pid_limit") and resources["pid_current"] >= resources["pid_limit"] * 0.9:
+        findings.append("processes:warning_over_90_percent_of_provider_limit")
     if resources["disk_used_percent"] >= 90:
         findings.append("disk:critical_over_90_percent")
     elif resources["disk_used_percent"] >= 80:

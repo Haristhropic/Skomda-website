@@ -37,6 +37,11 @@ type UploadResult struct {
 	Height       int    `json:"height"`
 	Bytes        int64  `json:"bytes"`
 	ResourceType string `json:"resource_type"`
+	Eager        []struct {
+		SecureURL string `json:"secure_url"`
+		Format    string `json:"format"`
+		Bytes     int64  `json:"bytes"`
+	} `json:"eager"`
 }
 
 // NewClient menginisialisasi Client dari string CLOUDINARY_URL
@@ -51,6 +56,9 @@ func NewClient(rawURL string) (*Client, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, fmt.Errorf("format CLOUDINARY_URL tidak valid: %w", err)
+	}
+	if u.Scheme != "cloudinary" || u.User == nil || u.Host == "" {
+		return nil, fmt.Errorf("format CLOUDINARY_URL tidak valid")
 	}
 
 	password, _ := u.User.Password()
@@ -123,6 +131,7 @@ func (c *Client) UploadImage(ctx context.Context, fileReader io.Reader, filename
 	paramsToSign := map[string]string{
 		"timestamp": timestamp,
 		"folder":    folder,
+		"eager":     "f_webp,q_90",
 	}
 	signature := c.GenerateSignature(paramsToSign)
 
@@ -130,6 +139,7 @@ func (c *Client) UploadImage(ctx context.Context, fileReader io.Reader, filename
 	_ = writer.WriteField("timestamp", timestamp)
 	_ = writer.WriteField("signature", signature)
 	_ = writer.WriteField("folder", folder)
+	_ = writer.WriteField("eager", "f_webp,q_90")
 	_ = writer.Close()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, uploadURL, body)
@@ -153,6 +163,12 @@ func (c *Client) UploadImage(ctx context.Context, fileReader io.Reader, filename
 	var res UploadResult
 	if err := json.Unmarshal(respBody, &res); err != nil {
 		return nil, fmt.Errorf("gagal decode response Cloudinary: %w", err)
+	}
+	// The original stays in Cloudinary; the derivative preserves dimensions.
+	if len(res.Eager) > 0 && res.Eager[0].SecureURL != "" {
+		res.SecureURL = res.Eager[0].SecureURL
+		res.Format = res.Eager[0].Format
+		res.Bytes = res.Eager[0].Bytes
 	}
 
 	return &res, nil

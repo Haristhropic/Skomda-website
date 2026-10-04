@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   NewsItem,
-  MOCK_NEWS,
   NEWS_CATEGORIES,
   NewsCategory,
   getNewsList,
@@ -20,7 +19,8 @@ interface NewsSectionProps {
 
 export default function NewsSection({ showTitle = true }: NewsSectionProps) {
   const { t, isEn } = useLanguage();
-  const [newsData, setNewsData] = useState<NewsItem[]>(MOCK_NEWS);
+  const [newsData, setNewsData] = useState<NewsItem[]>([]);
+  const [loadError, setLoadError] = useState(false);
   const [activeCategory, setActiveCategory] = useState<NewsCategory>("Semua");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
@@ -43,9 +43,10 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
         });
         if (isMounted) {
           setNewsData(liveItems);
+          setLoadError(false);
         }
       } catch (err) {
-        console.warn("Failed to fetch live news:", err);
+        if (isMounted) { setLoadError(true); setNewsData([]); }
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -128,6 +129,7 @@ export default function NewsSection({ showTitle = true }: NewsSectionProps) {
         )}
 
         {/* Two-Column Layout: Sidebar + News Grid & Pagination */}
+        {loadError && <p role="alert" className="mb-5 text-sm text-red-800">{isEn ? "News is temporarily unavailable. Please reload to try again." : "Berita belum dapat dimuat. Muat ulang halaman untuk mencoba lagi."}</p>}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-start">
           {/* 2. Category Filter */}
           <aside className="w-full lg:w-[280px] shrink-0">

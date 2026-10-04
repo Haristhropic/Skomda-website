@@ -1,0 +1,1781 @@
+{
+  "captured_at": "2026-10-04T10:25:11.606Z",
+  "original_dimensions_preserved": true,
+  "display_strategy": "Cloudinary responsive widths, q85, f_auto; local WebP q90 alpha100",
+  "total_bytes": 405975129,
+  "images": [
+    {
+      "path": "berita/berita-bp3mi-kerja-korea.png",
+      "bytes": 799830,
+      "width": 646,
+      "height": 805,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-dtp-9-keahlian.png",
+      "bytes": 653874,
+      "width": 655,
+      "height": 808,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-guru-kunjungan-hummatech.png",
+      "bytes": 655357,
+      "width": 655,
+      "height": 805,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-hut-61-telkom.png",
+      "bytes": 986071,
+      "width": 639,
+      "height": 805,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-hut-ri-81.png",
+      "bytes": 972582,
+      "width": 1500,
+      "height": 1000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-levelup-guru-ai.png",
+      "bytes": 549759,
+      "width": 649,
+      "height": 804,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-lks-emas-revano.png",
+      "bytes": 654734,
+      "width": 657,
+      "height": 634,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-lomba-spectra.png",
+      "bytes": 2138421,
+      "width": 1500,
+      "height": 1000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-pra-mpls-leadership.png",
+      "bytes": 827319,
+      "width": 649,
+      "height": 808,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-seminar-kebekerjaan.png",
+      "bytes": 712774,
+      "width": 645,
+      "height": 805,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-spiderman-darjo-billal.png",
+      "bytes": 639919,
+      "width": 648,
+      "height": 804,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/berita-spmb-inden-2027.png",
+      "bytes": 829365,
+      "width": 643,
+      "height": 808,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "berita/news-thumb-1.png",
+      "bytes": 86142,
+      "width": 261,
+      "height": 148,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "common/akreditasi-a-badge.png",
+      "bytes": 144211,
+      "width": 360,
+      "height": 360,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "common/logo-smk-telkom.png",
+      "bytes": 30501,
+      "width": 488,
+      "height": 144,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "common/telkom-schools-icon.png",
+      "bytes": 17940,
+      "width": 685,
+      "height": 673,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "home/hero/home-hero-students.png",
+      "bytes": 2642190,
+      "width": 1774,
+      "height": 887,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "home/hero/image1.png",
+      "bytes": 2120864,
+      "width": 1086,
+      "height": 1448,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "home/hero/image4.png",
+      "bytes": 1621327,
+      "width": 1536,
+      "height": 1024,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "home/hero/image5.png",
+      "bytes": 2090771,
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "home/hero/image6.png",
+      "bytes": 1404827,
+      "width": 1350,
+      "height": 1165,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "home/kepsek.png",
+      "bytes": 250327,
+      "width": 500,
+      "height": 500,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "informasi/penerapan-k3/hero-student-k3.png",
+      "bytes": 1478130,
+      "width": 1454,
+      "height": 1082,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "informasi/pengumuman-kelulusan/hero-student-kelulusan.png",
+      "bytes": 1807846,
+      "width": 1245,
+      "height": 1263,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "lomba/logo-garuda-spark.png",
+      "bytes": 77982,
+      "width": 1600,
+      "height": 873,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "lomba/logo-jagoan-hosting.png",
+      "bytes": 42190,
+      "width": 1600,
+      "height": 503,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "lomba/logo-jhic.png",
+      "bytes": 143073,
+      "width": 1600,
+      "height": 972,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "lomba/logo-komdigi.png",
+      "bytes": 43142,
+      "width": 994,
+      "height": 720,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "lomba/logo-ngalup.png",
+      "bytes": 37737,
+      "width": 1600,
+      "height": 253,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/bdx_data_center.jpg",
+      "bytes": 229606,
+      "width": 4777,
+      "height": 2500,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/bnsp.png",
+      "bytes": 5563,
+      "width": 300,
+      "height": 114,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/indev.png",
+      "bytes": 7557,
+      "width": 605,
+      "height": 330,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/jobnation.png",
+      "bytes": 152904,
+      "width": 1920,
+      "height": 1080,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/lasambora.png",
+      "bytes": 6030,
+      "width": 225,
+      "height": 225,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/Logo-Lintasarta.png",
+      "bytes": 3572,
+      "width": 616,
+      "height": 272,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/logo-telkom-indonesia.jpg",
+      "bytes": 20753,
+      "width": 678,
+      "height": 381,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/logo_cisco.png",
+      "bytes": 34304,
+      "width": 3000,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/logo_huawei.webp",
+      "bytes": 105072,
+      "width": 3840,
+      "height": 3905,
+      "format": "webp",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/logo_mikrotik.png",
+      "bytes": 17345,
+      "width": 3840,
+      "height": 2160,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/logo_zte.webp",
+      "bytes": 10454,
+      "width": 1280,
+      "height": 619,
+      "format": "webp",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/moksha.png",
+      "bytes": 305296,
+      "width": 1742,
+      "height": 684,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-alfath-v2.png",
+      "bytes": 23750,
+      "width": 137,
+      "height": 106,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-alfath.png",
+      "bytes": 601314,
+      "width": 1600,
+      "height": 800,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-axelbit.png",
+      "bytes": 45294,
+      "width": 1630,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-digiprener.png",
+      "bytes": 25767,
+      "width": 1630,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-efortech-v2.png",
+      "bytes": 53089,
+      "width": 398,
+      "height": 92,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-efortech.png",
+      "bytes": 379514,
+      "width": 1600,
+      "height": 542,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-garuda.png",
+      "bytes": 52211,
+      "width": 1630,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-globalinfra.png",
+      "bytes": 35913,
+      "width": 1630,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-hai-v2.png",
+      "bytes": 41020,
+      "width": 175,
+      "height": 175,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-hai.png",
+      "bytes": 1108501,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-infratra-v2.png",
+      "bytes": 37621,
+      "width": 177,
+      "height": 157,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-jagoanhosting.png",
+      "bytes": 79934,
+      "width": 1002,
+      "height": 384,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-javacreatiox.png",
+      "bytes": 45575,
+      "width": 1630,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-markazdesign.png",
+      "bytes": 37011,
+      "width": 1630,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-play.png",
+      "bytes": 879316,
+      "width": 1322,
+      "height": 1190,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-purnamahotel-v2.png",
+      "bytes": 38626,
+      "width": 257,
+      "height": 129,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-purnama_hotel.png",
+      "bytes": 756977,
+      "width": 1600,
+      "height": 800,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-radnet.png",
+      "bytes": 42420,
+      "width": 1630,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-saka_global_perkasa.png",
+      "bytes": 812457,
+      "width": 1600,
+      "height": 800,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-sana_sini.png",
+      "bytes": 973773,
+      "width": 1313,
+      "height": 1198,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-sanssouci-v2.png",
+      "bytes": 25345,
+      "width": 147,
+      "height": 147,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-sgp-v2.png",
+      "bytes": 42892,
+      "width": 227,
+      "height": 114,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-slash-v2.png",
+      "bytes": 20497,
+      "width": 231,
+      "height": 66,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-slash.png",
+      "bytes": 258283,
+      "width": 1600,
+      "height": 533,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-ubig.png",
+      "bytes": 366856,
+      "width": 1600,
+      "height": 537,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/partner-widatra.png",
+      "bytes": 876441,
+      "width": 1452,
+      "height": 1083,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/pens.webp",
+      "bytes": 15454,
+      "width": 640,
+      "height": 360,
+      "format": "webp",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/rsi.jpg",
+      "bytes": 20405,
+      "width": 447,
+      "height": 447,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/TelkoMedika-v2.png",
+      "bytes": 30586,
+      "width": 395,
+      "height": 200,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/trijaya.png",
+      "bytes": 67812,
+      "width": 524,
+      "height": 300,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/ubig.png",
+      "bytes": 23017,
+      "width": 1024,
+      "height": 191,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/weza-group.png",
+      "bytes": 45088,
+      "width": 1273,
+      "height": 1084,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/woodneintegra.png",
+      "bytes": 2759048,
+      "width": 9248,
+      "height": 3448,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "partners/wowrack.png",
+      "bytes": 23126,
+      "width": 600,
+      "height": 95,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "ppdb/alur-student.png",
+      "bytes": 1906935,
+      "width": 1179,
+      "height": 1334,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "ppdb/hero-student.png",
+      "bytes": 756408,
+      "width": 1024,
+      "height": 683,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/bkk/adip.png",
+      "bytes": 700837,
+      "width": 900,
+      "height": 1200,
+      "format": "png",
+      "cloudinary": false,
+      "derivative": {
+        "path": "program/bkk/adip.webp",
+        "bytes": 76002,
+        "width": 900,
+        "height": 1200,
+        "quality": 90
+      }
+    },
+    {
+      "path": "program/bkk/clea.png",
+      "bytes": 539966,
+      "width": 900,
+      "height": 1200,
+      "format": "png",
+      "cloudinary": false,
+      "derivative": {
+        "path": "program/bkk/clea.webp",
+        "bytes": 52398,
+        "width": 900,
+        "height": 1200,
+        "quality": 90
+      }
+    },
+    {
+      "path": "program/bkk/hero-student-bkk.png",
+      "bytes": 1478443,
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/bkk/jasmine.png",
+      "bytes": 878369,
+      "width": 900,
+      "height": 1200,
+      "format": "png",
+      "cloudinary": false,
+      "derivative": {
+        "path": "program/bkk/jasmine.webp",
+        "bytes": 76444,
+        "width": 900,
+        "height": 1200,
+        "quality": 90
+      }
+    },
+    {
+      "path": "program/digital-talent/hero-student-digital-talent.png",
+      "bytes": 1743965,
+      "width": 1326,
+      "height": 1186,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-basket.png",
+      "bytes": 2087920,
+      "width": 1086,
+      "height": 1448,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-bdi.png",
+      "bytes": 2209660,
+      "width": 1200,
+      "height": 1600,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-english-club.jpg",
+      "bytes": 322876,
+      "width": 1999,
+      "height": 1500,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-esport.png",
+      "bytes": 989437,
+      "width": 1280,
+      "height": 720,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-futsal.png",
+      "bytes": 1874230,
+      "width": 900,
+      "height": 1600,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-kir.png",
+      "bytes": 1715289,
+      "width": 1200,
+      "height": 1600,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-musik.png",
+      "bytes": 1146569,
+      "width": 1280,
+      "height": 721,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-paskibra.png",
+      "bytes": 1771390,
+      "width": 1600,
+      "height": 905,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-pmr.png",
+      "bytes": 813814,
+      "width": 1280,
+      "height": 720,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-pramuka.png",
+      "bytes": 1112105,
+      "width": 1280,
+      "height": 718,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-silat.png",
+      "bytes": 1198971,
+      "width": 1280,
+      "height": 960,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/ekskul-voli.png",
+      "bytes": 1922330,
+      "width": 1599,
+      "height": 899,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ekstrakurikuler/hero-student-ekskul.png",
+      "bytes": 1427238,
+      "width": 1326,
+      "height": 1186,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/profil-jurusan/hero-jurusan-student.png",
+      "bytes": 1396609,
+      "width": 1326,
+      "height": 1186,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/profil-jurusan/jurusan-sija-character.png",
+      "bytes": 1441936,
+      "width": 1122,
+      "height": 1262,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/profil-jurusan/jurusan-tjat-curved.png",
+      "bytes": 1655241,
+      "width": 1122,
+      "height": 1402,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/profil-jurusan/student-sija.png",
+      "bytes": 1696522,
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "program/ts21/ts21-framework.png",
+      "bytes": 241523,
+      "width": 1024,
+      "height": 458,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/prod-company-profile.png",
+      "bytes": 933497,
+      "width": 1125,
+      "height": 750,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/prod-it-maintenance.png",
+      "bytes": 832497,
+      "width": 800,
+      "height": 534,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/prod-network-install.png",
+      "bytes": 703077,
+      "width": 1000,
+      "height": 500,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/prod-uiux-design.png",
+      "bytes": 1767645,
+      "width": 1380,
+      "height": 920,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/request-student-thinking.png",
+      "bytes": 1969082,
+      "width": 940,
+      "height": 1674,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/request-students-three.png",
+      "bytes": 2749078,
+      "width": 1448,
+      "height": 1086,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/tefa-building-banner.png",
+      "bytes": 1303167,
+      "width": 1680,
+      "height": 1032,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/tefa-building.png",
+      "bytes": 1146437,
+      "width": 770,
+      "height": 1024,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/tefa-hero-banner.png",
+      "bytes": 1738286,
+      "width": 1448,
+      "height": 1086,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tefa/tefa-hero-student.png",
+      "bytes": 1969082,
+      "width": 940,
+      "height": 1674,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/akomodasi/akomodasi-hero.jpg",
+      "bytes": 802744,
+      "width": 1376,
+      "height": 768,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/akomodasi/hero-student-akomodasi.png",
+      "bytes": 1855264,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-aula.png",
+      "bytes": 582460,
+      "width": 1024,
+      "height": 683,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-gedung-smk.png",
+      "bytes": 272056,
+      "width": 401,
+      "height": 243,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-kantin.png",
+      "bytes": 1958666,
+      "width": 1600,
+      "height": 903,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-lab-ai.jpg",
+      "bytes": 198137,
+      "width": 1999,
+      "height": 1500,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-lab-fiber-optic.jpg",
+      "bytes": 232470,
+      "width": 1999,
+      "height": 1125,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-lab-iot.jpg",
+      "bytes": 222940,
+      "width": 1999,
+      "height": 1125,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-lab-jaringan.jpg",
+      "bytes": 183564,
+      "width": 1999,
+      "height": 1125,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-lab-komputer.png",
+      "bytes": 1329920,
+      "width": 1600,
+      "height": 903,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-lapangan-basket.png",
+      "bytes": 1695169,
+      "width": 1600,
+      "height": 903,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-lapangan-utama.jpg",
+      "bytes": 189381,
+      "width": 1999,
+      "height": 1132,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-outdoor-class.png",
+      "bytes": 263783,
+      "width": 515,
+      "height": 388,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-perpustakaan.png",
+      "bytes": 2033468,
+      "width": 1672,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-rps.jpg",
+      "bytes": 204526,
+      "width": 1999,
+      "height": 1132,
+      "format": "jpeg",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-ruang-kelas.png",
+      "bytes": 851879,
+      "width": 1280,
+      "height": 720,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-smc.png",
+      "bytes": 898801,
+      "width": 1600,
+      "height": 903,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/fasilitas-uks.png",
+      "bytes": 1661742,
+      "width": 1672,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/fasilitas/hero-fasilitas-terpadu.png",
+      "bytes": 1855864,
+      "width": 1672,
+      "height": 941,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/hub-industri/hero-student-hub-industri.png",
+      "bytes": 1417272,
+      "width": 1179,
+      "height": 1334,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/hero-prestasi-lks.png",
+      "bytes": 2196633,
+      "width": 1536,
+      "height": 1024,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-beefest-sdlc-revano.png",
+      "bytes": 583898,
+      "width": 597,
+      "height": 747,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-content-creator-sidoarjo.png",
+      "bytes": 771448,
+      "width": 606,
+      "height": 814,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-ficpact-ai-storytelling.png",
+      "bytes": 741422,
+      "width": 606,
+      "height": 816,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-fls2n-film-pendek.png",
+      "bytes": 930401,
+      "width": 603,
+      "height": 714,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-iitc-gen-ai-agung-rayya.png",
+      "bytes": 349421,
+      "width": 462,
+      "height": 576,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-iitc-web-design-zaina.png",
+      "bytes": 300421,
+      "width": 460,
+      "height": 576,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-kejurprov-speed-billal.png",
+      "bytes": 500386,
+      "width": 589,
+      "height": 601,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-lafest-afgan.png",
+      "bytes": 517975,
+      "width": 596,
+      "height": 726,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-lks-nasional-ai-revano.png",
+      "bytes": 685616,
+      "width": 574,
+      "height": 819,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-pelajar-pelopor-llaj-charen.png",
+      "bytes": 526771,
+      "width": 589,
+      "height": 623,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/prestasi/prestasi-porkab-renang-nabil.png",
+      "bytes": 663321,
+      "width": 566,
+      "height": 665,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/abid.png",
+      "bytes": 4228244,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/abror.png",
+      "bytes": 4716209,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/adam.png",
+      "bytes": 4405511,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/adi.png",
+      "bytes": 4322396,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/arga.png",
+      "bytes": 4250617,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/arifin.png",
+      "bytes": 5782359,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/chintia.png",
+      "bytes": 5170093,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/david.png",
+      "bytes": 4333768,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/dean.png",
+      "bytes": 3974630,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/efendi.png",
+      "bytes": 5453762,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/eka.png",
+      "bytes": 4940705,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/eliza.png",
+      "bytes": 4797013,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/ellsa.png",
+      "bytes": 4370131,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/fajar.png",
+      "bytes": 5449244,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/fanny.png",
+      "bytes": 5598079,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/faun.png",
+      "bytes": 4541306,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/ferina.png",
+      "bytes": 5323592,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/firman.png",
+      "bytes": 5410354,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/galih.png",
+      "bytes": 4249260,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/galuh.png",
+      "bytes": 5145730,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/grisa.png",
+      "bytes": 4498342,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/habibi.png",
+      "bytes": 7417776,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/hadi.png",
+      "bytes": 4286511,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/hamka.png",
+      "bytes": 4594560,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/hana.png",
+      "bytes": 7328758,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/haqi.png",
+      "bytes": 4490427,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/hero-student-guru.png",
+      "bytes": 1988901,
+      "width": 1920,
+      "height": 1080,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/ike.png",
+      "bytes": 5176551,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/ilham.png",
+      "bytes": 4238535,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/indra-hadi.png",
+      "bytes": 4572349,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/indra-kurniawan.png",
+      "bytes": 6372915,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/kazu.png",
+      "bytes": 5204937,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/laila.png",
+      "bytes": 5195023,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/lia.png",
+      "bytes": 5615013,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/manda.png",
+      "bytes": 7081566,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/maulana.png",
+      "bytes": 4292893,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/mayonk.png",
+      "bytes": 4260685,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/nafita.png",
+      "bytes": 4840252,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/novra.png",
+      "bytes": 4718477,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/okky.png",
+      "bytes": 4660982,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/profil-guru-hero.png",
+      "bytes": 2401050,
+      "width": 1720,
+      "height": 1544,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/putri.png",
+      "bytes": 5184709,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/rachel.png",
+      "bytes": 4578961,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/rifai.png",
+      "bytes": 4463628,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/rina.png",
+      "bytes": 5666567,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/rio.png",
+      "bytes": 5089281,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/risma.png",
+      "bytes": 7204403,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/rizka.png",
+      "bytes": 4985135,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/sarah.png",
+      "bytes": 4893442,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/shandi.png",
+      "bytes": 4504433,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/sinta.png",
+      "bytes": 5404020,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/suhud.png",
+      "bytes": 4451711,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/ulum.png",
+      "bytes": 4754536,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/vina.png",
+      "bytes": 7538433,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-guru/yunia.png",
+      "bytes": 7309529,
+      "width": 1615,
+      "height": 2000,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-sekolah/profil-hero-character.png",
+      "bytes": 1814261,
+      "width": 1122,
+      "height": 1402,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-sekolah/struktur-organisasi.png",
+      "bytes": 1126724,
+      "width": 1351,
+      "height": 1164,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "tentang-kami/profil-sekolah/visimisi-student.png",
+      "bytes": 2277088,
+      "width": 1024,
+      "height": 1536,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/calendar-3d-icon.png",
+      "bytes": 917930,
+      "width": 1312,
+      "height": 1199,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-artificial-intelligence.png",
+      "bytes": 695570,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-cloud-engineer.png",
+      "bytes": 453836,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-cyber-security.png",
+      "bytes": 643379,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-digital-marketing.png",
+      "bytes": 644706,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-iot.png",
+      "bytes": 576502,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-network-admin.png",
+      "bytes": 618082,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-network-infrastructure.png",
+      "bytes": 602035,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-software-developer.png",
+      "bytes": 461426,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/dtp-visual-designer.png",
+      "bytes": 341787,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/hero-student.png",
+      "bytes": 1782022,
+      "width": 941,
+      "height": 1672,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/icon-date.png",
+      "bytes": 41629,
+      "width": 1024,
+      "height": 888,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/icon-online.png",
+      "bytes": 50379,
+      "width": 1024,
+      "height": 889,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/icon-time.png",
+      "bytes": 81833,
+      "width": 1024,
+      "height": 986,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/laptop-mockup.png",
+      "bytes": 1920486,
+      "width": 1536,
+      "height": 1024,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/quiz-badge-icon.png",
+      "bytes": 650589,
+      "width": 1254,
+      "height": 1254,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/school-3d.png",
+      "bytes": 230698,
+      "width": 556,
+      "height": 427,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/school-building-banner.png",
+      "bytes": 306674,
+      "width": 720,
+      "height": 380,
+      "format": "png",
+      "cloudinary": true
+    },
+    {
+      "path": "trial-class/virtual-hero-students.png",
+      "bytes": 2388355,
+      "width": 1672,
+      "height": 941,
+      "format": "png",
+      "cloudinary": true
+    }
+  ]
+}

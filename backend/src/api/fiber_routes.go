@@ -21,8 +21,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/haristhropic/skomda-website/backend/src/api/chatbot"
+	"github.com/haristhropic/skomda-website/backend/src/shared"
 	"gorm.io/gorm"
 
 	"github.com/haristhropic/skomda-website/backend/src/api/auth"
@@ -36,14 +37,30 @@ import (
 // NewFiberApp menginisialisasi router Fiber beserta middleware dan seluruh route domain.
 func NewFiberApp(cfg config.Config) *fiber.App {
 	production := strings.EqualFold(cfg.Env, "production")
+	store, redisErr := shared.New(cfg.RedisURL)
+	if redisErr != nil {
+		log.Fatal("invalid Redis configuration")
+	}
+	shared.Current = store
 	app := fiber.New(fiber.Config{
 		AppName:      "SMK Telkom Sidoarjo API (Fiber Edition)",
 		ServerHeader: "Fiber",
-		BodyLimit:    15 * 1024 * 1024, // 15 MB limit untuk upload gambar dan dokumen
+		ReadTimeout:  10 * time.Second, WriteTimeout: 40 * time.Second, IdleTimeout: 60 * time.Second,
+		BodyLimit: 16 * 1024 * 1024, // 15 MB limit untuk upload gambar dan dokumen
 	})
 
 	// Middleware
 	app.Use(recover.New())
+	app.Use(func(c *fiber.Ctx) error {
+		timeout := 10 * time.Second
+		if c.Method() == fiber.MethodGet {
+			timeout = 3 * time.Second
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), timeout)
+		defer cancel()
+		c.SetUserContext(ctx)
+		return c.Next()
+	})
 	app.Use(func(c *fiber.Ctx) error {
 		requestID := observability.RequestID(c.Get("X-Request-ID"))
 		c.Locals("request_id", requestID)
@@ -56,6 +73,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		if matched := c.Route(); matched != nil && matched.Path != "" {
 			route = matched.Path
 		}
+		if cachedRoute, ok := c.Locals("cache_route").(string); ok && cachedRoute != "" {
+			route = cachedRoute
+		}
 		status := c.Response().StatusCode()
 		if err != nil {
 			status = fiber.StatusInternalServerError
@@ -63,6 +83,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				status = fiberErr.Code
 			}
 		}
+		observability.Record(c.Method(), route, status, time.Since(startedAt), requestID)
 		log.Printf("request_id=%s method=%s route=%q status=%d duration_ms=%d",
 			requestID, c.Method(), route, status, time.Since(startedAt).Milliseconds())
 		return err
@@ -105,6 +126,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 	cldClient, _ := cloudinary.NewClient(cfg.CloudinaryURL)
 
+	app.Use(middleware.PublicCache())
 	api := app.Group("/api")
 
 	// 1. Health check
@@ -131,38 +153,36 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				"database": "unavailable",
 			})
 		}
+		redisStatus := "disabled"
+		if shared.Current.Enabled() {
+			if !shared.Current.Healthy(ctx) {
+				return c.Status(503).JSON(fiber.Map{"status": "unavailable", "database": "ok", "redis": "unavailable"})
+			}
+			redisStatus = "ok"
+		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":   "ok",
 			"service":  "smktelkom-web-backend",
 			"engine":   "fiber-v2",
 			"database": "ok",
+			"redis":    redisStatus,
 		})
 	})
-
 	// 1.1 Auth Routes
 	authGroup := api.Group("/auth")
-	loginLimiter := limiter.New(limiter.Config{
-		Max:          5,
-		Expiration:   1 * time.Minute,
-		KeyGenerator: middleware.ClientIPKey,
-		LimitReached: func(c *fiber.Ctx) error {
-			c.Set("Retry-After", "60")
-			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Batas frekuensi percobaan masuk terlampaui. Silakan tunggu 1 menit sebelum mencoba kembali.",
-			})
-		},
-	})
-	authGroup.Post("/login", loginLimiter, auth.LoginHandler(cfg))
+	loginLimiter := middleware.SharedRateLimit("login", 5, time.Minute)
+	authGroup.Post("/login", loginLimiter, middleware.LoginConcurrency, auth.LoginHandler(cfg))
 	authGroup.Get("/me", middleware.AuthMiddleware(cfg.JWTSecret), auth.MeHandler())
 	authGroup.Post("/logout", auth.LogoutHandler())
 
 	// 1.2 Admin Protected Routes
 	adminGroup := api.Group("/admin", middleware.AuthMiddleware(cfg.JWTSecret))
+	adminGroup.Get("/monitoring", middleware.RequireRole("super_admin"), monitoringSnapshot)
 	listNews := func(c *fiber.Ctx, publicOnly bool) error {
 		category := strings.TrimSpace(c.Query("category"))
 		search := strings.TrimSpace(c.Query("search"))
-		query := config.DB.Model(&models.News{}).Order("id DESC")
+		query := requestDB(c).Model(&models.News{}).Order("id DESC")
 
 		if publicOnly {
 			// Query status dari client publik tidak boleh membuka berita draft.
@@ -193,6 +213,8 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				limit = 10
 			}
 			query = query.Offset((page - 1) * limit).Limit(limit)
+		} else if publicOnly {
+			query = query.Limit(100)
 		}
 
 		var newsList []models.News
@@ -207,7 +229,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	adminUserGuard := middleware.RequireRole("super_admin")
 	adminGroup.Get("/users", adminUserGuard, func(c *fiber.Ctx) error {
 		var users []models.User
-		if err := config.DB.Select("id", "name", "email", "role", "avatar", "created_at").Order("id ASC").Find(&users).Error; err != nil {
+		if err := requestDB(c).Select("id", "name", "email", "role", "avatar", "created_at").Order("id ASC").Find(&users).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil daftar akun admin"})
 		}
 		return c.JSON(fiber.Map{"data": users})
@@ -248,7 +270,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		if err := user.SetPassword(input.Password); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengamankan password akun"})
 		}
-		if err := config.DB.Create(&user).Error; err != nil {
+		if err := requestDB(c).Create(&user).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal membuat akun admin"})
 		}
 		recordAudit(c, "CREATE", "admin_user", fmt.Sprint(user.ID), fmt.Sprintf("Membuat akun admin %s dengan role %s", user.Email, user.Role))
@@ -278,12 +300,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		var target models.User
-		if err := config.DB.First(&target, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&target, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Akun admin tidak ditemukan"})
 		}
 		if strings.EqualFold(target.Role, "super_admin") && input.Role == "editor" {
 			var superAdminCount int64
-			if err := config.DB.Model(&models.User{}).Where("LOWER(role) = ?", "super_admin").Count(&superAdminCount).Error; err != nil {
+			if err := requestDB(c).Model(&models.User{}).Where("LOWER(role) = ?", "super_admin").Count(&superAdminCount).Error; err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memeriksa akun super admin"})
 			}
 			if superAdminCount <= 1 {
@@ -291,7 +313,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			}
 		}
 		oldRole := target.Role
-		if err := config.DB.Model(&target).Update("role", input.Role).Error; err != nil {
+		if err := requestDB(c).Model(&target).Update("role", input.Role).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memperbarui role akun"})
 		}
 		recordAudit(c, "UPDATE", "admin_user", fmt.Sprint(target.ID), fmt.Sprintf("Mengubah role akun %s dari %s menjadi %s", target.Email, oldRole, input.Role))
@@ -314,25 +336,25 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		var recentLogs []models.AuditLog
 		var recentNews []models.News
 
-		config.DB.Model(&models.News{}).Count(&totalNews)
-		config.DB.Model(&models.News{}).Where("status = ?", "published").Count(&publishedNews)
-		config.DB.Model(&models.News{}).Where("status = ?", "draft").Count(&draftNews)
-		config.DB.Model(&models.User{}).Count(&totalUsers)
+		requestDB(c).Model(&models.News{}).Count(&totalNews)
+		requestDB(c).Model(&models.News{}).Where("status = ?", "published").Count(&publishedNews)
+		requestDB(c).Model(&models.News{}).Where("status = ?", "draft").Count(&draftNews)
+		requestDB(c).Model(&models.User{}).Count(&totalUsers)
 
-		config.DB.Model(&models.Teacher{}).Count(&totalTeachers)
-		config.DB.Model(&models.Prestasi{}).Count(&totalPrestasi)
-		config.DB.Model(&models.Ekstrakurikuler{}).Count(&totalEkskul)
-		config.DB.Model(&models.Fasilitas{}).Count(&totalFasilitas)
-		config.DB.Model(&models.BKKJob{}).Count(&totalJobs)
-		config.DB.Model(&models.BKKPartner{}).Count(&totalPartners)
-		config.DB.Model(&models.Document{}).Count(&totalDocuments)
-		config.DB.Model(&models.DigitalTalent{}).Count(&totalDtp)
-		config.DB.Model(&models.TrialClassRegistration{}).Count(&totalTrialClass)
+		requestDB(c).Model(&models.Teacher{}).Count(&totalTeachers)
+		requestDB(c).Model(&models.Prestasi{}).Count(&totalPrestasi)
+		requestDB(c).Model(&models.Ekstrakurikuler{}).Count(&totalEkskul)
+		requestDB(c).Model(&models.Fasilitas{}).Count(&totalFasilitas)
+		requestDB(c).Model(&models.BKKJob{}).Count(&totalJobs)
+		requestDB(c).Model(&models.BKKPartner{}).Count(&totalPartners)
+		requestDB(c).Model(&models.Document{}).Count(&totalDocuments)
+		requestDB(c).Model(&models.DigitalTalent{}).Count(&totalDtp)
+		requestDB(c).Model(&models.TrialClassRegistration{}).Count(&totalTrialClass)
 
 		if strings.EqualFold(c.Locals("user_role").(string), "super_admin") {
-			config.DB.Order("created_at DESC").Limit(10).Find(&recentLogs)
+			requestDB(c).Order("created_at DESC").Limit(10).Find(&recentLogs)
 		}
-		config.DB.Order("id DESC").Limit(5).Find(&recentNews)
+		requestDB(c).Order("id DESC").Limit(5).Find(&recentNews)
 
 		response := fiber.Map{
 			"totalNews":       totalNews,
@@ -362,7 +384,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		if limit <= 0 || limit > 100 {
 			limit = 50
 		}
-		if err := config.DB.Order("id DESC").Limit(limit).Find(&logs).Error; err != nil {
+		if err := requestDB(c).Order("id DESC").Limit(limit).Find(&logs).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal mengambil audit log",
 			})
@@ -374,7 +396,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	jurusanGroup := api.Group("/jurusan")
 	jurusanGroup.Get("", func(c *fiber.Ctx) error {
 		var list []models.Jurusan
-		if err := config.DB.Find(&list).Error; err != nil {
+		if err := requestDB(c).Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal mengambil data jurusan dari server",
 			})
@@ -391,7 +413,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		var item models.Jurusan
-		err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(slug)).First(&item).Error
+		err := requestDB(c).Where("LOWER(slug) = ?", strings.ToLower(slug)).First(&item).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -414,7 +436,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	newsGroup.Get("/:slug", func(c *fiber.Ctx) error {
 		slug := strings.TrimSpace(c.Params("slug"))
 		var item models.News
-		err := config.DB.Where("LOWER(slug) = ? AND LOWER(status) = ?", strings.ToLower(slug), "published").First(&item).Error
+		err := requestDB(c).Where("LOWER(slug) = ? AND LOWER(status) = ?", strings.ToLower(slug), "published").First(&item).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -546,7 +568,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		var existing models.News
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Berita tidak ditemukan",
 			})
@@ -586,7 +608,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			existing.Status = input.Status
 		}
 
-		if err := config.DB.Save(&existing).Error; err != nil {
+		if err := requestDB(c).Save(&existing).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal memperbarui berita",
 			})
@@ -613,7 +635,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		})
 	})
 
-	newsGroup.Delete("/:id", middleware.AuthMiddleware(cfg.JWTSecret), middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
+	newsGroup.Delete("/:id", middleware.AuthMiddleware(cfg.JWTSecret), middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
 		idParam := c.Params("id")
 		id, err := strconv.ParseUint(idParam, 10, 32)
 		if err != nil {
@@ -623,13 +645,13 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		var existing models.News
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
+		if err := requestDB(c).First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Berita tidak ditemukan",
 			})
 		}
 
-		if err := config.DB.Delete(&existing).Error; err != nil {
+		if err := requestDB(c).Delete(&existing).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal menghapus berita",
 			})
@@ -656,17 +678,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	// 4. Chatbot
 	cbGroup := api.Group("/chatbot")
 	chatbotSlots := make(chan struct{}, 16)
-	chatbotLimiter := limiter.New(limiter.Config{
-		Max:          60,
-		Expiration:   time.Minute,
-		KeyGenerator: middleware.ClientIPKey,
-		LimitReached: func(c *fiber.Ctx) error {
-			c.Set("Retry-After", "60")
-			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Batas permintaan chatbot tercapai. Silakan coba lagi dalam satu menit.",
-			})
-		},
-	})
+	chatbotLimiter := middleware.SharedRateLimit("chatbot", 60, time.Minute)
 	cbGroup.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"status": "ready",
@@ -674,6 +686,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		})
 	})
 	cbGroup.Post("/message", chatbotLimiter, func(c *fiber.Ctx) error {
+		if len(c.Body()) > 32*1024 {
+			return c.Status(413).JSON(fiber.Map{"error": "Pesan percakapan terlalu besar"})
+		}
 		select {
 		case chatbotSlots <- struct{}{}:
 		default:
@@ -690,10 +705,10 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}()
 
 		var req struct {
-			Message string        `json:"message"`
-			History []interface{} `json:"history"`
-			Stream  bool          `json:"stream"`
-			Model   string        `json:"model"`
+			Message string                `json:"message"`
+			History []chatbot.ChatMessage `json:"history"`
+			Stream  bool                  `json:"stream"`
+			Model   string                `json:"model"`
 		}
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -707,14 +722,26 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 
-		if req.Model == "" || req.Model == "groq" || req.Model == "gemini" || req.Model == "gemini-3.8-flash" {
-			if cfg.ChatbotModel != "" {
-				req.Model = cfg.ChatbotModel
-			} else {
-				req.Model = "llama-3.3-70b-versatile"
-			}
+		if _, err := chatbot.ValidateRequest(trimmed, req.History); err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 		}
-
+		if chatbot.Suspicious(trimmed) || chatbot.UnsafeHistory(req.History) {
+			return c.JSON(fiber.Map{"response": chatbot.SafetyReply, "sources": []fiber.Map{}, "fallback": true})
+		}
+		req.Model = cfg.ChatbotModel
+		leaseID := observability.RequestID("")
+		leaseCtx, leaseCancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+		acquired, leaseErr := shared.Current.AcquireAI(leaseCtx, leaseID)
+		leaseCancel()
+		if leaseErr != nil || !acquired {
+			c.Set("Retry-After", "10")
+			return c.Status(503).JSON(fiber.Map{"error": "Asisten sedang sibuk. Silakan coba kembali."})
+		}
+		defer func() {
+			if !streamingResponse {
+				shared.Current.ReleaseAI(leaseID)
+			}
+		}()
 		// Cek apakah query DTP memiliki intensi spesifik (magang/karir, sertifikasi, daftar 9 spesialisasi, atau overview)
 		if isDtpQuery(trimmed) {
 			lower := strings.ToLower(trimmed)
@@ -787,7 +814,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 					c.Set("Transfer-Encoding", "chunked")
 					streamingResponse = true
 					c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
-						defer func() { <-chatbotSlots }()
+						defer func() { <-chatbotSlots; shared.Current.ReleaseAI(leaseID) }()
 						words := strings.Split(targetedResp, " ")
 						chunkSize := 8
 						for i := 0; i < len(words); i += chunkSize {
@@ -805,7 +832,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 							})
 							_, _ = w.Write([]byte("data: " + string(payload) + "\n\n"))
 							_ = w.Flush()
-							time.Sleep(5 * time.Millisecond)
+
 						}
 						_, _ = w.Write([]byte("data: [DONE]\n\n"))
 						_ = w.Flush()
@@ -843,10 +870,11 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 		targetURL := strings.TrimRight(cfg.NexusRouterURL, "/") + "/api/v1/skomda/chat"
 		forwardPayload, err := json.Marshal(map[string]interface{}{
-			"message": processedMessage,
-			"history": req.History,
-			"stream":  req.Stream,
-			"model":   req.Model,
+			"message":       chatbot.ProtectedMessage(processedMessage),
+			"system_prompt": chatbot.SafetyPolicy,
+			"history":       req.History,
+			"stream":        req.Stream,
+			"model":         req.Model,
 		})
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -872,9 +900,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			httpReq.Header.Set("Accept", "text/event-stream")
 		}
 
-		client := &http.Client{
-			Timeout: 45 * time.Second,
-		}
+		client := chatbot.GatewayClient
 
 		resp, err := client.Do(httpReq)
 		if err != nil || (resp != nil && resp.StatusCode != fiber.StatusOK) {
@@ -927,9 +953,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			c.Set("Transfer-Encoding", "chunked")
 			streamingResponse = true
 			c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
-				defer func() { <-chatbotSlots }()
+				defer func() { <-chatbotSlots; shared.Current.ReleaseAI(leaseID) }()
 				defer resp.Body.Close()
-				reader := bufio.NewReader(resp.Body)
+				reader := bufio.NewReader(io.LimitReader(resp.Body, 512*1024))
 				for {
 					line, readErr := reader.ReadBytes('\n')
 					if len(line) > 0 {
@@ -945,7 +971,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		}
 
 		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
+		body, err := io.ReadAll(io.LimitReader(resp.Body, 512*1024))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal membaca respons dari gateway AI.",
@@ -958,7 +984,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	})
 
 	// 5. Cloudinary Signed Upload & Direct Image Upload
-	api.Get("/cloudinary/sign", middleware.AuthMiddleware(cfg.JWTSecret), func(c *fiber.Ctx) error {
+	api.Get("/cloudinary/sign", middleware.AuthMiddleware(cfg.JWTSecret), middleware.SharedRateLimit("uploads", 20, 10*time.Minute), middleware.UploadConcurrency, func(c *fiber.Ctx) error {
 		if cldClient == nil || cldClient.CloudName == "" {
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
 				"error": "Cloudinary belum dikonfigurasi di server backend",
@@ -971,7 +997,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		})
 	})
 
-	api.Post("/upload/image", middleware.AuthMiddleware(cfg.JWTSecret), func(c *fiber.Ctx) error {
+	api.Post("/upload/image", middleware.AuthMiddleware(cfg.JWTSecret), middleware.SharedRateLimit("uploads", 20, 10*time.Minute), middleware.UploadConcurrency, func(c *fiber.Ctx) error {
 		fileHeader, err := c.FormFile("image")
 		if err != nil {
 			fileHeader, err = c.FormFile("file")
@@ -989,7 +1015,6 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			".jpeg": true,
 			".png":  true,
 			".webp": true,
-			".gif":  true,
 		}
 		if !allowedImgExts[ext] {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -1024,6 +1049,18 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 		defer file.Close()
+		signature := make([]byte, 512)
+		read, readErr := file.Read(signature)
+		if readErr != nil && readErr != io.EOF {
+			return c.Status(400).JSON(fiber.Map{"error": "Berkas gambar tidak valid"})
+		}
+		mime := http.DetectContentType(signature[:read])
+		if mime != "image/jpeg" && mime != "image/png" && mime != "image/webp" {
+			return c.Status(400).JSON(fiber.Map{"error": "Isi berkas bukan gambar yang diizinkan"})
+		}
+		if _, err := file.Seek(0, io.SeekStart); err != nil {
+			return c.Status(400).JSON(fiber.Map{"error": "Berkas gambar tidak dapat dibaca"})
+		}
 
 		folder := c.FormValue("folder", "skomda/admin-uploads")
 		if cloudinaryConfigured(cldClient) {
@@ -1068,7 +1105,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		})
 	})
 
-	api.Post("/upload/document", middleware.AuthMiddleware(cfg.JWTSecret), func(c *fiber.Ctx) error {
+	api.Post("/upload/document", middleware.AuthMiddleware(cfg.JWTSecret), middleware.SharedRateLimit("uploads", 20, 10*time.Minute), middleware.UploadConcurrency, func(c *fiber.Ctx) error {
 		fileHeader, err := c.FormFile("file")
 		if err != nil {
 			fileHeader, err = c.FormFile("document")

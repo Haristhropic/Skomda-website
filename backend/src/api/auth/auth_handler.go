@@ -9,7 +9,10 @@ import (
 	"github.com/haristhropic/skomda-website/backend/src/config"
 	"github.com/haristhropic/skomda-website/backend/src/models"
 	"github.com/haristhropic/skomda-website/backend/src/utils"
+	"golang.org/x/crypto/bcrypt"
 )
+
+var dummyPasswordHash, _ = bcrypt.GenerateFromPassword([]byte("unused-timing-only-not-an-account"), bcrypt.DefaultCost)
 
 // LoginHandler menangani autentikasi pengguna panel admin dan menerbitkan HttpOnly cookie.
 func LoginHandler(cfg config.Config) fiber.Handler {
@@ -19,6 +22,9 @@ func LoginHandler(cfg config.Config) fiber.Handler {
 	}
 
 	return func(c *fiber.Ctx) error {
+		if len(c.Body()) > 8192 {
+			return c.Status(413).JSON(fiber.Map{"error": "Permintaan masuk terlalu besar"})
+		}
 		var input LoginInput
 		if err := c.BodyParser(&input); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -27,16 +33,19 @@ func LoginHandler(cfg config.Config) fiber.Handler {
 		}
 
 		email := strings.ToLower(strings.TrimSpace(input.Email))
-		password := strings.TrimSpace(input.Password)
+		password := input.Password
 
-		if email == "" || password == "" {
+		if email == "" || password == "" || len(email) > 150 || len(password) > 72 {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Email dan kata sandi wajib diisi",
 			})
 		}
 
 		var user models.User
-		err := config.DB.Where("LOWER(email) = ?", email).First(&user).Error
+		err := config.DB.WithContext(c.UserContext()).Where("LOWER(email) = ?", email).First(&user).Error
+		if err != nil {
+			_ = bcrypt.CompareHashAndPassword(dummyPasswordHash, []byte(password))
+		}
 		if err != nil || !user.CheckPassword(password) {
 			// Rekam percobaan gagal ke audit log untuk pemantauan keamanan
 			go func(ip string) {
@@ -127,7 +136,7 @@ func MeHandler() fiber.Handler {
 		}
 
 		var user models.User
-		if err := config.DB.First(&user, userID).Error; err != nil {
+		if err := config.DB.WithContext(c.UserContext()).First(&user, userID).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Pengguna tidak ditemukan",
 			})

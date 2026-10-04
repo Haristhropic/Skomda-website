@@ -29,7 +29,7 @@ function requestError(message: string, status: number, requestId: string) {
   }));
   return NextResponse.json(
     { error: message },
-    { status, headers: { "x-request-id": requestId } },
+    { status, headers: { "x-request-id": requestId, "cache-control": "no-store, private" } },
   );
 }
 
@@ -66,13 +66,14 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
   if (MUTATING_METHODS.has(request.method)) {
     const configuredOrigin = process.env.FRONTEND_ORIGIN?.replace(/\/+$/, "");
     const requestOrigin = request.headers.get("origin");
-    if (
-      requestOrigin &&
-      requestOrigin !== configuredOrigin &&
-      requestOrigin !== request.nextUrl.origin
-    ) {
+    const expectedOrigin = configuredOrigin || request.nextUrl.origin;
+    if (!requestOrigin || requestOrigin !== expectedOrigin) {
       return requestError("Origin permintaan tidak diizinkan", 403, requestId);
     }
+  }
+
+  if (path.some((part) => part === "." || part === ".." || /[\\/\u0000]/.test(part))) {
+    return requestError("Jalur permintaan tidak valid", 400, requestId);
   }
 
   const contentLength = Number(request.headers.get("content-length") || 0);
@@ -121,6 +122,9 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
   for (const name of FORWARDED_RESPONSE_HEADERS) {
     const value = upstream.headers.get(name);
     if (value) responseHeaders.set(name, value);
+  }
+  if (path[0] === "auth" || path[0] === "admin" || MUTATING_METHODS.has(request.method) || request.headers.has("cookie")) {
+    responseHeaders.set("cache-control", "no-store, private");
   }
   for (const cookie of upstream.headers.getSetCookie()) {
     // The admin cookie must also reach page requests such as /admin, not only

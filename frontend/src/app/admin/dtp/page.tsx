@@ -20,15 +20,14 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import {
   DtpItem,
-  getDtpList,
+  getAdminDtpList,
   createDtp,
   updateDtp,
   deleteDtp,
 } from "@/services/dtp";
-import { INITIAL_DTP_ITEMS } from "@/data/initialDtp";
 
 export default function AdminDtpPage() {
-  const [list, setList] = useState<DtpItem[]>(INITIAL_DTP_ITEMS);
+  const [list, setList] = useState<DtpItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,13 +61,14 @@ export default function AdminDtpPage() {
   };
 
   const loadData = async () => {
+    setIsLoading(true);
     try {
-      const data = await getDtpList();
-      if (data && data.length > 0) {
-        setList(data);
-      }
+      const data = await getAdminDtpList();
+      setList(data);
     } catch {
-      // Keep existing list
+      showToast("Daftar DTP tidak dapat dimuat. Coba muat ulang halaman.", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 

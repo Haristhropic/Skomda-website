@@ -18,11 +18,12 @@ interface TrialClassHeroProps {
 export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) {
   const { t } = useLanguage();
   const [event, setEvent] = useState<TrialClassEvent>(DEFAULT_TRIAL_CLASS_EVENT);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     getUpcomingTrialClassEvent().then((data) => {
       if (data) setEvent(data);
-    });
+    }).catch(() => setLoadError(true));
   }, []);
 
   const handleScrollToEvent = () => {
@@ -87,6 +88,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
               <button
                 type="button"
                 onClick={onOpenRegister}
+                disabled={event.status === "closed" || !event.isActive}
                 className="btn-primary group !px-7 !h-[50px] !min-h-[48px]"
               >
                 <span className="font-jakarta font-medium text-[15px] leading-none whitespace-nowrap">
@@ -211,10 +213,10 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="font-jakarta text-xs sm:text-sm font-bold text-[#101828] whitespace-nowrap">
-                        {event.dateDay || t("trialClassPage.eventDateDay", "Sabtu,")}
+                        {event.dateDay}
                       </span>
                       <span className="font-jakarta text-[11px] sm:text-xs text-[#6a7282] whitespace-nowrap">
-                        {event.dateFull || t("trialClassPage.eventDateFull", "26 September 2026")}
+                        {event.dateFull || (loadError ? "Jadwal belum dapat dimuat" : "Jadwal belum diumumkan")}
                       </span>
                     </div>
                   </div>
@@ -231,7 +233,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="font-jakarta text-xs sm:text-sm font-bold text-[#101828] whitespace-nowrap">
-                        {event.timeRange || t("trialClassPage.eventTime", "09.00 - 11.00")}
+                        {event.timeRange || "—"}
                       </span>
                       <span className="font-jakarta text-[11px] sm:text-xs text-[#6a7282] whitespace-nowrap">
                         {event.timezone || t("trialClassPage.eventTimezone", "WIB")}
@@ -267,7 +269,7 @@ export default function TrialClassHero({ onOpenRegister }: TrialClassHeroProps) 
                 <button
                   type="button"
                   onClick={onOpenRegister}
-                  disabled={event.status === "closed"}
+                  disabled={event.status === "closed" || !event.isActive}
                   className="btn-primary group w-full sm:w-auto lg:w-[200px] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="whitespace-nowrap">

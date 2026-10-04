@@ -11,7 +11,6 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import PageHeroSection from "@/components/sections/common/PageHeroSection";
 import {
-  DTP_SPECIALIZATIONS,
   DTP_COLLABORATION_PROJECTS,
   DTP_WEEKLY_SCHEDULE,
   DtpSpecialization,
@@ -27,7 +26,8 @@ const DtpDetailModal = dynamic(() => import("./DtpDetailModal"), {
 
 export default function DigitalTalentClient() {
   const { t, isEn } = useLanguage();
-  const [specializations, setSpecializations] = useState<DtpSpecialization[]>(DTP_SPECIALIZATIONS);
+  const [specializations, setSpecializations] = useState<DtpSpecialization[]>([]);
+  const [loadError, setLoadError] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSpec, setSelectedSpec] = useState<DtpSpecialization | null>(null);
 
@@ -36,35 +36,31 @@ export default function DigitalTalentClient() {
     let isMounted = true;
     getDtpList()
       .then((data) => {
-        if (isMounted && data && data.length > 0) {
+        if (isMounted && data) {
           setSpecializations(
             data.map((item) => {
-              const matchedLocal = DTP_SPECIALIZATIONS.find(
-                (l) => l.id === item.slug || l.title.toLowerCase() === item.title.toLowerCase()
-              );
-
               const splitComma = (str?: string) =>
                 str ? str.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
               return {
-                id: item.slug || (matchedLocal ? matchedLocal.id : `dtp-${item.id}`),
-                number: item.number || (matchedLocal ? matchedLocal.number : "01"),
+                id: item.slug || `dtp-${item.id}`,
+                number: item.number || "01",
                 title: item.title,
-                category: (item.category || matchedLocal?.category || "Software & AI") as any,
-                image: item.image || matchedLocal?.image || "",
-                badgeText: item.badgeText || matchedLocal?.badgeText || "",
-                shortDesc: item.shortDesc || matchedLocal?.shortDesc || "",
-                fullDesc: item.fullDesc || matchedLocal?.fullDesc || "",
-                coreSkills: item.coreSkills ? splitComma(item.coreSkills) : (matchedLocal?.coreSkills || []),
-                supportingSkills: item.supportingSkills ? splitComma(item.supportingSkills) : (matchedLocal?.supportingSkills || []),
-                careerProspects: item.careerProspects ? splitComma(item.careerProspects) : (matchedLocal?.careerProspects || []),
-                tools: item.tools ? splitComma(item.tools) : (matchedLocal?.tools || []),
+                category: (item.category || "Software & AI") as DtpSpecialization["category"],
+                image: item.image || "",
+                badgeText: item.badgeText || "",
+                shortDesc: item.shortDesc || "",
+                fullDesc: item.fullDesc || "",
+                coreSkills: splitComma(item.coreSkills),
+                supportingSkills: splitComma(item.supportingSkills),
+                careerProspects: splitComma(item.careerProspects),
+                tools: splitComma(item.tools),
               };
             })
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { if (isMounted) setLoadError(true); });
 
     return () => {
       isMounted = false;
@@ -113,6 +109,7 @@ export default function DigitalTalentClient() {
         imageContainerClassName="w-full max-w-[440px] sm:max-w-[480px] lg:max-w-[520px] aspect-[1326/1186]"
         imageClassName="drop-shadow-xl"
       />
+      {loadError && <p role="alert" className="mx-auto max-w-[1280px] px-4 py-4 text-sm text-red-800 sm:px-6 lg:px-8">{isEn ? "Program information could not be loaded. Please reload the page to try again." : "Informasi program belum dapat dimuat. Muat ulang halaman untuk mencoba lagi."}</p>}
 
       {/* ─── 2. Background & Weekly Learning Model ─── */}
       <section className="py-16 sm:py-24 bg-[#f8f9fb]">

@@ -19,7 +19,7 @@ export default function ImageUploadField({
   value,
   onChange,
   folder = "skomda/admin-uploads",
-  recommendedSize = "Format JPG, PNG, atau WebP (Maks 5MB)",
+  recommendedSize = "Format JPG, PNG, atau WebP (Maks 10MB)",
   required = false,
 }: ImageUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,8 +32,8 @@ export default function ImageUploadField({
     setErrorMsg(null);
 
     // Validasi tipe berkas hanya gambar
-    if (!file.type.startsWith("image/")) {
-      setErrorMsg("Berkas harus berupa gambar (JPG, PNG, WebP, atau GIF).");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setErrorMsg("Berkas harus berupa gambar JPG, PNG, atau WebP.");
       return;
     }
 

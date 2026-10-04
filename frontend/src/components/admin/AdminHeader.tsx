@@ -1,8 +1,6 @@
 "use client";
 
-import { Menu, Shield, User, Globe } from "lucide-react";
-import Link from "next/link";
-import { useAdminAuth } from "@/context/AdminAuthContext";
+import { Menu } from "lucide-react";
 
 interface AdminHeaderProps {
   title?: string;
@@ -17,10 +15,8 @@ export default function AdminHeader({
   onOpenSidebar,
   actions,
 }: AdminHeaderProps) {
-  const { user } = useAdminAuth();
-
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/95 px-4 sm:px-8 backdrop-blur-md">
+    <header className="sticky top-0 z-30 flex min-h-16 w-full flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 sm:px-8">
       {/* Left: Mobile hamburger & Page Title */}
       <div className="flex items-center gap-3 sm:gap-4">
         <button
@@ -43,6 +39,7 @@ export default function AdminHeader({
           )}
         </div>
       </div>
+      {actions && <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div>}
     </header>
   );
 }

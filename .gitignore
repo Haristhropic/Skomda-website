@@ -6,6 +6,15 @@ backend/.env
 frontend/.env*.local
 deploy.env
 .deployed-image-tag
+.active-slot
+.previous-slot
+.previous-image-tag
+secrets/
+deploy/nginx/releases/
+*.dump
+public-schema.sql
+__pycache__/
+scripts/.vps-*.sh
 
 # Dependencies & Build Outputs
 node_modules/

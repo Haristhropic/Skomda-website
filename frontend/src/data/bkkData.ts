@@ -215,7 +215,7 @@ export const TALENTA_SKOMDA_ITEMS: TalentaSkomdaItem[] = [
     role: "UI/UX Designer",
     major: "SIJA",
     status: "SIJA · Alumni 2026",
-    avatar: "/images/program/bkk/clea.png",
+    avatar: "/images/program/bkk/clea.webp",
     skills: ["Figma", "UI Design", "Front-End"],
     bio: "Spesialis dalam merancang sistem antarmuka web dan mobile yang user-friendly, interaktif, serta berorientasi pada kemudahan pengguna.",
     achievements: [
@@ -229,7 +229,7 @@ export const TALENTA_SKOMDA_ITEMS: TalentaSkomdaItem[] = [
     role: "Network Engineer",
     major: "TJAT",
     status: "TJAT · Alumni 2025",
-    avatar: "/images/program/bkk/adip.png",
+    avatar: "/images/program/bkk/adip.webp",
     skills: ["Network", "Mikrotik", "IT Support"],
     bio: "Fokus pada perancangan infrastruktur jaringan nirkabel, routing Mikrotik/Cisco, dan troubleshooting jaringan berskala enterprise.",
     achievements: [
@@ -243,7 +243,7 @@ export const TALENTA_SKOMDA_ITEMS: TalentaSkomdaItem[] = [
     role: "Web Developer",
     major: "SIJA",
     status: "SIJA · Alumni 2026",
-    avatar: "/images/program/bkk/jasmine.png",
+    avatar: "/images/program/bkk/jasmine.webp",
     skills: ["HTML", "CSS", "JavaScript"],
     bio: "Pengembang aplikasi web yang menyukai arsitektur modern TypeScript, React, dan API backend, aktif membangun solusi digital sekolah.",
     achievements: [

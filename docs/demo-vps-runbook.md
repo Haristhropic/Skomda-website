@@ -89,6 +89,15 @@ Paste seluruh isi private key—termasuk baris `BEGIN OPENSSH PRIVATE KEY` dan `
 - Cek `docker compose --env-file deploy.env config` di folder deployment; jangan menampilkan hasil yang mengandung environment secrets.
 - Pastikan file `backend/.env` ada, permission-nya `600`, dan `DATABASE_DRIVER=postgres`.
 - Pastikan `backend/migrate.env` dibuat dari contoh, permission `600`, dan URL database migrasi mengarah ke project yang sudah dicadangkan. Workflow deployment sekarang membutuhkan file ini sebelum menjalankan backend baru.
+- Migrator versi baru memakai schema history di `skomda_internal.goose_db_version`. Pada database Supabase existing yang belum punya ledger, jangan setujui job deploy langsung: deploy akan berhenti sebelum mengganti container aplikasi sampai baseline satu kali dicatat. Setelah CI berhasil build image commit yang memuat migrasi dan sebelum menyetujui deployment, jalankan dari sesi SSH user `deploy`:
+
+  ```bash
+  cd /opt/skomda-demo
+  docker compose --profile operations --env-file deploy.env pull migrate
+  docker compose --profile operations --env-file deploy.env run --rm --no-deps migrate --baseline-existing
+  ```
+
+  Baseline memeriksa nama 17 tabel, kolom, indeks, 17 sequence, 7 tabel ber-RLS, dan 2 policy; lalu hanya mencatat versi 1 ke schema internal. Pemeriksaan tidak membandingkan tipe kolom, nilai default, atau definisi lengkap indeks/constraint. Sebelum menjalankannya, pastikan dump schema terbaru sudah diunduh, struktur lengkap masih cocok, tidak ada perubahan schema sejak dump, dan backup data dapat dipulihkan. Jika perintah menolak baseline, jangan lanjutkan deployment; kirim pesan error tanpa menampilkan `migrate.env`. Setelah perintah sukses, deployment tertunda di GitHub boleh disetujui. Deployment berikutnya menjalankan hanya migrasi yang belum diterapkan.
 - Backend membatasi SQL pool ke maksimum 25 koneksi terbuka dan 5 idle. Sebelum stress test, pemilik project Supabase perlu mencocokkan nilai ini dengan compute/connection limit dan konfigurasi pooler; jangan menaikkan maksimum hanya berdasarkan jumlah pengguna bersamaan.
 - Pastikan kedua hostname memiliki route Tunnel yang tepat, connector aktif, dan container `cloudflared` tersambung ke network aplikasi.
 - Jalankan workflow CI/build dahulu. Aktifkan deploy hanya setelah siap menerima deployment pertama.

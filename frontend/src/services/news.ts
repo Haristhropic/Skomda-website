@@ -239,78 +239,19 @@ export const MOCK_NEWS: NewsItem[] = [
   },
 ];
 
-// Helper: Filter mock news
-function filterMockNews(category?: string, search?: string): NewsItem[] {
-  let result = [...MOCK_NEWS];
-  if (category && category !== "Semua") {
-    result = result.filter(
-      (item) => item.category.toLowerCase() === category.toLowerCase()
-    );
-  }
-  if (search && search.trim() !== "") {
-    const term = search.toLowerCase();
-    result = result.filter(
-      (item) =>
-        item.title.toLowerCase().includes(term) ||
-        (item.summary && item.summary.toLowerCase().includes(term)) ||
-        (item.content && item.content.toLowerCase().includes(term))
-    );
-  }
-  return result;
-}
-
-/**
- * Mengambil daftar berita dari Go backend API (dengan filter opsional category & search).
- * Otomatis retry 1x jika gagal, lalu fallback ke mock data jika backend offline.
- */
+/** Public content always comes from the backend; an outage must not publish sample news. */
 export async function getNewsList(params?: {
-  category?: string;
-  search?: string;
-  page?: number;
-  limit?: number;
+  category?: string; search?: string; page?: number; limit?: number;
 }): Promise<NewsItem[]> {
   const url = buildApiUrl("news", {
-    category: params?.category,
-    search: params?.search?.trim(),
-    page: params?.page,
-    limit: params?.limit,
+    category: params?.category, search: params?.search?.trim(), page: params?.page, limit: params?.limit,
   });
-
-  // Retry helper: coba fetch, jika gagal tunggu lalu retry 1x
-  const attemptFetch = async (retries = 1): Promise<Response | null> => {
-    try {
-      const res = await fetch(url, { cache: "no-store" });
-      if (res.ok) return res;
-    } catch {
-      // fetch failed (network error / backend belum siap)
-    }
-    if (retries > 0) {
-      await new Promise((r) => setTimeout(r, 1500));
-      return attemptFetch(retries - 1);
-    }
-    return null;
-  };
-
-  try {
-    const res = await attemptFetch(1);
-
-    if (res) {
-      const json = await res.json();
-      if (Array.isArray(json.data)) {
-        return json.data.map(normalizeNewsItem);
-      }
-    }
-
-    // Backend tidak merespons (jaringan offline / backend belum jalan) → fallback lokal
-    if (typeof window !== "undefined") {
-      console.log("[News] Menggunakan data lokal (backend belum tersedia)");
-    }
-    return filterMockNews(params?.category, params?.search).map(normalizeNewsItem);
-  } catch {
-    return filterMockNews(params?.category, params?.search).map(normalizeNewsItem);
-  }
+  const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(8_000) });
+  if (!response.ok) throw new Error("Berita tidak dapat dimuat dari server.");
+  const result = await response.json();
+  if (!Array.isArray(result.data)) throw new Error("Respons berita tidak valid.");
+  return result.data.map(normalizeNewsItem);
 }
-
 /** Mengambil seluruh status berita melalui endpoint admin yang mewajibkan sesi login. */
 export async function getAdminNewsList(params?: {
   category?: string;
@@ -352,40 +293,13 @@ export async function getAdminNewsList(params?: {
  * Mengambil detail satu berita berdasarkan slug.
  */
 export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
-  const cleanSlug = slug.toLowerCase().trim();
-  const url = buildApiUrl(`news/${encodeURIComponent(cleanSlug)}`);
-
-  const attemptFetch = async (retries = 1): Promise<Response | null> => {
-    try {
-      const res = await fetch(url, { cache: "no-store" });
-      if (res.ok) return res;
-    } catch {
-      // network error
-    }
-    if (retries > 0) {
-      await new Promise((r) => setTimeout(r, 1500));
-      return attemptFetch(retries - 1);
-    }
-    return null;
-  };
-
-  try {
-    const res = await attemptFetch(1);
-    if (res) {
-      const json = await res.json();
-      if (json.data) return normalizeNewsItem(json.data);
-    }
-  } catch {
-    // silent fallback
-  }
-
-  // Fallback ke mock data
-  const fallbackItem = MOCK_NEWS.find(
-    (item) => item.slug.toLowerCase() === cleanSlug
-  );
-  return fallbackItem ? normalizeNewsItem(fallbackItem) : null;
+  const url = buildApiUrl(`news/${encodeURIComponent(slug.toLowerCase().trim())}`);
+  const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(8_000) });
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error("Berita tidak dapat dimuat dari server.");
+  const result = await response.json();
+  return result.data ? normalizeNewsItem(result.data) : null;
 }
-
 /**
  * Menambahkan berita baru ke database backend (POST /api/news).
  */

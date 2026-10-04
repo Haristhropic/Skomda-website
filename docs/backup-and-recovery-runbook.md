@@ -4,6 +4,19 @@
 
 Dokumen ini melengkapi [runbook demo VPS](demo-vps-runbook.md). Jangan menganggap database aman dipulihkan hanya karena aplikasi sehat atau deployment image bisa di-rollback.
 
+## Checkpoint wajib sebelum baseline migrasi
+
+Repo memiliki file `public-schema.sql` hasil dump **schema-only**. File itu membantu membandingkan struktur untuk baseline Goose, tetapi **tidak berisi data dan bukan backup yang bisa memulihkan isi database**. Jangan jalankan `--baseline-existing` sampai ada backup data bertanggal setelah perubahan data terakhir dan pemilik proyek menyetujui pemakaiannya.
+
+Pilih salah satu jalur berikut:
+
+1. **Backup Supabase yang dikelola provider:** pemilik project memeriksa Database → Backups, memastikan backup terbaru mencakup waktu perubahan terakhir, serta memastikan plan tersebut memberi kemampuan restore yang dibutuhkan. Ketersediaan dan retensi berbeda menurut plan; Free tidak menyediakan backup database untuk diunduh. Mengandalkan restore provider saja tidak membuat salinan independen.
+2. **Logical dump lokal:** bila backup provider tidak dapat diunduh/dipulihkan untuk kebutuhan ini, buat dump sebelum migrasi ke komputer tepercaya. Ikuti Tahap 1 pada [`supabase-runtime-role-runbook.md`](supabase-runtime-role-runbook.md). Perintah `pg_dump --format=custom --schema=public` menyertakan data tabel `public` secara default, kecuali ditambahkan `--schema-only` atau `--data-only`. Itu tidak mencadangkan schema Supabase-managed seperti `auth` dan `storage`, atau aset Cloudinary. Pastikan cakupan tersebut sesuai dengan kebutuhan pemulihan aplikasi.
+
+Logical dump dapat memuat data pribadi siswa/pengguna. Simpan di disk lokal terenkripsi dengan akses terbatas; jangan unggah ke chat, GitHub, repo, atau VPS. Catat hanya path lokal, ukuran, waktu, dan SHA-256. `pg_restore --list` dapat memeriksa bahwa arsip dapat dibaca, tetapi **belum membuktikan restore berhasil**; pemulihan tetap perlu diuji ke database/project terisolasi dengan persetujuan pemilik.
+
+**Checkpoint untuk operator:** laporkan plan dan waktu backup provider, atau konfirmasi bahwa logical dump lokal selesai beserta ukuran dan SHA-256. Jangan kirim file dump maupun isi `.env`/connection string. Setelah checkpoint ini diverifikasi, lanjut ke perbandingan schema terbaru dan migrasi ledger.
+
 ## Sasaran awal
 
 | Ukuran | Sasaran sementara | Catatan |

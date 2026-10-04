@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"github.com/haristhropic/skomda-website/backend/src/models"
 )
@@ -20,20 +22,24 @@ var DB *gorm.DB
 // OpenDB membuka koneksi database tanpa mengubah skema atau isi database.
 func OpenDB(cfg Config) *gorm.DB {
 	var err error
+	ormConfig := &gorm.Config{}
+	if strings.EqualFold(cfg.Env, "production") {
+		ormConfig.Logger = logger.New(log.New(os.Stdout, "database ", log.LstdFlags), logger.Config{SlowThreshold: 500 * time.Millisecond, LogLevel: logger.Warn, IgnoreRecordNotFoundError: true, ParameterizedQueries: true, Colorful: false})
+	}
 	switch strings.ToLower(strings.TrimSpace(cfg.DatabaseDriver)) {
 	case "postgres":
 		if strings.TrimSpace(cfg.DatabaseURL) == "" {
 			log.Fatal("fatal: DATABASE_URL wajib diatur saat DATABASE_DRIVER=postgres")
 		}
 		log.Println("menghubungkan ke PostgreSQL via DATABASE_URL...")
-		DB, err = gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
+		DB, err = gorm.Open(postgres.Open(cfg.DatabaseURL), ormConfig)
 	case "sqlite":
 		env := strings.ToLower(strings.TrimSpace(cfg.Env))
 		if env != "development" && env != "test" {
 			log.Fatalf("fatal: SQLite hanya diizinkan untuk development/test, bukan ENV=%q; gunakan DATABASE_DRIVER=postgres", cfg.Env)
 		}
 		log.Println("menggunakan SQLite lokal sesuai DATABASE_DRIVER=sqlite (tanpa fallback otomatis)")
-		DB, err = gorm.Open(sqlite.Open("file:smktelkom_dev.db?cache=shared"), &gorm.Config{})
+		DB, err = gorm.Open(sqlite.Open("file:smktelkom_dev.db?cache=shared"), ormConfig)
 	default:
 		log.Fatalf("fatal: DATABASE_DRIVER tidak valid (%q); gunakan postgres atau sqlite", cfg.DatabaseDriver)
 	}
@@ -45,8 +51,10 @@ func OpenDB(cfg Config) *gorm.DB {
 	if err != nil {
 		log.Fatalf("fatal: gagal mendapatkan database connection pool: %v", err)
 	}
-	sqlDB.SetMaxOpenConns(25)
-	sqlDB.SetMaxIdleConns(5)
+	maxOpen := poolLimit("DB_MAX_OPEN_CONNS", 8, 100)
+	maxIdle := poolLimit("DB_MAX_IDLE_CONNS", 2, maxOpen)
+	sqlDB.SetMaxOpenConns(maxOpen)
+	sqlDB.SetMaxIdleConns(maxIdle)
 	sqlDB.SetConnMaxLifetime(15 * time.Minute)
 	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
 	if err := sqlDB.Ping(); err != nil {
@@ -55,8 +63,16 @@ func OpenDB(cfg Config) *gorm.DB {
 	return DB
 }
 
-// MigrateDB menerapkan skema dan mengaktifkan RLS pada tabel yang ditetapkan.
-// Fungsi ini hanya dipanggil oleh perintah migrasi eksplisit pada production.
+func poolLimit(name string, fallback, maximum int) int {
+	value, err := strconv.Atoi(os.Getenv(name))
+	if err != nil || value < 1 || value > maximum {
+		return fallback
+	}
+	return value
+}
+
+// MigrateDB menyinkronkan model untuk development/test saja.
+// Production memakai SQL migrations berversi melalui cmd/migrate.
 func MigrateDB(db *gorm.DB) error {
 	if db == nil {
 		return fmt.Errorf("database belum dibuka")
@@ -102,7 +118,7 @@ func SeedInitialData(db *gorm.DB) {
 }
 
 // InitDB mempertahankan auto-migrate dan seed untuk development/test saja.
-// Production hanya membuka koneksi; perubahan data/skema dilakukan lewat CLI terpisah.
+// Production hanya membuka koneksi; perubahan skema dilakukan lewat SQL migrations berversi.
 func InitDB(cfg Config) *gorm.DB {
 	db := OpenDB(cfg)
 	if strings.EqualFold(cfg.Env, "production") {

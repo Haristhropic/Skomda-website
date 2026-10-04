@@ -154,33 +154,34 @@ export interface TrialClassEvent {
 }
 
 export const DEFAULT_TRIAL_CLASS_EVENT: TrialClassEvent = {
-  title: "Virtual Trial Class 2026",
-  badge: "EVENT TERDEKAT",
-  dateDay: "Sabtu,",
-  dateFull: "26 September 2026",
-  timeRange: "09.00 - 11.00",
+  title: "Trial Class",
+  badge: "JADWAL BELUM DIUMUMKAN",
+  dateDay: "",
+  dateFull: "",
+  timeRange: "",
   timezone: "WIB",
   mode: "Online",
   submode: "(Virtual Class)",
-  status: "open",
-  quota: 100,
-  description: "Sesi simulasi interaktif pembelajaran vokasi SIJA & TJAT bersama mentor industri dan guru kejuruan.",
-  isActive: true,
+  status: "closed",
+  quota: 0,
+  description: "Jadwal berikutnya akan diumumkan setelah dikonfirmasi oleh sekolah.",
+  isActive: false,
 };
 
 export async function getUpcomingTrialClassEvent(): Promise<TrialClassEvent> {
   try {
     const res = await fetch(buildApiUrl("trial-class/event"), {
       cache: "no-store",
+      signal: AbortSignal.timeout(8_000),
     });
+    if (!res.ok) throw new Error("Jadwal trial class belum dapat dimuat.");
     if (res.ok) {
       const json = await res.json();
       if (json.data) return json.data;
     }
     return DEFAULT_TRIAL_CLASS_EVENT;
   } catch (err) {
-    console.error("Gagal mengambil event trial class terdekat:", err);
-    return DEFAULT_TRIAL_CLASS_EVENT;
+    throw new Error("Jadwal trial class belum dapat dimuat.");
   }
 }
 

@@ -22,11 +22,10 @@ import {
 
 import { useLanguage } from "@/context/LanguageContext";
 import {
-  isDtpQuery,
-  getSmartDtpResponse,
   getFollowUpSuggestions,
   type ChatSource,
 } from "./dtpChatbotKnowledge";
+import { buildApiUrl } from "@/lib/api";
 
 interface Message {
   id: string;
@@ -36,6 +35,16 @@ interface Message {
   suggestedQuestions?: string[];
   timestamp: string;
   isStreaming?: boolean;
+}
+
+function safeChatHref(value?: string): string | null {
+  if (!value || /[\u0000-\u001f]/.test(value)) return null;
+  if (value.startsWith("/") && !value.startsWith("//") && !value.includes("\\")) return value;
+  try {
+    const url = new URL(value);
+    if (url.protocol === "https:" && !url.username && !url.password && ["smktelkom-sda.sch.id", "www.smktelkom-sda.sch.id", "smktelkom-sidoarjo.my.id", "linear.smktelkom-sidoarjo.my.id"].includes(url.hostname)) return url.toString();
+  } catch { /* Display untrusted links as text. */ }
+  return null;
 }
 
 const QUICK_PROMPTS_ID = [
@@ -115,15 +124,17 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
     };
   }, []);
 
-  // Restore chat messages from localStorage on mount (hydration safe)
+  // Restore chat messages from sessionStorage on mount (hydration safe)
   useEffect(() => {
     setIsMounted(true);
     try {
-      const saved = localStorage.getItem("skomda_chat_messages");
+      // Remove the previous persistent transcript on shared school devices.
+      localStorage.removeItem("skomda_chat_messages");
+      const saved = sessionStorage.getItem("skomda_chat_messages");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const cleaned = parsed.map((m: Message) => {
+          const cleaned = parsed.slice(-40).filter((m: Message) => m && typeof m.content === "string" && m.content.length <= 16_000 && ["user", "assistant"].includes(m.role)).map((m: Message) => {
             if (m.id === "welcome-1") {
               return initialWelcome;
             }
@@ -133,20 +144,20 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
         }
       }
     } catch (err) {
-      console.warn("[SkomdaChat] Failed to restore chat from localStorage:", err);
+      console.warn("[SkomdaChat] Failed to restore chat from sessionStorage:", err);
     }
   }, [initialWelcome]);
 
-  // Persist chat messages to localStorage whenever they change
+  // Persist chat messages to sessionStorage whenever they change
   useEffect(() => {
     if (!isMounted) return;
     try {
-      const toSave = messages.filter((m) => m.content.trim().length > 0 || !m.isStreaming);
+      const toSave = messages.filter((m) => m.content.trim().length > 0 && !m.isStreaming).slice(-40);
       if (toSave.length > 0) {
-        localStorage.setItem("skomda_chat_messages", JSON.stringify(toSave));
+        sessionStorage.setItem("skomda_chat_messages", JSON.stringify(toSave));
       }
     } catch (err) {
-      console.warn("[SkomdaChat] Failed to save chat to localStorage:", err);
+      console.warn("[SkomdaChat] Failed to save chat to sessionStorage:", err);
     }
   }, [messages, isMounted]);
 
@@ -212,6 +223,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputMessage).trim();
     if (!query || isLoading) return;
+    if (query.length > 2000 || new TextEncoder().encode(query).length > 4000) { setErrorStatus(isEn ? "Your question is too long. Please shorten it." : "Pertanyaan terlalu panjang. Ringkas pertanyaan lalu coba lagi."); return; }
 
     setInputMessage("");
     setErrorStatus(null);
@@ -234,7 +246,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
       isStreaming: true,
     };
 
-    setMessages((prev) => [...prev, userMsg, botPlaceholder]);
+    setMessages((prev) => [...prev.slice(-38), userMsg, botPlaceholder]);
     setIsLoading(true);
 
     setTimeout(() => scrollToBottom(true), 50);
@@ -255,13 +267,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           content: m.content.slice(0, 1000),
         }));
 
-      const apiBase =
-        process.env.NEXT_PUBLIC_API_URL ||
-        (typeof window !== "undefined" && window.location.hostname
-          ? `http://${window.location.hostname}:8080/api`
-          : "http://localhost:8080/api");
-
-      const response = await fetch(`${apiBase}/chatbot/message`, {
+      const response = await fetch(buildApiUrl("chatbot/message"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -272,6 +278,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           history: historyPayload,
           stream: true,
         }),
+        signal: AbortSignal.timeout(25_000),
       });
 
       if (!response.ok) {
@@ -318,6 +325,10 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
             if (done) break;
 
             streamBuffer += decoder.decode(value, { stream: true });
+            if (streamBuffer.length > 64_000 || accumulatedText.length > 32_000) {
+              await reader.cancel();
+              throw new Error("Respons asisten terlalu besar");
+            }
             const lines = streamBuffer.split("\n");
             streamBuffer = lines.pop() || "";
 
@@ -427,64 +438,15 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           )
         );
       }
-    } catch (err) {
-      console.warn("[SkomdaChatWidget] Request error, using friendly offline fallback:", err);
-      const lower = query.toLowerCase();
-      let offlineReply =
-        "Halo! Saat ini sistem kami sedang dalam pemeliharaan berkala. Untuk informasi resmi, silakan hubungi Humas SMK Telkom Sidoarjo di **0811-3021-919** atau kunjungi halaman **PPDB**.";
-      let fallbackSources: ChatSource[] = [
-        { title: "Portal Pendaftaran PPDB", url: "/ppdb" },
-        { title: "Unduh Brosur Informasi", url: "/unduh-informasi" },
-      ];
-
-      if (isDtpQuery(query)) {
-        const dtpData = getSmartDtpResponse(query, isEn);
-        offlineReply = dtpData.content;
-        fallbackSources = dtpData.sources;
-      } else if (lower.includes("sija") || lower.includes("rekayasa")) {
-        offlineReply =
-          "**Jurusan SIJA (Sistem Informatika, Jaringan, dan Aplikasi)** merupakan program keahlian unggulan 4 tahun yang mencakup pengembangan Full-Stack Web & Mobile, Cloud Computing (AWS/GCP), Cybersecurity, dan Internet of Things. Lulusan dipersiapkan setara D1/D2 dengan sertifikasi industri AWS Academy dan BNSP.";
-        fallbackSources = [
-          { title: "Profil Jurusan SIJA (4 Tahun)", url: "/jurusan/sija" },
-          { title: "Alur PPDB 2026/2027", url: "/ppdb" },
-        ];
-      } else if (lower.includes("tjat") || lower.includes("telekomunikasi") || lower.includes("fiber")) {
-        offlineReply =
-          "**Jurusan TJAT (Teknik Jaringan Akses Telekomunikasi)** adalah program keahlian 3 tahun dengan spesialisasi instalasi fiber optik (FTTH/FTTx), transmisi wireless & seluler 4G/5G, serta konfigurasi jaringan telekomunikasi ISP dengan sertifikasi Telkom Group.";
-        fallbackSources = [
-          { title: "Profil Jurusan TJAT (3 Tahun)", url: "/jurusan/tjat" },
-          { title: "Alur PPDB 2026/2027", url: "/ppdb" },
-        ];
-      } else if (lower.includes("daftar") || lower.includes("ppdb") || lower.includes("syarat")) {
-        offlineReply =
-          "Pendaftaran Peserta Didik Baru (PPDB) SMK Telkom Sidoarjo tahun ajaran 2026/2027 dapat diakses melalui portal resmi atau langsung ke Sekretariat Panitia di Kampus Jl. Pahlawan No. 27 Sekardangan Sidoarjo.";
-        fallbackSources = [
-          { title: "Portal Pendaftaran PPDB", url: "/ppdb" },
-          { title: "Unduh Brosur Informasi", url: "/unduh-informasi" },
-        ];
-      }
-
-      const followUps = getFollowUpSuggestions(
-        query,
-        offlineReply,
-        isEn,
-        messages.map((m) => m.content)
-      );
-
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === botMsgId
-            ? {
-              ...msg,
-              content: offlineReply,
-              sources: fallbackSources,
-              suggestedQuestions: followUps,
-              isStreaming: false,
-            }
-            : msg
-        )
-      );
-      setErrorStatus("Mode informatif offline aktif. Menampilkan arsip data resmi.");
+    } catch {
+      const unavailable = isEn
+        ? "I cannot verify an answer right now. Please try again shortly or check the school pages below for confirmed information."
+        : "Saya belum dapat memverifikasi jawaban saat ini. Coba lagi sebentar atau periksa halaman sekolah berikut untuk informasi terkonfirmasi.";
+      setMessages((prev) => prev.map((msg) => msg.id === botMsgId ? {
+        ...msg, content: unavailable, isStreaming: false, suggestedQuestions: [],
+        sources: [{ title: "PPDB", url: "/ppdb" }, { title: isEn ? "School programs" : "Program sekolah", url: "/program/profil-jurusan" }],
+      } : msg));
+      setErrorStatus(isEn ? "The assistant is temporarily unavailable." : "Asisten belum tersedia. Coba lagi sebentar.");
     } finally {
       setIsLoading(false);
       setTimeout(() => scrollToBottom(true), 100);
@@ -508,7 +470,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
     setInputMessage("");
     setShowResetConfirm(false);
     try {
-      localStorage.removeItem("skomda_chat_messages");
+      sessionStorage.removeItem("skomda_chat_messages");
     } catch { }
   };
 
@@ -641,11 +603,12 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                       <span>{isEn ? "Related Pages:" : "Halaman Terkait:"}</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {msg.sources.slice(0, 3).map((src, idx) => (
+                      {msg.sources.filter((source) => safeChatHref(source.url)).slice(0, 3).map((src, idx) => (
                         <Link
                           key={idx}
                           href={src.url}
                           target={src.url.startsWith("http") ? "_blank" : undefined}
+                          rel={src.url.startsWith("http") ? "noopener noreferrer" : undefined}
                           onClick={() => {
                             if (!src.url.startsWith("http")) {
                               onClose();
@@ -898,10 +861,12 @@ function MarkdownRenderer({ content, isStreaming, onClose }: MarkdownRendererPro
             </td>
           ),
           a: ({ href, children }) => {
+            const safeHref = safeChatHref(href);
+            if (!safeHref) return <span>{children}</span>;
             const isExternal = href?.startsWith("http");
             return (
               <Link
-                href={href || "#"}
+                href={safeHref}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
                 onClick={() => {

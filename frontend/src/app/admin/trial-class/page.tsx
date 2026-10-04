@@ -1196,7 +1196,7 @@ export default function AdminTrialClassPage() {
                   </div>
                   <div className="text-xs">
                     <span className="font-bold text-slate-900 block">{eventData.dateDay || "Sabtu,"}</span>
-                    <span className="text-slate-500 text-[11px]">{eventData.dateFull || "26 September 2026"}</span>
+                    <span className="text-slate-500 text-[11px]">{eventData.dateFull || "Jadwal belum diumumkan"}</span>
                   </div>
                 </div>
 

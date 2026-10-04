@@ -5,17 +5,21 @@ package chatbot
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"regexp"
 	"strings"
-	"sync"
+
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/observability"
+	"github.com/haristhropic/skomda-website/backend/src/shared"
 )
 
 // ChatMessage merepresentasikan satu pesan dalam riwayat percakapan.
@@ -30,41 +34,6 @@ type ChatRequest struct {
 	History []ChatMessage `json:"history"`
 	Stream  bool          `json:"stream"`
 	Model   string        `json:"model"`
-}
-
-// RateLimiter sederhana in-memory per IP (maksimal 15 request per menit).
-type RateLimiter struct {
-	mu      sync.Mutex
-	history map[string][]time.Time
-}
-
-var limiter = &RateLimiter{
-	history: make(map[string][]time.Time),
-}
-
-func (rl *RateLimiter) allow(ip string, maxReq int, window time.Duration) bool {
-	rl.mu.Lock()
-	defer rl.mu.Unlock()
-
-	now := time.Now()
-	cutoff := now.Add(-window)
-
-	// Filter timestamps lama
-	var valid []time.Time
-	for _, t := range rl.history[ip] {
-		if t.After(cutoff) {
-			valid = append(valid, t)
-		}
-	}
-
-	if len(valid) >= maxReq {
-		rl.history[ip] = valid
-		return false
-	}
-
-	valid = append(valid, now)
-	rl.history[ip] = valid
-	return true
 }
 
 // RegisterRoutes mendaftarkan endpoint chatbot ke Gin router group.
@@ -84,14 +53,36 @@ func RegisterRoutes(r *gin.RouterGroup, cfg config.Config) {
 
 func handleChatMessage(c *gin.Context, cfg config.Config) {
 	clientIP := c.ClientIP()
+	if forwarded := net.ParseIP(c.GetHeader("CF-Connecting-IP")); forwarded != nil {
+		clientIP = forwarded.String()
+	}
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 32*1024)
 
 	// 1. Rate Limiting Check (15 req/menit)
-	if !limiter.allow(clientIP, 15, 1*time.Minute) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 750*time.Millisecond)
+	allowed, _, limitErr := shared.Current.Allow(ctx, "chatbot", clientIP, 60, time.Minute)
+	cancel()
+	if limitErr != nil {
+		c.Header("Retry-After", "5")
+		c.JSON(503, gin.H{"error": "Proteksi layanan sementara tidak tersedia"})
+		return
+	}
+	if !allowed {
 		c.JSON(http.StatusTooManyRequests, gin.H{
 			"error": "Terlalu banyak pesan dalam waktu singkat. Mohon tunggu beberapa saat sebelum bertanya kembali.",
 		})
 		return
 	}
+	leaseID := observability.RequestID("")
+	ctx, cancel = context.WithTimeout(c.Request.Context(), 500*time.Millisecond)
+	acquired, leaseErr := shared.Current.AcquireAI(ctx, leaseID)
+	cancel()
+	if leaseErr != nil || !acquired {
+		c.Header("Retry-After", "10")
+		c.JSON(503, gin.H{"error": "Asisten sedang sibuk"})
+		return
+	}
+	defer shared.Current.ReleaseAI(leaseID)
 
 	// 2. Parse & Validate Payload
 	var req ChatRequest
@@ -110,14 +101,15 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		return
 	}
 
-	if req.Model == "" || req.Model == "groq" || req.Model == "gemini" || req.Model == "gemini-3.8-flash" {
-		if cfg.ChatbotModel != "" {
-			req.Model = cfg.ChatbotModel
-		} else {
-			req.Model = "llama-3.3-70b-versatile"
-		}
+	if _, err := ValidateRequest(trimmedMessage, req.History); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
 	}
-
+	if Suspicious(trimmedMessage) || UnsafeHistory(req.History) {
+		c.JSON(200, gin.H{"response": SafetyReply, "sources": []gin.H{}, "fallback": true})
+		return
+	}
+	req.Model = cfg.ChatbotModel
 	// Cek apakah query DTP memiliki intensi spesifik (magang/karir, sertifikasi, daftar 9 spesialisasi, atau overview)
 	if isDtpQuery(trimmedMessage) {
 		lower := strings.ToLower(trimmedMessage)
@@ -207,7 +199,7 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 					})
 					_, _ = c.Writer.Write([]byte("data: " + string(payload) + "\n\n"))
 					c.Writer.Flush()
-					time.Sleep(5 * time.Millisecond)
+
 				}
 				_, _ = c.Writer.Write([]byte("data: [DONE]\n\n"))
 				c.Writer.Flush()
@@ -246,10 +238,11 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 	// 3. Siapkan request ke NexusRouter Gateway
 	nexusURL := strings.TrimRight(cfg.NexusRouterURL, "/") + "/api/v1/skomda/chat"
 	forwardPayload, err := json.Marshal(map[string]interface{}{
-		"message": processedMessage,
-		"history": req.History,
-		"stream":  req.Stream,
-		"model":   req.Model,
+		"message":       ProtectedMessage(processedMessage),
+		"system_prompt": SafetyPolicy,
+		"history":       req.History,
+		"stream":        req.Stream,
+		"model":         req.Model,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -277,9 +270,7 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		httpReq.Header.Set("Accept", "text/event-stream")
 	}
 
-	client := &http.Client{
-		Timeout: 45 * time.Second,
-	}
+	client := GatewayClient
 
 	resp, err := client.Do(httpReq)
 	if err != nil || (resp != nil && resp.StatusCode != http.StatusOK) {
@@ -336,7 +327,7 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		c.Header("X-Accel-Buffering", "no")
 		c.Writer.Flush()
 
-		reader := bufio.NewReader(resp.Body)
+		reader := bufio.NewReader(io.LimitReader(resp.Body, 512*1024))
 		for {
 			line, readErr := reader.ReadBytes('\n')
 			if len(line) > 0 {
@@ -355,7 +346,7 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 	}
 
 	// Response Non-Streaming (JSON biasa)
-	body, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 512*1024))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Gagal membaca balasan dari gateway AI.",

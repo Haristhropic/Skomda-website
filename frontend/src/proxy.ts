@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("skomda_admin_token")?.value;
 
@@ -16,7 +16,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL("/not-found", request.url));
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("cache-control", "no-store, private");
+  response.headers.set("x-robots-tag", "noindex, nofollow");
+  return response;
 }
 
 export const config = {

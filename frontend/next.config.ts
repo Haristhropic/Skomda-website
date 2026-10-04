@@ -39,7 +39,9 @@ const nextConfig: NextConfig = {
   compress: true,
   allowedDevOrigins: getLocalDevOrigins(),
   images: {
-    unoptimized: true,
+    loader: "custom",
+    loaderFile: "./src/lib/cloudinaryLoader.ts",
+    qualities: [85, 90, 100],
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
@@ -47,6 +49,17 @@ const nextConfig: NextConfig = {
         hostname: "res.cloudinary.com",
       },
     ],
+  },
+  async headers() {
+    return [{
+      source: "/:path*",
+      headers: [
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+      ],
+    }];
   },
   async redirects() {
     return [
