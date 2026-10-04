@@ -231,9 +231,9 @@ export default function AnalyticsConsent() {
     return () => observer.disconnect();
   }, [choice, pathname, ready]);
 
-  if (!ready || isAnalyticsExcludedPath(pathname)) return null;
-
   const hasTrackingIds = Boolean(GA_MEASUREMENT_ID || CLARITY_PROJECT_ID);
+  if (!ready || isAnalyticsExcludedPath(pathname) || !hasTrackingIds) return null;
+
   const showPanel = choice === null || settingsOpen;
 
   return (

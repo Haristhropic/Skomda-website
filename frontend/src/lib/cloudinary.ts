@@ -85,7 +85,7 @@ export function getCloudinaryUrl(
 
   // 4. Periksa apakah aset terdaftar di manifest hasil sinkronisasi
   const relKey = imagePath.replace(/^\/+/, "").replace(/^images\//, "");
-  if (LOCAL_ASSETS.has(relKey)) return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+  if (LOCAL_ASSETS.has(relKey) || relKey.includes("hero-student-k3")) return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   const manifestItem = manifest[relKey];
 
   let targetPublicId = "";
