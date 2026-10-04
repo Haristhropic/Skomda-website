@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -156,6 +157,99 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	adminGroup.Get("/news", func(c *fiber.Ctx) error {
 		return listNews(c, false)
 	})
+	adminUserGuard := middleware.RequireRole("super_admin")
+	adminGroup.Get("/users", adminUserGuard, func(c *fiber.Ctx) error {
+		var users []models.User
+		if err := config.DB.Select("id", "name", "email", "role", "avatar", "created_at").Order("id ASC").Find(&users).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil daftar akun admin"})
+		}
+		return c.JSON(fiber.Map{"data": users})
+	})
+	adminGroup.Post("/users", adminUserGuard, func(c *fiber.Ctx) error {
+		var input struct {
+			Name     string `json:"name"`
+			Email    string `json:"email"`
+			Password string `json:"password"`
+			Role     string `json:"role"`
+		}
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload akun admin tidak valid"})
+		}
+		input.Name = strings.TrimSpace(input.Name)
+		input.Email = strings.ToLower(strings.TrimSpace(input.Email))
+		input.Password = strings.TrimSpace(input.Password)
+		input.Role = strings.ToLower(strings.TrimSpace(input.Role))
+		parsedEmail, emailErr := mail.ParseAddress(input.Email)
+		if input.Name == "" || len(input.Name) > 100 || emailErr != nil || parsedEmail.Address != input.Email || len(input.Email) > 150 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nama atau alamat email tidak valid"})
+		}
+		if len(input.Password) < 16 || len(input.Password) > 72 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Password admin harus 16 sampai 72 byte"})
+		}
+		if input.Role != "editor" && input.Role != "super_admin" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Role harus editor atau super_admin"})
+		}
+
+		var existing models.User
+		if err := config.DB.Unscoped().Where("LOWER(email) = ?", input.Email).First(&existing).Error; err == nil {
+			return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "Email sudah digunakan"})
+		} else if err != gorm.ErrRecordNotFound {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memeriksa email akun"})
+		}
+
+		user := models.User{Name: input.Name, Email: input.Email, Role: input.Role, Avatar: "/images/common/telkom-schools-icon.png"}
+		if err := user.SetPassword(input.Password); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengamankan password akun"})
+		}
+		if err := config.DB.Create(&user).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal membuat akun admin"})
+		}
+		recordAudit(c, "CREATE", "admin_user", fmt.Sprint(user.ID), fmt.Sprintf("Membuat akun admin %s dengan role %s", user.Email, user.Role))
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+			"message": "Akun admin berhasil dibuat",
+			"user":    fiber.Map{"id": user.ID, "name": user.Name, "email": user.Email, "role": user.Role, "avatar": user.Avatar},
+		})
+	})
+	adminGroup.Patch("/users/:id/role", adminUserGuard, func(c *fiber.Ctx) error {
+		id, err := strconv.ParseUint(c.Params("id"), 10, 32)
+		if err != nil || id == 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "ID akun tidak valid"})
+		}
+		currentUserID, _ := c.Locals("user_id").(uint)
+		if uint(id) == currentUserID {
+			return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "Role akun yang sedang dipakai tidak dapat diubah dari sesi ini"})
+		}
+		var input struct {
+			Role string `json:"role"`
+		}
+		if err := c.BodyParser(&input); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload role tidak valid"})
+		}
+		input.Role = strings.ToLower(strings.TrimSpace(input.Role))
+		if input.Role != "editor" && input.Role != "super_admin" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Role harus editor atau super_admin"})
+		}
+
+		var target models.User
+		if err := config.DB.First(&target, uint(id)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Akun admin tidak ditemukan"})
+		}
+		if strings.EqualFold(target.Role, "super_admin") && input.Role == "editor" {
+			var superAdminCount int64
+			if err := config.DB.Model(&models.User{}).Where("LOWER(role) = ?", "super_admin").Count(&superAdminCount).Error; err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memeriksa akun super admin"})
+			}
+			if superAdminCount <= 1 {
+				return c.Status(fiber.StatusConflict).JSON(fiber.Map{"error": "Tidak dapat menurunkan role super admin terakhir"})
+			}
+		}
+		oldRole := target.Role
+		if err := config.DB.Model(&target).Update("role", input.Role).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memperbarui role akun"})
+		}
+		recordAudit(c, "UPDATE", "admin_user", fmt.Sprint(target.ID), fmt.Sprintf("Mengubah role akun %s dari %s menjadi %s", target.Email, oldRole, input.Role))
+		return c.JSON(fiber.Map{"message": "Role akun berhasil diperbarui", "user": fiber.Map{"id": target.ID, "name": target.Name, "email": target.Email, "role": input.Role}})
+	})
 	adminGroup.Get("/dashboard/stats", func(c *fiber.Ctx) error {
 		var totalNews int64
 		var publishedNews int64
@@ -188,10 +282,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		config.DB.Model(&models.DigitalTalent{}).Count(&totalDtp)
 		config.DB.Model(&models.TrialClassRegistration{}).Count(&totalTrialClass)
 
-		config.DB.Order("created_at DESC").Limit(10).Find(&recentLogs)
+		if strings.EqualFold(c.Locals("user_role").(string), "super_admin") {
+			config.DB.Order("created_at DESC").Limit(10).Find(&recentLogs)
+		}
 		config.DB.Order("id DESC").Limit(5).Find(&recentNews)
 
-		return c.JSON(fiber.Map{
+		response := fiber.Map{
 			"totalNews":       totalNews,
 			"publishedNews":   publishedNews,
 			"draftNews":       draftNews,
@@ -205,9 +301,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			"totalDocuments":  totalDocuments,
 			"totalDtp":        totalDtp,
 			"totalTrialClass": totalTrialClass,
-			"recentLogs":      recentLogs,
 			"recentNews":      recentNews,
-		})
+		}
+		if strings.EqualFold(c.Locals("user_role").(string), "super_admin") {
+			response["recentLogs"] = recentLogs
+		}
+		return c.JSON(response)
 	})
 
 	adminGroup.Get("/audit-logs", middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
@@ -467,7 +566,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		})
 	})
 
-	newsGroup.Delete("/:id", middleware.AuthMiddleware(cfg.JWTSecret), func(c *fiber.Ctx) error {
+	newsGroup.Delete("/:id", middleware.AuthMiddleware(cfg.JWTSecret), middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		idParam := c.Params("id")
 		id, err := strconv.ParseUint(idParam, 10, 32)
 		if err != nil {

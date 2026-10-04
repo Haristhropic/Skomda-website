@@ -55,6 +55,11 @@ func LoginHandler(cfg config.Config) fiber.Handler {
 				"error": "Email atau kata sandi tidak valid. Silakan periksa kembali.",
 			})
 		}
+		if !strings.EqualFold(user.Role, "editor") && !strings.EqualFold(user.Role, "super_admin") {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error": "Role akun tidak valid. Hubungi super admin.",
+			})
+		}
 
 		// Terbitkan token JWT berlaku 24 jam
 		tokenDuration := 24 * time.Hour

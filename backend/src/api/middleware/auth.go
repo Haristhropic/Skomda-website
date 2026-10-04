@@ -1,10 +1,14 @@
 package middleware
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/models"
 	"github.com/haristhropic/skomda-website/backend/src/utils"
+	"gorm.io/gorm"
 )
 
 // AuthMiddleware memverifikasi token JWT dari HttpOnly cookie atau header Authorization.
@@ -36,6 +40,28 @@ func AuthMiddleware(secret string) fiber.Handler {
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error": "Token tidak valid atau kedaluwarsa. Silakan login kembali.",
+			})
+		}
+
+		// Role dalam JWT adalah snapshot saat login. Ambil role terbaru dari database
+		// agar perubahan/penonaktifan akun berlaku tanpa menunggu token 24 jam kedaluwarsa.
+		var user models.User
+		if err := config.DB.Select("id", "email", "name", "role").First(&user, claims.UserID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"error": "Akun tidak ditemukan atau sudah dinonaktifkan. Silakan login kembali.",
+				})
+			}
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"error": "Tidak dapat memverifikasi akun saat ini. Silakan coba kembali.",
+			})
+		}
+		claims.Email = user.Email
+		claims.Name = user.Name
+		claims.Role = user.Role
+		if !strings.EqualFold(user.Role, "editor") && !strings.EqualFold(user.Role, "super_admin") {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error": "Role akun tidak valid. Hubungi super admin.",
 			})
 		}
 

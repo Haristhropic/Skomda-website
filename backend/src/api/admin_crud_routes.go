@@ -65,7 +65,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Data guru berhasil diperbarui", "data": existing})
 	})
 
-	teacherGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	teacherGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.Teacher
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
@@ -128,7 +128,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Data prestasi berhasil diperbarui", "data": existing})
 	})
 
-	prestasiGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	prestasiGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.Prestasi
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
@@ -155,7 +155,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	}
 	adminGroup := api.Group("/admin", authGuard)
-	adminGroup.Get("/bkk/jobs", func(c *fiber.Ctx) error {
+	adminGroup.Get("/bkk/jobs", middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		return listBKKJobs(c, false)
 	})
 	bkkGroup.Get("/jobs", func(c *fiber.Ctx) error {
@@ -214,6 +214,11 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if err := c.BodyParser(&item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
+		if role, _ := c.Locals("user_role").(string); !strings.EqualFold(role, "super_admin") {
+			// Editor boleh menyiapkan lowongan, tetapi hanya super admin yang dapat menerbitkannya.
+			item.Status = "pending"
+			item.Source = "admin"
+		}
 		if strings.TrimSpace(item.Status) == "" {
 			item.Status = "active"
 		}
@@ -226,7 +231,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	// Endpoint khusus update status (ACC/Setujui, Tolak, atau Tutup) oleh Admin
-	bkkGroup.Put("/jobs/:id/status", authGuard, func(c *fiber.Ctx) error {
+	bkkGroup.Put("/jobs/:id/status", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var input struct {
 			Status string `json:"status"`
@@ -261,14 +266,20 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Lowongan tidak ditemukan"})
 		}
+		originalStatus, originalSource := existing.Status, existing.Source
 		c.BodyParser(&existing)
 		existing.ID = uint(id)
+		if role, _ := c.Locals("user_role").(string); !strings.EqualFold(role, "super_admin") {
+			// Status dan asal pengajuan tidak dapat diubah lewat endpoint edit umum.
+			existing.Status = originalStatus
+			existing.Source = originalSource
+		}
 		config.DB.Save(&existing)
 		recordAudit(c, "UPDATE", "bkk_job", fmt.Sprint(id), fmt.Sprintf("Memperbarui lowongan: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Lowongan berhasil diperbarui", "data": existing})
 	})
 
-	bkkGroup.Delete("/jobs/:id", authGuard, func(c *fiber.Ctx) error {
+	bkkGroup.Delete("/jobs/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.BKKJob
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
@@ -316,7 +327,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Mitra berhasil diperbarui", "data": existing})
 	})
 
-	bkkGroup.Delete("/partners/:id", authGuard, func(c *fiber.Ctx) error {
+	bkkGroup.Delete("/partners/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		config.DB.Delete(&models.BKKPartner{}, uint(id))
 		recordAudit(c, "DELETE", "bkk_partner", fmt.Sprint(id), "Menghapus mitra industri")
@@ -353,7 +364,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Ekstrakurikuler berhasil diperbarui", "data": existing})
 	})
 
-	ekskulGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	ekskulGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		config.DB.Delete(&models.Ekstrakurikuler{}, uint(id))
 		recordAudit(c, "DELETE", "ekskul", fmt.Sprint(id), "Menghapus ekstrakurikuler")
@@ -387,7 +398,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Fasilitas berhasil diperbarui", "data": existing})
 	})
 
-	fasilitasGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	fasilitasGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		config.DB.Delete(&models.Fasilitas{}, uint(id))
 		recordAudit(c, "DELETE", "fasilitas", fmt.Sprint(id), "Menghapus fasilitas")
@@ -406,7 +417,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		query.Find(&list)
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	})
-	api.Get("/admin/documents", authGuard, func(c *fiber.Ctx) error {
+	api.Get("/admin/documents", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
 		query := config.DB.Model(&models.Document{}).Order("order_index ASC, id ASC")
 		if category != "" && !strings.EqualFold(category, "semua") {
@@ -469,7 +480,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	// Endpoint terproteksi: Menetapkan dokumen tertentu sebagai Brosur PPDB aktif
-	docGroup.Post("/active-brochure", authGuard, func(c *fiber.Ctx) error {
+	docGroup.Post("/active-brochure", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		var payload struct {
 			DocumentID uint `json:"documentId"`
 		}
@@ -526,7 +537,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Dokumen berhasil diperbarui", "data": existing})
 	})
 
-	docGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	docGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		config.DB.Delete(&models.Document{}, uint(id))
 		recordAudit(c, "DELETE", "document", fmt.Sprint(id), "Menghapus dokumen")
@@ -535,7 +546,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	// ==================== 7. SITE SETTINGS ====================
 	settingsGroup := api.Group("/settings")
-	settingsGroup.Get("", authGuard, func(c *fiber.Ctx) error {
+	settingsGroup.Get("", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		var list []models.SiteSetting
 		config.DB.Find(&list)
 		settingsMap := make(map[string]string)
@@ -614,7 +625,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		}
 		return c.JSON(fiber.Map{"data": publicList, "total": total})
 	})
-	api.Get("/admin/alumni", authGuard, func(c *fiber.Ctx) error {
+	api.Get("/admin/alumni", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
 		q := strings.TrimSpace(c.Query("q"))
 		query := config.DB.Model(&models.Alumni{}).Order("id ASC")
@@ -642,7 +653,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"data": list, "total": total})
 	})
 
-	alumniGroup.Get("/:id", authGuard, func(c *fiber.Ctx) error {
+	alumniGroup.Get("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var item models.Alumni
 		if err := config.DB.First(&item, uint(id)).Error; err != nil {
@@ -651,7 +662,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"data": item})
 	})
 
-	alumniGroup.Post("", authGuard, func(c *fiber.Ctx) error {
+	alumniGroup.Post("", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		var item models.Alumni
 		if err := c.BodyParser(&item); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
@@ -682,7 +693,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Data kelulusan siswa berhasil ditambahkan", "data": item})
 	})
 
-	alumniGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
+	alumniGroup.Put("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.Alumni
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
@@ -697,7 +708,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Data siswa kelulusan berhasil diperbarui", "data": existing})
 	})
 
-	alumniGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	alumniGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.Alumni
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
@@ -788,7 +799,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		return c.JSON(fiber.Map{"message": "Program Digital Talent berhasil diperbarui", "data": existing})
 	})
 
-	dtpGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	dtpGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.DigitalTalent
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
@@ -902,7 +913,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	// Admin: List all registrations
-	trialGroup.Get("", authGuard, func(c *fiber.Ctx) error {
+	trialGroup.Get("", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		q := strings.TrimSpace(c.Query("q"))
 		major := strings.TrimSpace(c.Query("major"))
 		status := strings.TrimSpace(c.Query("status"))
@@ -1044,7 +1055,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	// Admin: Update status / notes
-	trialGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
+	trialGroup.Put("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.TrialClassRegistration
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
@@ -1075,7 +1086,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	// Admin: Delete participant
-	trialGroup.Delete("/:id", authGuard, func(c *fiber.Ctx) error {
+	trialGroup.Delete("/:id", authGuard, middleware.RequireRole("super_admin"), func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.TrialClassRegistration
 		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
