@@ -114,6 +114,14 @@ CI run 35 (`37206364276`) sukses dan membuktikan workflow yang hanya mengubah pi
 
 CI run 36 (`37206548796`) sukses end-to-end pada commit `a18956b`. Deployment kini menghentikan replica B lama untuk membebaskan PID sebelum menjalankan Nginx config test; lalu memvalidasi pair kandidat dengan health checks, mengaktifkan konfigurasi melalui HUP, dan menambah pair kedua bila masih ada ruang. Slot `blue` aktif, keempat container healthy, slot green lama berhenti. Probe publik 10 menit setelah deploy lulus **596/596** (frontend 199, API langsung 199, proxy 198), 0 gagal; p95 masing-masing 305, 256, dan 226 ms. Semua respons HTTP 200. Artifak: `artifacts/deploy-availability-a18956b.json`.
 
+CI run 37 (`37207568420`) sukses. Backend checks, frontend typecheck/lint/security/build, dan edge checks lulus. Karena hanya dokumentasi dan artefak berubah, build/publish image serta deploy VPS dilewati sesuai gate docs-only.
+
+## Pemeriksaan lanjutan batas PID
+
+Pemeriksaan cgroup langsung pada VPS setelah monitor run 36 menunjukkan **479/500 PID/thread**. `ps` pada user `deploy` hanya melihat sebagian proses dan tidak mewakili batas provider. Ditemukan lima proses yatim dari diagnostik baca-log lama yang telah berjalan sekitar tiga jam; hanya proses diagnostik tersebut yang dihentikan. Setelah itu nilai provider turun menjadi **449/500** (headroom 51). Pengukuran cgroup menunjukkan kontribusi besar dari layanan host/containerd selain container aplikasi. Ini memulihkan sebagian kapasitas, tetapi belum memberi ruang aman untuk beban ekstrem atau menambah Kubernetes.
+
+Karena batas 500 diberlakukan pada seluruh VPS bersama Webuzo dan daemon host, jangan pasang K3s/Kubernetes pada VPS ini sekarang. Langkah berikutnya adalah meminta provider menaikkan batas PID dan mengonfirmasi dukungan cgroup/namespaces serta kapasitas node; Kubernetes satu node juga tetap satu titik kegagalan. Angka hasil perintah baca-saja ini bukan telemetry berkelanjutan dan bisa berubah.
+
 Audit live anonim terbaru mencatat **47/47 pass** di `artifacts/final-live-audit-d166a85.json`, termasuk halaman publik, denial endpoint privat tanpa sesi, JWT palsu, Origin yang tidak sah/hilang, identitas Grafana palsu, batas body, dan pengujian deterministik AI guard. Ini bukan audit penetrasi menyeluruh atau bukti AI kebal jailbreak. Pengujian autentikasi/role/CRUD yang lebih lengkap sebelumnya tercatat pada artefak revisi 86cc6ef; revisi d166a85 tidak mengubah kode auth/admin.
 
 Ramp bertahap 5→50→100→250→500→1.000 VU lulus: 29.010 request, 0 error. Pada 1.000 VU terdapat 23.624 request dalam tahap, sekitar 119,93 RPS; p95 frontend 595 ms, API langsung 424 ms, proxy API 461 ms. Modelnya 1.000 sesi baca berpacing (halaman + satu API, lalu think-time 15 detik), bukan 1.000 RPS atau 1.000 request serentak. Rincian: `artifacts/load-stress-d166a85.json`.

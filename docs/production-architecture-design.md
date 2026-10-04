@@ -77,6 +77,8 @@ Gunakan `scripts/rollback-demo.sh` dari repo, atau `./rollback-demo.sh` pada dir
 
 Provider membatasi seluruh PID/thread ke **500**, selain kapasitas RAM 4 GB dan 8 CPU. Batas ini ditemukan ketika Docker gagal membuat thread. Jumlah worker/thread Apache lama diturunkan; `GOMAXPROCS` Go/containerd dibatasi; metrik PID dan aturan alert ditambahkan.
 
+Pemeriksaan cgroup lanjutan setelah release 4 Oktober mengukur 479/500 PID/thread; setelah menghentikan lima perintah diagnostik yatim, jumlahnya turun ke 449/500. Ini bukan headroom memadai untuk memasang K3s pada host bersama Webuzo/containerd. **Kubernetes adalah rencana ekspansi, belum bagian dari deployment saat ini.** Sebelum migrasi, provider harus mengonfirmasi kenaikan hard PID limit dan dukungan cgroup/namespaces; ukur ulang kapasitas RAM/PID dengan control plane serta observability. Cluster satu node tetap satu titik kegagalan, sedangkan HA memerlukan node tambahan dan load balancer eksternal.
+
 RAM container dibatasi: backend 192 MiB, frontend 384 MiB, Redis 192 MiB, Nginx 96 MiB, serta Prometheus/Loki/Grafana masing-masing 256 MiB. Dua slot selama CD memerlukan kapasitas tambahan. Pantau koneksi DB, RAM, dan PID sebelum menambah replika atau menjalankan restore.
 
 ## AI
