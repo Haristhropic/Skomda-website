@@ -69,8 +69,6 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: https://api-linear.smktelkom-sidoarjo.my.id/api
-          NEXT_PUBLIC_NEXUS_ROUTER_URL: https://fahlyce.vercel.app
-          NEXT_PUBLIC_CHATBOT_MODEL: llama-3.3-70b-versatile
 
   container-images:
     name: Build and publish demo images
@@ -128,8 +126,6 @@ jobs:
             ghcr.io/${{ steps.owner.outputs.value }}/skomda-frontend:demo-latest
           build-args: |
             NEXT_PUBLIC_API_URL=https://api-linear.smktelkom-sidoarjo.my.id/api
-            NEXT_PUBLIC_NEXUS_ROUTER_URL=https://fahlyce.vercel.app
-            NEXT_PUBLIC_CHATBOT_MODEL=llama-3.3-70b-versatile
             NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend

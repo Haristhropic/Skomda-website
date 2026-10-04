@@ -324,56 +324,21 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
           ? `http://${window.location.hostname}:8080/api`
           : "http://localhost:8080/api");
 
-      const liveGatewayUrl =
-        process.env.NEXT_PUBLIC_NEXUS_ROUTER_URL || "https://fahlyce.vercel.app";
-      const chatbotModel =
-        process.env.NEXT_PUBLIC_CHATBOT_MODEL || "llama-3.3-70b-versatile";
+      const response = await fetch(`${apiBase}/chatbot/message`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream, application/json",
+        },
+        body: JSON.stringify({
+          message: promptPayload,
+          history: historyPayload,
+          stream: true,
+        }),
+      });
 
-      let response: Response | null = null;
-
-      try {
-        response = await fetch(`${liveGatewayUrl.replace(/\/+$/, "")}/api/v1/skomda/chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Internal-Client": "skomda",
-            "X-Agent-Name": "Skomda-Website-Bot",
-            "X-Virtual-Key": "vk-skomda",
-            Accept: "text/event-stream, application/json",
-          },
-          body: JSON.stringify({
-            message: promptPayload,
-            history: historyPayload,
-            stream: true,
-            model: chatbotModel,
-          }),
-        });
-      } catch (cloudErr) {
-        console.warn("[SkomdaChatWidget] Cloud gateway langsung gagal, beralih ke proxy lokal:", cloudErr);
-      }
-
-      if (!response || !response.ok) {
-        try {
-          response = await fetch(`${apiBase}/chatbot/message`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "text/event-stream, application/json",
-            },
-            body: JSON.stringify({
-              message: promptPayload,
-              history: historyPayload,
-              stream: true,
-              model: chatbotModel,
-            }),
-          });
-        } catch (localErr) {
-          console.error("[SkomdaChatWidget] Proxy backend lokal gagal:", localErr);
-        }
-      }
-
-      if (!response || !response.ok) {
-        throw new Error(`Server status: ${response ? response.status : "unreachable"}`);
+      if (!response.ok) {
+        throw new Error(`Server status: ${response.status}`);
       }
 
       const contentType = response.headers.get("Content-Type") || "";

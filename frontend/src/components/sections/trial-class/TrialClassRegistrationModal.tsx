@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import { registerTrialClass } from "@/services/trialClass";
 
 const MAJOR_OPTIONS_ID = [
   {
@@ -53,6 +54,7 @@ export default function TrialClassRegistrationModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [ticketCode, setTicketCode] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   const selectedMajor =
     majorOptions.find((opt) => opt.id === major) || majorOptions[0];
@@ -105,42 +107,35 @@ export default function TrialClassRegistrationModal({
     if (!fullName || !schoolOrigin || !whatsapp) return;
 
     setIsSubmitting(true);
-    let code = "TC-" + Math.floor(100000 + Math.random() * 900000);
-
+    setSubmitError("");
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-      const res = await fetch(`${apiBase}/trial-class/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName,
-          schoolOrigin,
-          whatsapp,
-          email,
-          major,
-        }),
+      const result = await registerTrialClass({
+        fullName,
+        schoolOrigin,
+        whatsapp,
+        email,
+        major,
       });
+      if (!result.success || !result.data?.ticketCode) {
+        setSubmitError(result.error || (isEn
+          ? "Registration failed. Please try again."
+          : "Pendaftaran gagal. Silakan coba lagi."));
+        return;
+      }
 
-      if (res.ok) {
-        const result = await res.json();
-        if (result?.data?.ticketCode) {
-          code = result.data.ticketCode;
-        }
-      }
-    } catch (err) {
-      console.warn("Registrasi trial class fallback lokal:", err);
-    } finally {
+      const code = result.data.ticketCode;
       setTicketCode(code);
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("trial_pass_code", code);
-        sessionStorage.setItem("trial_pass_name", fullName);
-        sessionStorage.setItem("trial_pass_major", major);
-      }
-      setIsSubmitting(false);
+      sessionStorage.setItem("trial_pass_code", code);
+      sessionStorage.setItem("trial_pass_name", "Peserta Terdaftar");
+      sessionStorage.setItem("trial_pass_major", major);
       setIsSuccess(true);
       onSuccess?.(code, fullName, major);
+    } catch {
+      setSubmitError(isEn
+        ? "Could not connect to the registration service. Please try again."
+        : "Tidak dapat terhubung ke layanan pendaftaran. Silakan coba lagi.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -152,6 +147,7 @@ export default function TrialClassRegistrationModal({
     setMajor("SIJA");
     setIsMajorDropdownOpen(false);
     setIsSuccess(false);
+    setSubmitError("");
     onClose();
   };
 
@@ -371,6 +367,12 @@ export default function TrialClassRegistrationModal({
                     </AnimatePresence>
                   </div>
 
+                  {submitError && (
+                    <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {submitError}
+                    </p>
+                  )}
+
                   {/* Submit Button */}
                   <div className="pt-3">
                     <button
@@ -461,7 +463,7 @@ export default function TrialClassRegistrationModal({
                   </a>
 
                   <Link
-                    href={`/trial-class/virtual-class?ticket=${encodeURIComponent(ticketCode)}&name=${encodeURIComponent(fullName)}&major=${encodeURIComponent(major)}`}
+                    href="/trial-class/virtual-class"
                     onClick={handleReset}
                     className="btn-primary w-full !h-[48px] cursor-pointer"
                   >

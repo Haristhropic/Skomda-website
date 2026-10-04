@@ -1,5 +1,7 @@
 import { INITIAL_DTP_ITEMS } from "@/data/initialDtp";
 
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface DtpItem {
   id?: number | string;
   slug: string;
@@ -147,7 +149,7 @@ export async function createDtp(
 
   // Coba sinkronkan ke backend API jika online
   try {
-    const res = await fetch(`${API_BASE_URL}/dtp`, {
+    const res = await fetch(adminApiUrl("dtp"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -187,7 +189,7 @@ export async function updateDtp(
 
   // Coba sinkronkan ke backend API jika online
   try {
-    const res = await fetch(`${API_BASE_URL}/dtp/${id}`, {
+    const res = await fetch(adminApiUrl(`dtp/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -217,7 +219,7 @@ export async function deleteDtp(
 
   // Coba sinkronkan ke backend API jika online
   try {
-    await fetch(`${API_BASE_URL}/dtp/${id}`, {
+    await fetch(adminApiUrl(`dtp/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

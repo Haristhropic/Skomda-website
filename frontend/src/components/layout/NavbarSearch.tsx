@@ -14,7 +14,7 @@ import { K3_DOCUMENTS } from "@/data/k3Documents";
 import { EKSKUL_LIST } from "@/data/ekstrakurikulerData";
 import { PELUANG_KARIER_ITEMS } from "@/data/bkkData";
 import { kepalaSekolah, wakilKepalaList } from "@/data/teachers";
-import alumniData from "@/data/alumni-angkatan-6.json";
+import { AlumniItem, getAlumniList } from "@/services/alumni";
 import { TEFA_PRODUCTS } from "@/components/sections/tefa/TefaCatalogSection";
 import { DTP_SPECIALIZATIONS } from "@/data/dtpData";
 
@@ -557,6 +557,7 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
   const [mounted, setMounted] = useState(false);
 
   const [liveNews, setLiveNews] = useState<NewsItem[]>(MOCK_NEWS);
+  const [liveAlumni, setLiveAlumni] = useState<AlumniItem[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -573,6 +574,13 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
         })
         .catch(() => {});
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    getAlumniList()
+      .then(({ data }) => setLiveAlumni(data))
+      .catch(() => setLiveAlumni([]));
   }, [isOpen]);
 
   // Combine full dataset across all school domains
@@ -694,8 +702,8 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
       { id: "i-sertifikasi", title: "Sertifikasi Industri (Cisco, BNSP, AWS, MikroTik)", description: "Uji kompetensi internasional siap kerja di industri global", href: "/program/profil-jurusan#keunggulan-sertifikasi", category: "Info", badge: "Sertifikasi", iconType: "info", keywords: "lisensi keahlian sertifikasi dudi" },
     ];
 
-    // 10. Alumni Kelulusan Siswa (255 Siswa Resmi)
-    const alumniItems: SearchItem[] = alumniData.map((a): SearchItem => ({
+    // 10. Alumni Kelulusan Siswa (public response excludes private identifiers)
+    const alumniItems: SearchItem[] = liveAlumni.map((a): SearchItem => ({
       id: `alumni-${a.id}`,
       title: a.name,
       description: `${a.statusKelulusan} • ${a.keterangan || "Lulusan Resmi"} (T.A. ${a.tahunAjaran})`,
@@ -703,7 +711,7 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
       category: "Kelulusan",
       badge: a.kategori,
       iconType: "doc",
-      keywords: `${a.name} ${a.nisn} ${a.kategori} ${a.statusAktivitas} ${a.keterangan} ${a.institusi || ""} ${a.jurusan || ""} kelulusan lulus skl alumni angkatan 6 siswa`,
+      keywords: `${a.name} ${a.kategori} ${a.statusAktivitas} ${a.keterangan} ${a.institusi || ""} ${a.jurusan || ""} kelulusan lulus skl alumni angkatan 6 siswa`,
     }));
 
     // 11. Teaching Factory (TeFa) Products & Services
@@ -747,7 +755,7 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
       ...guruItems,
       ...quickInfo,
     ];
-  }, [liveNews]);
+  }, [liveNews, liveAlumni]);
 
   // Filter with smart scoring
   const filteredResults = useMemo<SearchItem[]>(() => {

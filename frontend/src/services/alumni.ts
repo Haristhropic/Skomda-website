@@ -1,8 +1,8 @@
-import fallbackAlumni from "@/data/alumni-angkatan-6.json";
+import { adminApiUrl } from "@/services/adminApi";
 
 export interface AlumniItem {
   id?: number;
-  nisn: string;
+  nisn?: string;
   name: string;
   angkatan: string;
   tahunLulus: string;
@@ -52,44 +52,37 @@ export async function getAlumniList(params?: {
     const res = await fetch(url.toString(), { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
-      if (Array.isArray(json.data) && json.data.length > 0) {
-        return { data: json.data, total: json.total || json.data.length };
-      }
+      return { data: Array.isArray(json.data) ? json.data : [], total: json.total || 0 };
     }
   } catch {
-    // Graceful fallback to static JSON
+    // Do not ship the private alumni dataset as a public fallback.
   }
+  return { data: [], total: 0 };
+}
 
-  // Fallback to local alumni dataset
-  let list = fallbackAlumni as AlumniItem[];
-  if (params?.category && params.category !== "Semua") {
-    list = list.filter((a) => a.kategori === params.category);
-  }
-  if (params?.q) {
-    const qLower = params.q.toLowerCase();
-    list = list.filter(
-      (a) =>
-        a.name.toLowerCase().includes(qLower) ||
-        a.nisn.toLowerCase().includes(qLower) ||
-        (a.institusi && a.institusi.toLowerCase().includes(qLower)) ||
-        a.keterangan.toLowerCase().includes(qLower)
-    );
-  }
+export async function getAdminAlumniList(params?: {
+  category?: string;
+  q?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ data: AlumniItem[]; total: number }> {
+  const url = new URL(adminApiUrl("admin/alumni"), window.location.origin);
+  if (params?.category && params.category !== "Semua") url.searchParams.set("category", params.category);
+  if (params?.q) url.searchParams.set("q", params.q);
+  if (params?.limit) url.searchParams.set("limit", String(params.limit));
+  if (params?.offset) url.searchParams.set("offset", String(params.offset));
 
-  const total = list.length;
-  if (params?.limit && params.limit > 0) {
-    const offset = params.offset || 0;
-    list = list.slice(offset, offset + params.limit);
-  }
-
-  return { data: list, total };
+  const res = await fetch(url.toString(), { credentials: "include", cache: "no-store" });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || "Gagal memuat data kelulusan");
+  return { data: Array.isArray(json.data) ? json.data : [], total: json.total || 0 };
 }
 
 export async function createAlumni(
   data: Partial<AlumniItem>
 ): Promise<{ success: boolean; data?: AlumniItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/alumni`, {
+    const res = await fetch(adminApiUrl("alumni"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -110,7 +103,7 @@ export async function updateAlumni(
   data: Partial<AlumniItem>
 ): Promise<{ success: boolean; data?: AlumniItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/alumni/${id}`, {
+    const res = await fetch(adminApiUrl(`alumni/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -130,7 +123,7 @@ export async function deleteAlumni(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/alumni/${id}`, {
+    const res = await fetch(adminApiUrl(`alumni/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

@@ -131,7 +131,7 @@ Skomda-website/
 | Package Manager (FE) | **npm** | Node 22.x |
 | Package Manager (BE) | **Go Modules** | go.mod & go.sum |
 | Audit Script | **Node.js ESM** | scripts/sync-cloudinary.mjs |
-| Row Level Security | **PostgreSQL RLS** | Aktif di production tabel utama |
+| Row Level Security | **PostgreSQL RLS** | Belum terverifikasi sebagai kontrol efektif; lihat audit role, grants, dan policies |
 
 ---
 
@@ -145,9 +145,9 @@ Skomda-website/
   - Next.js Middleware: cek cookie skomda_admin_token
   - /admin/* tanpa token: rewrite ke /not-found (stealth)
                         |
-           HTTP REST (fetch + CORS)
-           Cookie: skomda_admin_token (httpOnly)
-           Header: Authorization: Bearer <token>
+           Public API: api-linear (fetch + CORS)
+           Admin API: same-origin /api/backend/* -> internal Go API
+           Cookie: skomda_admin_token (httpOnly, scoped to linear host)
                         |
                         v
 [ BACKEND: Go API Service | Port 8080 ]
@@ -277,15 +277,16 @@ Login hanya via `/gate-internal-skomda` (tidak ada link publik).
 | Method | Path | Deskripsi |
 |---|---|---|
 | `GET` | `/api/health` | Status & info engine |
-| `POST` | `/api/auth/login` | Login admin, return JWT (rate-limited: 5 req/mnt) |
-| `GET` | `/api/auth/me` | Info user login (JWT required) |
-| `POST` | `/api/auth/logout` | Logout, hapus cookie |
+| `POST` | `/api/auth/login` (via `/api/backend/auth/login` dari browser) | Login admin, JWT hanya dalam cookie HttpOnly; rate-limited |
+| `GET` | `/api/auth/me` (via `/api/backend/auth/me` dari browser) | Info user login (JWT required) |
+| `POST` | `/api/auth/logout` (via `/api/backend/auth/logout` dari browser) | Logout, hapus cookie |
+| `GET` | `/api/admin/alumni`, `/api/admin/documents`, `/api/settings` | Data lengkap hanya untuk admin dengan JWT; endpoint publik alumni/dokumen mengembalikan data yang layak ditampilkan publik |
 | `GET` | `/api/news` | Daftar berita publik (paginasi, filter) |
 | `GET` | `/api/news/:slug` | Detail berita |
 | `GET` | `/api/jurusan` | Daftar program keahlian |
 | `GET` | `/api/jurusan/:slug` | Detail jurusan |
 | `POST` | `/api/chatbot/message` | Proxy ke NexusRouter AI |
-| `POST` | `/api/cloudinary/sign` | Signed upload parameters |
+| `GET` | `/api/cloudinary/sign` | Signed upload parameters (JWT required; no frontend caller found in current source) |
 
 #### Admin Endpoints (Bearer JWT Required)
 
@@ -329,7 +330,7 @@ Request masuk
 Production:   PostgreSQL (Supabase), DATABASE_DRIVER=postgres
               Driver: gorm.io/driver/postgres via jackc/pgx v5
               Koneksi: DATABASE_URL
-              RLS: Row Level Security aktif di tabel utama
+              RLS: status tabel, grants, policies, dan role aplikasi perlu diverifikasi
 
 Development:  PostgreSQL (default) atau SQLite (hanya jika dipilih eksplisit)
               PostgreSQL: DATABASE_URL
@@ -616,16 +617,16 @@ w_auto  - Lebar responsif
 ```
 Admin (Browser) - form pilih file
   v
-Frontend: POST /api/cloudinary/sign + metadata (folder, tags)
+Frontend: POST /api/upload/image atau /api/upload/document dengan sesi JWT
   v
-Backend: generate signed params (signature, timestamp, api_key)
+Backend: validasi ekstensi, content type, dan ukuran file
   v
-Frontend: direct POST ke Cloudinary Upload API
+Backend: upload file ke Cloudinary
   v
-Cloudinary: simpan, kompresi, return public_id & URL
-  v
-Backend: simpan URL/public_id ke database via GORM
+Cloudinary: simpan file dan mengembalikan public_id & URL
 ```
+
+Endpoint bertanda tangan `/api/cloudinary/sign` masih tersedia dan kini membutuhkan JWT, tetapi tidak ditemukan pemanggilan endpoint tersebut di frontend saat audit kode. Jika Cloudinary gagal, endpoint upload saat ini masih mencoba menyimpan file pada filesystem container. Penyimpanan lokal container tidak boleh dianggap tahan lama atau tahan terhadap penggantian container; pantau risiko ini sebelum pemakaian production.
 
 ### 7.4. Script Sinkronisasi CLI (`scripts/sync-cloudinary.mjs`)
 
@@ -643,13 +644,12 @@ Backend: simpan URL/public_id ke database via GORM
 ```
 1. Admin akses /gate-internal-skomda (tidak ada link publik)
 2. Submit email + password
-3. Frontend POST /api/auth/login (rate-limited: 5 req/menit)
+3. Frontend POST /api/backend/auth/login (Next.js proxy; backend rate-limited)
 4. Backend verifikasi bcrypt hash (cost 12)
 5. Jika valid: sign JWT (HS256, expiry 24 jam)
-6. JWT disimpan di cookie httpOnly: skomda_admin_token
-7. /admin/* request: Middleware baca cookie -> allow / rewrite ke /not-found
-8. /api/admin/* request: Header Authorization: Bearer <token>
-                          AuthMiddleware verifikasi JWT_SECRET
+6. Backend mengirim Set-Cookie; proxy meneruskannya agar browser menyimpan cookie HttpOnly pada host linear
+7. /admin/* request: Middleware memeriksa keberadaan cookie untuk menyembunyikan halaman; backend tetap otoritatif
+8. /api/backend/* request: proxy meneruskan cookie ke Go API di network privat; AuthMiddleware memverifikasi JWT_SECRET
 ```
 
 ### 8.2. Mekanisme Keamanan
@@ -663,7 +663,7 @@ Backend: simpan URL/public_id ke database via GORM
 | CORS Allowlist | Fiber cors middleware | Hanya origin frontend diizinkan |
 | httpOnly Cookie | Set-Cookie response header | JWT tidak bisa diakses JS (anti XSS) |
 | Credential Isolation | Semua secret di backend .env | Tidak ada secret di bundel browser |
-| PostgreSQL RLS | Row Level Security di production | Pembatasan di level database |
+| PostgreSQL RLS | Direncanakan; belum boleh diklaim efektif sebelum audit | Pembatasan di level database |
 | Audit Log | models.AuditLog, dicatat di setiap mutasi | Jejak CREATE/UPDATE/DELETE/LOGIN/LOGOUT |
 
 ---

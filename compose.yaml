@@ -38,6 +38,7 @@ services:
       PORT: "3000"
       HOSTNAME: 0.0.0.0
       BACKEND_API_URL: http://backend:8080/api
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-https://linear.smktelkom-sidoarjo.my.id}
     depends_on:
       backend:
         condition: service_healthy

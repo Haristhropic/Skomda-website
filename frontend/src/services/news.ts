@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface NewsItem {
   id?: number | string;
   title: string;
@@ -266,7 +268,6 @@ function filterMockNews(category?: string, search?: string): NewsItem[] {
 export async function getNewsList(params?: {
   category?: string;
   search?: string;
-  status?: string;
   page?: number;
   limit?: number;
 }): Promise<NewsItem[]> {
@@ -276,9 +277,6 @@ export async function getNewsList(params?: {
   }
   if (params?.search && params.search.trim() !== "") {
     queryParams.set("search", params.search.trim());
-  }
-  if (params?.status && params.status !== "semua") {
-    queryParams.set("status", params.status);
   }
   if (params?.page) {
     queryParams.set("page", String(params.page));
@@ -323,6 +321,43 @@ export async function getNewsList(params?: {
   } catch {
     return filterMockNews(params?.category, params?.search).map(normalizeNewsItem);
   }
+}
+
+/** Mengambil seluruh status berita melalui endpoint admin yang mewajibkan sesi login. */
+export async function getAdminNewsList(params?: {
+  category?: string;
+  search?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}): Promise<NewsItem[]> {
+  const queryParams = new URLSearchParams();
+  if (params?.category && params.category !== "Semua") {
+    queryParams.set("category", params.category);
+  }
+  if (params?.search?.trim()) {
+    queryParams.set("search", params.search.trim());
+  }
+  if (params?.status && params.status !== "semua") {
+    queryParams.set("status", params.status);
+  }
+  if (params?.page) queryParams.set("page", String(params.page));
+  if (params?.limit) queryParams.set("limit", String(params.limit));
+
+  const queryString = queryParams.toString();
+  const url = `${adminApiUrl("admin/news")}${queryString ? `?${queryString}` : ""}`;
+  const res = await fetch(url, { cache: "no-store", credentials: "include" });
+  if (!res.ok) {
+    const message =
+      res.status === 401
+        ? "Sesi admin berakhir. Silakan login kembali."
+        : "Gagal memuat daftar berita admin.";
+    throw new Error(message);
+  }
+
+  const json = await res.json();
+  if (!Array.isArray(json.data)) throw new Error("Respons daftar berita admin tidak valid.");
+  return json.data.map(normalizeNewsItem);
 }
 
 /**
@@ -370,7 +405,7 @@ export async function createNews(
   data: Partial<NewsItem>
 ): Promise<{ success: boolean; data?: NewsItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/news`, {
+    const res = await fetch(adminApiUrl("news"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -398,7 +433,7 @@ export async function updateNews(
   data: Partial<NewsItem>
 ): Promise<{ success: boolean; data?: NewsItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/news/${id}`, {
+    const res = await fetch(adminApiUrl(`news/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -425,7 +460,7 @@ export async function deleteNews(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/news/${id}`, {
+    const res = await fetch(adminApiUrl(`news/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

@@ -22,7 +22,7 @@ import AdminSelect from "@/components/admin/AdminSelect";
 import {
   AlumniItem,
   ALUMNI_CATEGORIES,
-  getAlumniList,
+  getAdminAlumniList,
   createAlumni,
   updateAlumni,
   deleteAlumni,
@@ -80,7 +80,7 @@ export default function AdminKelulusanPage() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await getAlumniList({
+      const res = await getAdminAlumniList({
         category: selectedCategory,
         q: searchQuery,
       });

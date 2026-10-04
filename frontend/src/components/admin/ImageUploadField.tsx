@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { Upload, X, Image as ImageIcon, Loader2, Link2, AlertCircle } from "lucide-react";
+import { adminApiUrl } from "@/services/adminApi";
 
 interface ImageUploadFieldProps {
   label: string;
@@ -12,9 +13,6 @@ interface ImageUploadFieldProps {
   recommendedSize?: string;
   required?: boolean;
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 export default function ImageUploadField({
   label,
@@ -51,7 +49,7 @@ export default function ImageUploadField({
       formData.append("image", file);
       formData.append("folder", folder);
 
-      const res = await fetch(`${API_BASE_URL}/upload/image`, {
+      const res = await fetch(adminApiUrl("upload/image"), {
         method: "POST",
         credentials: "include",
         body: formData,

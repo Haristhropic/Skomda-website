@@ -1,10 +1,13 @@
 package api
 
 import (
+	crand "crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -138,23 +141,35 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	// ==================== 3. BKK (BURSA KERJA & MITRA) ====================
 	bkkGroup := api.Group("/bkk")
-	bkkGroup.Get("/jobs", func(c *fiber.Ctx) error {
-		status := strings.TrimSpace(c.Query("status"))
+	listBKKJobs := func(c *fiber.Ctx, publicOnly bool) error {
 		query := config.DB.Model(&models.BKKJob{}).Order("id DESC")
-		if status != "" && !strings.EqualFold(status, "semua") {
+		if publicOnly {
+			query = query.Where("LOWER(status) = ?", "active")
+		} else if status := strings.TrimSpace(c.Query("status")); status != "" && !strings.EqualFold(status, "semua") {
 			query = query.Where("LOWER(status) = ?", strings.ToLower(status))
 		}
 		var list []models.BKKJob
-		query.Find(&list)
+		if err := query.Find(&list).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil lowongan kerja"})
+		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
+	}
+	adminGroup := api.Group("/admin", authGuard)
+	adminGroup.Get("/bkk/jobs", func(c *fiber.Ctx) error {
+		return listBKKJobs(c, false)
+	})
+	bkkGroup.Get("/jobs", func(c *fiber.Ctx) error {
+		return listBKKJobs(c, true)
 	})
 
 	// Public endpoint: Pasang Lowongan oleh Mitra / Perusahaan / Pengguna Publik
 	// Status selalu otomatis 'pending' (menunggu verifikasi admin agar tidak langsung tayang jika tidak valid)
 	bkkSubmitLimiter := limiter.New(limiter.Config{
-		Max:        5,
-		Expiration: 10 * time.Minute,
+		Max:          5,
+		Expiration:   10 * time.Minute,
+		KeyGenerator: middleware.ClientIPKey,
 		LimitReached: func(c *fiber.Ctx) error {
+			c.Set("Retry-After", "600")
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
 				"error": "Batas frekuensi permohonan lowongan terlampaui. Silakan tunggu beberapa saat sebelum mencoba kembali.",
 			})
@@ -383,12 +398,24 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	docGroup := api.Group("/documents")
 	docGroup.Get("", func(c *fiber.Ctx) error {
 		category := strings.TrimSpace(c.Query("category"))
-		query := config.DB.Model(&models.Document{}).Order("order_index ASC, id ASC")
+		query := config.DB.Model(&models.Document{}).Where("is_public = ?", true).Order("order_index ASC, id ASC")
 		if category != "" && !strings.EqualFold(category, "semua") {
 			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
 		}
 		var list []models.Document
 		query.Find(&list)
+		return c.JSON(fiber.Map{"data": list, "total": len(list)})
+	})
+	api.Get("/admin/documents", authGuard, func(c *fiber.Ctx) error {
+		category := strings.TrimSpace(c.Query("category"))
+		query := config.DB.Model(&models.Document{}).Order("order_index ASC, id ASC")
+		if category != "" && !strings.EqualFold(category, "semua") {
+			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
+		}
+		var list []models.Document
+		if err := query.Find(&list).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil dokumen"})
+		}
 		return c.JSON(fiber.Map{"data": list, "total": len(list)})
 	})
 
@@ -508,7 +535,7 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	// ==================== 7. SITE SETTINGS ====================
 	settingsGroup := api.Group("/settings")
-	settingsGroup.Get("", func(c *fiber.Ctx) error {
+	settingsGroup.Get("", authGuard, func(c *fiber.Ctx) error {
 		var list []models.SiteSetting
 		config.DB.Find(&list)
 		settingsMap := make(map[string]string)
@@ -553,8 +580,8 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			query = query.Where("LOWER(kategori) = ?", strings.ToLower(category))
 		}
 		if q != "" {
-			query = query.Where("LOWER(name) LIKE ? OR LOWER(nisn) LIKE ? OR LOWER(institusi) LIKE ? OR LOWER(keterangan) LIKE ?",
-				"%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%")
+			query = query.Where("LOWER(name) LIKE ? OR LOWER(institusi) LIKE ? OR LOWER(keterangan) LIKE ?",
+				"%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%", "%"+strings.ToLower(q)+"%")
 		}
 
 		var total int64
@@ -575,10 +602,47 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if err := query.Find(&list).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data alumni"})
 		}
+		publicList := make([]fiber.Map, 0, len(list))
+		for _, item := range list {
+			publicList = append(publicList, fiber.Map{
+				"id": item.ID, "name": item.Name, "angkatan": item.Angkatan,
+				"tahunLulus": item.TahunLulus, "tahunAjaran": item.TahunAjaran,
+				"statusKelulusan": item.StatusKelulusan, "kategori": item.Kategori,
+				"statusAktivitas": item.StatusAktivitas, "keterangan": item.Keterangan,
+				"institusi": item.Institusi, "jurusan": item.Jurusan,
+			})
+		}
+		return c.JSON(fiber.Map{"data": publicList, "total": total})
+	})
+	api.Get("/admin/alumni", authGuard, func(c *fiber.Ctx) error {
+		category := strings.TrimSpace(c.Query("category"))
+		q := strings.TrimSpace(c.Query("q"))
+		query := config.DB.Model(&models.Alumni{}).Order("id ASC")
+		if category != "" && !strings.EqualFold(category, "semua") {
+			query = query.Where("LOWER(kategori) = ?", strings.ToLower(category))
+		}
+		if q != "" {
+			pattern := "%" + strings.ToLower(q) + "%"
+			query = query.Where("LOWER(name) LIKE ? OR LOWER(nisn) LIKE ? OR LOWER(institusi) LIKE ? OR LOWER(keterangan) LIKE ?", pattern, pattern, pattern, pattern)
+		}
+		var total int64
+		if err := query.Count(&total).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghitung data alumni"})
+		}
+		if limit, err := strconv.Atoi(c.Query("limit")); err == nil && limit > 0 {
+			query = query.Limit(limit)
+		}
+		if offset, err := strconv.Atoi(c.Query("offset")); err == nil && offset >= 0 {
+			query = query.Offset(offset)
+		}
+		var list []models.Alumni
+		if err := query.Find(&list).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data alumni"})
+		}
 		return c.JSON(fiber.Map{"data": list, "total": total})
 	})
 
-	alumniGroup.Get("/:id", func(c *fiber.Ctx) error {
+	alumniGroup.Get("/:id", authGuard, func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var item models.Alumni
 		if err := config.DB.First(&item, uint(id)).Error; err != nil {
@@ -737,9 +801,21 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 	// ==================== 11. TRIAL CLASS REGISTRATIONS ====================
 	trialGroup := api.Group("/trial-class")
+	trialRegisterLimiter := limiter.New(limiter.Config{
+		Max:          10,
+		Expiration:   10 * time.Minute,
+		KeyGenerator: middleware.ClientIPKey,
+		LimitReached: func(c *fiber.Ctx) error {
+			c.Set("Retry-After", "600")
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{"error": "Batas pendaftaran tercapai. Silakan coba kembali dalam beberapa menit."})
+		},
+	})
 
 	// Public: Register for Trial Class
-	trialGroup.Post("/register", func(c *fiber.Ctx) error {
+	trialGroup.Post("/register", trialRegisterLimiter, func(c *fiber.Ctx) error {
+		if len(c.Body()) > 8*1024 {
+			return c.Status(fiber.StatusRequestEntityTooLarge).JSON(fiber.Map{"error": "Ukuran data pendaftaran terlalu besar"})
+		}
 		var req struct {
 			FullName     string `json:"fullName"`
 			SchoolOrigin string `json:"schoolOrigin"`
@@ -756,9 +832,20 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		if strings.TrimSpace(req.Major) == "" {
 			req.Major = "SIJA"
 		}
+		if utf8.RuneCountInString(strings.TrimSpace(req.FullName)) > 255 ||
+			utf8.RuneCountInString(strings.TrimSpace(req.SchoolOrigin)) > 255 ||
+			utf8.RuneCountInString(strings.TrimSpace(req.Whatsapp)) > 50 ||
+			utf8.RuneCountInString(strings.TrimSpace(req.Email)) > 255 ||
+			utf8.RuneCountInString(strings.TrimSpace(req.Major)) > 100 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Salah satu data pendaftaran melebihi batas karakter"})
+		}
 
-		// Generate random 6-digit ticket code
-		ticketCode := fmt.Sprintf("TC-%d", time.Now().UnixNano()%900000+100000)
+		// Use a cryptographically random ticket instead of a guessable timestamp-derived code.
+		ticketEntropy := make([]byte, 12)
+		if _, err := crand.Read(ticketEntropy); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal membuat kode tiket aman"})
+		}
+		ticketCode := "TC-" + strings.ToUpper(hex.EncodeToString(ticketEntropy))
 
 		item := models.TrialClassRegistration{
 			TicketCode:   ticketCode,
@@ -778,21 +865,40 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 			"message": "Pendaftaran Trial Class berhasil",
-			"data":    item,
+			"data":    fiber.Map{"ticketCode": item.TicketCode},
 		})
 	})
 
+	trialTicketLimiter := limiter.New(limiter.Config{
+		Max:          30,
+		Expiration:   time.Minute,
+		KeyGenerator: middleware.ClientIPKey,
+		LimitReached: func(c *fiber.Ctx) error {
+			c.Set("Retry-After", "60")
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{"error": "Batas verifikasi tiket tercapai. Silakan coba lagi dalam satu menit."})
+		},
+	})
+
 	// Public: Verify / Check Ticket
-	trialGroup.Get("/check-ticket", func(c *fiber.Ctx) error {
-		code := strings.TrimSpace(c.Query("code"))
+	trialGroup.Post("/check-ticket", trialTicketLimiter, func(c *fiber.Ctx) error {
+		if len(c.Body()) > 1024 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		var req struct {
+			Code string `json:"code"`
+		}
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		code := strings.TrimSpace(req.Code)
 		if code == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Kode tiket wajib disertakan"})
 		}
 		var item models.TrialClassRegistration
-		if err := config.DB.Where("ticket_code = ?", code).First(&item).Error; err != nil {
+		if err := config.DB.Select("ticket_code", "major").Where("ticket_code = ?", code).First(&item).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Tiket tidak ditemukan"})
 		}
-		return c.JSON(fiber.Map{"data": item})
+		return c.JSON(fiber.Map{"data": fiber.Map{"ticketCode": item.TicketCode, "major": item.Major}})
 	})
 
 	// Admin: List all registrations

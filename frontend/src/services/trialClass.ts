@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface TrialClassParticipant {
   id: number;
   ticketCode: string;
@@ -12,6 +14,8 @@ export interface TrialClassParticipant {
   updatedAt: string;
 }
 
+export type TrialClassTicketVerification = Pick<TrialClassParticipant, "ticketCode" | "major">;
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
@@ -21,7 +25,7 @@ export async function getTrialClassParticipants(params?: {
   status?: string;
 }): Promise<{ data: TrialClassParticipant[]; total: number }> {
   try {
-    const url = new URL(`${API_BASE_URL}/trial-class`);
+    const url = new URL(adminApiUrl("trial-class"), window.location.origin);
     if (params?.q) url.searchParams.set("q", params.q);
     if (params?.major && params.major !== "Semua") url.searchParams.set("major", params.major);
     if (params?.status && params.status !== "Semua") url.searchParams.set("status", params.status);
@@ -51,7 +55,7 @@ export async function registerTrialClass(data: {
   whatsapp: string;
   email?: string;
   major: string;
-}): Promise<{ success: boolean; data?: TrialClassParticipant; error?: string }> {
+}): Promise<{ success: boolean; data?: Pick<TrialClassParticipant, "ticketCode">; error?: string }> {
   try {
     const res = await fetch(`${API_BASE_URL}/trial-class/register`, {
       method: "POST",
@@ -71,11 +75,16 @@ export async function registerTrialClass(data: {
 
 export async function checkTrialClassTicket(
   code: string
-): Promise<{ success: boolean; data?: TrialClassParticipant; error?: string }> {
+): Promise<{ success: boolean; data?: TrialClassTicketVerification; error?: string }> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/trial-class/check-ticket?code=${encodeURIComponent(code)}`,
-      { cache: "no-store" }
+      `${API_BASE_URL}/trial-class/check-ticket`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+        cache: "no-store",
+      }
     );
     const json = await res.json();
     if (!res.ok) {
@@ -93,7 +102,7 @@ export async function updateTrialClassParticipant(
   data: Partial<TrialClassParticipant>
 ): Promise<{ success: boolean; data?: TrialClassParticipant; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/trial-class/${id}`, {
+    const res = await fetch(adminApiUrl(`trial-class/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -114,7 +123,7 @@ export async function deleteTrialClassParticipant(
   id: number
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/trial-class/${id}`, {
+    const res = await fetch(adminApiUrl(`trial-class/${id}`), {
       method: "DELETE",
       credentials: "include",
     });
@@ -180,7 +189,7 @@ export async function updateTrialClassEvent(
   data: Partial<TrialClassEvent>
 ): Promise<{ success: boolean; data?: TrialClassEvent; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/trial-class/event`, {
+    const res = await fetch(adminApiUrl("trial-class/event"), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

@@ -22,7 +22,7 @@ import AdminSelect from "@/components/admin/AdminSelect";
 import {
   NewsItem,
   NEWS_CATEGORIES,
-  getNewsList,
+  getAdminNewsList,
   createNews,
   updateNews,
   deleteNews,
@@ -64,7 +64,7 @@ export default function AdminBeritaPage() {
   const loadNews = async () => {
     setIsLoading(true);
     try {
-      const data = await getNewsList({ status: "semua" });
+      const data = await getAdminNewsList({ status: "semua" });
       setNewsList(data);
     } catch {
       showToast("Gagal memuat daftar berita dari backend", "error");

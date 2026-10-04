@@ -21,7 +21,7 @@ import AdminSelect from "@/components/admin/AdminSelect";
 import { getSiteSettings, updateSiteSetting } from "@/services/settings";
 import {
   DocumentItem,
-  getDocumentList,
+  getAdminDocumentList,
   getActiveBrochure,
   setActiveBrochure,
 } from "@/services/documents";
@@ -56,7 +56,7 @@ export default function AdminPengaturanPage() {
       try {
         const [resSettings, docList, brochure] = await Promise.all([
           getSiteSettings(),
-          getDocumentList(),
+          getAdminDocumentList(),
           getActiveBrochure(),
         ]);
         if (resSettings.map && Object.keys(resSettings.map).length > 0) {

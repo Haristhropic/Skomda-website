@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface PrestasiItem {
   id?: number | string;
   slug?: string;
@@ -53,7 +55,7 @@ export async function createPrestasi(
   data: Partial<PrestasiItem>
 ): Promise<{ success: boolean; data?: PrestasiItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/prestasi`, {
+    const res = await fetch(adminApiUrl("prestasi"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -72,7 +74,7 @@ export async function updatePrestasi(
   data: Partial<PrestasiItem>
 ): Promise<{ success: boolean; data?: PrestasiItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/prestasi/${id}`, {
+    const res = await fetch(adminApiUrl(`prestasi/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -90,7 +92,7 @@ export async function deletePrestasi(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/prestasi/${id}`, {
+    const res = await fetch(adminApiUrl(`prestasi/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

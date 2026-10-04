@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface DocumentItem {
   id?: number | string;
   title: string;
@@ -31,11 +33,20 @@ export async function getDocumentList(category?: string): Promise<DocumentItem[]
   }
 }
 
+export async function getAdminDocumentList(category?: string): Promise<DocumentItem[]> {
+  const url = new URL(adminApiUrl("admin/documents"), window.location.origin);
+  if (category && category !== "Semua") url.searchParams.set("category", category);
+  const res = await fetch(url.toString(), { credentials: "include", cache: "no-store" });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || "Gagal memuat dokumen admin");
+  return Array.isArray(json.data) ? json.data : [];
+}
+
 export async function createDocument(
   data: Partial<DocumentItem>
 ): Promise<{ success: boolean; data?: DocumentItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/documents`, {
+    const res = await fetch(adminApiUrl("documents"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -54,7 +65,7 @@ export async function updateDocument(
   data: Partial<DocumentItem>
 ): Promise<{ success: boolean; data?: DocumentItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/documents/${id}`, {
+    const res = await fetch(adminApiUrl(`documents/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -72,7 +83,7 @@ export async function deleteDocument(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/documents/${id}`, {
+    const res = await fetch(adminApiUrl(`documents/${id}`), {
       method: "DELETE",
       credentials: "include",
     });
@@ -101,7 +112,7 @@ export async function setActiveBrochure(
   documentId: number | string
 ): Promise<{ success: boolean; data?: DocumentItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/documents/active-brochure`, {
+    const res = await fetch(adminApiUrl("documents/active-brochure"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   RotateCcw,
 } from "lucide-react";
+import { adminApiUrl } from "@/services/adminApi";
 
 interface DocumentUploadFieldProps {
   label: string;
@@ -30,9 +31,6 @@ interface DocumentUploadFieldProps {
   folder?: string;
   required?: boolean;
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 export default function DocumentUploadField({
   label,
@@ -85,9 +83,9 @@ export default function DocumentUploadField({
   const handleFileChange = async (file: File) => {
     setErrorMsg(null);
 
-    // Validasi ukuran berkas maksimal 50MB
-    if (file.size > 50 * 1024 * 1024) {
-      setErrorMsg("Ukuran berkas terlalu besar. Maksimal 50MB.");
+    // Match the Go API and same-origin proxy body limit.
+    if (file.size > 15 * 1024 * 1024) {
+      setErrorMsg("Ukuran berkas terlalu besar. Maksimal 15MB.");
       return;
     }
 
@@ -99,20 +97,11 @@ export default function DocumentUploadField({
       formData.append("file", file);
       formData.append("folder", folder);
 
-      // Prioritaskan upload ke Go backend API (Cloudinary Raw Storage)
-      let uploadRes = await fetch(`${API_BASE_URL}/upload/document`, {
+      const uploadRes = await fetch(adminApiUrl("upload/document"), {
         method: "POST",
         credentials: "include",
         body: formData,
       });
-
-      // Jika backend belum aktif atau offline di lingkungan lokal, fallback ke Next.js API route
-      if (!uploadRes.ok) {
-        uploadRes = await fetch("/api/upload/document", {
-          method: "POST",
-          body: formData,
-        });
-      }
 
       const json = await uploadRes.json();
       if (!uploadRes.ok) {

@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface EkskulItem {
   id?: number | string;
   name: string;
@@ -31,7 +33,7 @@ export async function createEkskul(
   data: Partial<EkskulItem>
 ): Promise<{ success: boolean; data?: EkskulItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/ekskul`, {
+    const res = await fetch(adminApiUrl("ekskul"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -50,7 +52,7 @@ export async function updateEkskul(
   data: Partial<EkskulItem>
 ): Promise<{ success: boolean; data?: EkskulItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/ekskul/${id}`, {
+    const res = await fetch(adminApiUrl(`ekskul/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -68,7 +70,7 @@ export async function deleteEkskul(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/ekskul/${id}`, {
+    const res = await fetch(adminApiUrl(`ekskul/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

@@ -30,20 +30,46 @@ export default function VirtualClassPageClient() {
   const [isVerifying, setIsVerifying] = useState(false);
 
   useEffect(() => {
-    const urlTicket = searchParams.get("ticket");
-    const urlName = searchParams.get("name");
-
-    if (urlTicket) {
-      setTicketCode(urlTicket);
-      if (urlName) setUserName(urlName);
-    } else if (typeof window !== "undefined") {
-      const storedTicket = sessionStorage.getItem("trial_pass_code");
-      const storedName = sessionStorage.getItem("trial_pass_name");
-      if (storedTicket) {
-        setTicketCode(storedTicket);
-        if (storedName) setUserName(storedName);
-      }
+    // Old links may still contain a ticket query. Verify it with the API and ignore
+    // legacy name/major query values; new links keep the ticket in session storage.
+    const urlTicket = searchParams.get("ticket")?.trim().toUpperCase();
+    if (searchParams.size > 0) {
+      // Remove legacy ticket and personal-data query values from history/referrers
+      // before the verification request starts.
+      window.history.replaceState(null, "", window.location.pathname);
     }
+    const storedTicket = sessionStorage.getItem("trial_pass_code");
+    const candidate = urlTicket || storedTicket;
+    if (!candidate) return;
+
+    let active = true;
+    setIsVerifying(true);
+    setVerifyError("");
+    checkTrialClassTicket(candidate)
+      .then((res) => {
+        if (!active) return;
+        if (res.success && res.data) {
+          setTicketCode(res.data.ticketCode);
+          setUserName("Peserta Terdaftar");
+          sessionStorage.setItem("trial_pass_code", res.data.ticketCode);
+          sessionStorage.setItem("trial_pass_name", "Peserta Terdaftar");
+          sessionStorage.setItem("trial_pass_major", res.data.major);
+        } else {
+          if (res.error?.includes("Tiket tidak ditemukan")) {
+            sessionStorage.removeItem("trial_pass_code");
+            sessionStorage.removeItem("trial_pass_name");
+            sessionStorage.removeItem("trial_pass_major");
+          }
+          setVerifyError(res.error || "Gagal memverifikasi tiket. Silakan coba lagi.");
+        }
+      })
+      .finally(() => {
+        if (active) setIsVerifying(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [searchParams]);
 
   // Handle class selection: gate if unregistered
@@ -68,36 +94,19 @@ export default function VirtualClassPageClient() {
       const res = await checkTrialClassTicket(cleanCode);
       if (res.success && res.data) {
         setTicketCode(res.data.ticketCode);
-        setUserName(res.data.fullName);
+        setUserName("Peserta Terdaftar");
         if (typeof window !== "undefined") {
           sessionStorage.setItem("trial_pass_code", res.data.ticketCode);
-          sessionStorage.setItem("trial_pass_name", res.data.fullName);
+          sessionStorage.setItem("trial_pass_name", "Peserta Terdaftar");
           sessionStorage.setItem("trial_pass_major", res.data.major);
         }
       } else {
-        // Fallback for valid format if network is offline
-        if (cleanCode.startsWith("TC-") && cleanCode.length >= 7) {
-          setTicketCode(cleanCode);
-          setUserName("Peserta Terdaftar");
-          if (typeof window !== "undefined") {
-            sessionStorage.setItem("trial_pass_code", cleanCode);
-            sessionStorage.setItem("trial_pass_name", "Peserta Terdaftar");
-          }
-        } else {
-          setVerifyError(
-            isEn
-              ? "Ticket code not found. Please register first."
-              : "Kode tiket tidak ditemukan. Silakan lakukan pendaftaran terlebih dahulu."
-          );
-        }
+        setVerifyError(res.error || (isEn
+          ? "Ticket code not found. Please register first."
+          : "Kode tiket tidak ditemukan. Silakan lakukan pendaftaran terlebih dahulu."));
       }
     } catch {
-      if (cleanCode.startsWith("TC-")) {
-        setTicketCode(cleanCode);
-        setUserName("Peserta Terdaftar");
-      } else {
-        setVerifyError("Gagal memverifikasi tiket. Silakan coba lagi.");
-      }
+      setVerifyError("Gagal memverifikasi tiket. Silakan coba lagi.");
     } finally {
       setIsVerifying(false);
     }
@@ -162,7 +171,7 @@ export default function VirtualClassPageClient() {
                     value={inputTicket}
                     onChange={(e) => setInputTicket(e.target.value)}
                     placeholder="Kode Tiket (TC-...)"
-                    className="bg-transparent text-xs font-mono font-bold text-[#101828] placeholder:text-gray-400 placeholder:font-sans focus:outline-none w-32 uppercase"
+                    className="bg-transparent text-xs font-mono font-bold text-[#101828] placeholder:text-gray-400 placeholder:font-sans focus:outline-none w-44 sm:w-52 uppercase"
                   />
                   <button
                     type="submit"

@@ -7,12 +7,15 @@ Panduan ini menjelaskan deployment demo pada VPS dan konfigurasi yang dilakukan 
 ```text
 Browser -> Cloudflare DNS/proxy -> Cloudflare Tunnel (skomda-demo-vps)
   linear.smktelkom-sidoarjo.my.id      -> http://frontend:3000 (Next.js container)
-  api-linear.smktelkom-sidoarjo.my.id  -> http://backend:8080 (Go API container)
+  api-linear.smktelkom-sidoarjo.my.id  -> http://backend:8080 (Go API; public API/health)
+  Admin browser calls /api/backend/* on linear; Next.js proxies them internally to http://backend:8080/api.
 ```
 
 `cloudflared` must be connected to Docker network `skomda-demo_app`, where the `frontend` and `backend` service names resolve. Traffic from the tunnel to these services uses HTTP inside this Docker network; use `http://`, not `https://`, in both published application routes. The browser-facing hostname still uses HTTPS at Cloudflare.
 
-Repo Next.js juga memiliki route `/api/dtp`, `/api/upload/document`, dan `/api/virtual-class/video`. Karena itu backend Go **jangan** dipasang sebagai proxy untuk semua path `/api/*` pada host `linear`; gunakan host API terpisah seperti di atas agar route API milik Next.js tetap bisa diakses.
+Admin login and protected admin requests use the same-origin Next.js proxy at `/api/backend/*`. The proxy sets the host-only `HttpOnly` admin cookie on `linear` and forwards it to Go over the private Docker network. It checks the `Origin` of mutating requests. Public API requests may continue using `api-linear`.
+
+Repo Next.js juga memiliki route aplikasi lain di bawah `/api`. Karena itu backend Go jangan dipasang sebagai catch-all proxy untuk semua path `/api/*` pada host `linear`; path proxy backend dibatasi ke `/api/backend/*`.
 
 ## Yang perlu disiapkan pemilik pada VPS
 
@@ -48,7 +51,7 @@ Jika `Resolve-DnsName <hostname> -Server 1.1.1.1` berhasil tetapi query tanpa op
    - `VPS_KNOWN_HOSTS`: host key SSH yang fingerprint-nya sudah diverifikasi secara terpisah. Untuk port nonstandar, entri known_hosts biasanya berbentuk `[HOST]:PORT`.
 3. Tambahkan environment variables `VPS_DEPLOY_PATH=/opt/skomda-demo` dan `VPS_SSH_PORT=58300`. Port `22` digunakan bila `VPS_SSH_PORT` tidak diatur.
 4. Tambahkan **repository Actions variable** `DEMO_DEPLOY_ENABLED=true` hanya setelah seluruh preflight server selesai. Variable ini harus berada di level repository karena kondisi `if` job deploy dievaluasi sebelum job memasuki environment `demo`; variable level environment belum tersedia untuk kondisi tersebut.
-5. Opsional: set repository variable `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`. Docker Scout bisa diaktifkan dengan repository variable `DOCKER_SCOUT_ENABLED=true`; siapkan `DOCKER_SCOUT_HUB_USER` sebagai variable dan `DOCKER_SCOUT_HUB_PASSWORD` sebagai secret bila ingin menggunakannya.
+5. Opsional: set repository variable `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`. `NEXT_PUBLIC_API_URL` tetap dipakai untuk request API publik yang browser kirim ke `api-linear`; request admin menggunakan same-origin `/api/backend/*`, yang diteruskan Next.js lewat `BACKEND_API_URL=http://backend:8080/api` dari Compose. Docker Scout bisa diaktifkan dengan repository variable `DOCKER_SCOUT_ENABLED=true`; siapkan `DOCKER_SCOUT_HUB_USER` sebagai variable dan `DOCKER_SCOUT_HUB_PASSWORD` sebagai secret bila ingin menggunakannya.
 
 GitHub Actions membangun dan mem-push image dengan tag SHA commit. VPS menarik tag immutable itu. `demo-latest` hanya tag kenyamanan untuk inspeksi dan bukan identitas deployment yang dipakai rollback.
 

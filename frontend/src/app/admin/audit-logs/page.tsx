@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ShieldCheck, RefreshCw, AlertTriangle, Shield } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { adminApiUrl } from "@/services/adminApi";
 
 interface AuditLogItem {
   id: number;
@@ -17,9 +18,6 @@ interface AuditLogItem {
   created_at: string;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export default function AdminAuditLogsPage() {
   const { user } = useAdminAuth();
   const [logs, setLogs] = useState<AuditLogItem[]>([]);
@@ -28,7 +26,7 @@ export default function AdminAuditLogsPage() {
   const loadLogs = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/admin/audit-logs?limit=50`, {
+      const res = await fetch(`${adminApiUrl("admin/audit-logs")}?limit=50`, {
         credentials: "include",
       });
       if (res.ok) {

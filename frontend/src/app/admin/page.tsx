@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useAdminAuth } from "@/context/AdminAuthContext";
+import { adminApiUrl } from "@/services/adminApi";
 
 interface DashboardStats {
   totalNews: number;
@@ -53,9 +54,6 @@ interface DashboardStats {
   }>;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export default function AdminDashboardPage() {
   const { user } = useAdminAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -64,7 +62,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/dashboard/stats`, {
+        const res = await fetch(adminApiUrl("admin/dashboard/stats"), {
           credentials: "include",
         });
         if (res.ok) {

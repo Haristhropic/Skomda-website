@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { SECRET_ADMIN_LOGIN_PATH } from "@/config/adminPath";
+import { adminApiUrl } from "@/services/adminApi";
 
 export interface AdminUser {
   id: number;
@@ -24,9 +25,6 @@ interface AdminAuthContextType {
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -35,7 +33,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      const res = await fetch(adminApiUrl("auth/me"), {
         method: "GET",
         credentials: "include",
         headers: {
@@ -71,7 +69,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      const res = await fetch(adminApiUrl("auth/login"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -104,7 +102,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
+      await fetch(adminApiUrl("auth/logout"), {
         method: "POST",
         credentials: "include",
       });

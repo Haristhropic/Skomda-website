@@ -95,9 +95,11 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	// 1.1 Auth Routes
 	authGroup := api.Group("/auth")
 	loginLimiter := limiter.New(limiter.Config{
-		Max:        5,
-		Expiration: 1 * time.Minute,
+		Max:          5,
+		Expiration:   1 * time.Minute,
+		KeyGenerator: middleware.ClientIPKey,
 		LimitReached: func(c *fiber.Ctx) error {
+			c.Set("Retry-After", "60")
 			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
 				"error": "Batas frekuensi percobaan masuk terlampaui. Silakan tunggu 1 menit sebelum mencoba kembali.",
 			})
@@ -109,6 +111,51 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 	// 1.2 Admin Protected Routes
 	adminGroup := api.Group("/admin", middleware.AuthMiddleware(cfg.JWTSecret))
+	listNews := func(c *fiber.Ctx, publicOnly bool) error {
+		category := strings.TrimSpace(c.Query("category"))
+		search := strings.TrimSpace(c.Query("search"))
+		query := config.DB.Model(&models.News{}).Order("id DESC")
+
+		if publicOnly {
+			// Query status dari client publik tidak boleh membuka berita draft.
+			query = query.Where("LOWER(status) = ?", "published")
+		} else if status := strings.TrimSpace(c.Query("status")); status != "" && !strings.EqualFold(status, "semua") {
+			query = query.Where("LOWER(status) = ?", strings.ToLower(status))
+		}
+		if category != "" && !strings.EqualFold(category, "semua") {
+			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
+		}
+		if search != "" {
+			searchTerm := "%" + strings.ToLower(search) + "%"
+			query = query.Where("LOWER(title) LIKE ? OR LOWER(summary) LIKE ? OR LOWER(content) LIKE ?", searchTerm, searchTerm, searchTerm)
+		}
+
+		var total int64
+		if err := query.Count(&total).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghitung data berita"})
+		}
+
+		if pageStr := c.Query("page"); pageStr != "" {
+			page, _ := strconv.Atoi(pageStr)
+			limit, _ := strconv.Atoi(c.Query("limit", "10"))
+			if page < 1 {
+				page = 1
+			}
+			if limit < 1 || limit > 100 {
+				limit = 10
+			}
+			query = query.Offset((page - 1) * limit).Limit(limit)
+		}
+
+		var newsList []models.News
+		if err := query.Find(&newsList).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal mengambil data berita dari database"})
+		}
+		return c.JSON(fiber.Map{"data": newsList, "total": total})
+	}
+	adminGroup.Get("/news", func(c *fiber.Ctx) error {
+		return listNews(c, false)
+	})
 	adminGroup.Get("/dashboard/stats", func(c *fiber.Ctx) error {
 		var totalNews int64
 		var publishedNews int64
@@ -215,56 +262,13 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	// 3. News routes
 	newsGroup := api.Group("/news")
 	newsGroup.Get("", func(c *fiber.Ctx) error {
-		category := strings.TrimSpace(c.Query("category"))
-		search := strings.TrimSpace(c.Query("search"))
-		status := strings.TrimSpace(c.Query("status"))
-
-		query := config.DB.Model(&models.News{}).Order("id DESC")
-
-		if status != "" && !strings.EqualFold(status, "semua") {
-			query = query.Where("LOWER(status) = ?", strings.ToLower(status))
-		}
-		if category != "" && !strings.EqualFold(category, "semua") {
-			query = query.Where("LOWER(category) = ?", strings.ToLower(category))
-		}
-		if search != "" {
-			searchTerm := "%" + strings.ToLower(search) + "%"
-			query = query.Where("LOWER(title) LIKE ? OR LOWER(summary) LIKE ? OR LOWER(content) LIKE ?", searchTerm, searchTerm, searchTerm)
-		}
-
-		var total int64
-		query.Count(&total)
-
-		// Pagination opsional
-		if pageStr := c.Query("page"); pageStr != "" {
-			page, _ := strconv.Atoi(pageStr)
-			limit, _ := strconv.Atoi(c.Query("limit", "10"))
-			if page < 1 {
-				page = 1
-			}
-			if limit < 1 || limit > 100 {
-				limit = 10
-			}
-			offset := (page - 1) * limit
-			query = query.Offset(offset).Limit(limit)
-		}
-
-		var newsList []models.News
-		if err := query.Find(&newsList).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Gagal mengambil data berita dari database",
-			})
-		}
-		return c.JSON(fiber.Map{
-			"data":  newsList,
-			"total": total,
-		})
+		return listNews(c, true)
 	})
 
 	newsGroup.Get("/:slug", func(c *fiber.Ctx) error {
 		slug := strings.TrimSpace(c.Params("slug"))
 		var item models.News
-		err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(slug)).First(&item).Error
+		err := config.DB.Where("LOWER(slug) = ? AND LOWER(status) = ?", strings.ToLower(slug), "published").First(&item).Error
 		if err != nil {
 			if err == gorm.ErrRecordNotFound {
 				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
@@ -505,6 +509,18 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 	// 4. Chatbot
 	cbGroup := api.Group("/chatbot")
+	chatbotSlots := make(chan struct{}, 16)
+	chatbotLimiter := limiter.New(limiter.Config{
+		Max:          60,
+		Expiration:   time.Minute,
+		KeyGenerator: middleware.ClientIPKey,
+		LimitReached: func(c *fiber.Ctx) error {
+			c.Set("Retry-After", "60")
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error": "Batas permintaan chatbot tercapai. Silakan coba lagi dalam satu menit.",
+			})
+		},
+	})
 	cbGroup.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"status": "ready",
@@ -512,7 +528,22 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			"target": cfg.NexusRouterURL,
 		})
 	})
-	cbGroup.Post("/message", func(c *fiber.Ctx) error {
+	cbGroup.Post("/message", chatbotLimiter, func(c *fiber.Ctx) error {
+		select {
+		case chatbotSlots <- struct{}{}:
+		default:
+			c.Set("Retry-After", "10")
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"error": "Layanan chatbot sedang sibuk. Silakan coba kembali beberapa saat lagi.",
+			})
+		}
+		streamingResponse := false
+		defer func() {
+			if !streamingResponse {
+				<-chatbotSlots
+			}
+		}()
+
 		var req struct {
 			Message string        `json:"message"`
 			History []interface{} `json:"history"`
@@ -560,7 +591,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				c.Set("Cache-Control", "no-cache")
 				c.Set("Connection", "keep-alive")
 				c.Set("Transfer-Encoding", "chunked")
+				streamingResponse = true
 				c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
+					defer func() { <-chatbotSlots }()
 					words := strings.Split(dtpResp, " ")
 					chunkSize := 5
 					for i := 0; i < len(words); i += chunkSize {
@@ -652,7 +685,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			c.Set("Cache-Control", "no-cache")
 			c.Set("Connection", "keep-alive")
 			c.Set("Transfer-Encoding", "chunked")
+			streamingResponse = true
 			c.Context().SetBodyStreamWriter(func(w *bufio.Writer) {
+				defer func() { <-chatbotSlots }()
 				defer resp.Body.Close()
 				reader := bufio.NewReader(resp.Body)
 				for {
@@ -683,7 +718,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	})
 
 	// 5. Cloudinary Signed Upload & Direct Image Upload
-	api.Get("/cloudinary/sign", func(c *fiber.Ctx) error {
+	api.Get("/cloudinary/sign", middleware.AuthMiddleware(cfg.JWTSecret), func(c *fiber.Ctx) error {
 		if cldClient == nil || cldClient.CloudName == "" {
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
 				"error": "Cloudinary belum dikonfigurasi di server backend",

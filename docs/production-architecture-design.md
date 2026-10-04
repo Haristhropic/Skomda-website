@@ -8,6 +8,10 @@
 
 Panduan konfigurasi manual VPS dan GitHub ada di [`demo-vps-runbook.md`](demo-vps-runbook.md).
 
+Prosedur load test baca-saja untuk subdomain demo ada di [`stress-testing.md`](stress-testing.md).
+
+Audit baca-saja Supabase untuk pemilik proyek tersedia di [`supabase-access-audit.md`](supabase-access-audit.md).
+
 Dokumen ini menjadikan daftar kebutuhan infrastruktur sebagai cakupan arsitektur proyek. Status membedakan kemampuan yang sudah tampak di repo dari rancangan yang masih memerlukan implementasi atau konfigurasi akun/server.
 
 ## Tujuan dan batasan
@@ -22,10 +26,10 @@ Dokumen ini menjadikan daftar kebutuhan infrastruktur sebagai cakupan arsitektur
 ```mermaid
 flowchart LR
   V[Pengunjung] --> CF[Cloudflare DNS, TLS, WAF, CDN]
-  CF -->|linear host| T[Cloudflare Tunnel]
-  CF -->|api-linear host| T
+  CF -->|linear and api-linear hosts| T[Cloudflare Tunnel]
   T -->|HTTP internal Docker network| FE[Frontend Next.js]
   T -->|HTTP internal Docker network| API[Go API: Fiber]
+  FE -->|same-origin /api/backend proxy for admin| API
   API --> PG[(Supabase PostgreSQL)]
   API --> MED[Cloudinary media]
   API --> AI[NexusRouter]
@@ -36,7 +40,7 @@ flowchart LR
   VPS --> T
 ```
 
-Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compose. Keduanya hanya bind ke loopback host ports dan juga berada pada network Docker privat. Connector `cloudflared` bergabung ke network tersebut; Cloudflare Tunnel merutekan hostname frontend ke `http://frontend:3000` dan hostname API ke `http://backend:8080`. TLS publik berakhir di Cloudflare, sedangkan HTTP dipakai pada koneksi internal Docker. Webuzo tetap mengelola panel server dan bukan reverse proxy untuk dua hostname demo ini. Go API menggunakan Supabase PostgreSQL melalui `DATABASE_URL`, Cloudinary untuk media, dan NexusRouter untuk chatbot.
+Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compose. Keduanya hanya bind ke loopback host ports dan juga berada pada network Docker privat. Connector `cloudflared` bergabung ke network tersebut; hostname `linear` diarahkan ke `http://frontend:3000`, sedangkan `api-linear` dapat diarahkan ke `http://backend:8080` untuk API publik/health. Request admin dari browser tetap satu origin di `linear`; Next.js meneruskannya ke Go lewat network privat. TLS publik berakhir di Cloudflare, sedangkan HTTP dipakai pada koneksi internal Docker. Webuzo tetap mengelola panel server. Go API menggunakan Supabase PostgreSQL melalui `DATABASE_URL`, Cloudinary untuk media, dan NexusRouter untuk chatbot.
 
 ## Cakupan komponen
 
@@ -45,12 +49,12 @@ Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compo
 | Frontend | Next.js App Router untuk website publik dan CMS yang tersedia | Next.js sudah ada; Dockerfile dan standalone output disiapkan. Framework UI tidak digabung ke backend Go. |
 | APIs & Backend Logic | Go API, Fiber sebagai engine production; Gin tetap alternatif yang diuji | Kedua entrypoint tersedia. Production menjalankan satu engine saja. API tetap menjadi jalur mutasi dan akses data. |
 | Database & Storage | Supabase PostgreSQL untuk staging/production; Cloudinary untuk gambar/dokumen media | Backend mewajibkan Postgres di Compose production. SQLite dipilih eksplisit via `DATABASE_DRIVER=sqlite` hanya pada `development` atau `test`; tidak ada fallback koneksi. |
-| Auth & Permissions | JWT backend, password bcrypt, role checks API, cookie httpOnly untuk admin | Auth dan role guards ada. Middleware Next.js hanya memeriksa keberadaan cookie untuk menyamarkan route; validasi otorisasi wajib tetap di API. |
-| Hosting & Deployment | Ubuntu VPS + Docker Compose + Cloudflare Tunnel; `linear` frontend dan `api-linear` API demo hosts | Published routes `linear` dan `api-linear` mengarah ke container yang sesuai. Homepage merespons HTTP 200 dan API health mengonfirmasi database PostgreSQL sehat. Panel Webuzo tetap pada hostname `server`; resolver DNS bawaan komputer pemilik sempat memberi `NXDOMAIN` sementara resolver publik berhasil. |
+| Auth & Permissions | JWT backend, password bcrypt, role checks API, cookie httpOnly untuk admin | JWT berlaku 24 jam dan dikeluarkan lewat cookie `HttpOnly` pada host frontend melalui proxy same-origin `/api/backend/*`. Proxy meneruskan cookie ke Go API lewat network privat Docker; backend tetap memvalidasi JWT dan izin setiap request. Login admin berada di `/gate-internal-skomda`, tetapi nama URL tersembunyi bukan kontrol keamanan. Role checks hanya tampak pada route tertentu; pemeriksaan status/revokasi user pada setiap request belum terverifikasi. |
+| Hosting & Deployment | Ubuntu VPS + Docker Compose + Cloudflare Tunnel; `linear` frontend demo | Published route `linear` mengarah ke frontend. Next.js meneruskan request admin ke backend melalui `http://backend:8080/api` di network Docker. `api-linear` dapat tetap dipakai oleh endpoint publik dan health check. Panel Webuzo tetap pada hostname `server`. |
 | Cloud & Compute | VPS saat ini; Supabase dan Cloudinary sebagai layanan terkelola | Kapasitas awal cukup untuk satu replica per aplikasi menurut spesifikasi VPS yang diberikan. Batasi CPU/RAM container dan pantau pemakaian. |
 | CI/CD & Version Control | GitHub Actions untuk pemeriksaan, build, image GHCR immutable SHA, deploy demo opsional | Workflow disiapkan di branch `deploy`; deploy memakai secrets dan variables pada environment `demo`, sedangkan sakelar job `DEMO_DEPLOY_ENABLED` harus berupa repository variable. Pipeline demo tidak mengubah domain utama. |
 | Security & RLS | Secret di VPS/GitHub Secrets; TLS; CORS allowlist; JWT; least privilege; kebijakan RLS yang terverifikasi | CORS/JWT tersedia dan beberapa tabel mengaktifkan RLS dari startup code. RLS belum boleh dianggap perlindungan efektif sebelum policy, grants, dan role koneksi diverifikasi. |
-| Rate Limiting | Batas khusus endpoint sensitif; Cloudflare edge rules ditambahkan untuk abuse umum | Login 5 request/menit dan chatbot 15 request/menit tercatat di kode. Chatbot limiter bersifat in-memory dan tidak berbagi counter antar replica. |
+| Rate Limiting | Batas khusus endpoint sensitif; Cloudflare edge rules ditambahkan untuk abuse umum | Perubahan lokal memakai IP pengunjung Cloudflare: login 5/menit, chatbot 60/menit plus 16 request aktif/proses, pengajuan BKK 5/10 menit, pendaftaran Trial Class 10/10 menit, dan cek tiket 30/menit. Counter masih in-memory dan tidak berbagi antar replica; perubahan ini belum diuji atau dideploy. |
 | Caching & CDN | Cloudflare untuk aset publik yang aman; Cloudinary untuk media; cache API/Next ditentukan per route | Cloudinary sudah digunakan. Jangan cache respons admin, auth, personal data, atau API mutasi. Mulai dengan cache statis dan aturan eksplisit untuk GET publik. |
 | Load Balancing & Scaling | Satu VPS dan satu replica pada fase demo; tambah replica/host hanya bila metrik menuntut | Belum ada load balancer aplikasi. Jika scale horizontal kelak, pindahkan limiter/sesi yang perlu berbagi state ke storage bersama dan uji batas koneksi Supabase. |
 | Error Tracking & Logs | stdout/stderr container dengan rotasi; request ID; agregasi/error tracker setelah demo dasar stabil | Compose sudah mengatur log rotation lokal. Belum ada error tracker terpusat atau alert; hindari memasukkan token, password, dan data pendaftar ke log. |
@@ -61,12 +65,13 @@ Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compo
 ## Keamanan data dan observabilitas
 
 1. Browser tidak pernah menerima `DATABASE_URL`, Cloudinary API secret, JWT signing secret, password seed admin, atau SSH key. Production gagal startup bila `ADMIN_DEFAULT_PASSWORD` tidak diatur kuat.
-2. Semua endpoint admin memvalidasi JWT, status user, dan role di backend; route tersembunyi bukan kontrol keamanan.
-3. Production fail-closed: jika PostgreSQL kosong/tidak terjangkau, backend tidak start dan health check gagal. Tidak ada penulisan ke SQLite sebagai fallback.
-4. RLS, grants, dan role koneksi database harus diuji dari sudut pandang role yang dipakai aplikasi dan role `anon`/`authenticated`; status `ENABLE ROW LEVEL SECURITY` saja belum membuktikan akses aman.
-5. Rate limiter in-memory cukup untuk satu replica demo, tetapi bukan kontrol lintas replica. Terapkan edge rules Cloudflare dan pantau false positive sebelum memperketat batas publik.
-6. Request logs hanya memuat metadata operasional yang diperlukan. Hapus atau redaksi Authorization, cookie, password, JWT, connection string, dan data calon siswa.
-7. Analytics dipasang hanya di area publik dan mengikuti persetujuan/pengaturan privasi sekolah. Event conversion berbentuk kategori/aksi (mis. klik CTA atau unduh brosur), tanpa nama, email, nomor telepon, NISN, atau isi form. Clarity menyamarkan input dan tidak merekam halaman admin.
+2. Daftar dokumen publik dibatasi ke `is_public=true`; daftar admin menggunakan `/admin/documents`. Endpoint publik alumni hanya mengirim kolom yang layak diumumkan; NISN dan data lengkap hanya lewat `/admin/alumni` dengan JWT. Data alumni privat tidak lagi dikirim sebagai fallback statis frontend.
+3. Route admin Go memvalidasi JWT; role checks hanya terpasang pada sebagian route, dan status user/revokasi token belum dicek ulang pada setiap request. Login melalui `/api/backend/auth/login` mengeluarkan cookie `HttpOnly` untuk host frontend. Proxy Next.js meneruskan cookie itu ke backend melalui network Docker privat dan memeriksa `Origin` untuk request mutasi. Route halaman Next.js bukan batas keamanan; backend tetap harus memvalidasi setiap akses.
+4. Production fail-closed: jika PostgreSQL kosong/tidak terjangkau, backend tidak start dan health check gagal. Tidak ada penulisan ke SQLite sebagai fallback.
+5. RLS, grants, dan role koneksi database harus diuji dari sudut pandang role yang dipakai aplikasi dan role `anon`/`authenticated`; status `ENABLE ROW LEVEL SECURITY` saja belum membuktikan akses aman.
+6. Rate limiter in-memory cukup untuk satu replica demo, tetapi bukan kontrol lintas replica. Untuk chatbot, backend membaca `CF-Connecting-IP` karena akses publik masuk melalui Cloudflare Tunnel dan port backend hanya bind ke loopback VPS. Terapkan edge rules Cloudflare dan pantau false positive sebelum memperketat batas publik.
+7. Request logs hanya memuat metadata operasional yang diperlukan. Hapus atau redaksi Authorization, cookie, password, JWT, connection string, dan data calon siswa.
+8. Analytics dipasang hanya di area publik dan mengikuti persetujuan/pengaturan privasi sekolah. Event conversion berbentuk kategori/aksi (mis. klik CTA atau unduh brosur), tanpa nama, email, nomor telepon, NISN, atau isi form. Clarity menyamarkan input dan tidak merekam halaman admin.
 
 ## Tahapan implementasi
 

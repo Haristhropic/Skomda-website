@@ -32,7 +32,7 @@ import AdminSelect from "@/components/admin/AdminSelect";
 import {
   BKKJobItem,
   BKKPartnerItem,
-  getBKKJobs,
+  getAdminBKKJobs,
   createBKKJob,
   updateBKKJob,
   deleteBKKJob,
@@ -185,7 +185,7 @@ export default function AdminBKKPage() {
     setIsLoading(true);
     try {
       const [jobsData, partnersData] = await Promise.all([
-        getBKKJobs(),
+        getAdminBKKJobs(),
         getBKKPartners(),
       ]);
       setJobs(jobsData);

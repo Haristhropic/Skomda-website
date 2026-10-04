@@ -93,7 +93,6 @@ func LoginHandler(cfg config.Config) fiber.Handler {
 
 		return c.JSON(fiber.Map{
 			"message": "Login berhasil",
-			"token":   token,
 			"user": fiber.Map{
 				"id":     user.ID,
 				"name":   user.Name,

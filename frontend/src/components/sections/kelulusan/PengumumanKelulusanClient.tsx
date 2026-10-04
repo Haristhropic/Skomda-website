@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, ChevronLeft, ChevronRight, FileText, GraduationCap } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import PageHeroSection from "@/components/sections/common/PageHeroSection";
-import initialAlumniData from "@/data/alumni-angkatan-6.json";
 import { AlumniItem, getAlumniList } from "@/services/alumni";
 
 const ITEMS_PER_PAGE = 15;
@@ -23,7 +22,7 @@ export default function PengumumanKelulusanClient() {
       .replace(/Tahun Ajaran\s*/gi, "Academic Year ");
   };
 
-  const [alumniList, setAlumniList] = useState<AlumniItem[]>(initialAlumniData as AlumniItem[]);
+  const [alumniList, setAlumniList] = useState<AlumniItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [currentPage, setCurrentPage] = useState(1);

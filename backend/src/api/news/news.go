@@ -57,7 +57,7 @@ func getNewsList(c *gin.Context) {
 	category := strings.TrimSpace(c.Query("category"))
 	search := strings.TrimSpace(c.Query("search"))
 
-	query := config.DB.Model(&models.News{}).Order("id DESC")
+	query := config.DB.Model(&models.News{}).Where("LOWER(status) = ?", "published").Order("id DESC")
 
 	if category != "" && !strings.EqualFold(category, "semua") {
 		query = query.Where("LOWER(category) = ?", strings.ToLower(category))
@@ -93,7 +93,7 @@ func getNewsBySlug(c *gin.Context) {
 	}
 
 	var item models.News
-	err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(slugParam)).First(&item).Error
+	err := config.DB.Where("LOWER(slug) = ? AND LOWER(status) = ?", strings.ToLower(slugParam), "published").First(&item).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{

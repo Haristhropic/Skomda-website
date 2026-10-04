@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface BKKJobItem {
   id?: number | string;
   title: string;
@@ -48,11 +50,27 @@ export async function getBKKJobs(status?: string): Promise<BKKJobItem[]> {
   }
 }
 
+export async function getAdminBKKJobs(): Promise<BKKJobItem[]> {
+  const res = await fetch(adminApiUrl("admin/bkk/jobs"), {
+    credentials: "include",
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    throw new Error(res.status === 401
+      ? "Sesi admin berakhir. Silakan login kembali."
+      : "Gagal memuat daftar lowongan admin.");
+  }
+
+  const json = await res.json();
+  if (!Array.isArray(json.data)) throw new Error("Respons daftar lowongan admin tidak valid.");
+  return json.data;
+}
+
 export async function createBKKJob(
   data: Partial<BKKJobItem>
 ): Promise<{ success: boolean; data?: BKKJobItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/jobs`, {
+    const res = await fetch(adminApiUrl("bkk/jobs"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -71,7 +89,7 @@ export async function updateBKKJob(
   data: Partial<BKKJobItem>
 ): Promise<{ success: boolean; data?: BKKJobItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/jobs/${id}`, {
+    const res = await fetch(adminApiUrl(`bkk/jobs/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -89,7 +107,7 @@ export async function deleteBKKJob(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/jobs/${id}`, {
+    const res = await fetch(adminApiUrl(`bkk/jobs/${id}`), {
       method: "DELETE",
       credentials: "include",
     });
@@ -130,7 +148,7 @@ export async function updateBKKJobStatus(
   status: "active" | "rejected" | "closed" | "pending"
 ): Promise<{ success: boolean; data?: BKKJobItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/jobs/${id}/status`, {
+    const res = await fetch(adminApiUrl(`bkk/jobs/${id}/status`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -161,7 +179,7 @@ export async function createBKKPartner(
   data: Partial<BKKPartnerItem>
 ): Promise<{ success: boolean; data?: BKKPartnerItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/partners`, {
+    const res = await fetch(adminApiUrl("bkk/partners"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -180,7 +198,7 @@ export async function updateBKKPartner(
   data: Partial<BKKPartnerItem>
 ): Promise<{ success: boolean; data?: BKKPartnerItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/partners/${id}`, {
+    const res = await fetch(adminApiUrl(`bkk/partners/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -198,7 +216,7 @@ export async function deleteBKKPartner(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/partners/${id}`, {
+    const res = await fetch(adminApiUrl(`bkk/partners/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

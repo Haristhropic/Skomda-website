@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface FasilitasItem {
   id?: number | string;
   name: string;
@@ -29,7 +31,7 @@ export async function createFasilitas(
   data: Partial<FasilitasItem>
 ): Promise<{ success: boolean; data?: FasilitasItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/fasilitas`, {
+    const res = await fetch(adminApiUrl("fasilitas"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -48,7 +50,7 @@ export async function updateFasilitas(
   data: Partial<FasilitasItem>
 ): Promise<{ success: boolean; data?: FasilitasItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/fasilitas/${id}`, {
+    const res = await fetch(adminApiUrl(`fasilitas/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -66,7 +68,7 @@ export async function deleteFasilitas(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/fasilitas/${id}`, {
+    const res = await fetch(adminApiUrl(`fasilitas/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

@@ -20,7 +20,7 @@ import AdminSelect from "@/components/admin/AdminSelect";
 import DocumentUploadField from "@/components/admin/DocumentUploadField";
 import {
   DocumentItem,
-  getDocumentList,
+  getAdminDocumentList,
   createDocument,
   updateDocument,
   deleteDocument,
@@ -81,7 +81,7 @@ export default function AdminDokumenPage() {
     setIsLoading(true);
     try {
       const [data, brochure] = await Promise.all([
-        getDocumentList(),
+        getAdminDocumentList(),
         getActiveBrochure(),
       ]);
       setList(data);

@@ -1,3 +1,5 @@
+import { adminApiUrl } from "@/services/adminApi";
+
 export interface TeacherItem {
   id?: number | string;
   name: string;
@@ -52,7 +54,7 @@ export async function createTeacher(
   data: Partial<TeacherItem>
 ): Promise<{ success: boolean; data?: TeacherItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/teachers`, {
+    const res = await fetch(adminApiUrl("teachers"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -71,7 +73,7 @@ export async function updateTeacher(
   data: Partial<TeacherItem>
 ): Promise<{ success: boolean; data?: TeacherItem; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/teachers/${id}`, {
+    const res = await fetch(adminApiUrl(`teachers/${id}`), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -89,7 +91,7 @@ export async function deleteTeacher(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/teachers/${id}`, {
+    const res = await fetch(adminApiUrl(`teachers/${id}`), {
       method: "DELETE",
       credentials: "include",
     });
