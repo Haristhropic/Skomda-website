@@ -21,10 +21,16 @@ active="$(cat .active-slot 2>/dev/null || true)"
 case "$active" in blue) candidate=green;; green|'') candidate=blue;; *) echo 'Invalid release state' >&2; exit 1;; esac
 export RELEASE_SLOT="$candidate"
 release() { docker compose -f compose.release.yaml --env-file deploy.env "$@"; }
+active_address() {
+  local cid
+  cid=$(RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env ps -q "$1")
+  docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' "$cid"
+}
 release --profile operations config --quiet
 switched=false
 committed=false
 reduced_active=false
+secondary_attempted=false
 recover_candidate() {
   local result=$?
   if [[ "$switched" == true ]]; then
@@ -36,7 +42,16 @@ recover_candidate() {
     release stop --timeout 35 || true
     if [[ "$reduced_active" == true ]]; then
       RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env up -d --no-build --wait --wait-timeout 120 frontend-b backend-b || true
+      active_frontends=("$(active_address frontend-a)" "$(active_address frontend-b)")
+      active_backends=("$(active_address backend-a)" "$(active_address backend-b)")
+      python3 render-edge.py --frontend "${active_frontends[@]}" --backend "${active_backends[@]}" --output deploy/nginx/releases/candidate.conf || true
+      if [[ -s deploy/nginx/releases/candidate.conf ]]; then
+        mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
+        docker compose --env-file deploy.env exec -T edge nginx -t && docker compose --env-file deploy.env exec -T edge nginx -s reload || true
+      fi
     fi
+  elif [[ "$secondary_attempted" == true ]]; then
+    release stop --timeout 35 frontend-b backend-b || true
   fi
   exit "$result"
 }
@@ -52,13 +67,24 @@ if [[ -n "$active" && -r "$pid_file" && "$(cat "$pid_file")" -gt 370 ]]; then
     [[ "$(docker inspect --format '{{.State.Health.Status}}' "skomda-$active-$service-1")" == healthy ]] || { echo 'Serving pair is not healthy; refusing capacity reduction' >&2; exit 1; }
   done
   reduced_active=true
+  active_front_a="$(active_address frontend-a)"
+  active_back_a="$(active_address backend-a)"
+  docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$active_front_a:3000/api/backend/health"
+  python3 render-edge.py --frontend "$active_front_a" --backend "$active_back_a" --output deploy/nginx/releases/candidate.conf
+  cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
+  mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
+  switched=true
+  docker compose --env-file deploy.env exec -T edge nginx -t
+  docker compose --env-file deploy.env exec -T edge nginx -s reload
+  docker compose --env-file deploy.env exec -T edge wget -q --spider http://127.0.0.1:3000/api/backend/health
+  switched=false
   RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 35 frontend-b backend-b
-  echo 'One healthy serving pair retained during candidate warm-up due to provider PID budget.'
+  echo 'Traffic is on one verified serving pair during candidate warm-up due to provider PID budget.'
 fi
 release --profile operations pull
 release --profile operations run --rm --no-deps -T migrate < /dev/null
-release up -d --no-build --wait --wait-timeout 180
 address() { docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' "$(release ps -q "$1")"; }
+release up -d --no-build --wait --wait-timeout 180 backend-a frontend-a
 mkdir -p deploy/nginx/releases/static
 # Chunks use content hashes/build IDs. Retain old browser assets independently
 # of app process lifetime; no credentials or server bundles are copied.
@@ -71,14 +97,13 @@ find deploy/nginx/releases/static -type f -exec chmod 644 {} +
 # Pin this release's live container addresses into Nginx. Docker DNS aliases can
 # briefly return NXDOMAIN while blue/green services are being replaced; a stale
 # DNS answer during cutover caused one observed 3-second frontend proxy 504.
-frontends=("$(address frontend-a)" "$(address frontend-b)")
-backends=("$(address backend-a)" "$(address backend-b)")
-# Exercise each candidate's same-origin backend route before moving traffic.
-for frontend_ip in "${frontends[@]}"; do
-  docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$frontend_ip:3000/api/backend/health"
-done
+frontend_a="$(address frontend-a)"
+backend_a="$(address backend-a)"
+# Keep one active app pair on each side of cutover; expand to two replicas
+# only after the old pair has drained and stopped under the provider's PID cap.
+docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$frontend_a:3000/api/backend/health"
 mkdir -p deploy/nginx/releases
-python3 render-edge.py --frontend "${frontends[@]}" --backend "${backends[@]}" --output deploy/nginx/releases/candidate.conf
+python3 render-edge.py --frontend "$frontend_a" --backend "$backend_a" --output deploy/nginx/releases/candidate.conf
 cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
 mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
 switched=true
@@ -101,6 +126,23 @@ trap - ERR
 if [[ -n "$active" ]]; then
   sleep 35
   RELEASE_SLOT="$active" IMAGE_TAG="$(cat .previous-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 35
+  reduced_active=false
 fi
-echo "Deployed $IMAGE_TAG to $candidate; previous slot stopped and retained for warm rollback."
+# The new single pair serves while its second pair starts within the freed PID budget.
+secondary_attempted=true
+release up -d --no-build --wait --wait-timeout 180 backend-b frontend-b
+frontend_b="$(address frontend-b)"
+backend_b="$(address backend-b)"
+docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$frontend_b:3000/api/backend/health"
+cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
+python3 render-edge.py --frontend "$frontend_a" "$frontend_b" --backend "$backend_a" "$backend_b" --output deploy/nginx/releases/candidate.conf
+mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
+switched=true
+docker compose --env-file deploy.env exec -T edge nginx -t
+docker compose --env-file deploy.env exec -T edge nginx -s reload
+docker compose --env-file deploy.env exec -T edge wget -q --spider http://127.0.0.1:3000/api/backend/health
+switched=false
+secondary_attempted=false
+trap - ERR
+echo "Deployed $IMAGE_TAG to $candidate; both app pairs are healthy. Previous slot is stopped and retained for warm rollback."
 release ps

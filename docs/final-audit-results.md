@@ -30,6 +30,7 @@ Probe menjalankan maksimal satu GET per detik, bergantian HTML frontend, daftar 
 | `artifacts/deploy-availability-86cc6ef.json` | 827/827 sampel HTTP 200, sekitar 11:10:43–11:25:22 UTC | Mencakup percobaan CD pertama, rerun, cutover, dan sesudah cutover. p95 frontend 260,53 ms, API langsung 319,73 ms, proxy 285,25 ms. |
 | `artifacts/deploy-availability-e51da8a.json` | 298/298 sampel HTTP 200 | Probe sebelum cutover revisi `e51da8a`; baseline sehat saja. |
 | `artifacts/deploy-availability-cutover-e51da8a.json` | 236/237 HTTP 200; 1 HTTP 504 | Satu proxy API timeout saat cutover ke frontend kandidat; lihat log dan tindak lanjut pada bagian stress test. |
+| `artifacts/deploy-availability-cutover-76ba884.json` | 296/296 sampel HTTP 200 | Run 28 gagal sebelum cutover saat host kehabisan PID ketika membuat replica kandidat keempat; safety trap memulihkan pair aktif `e51da8a`, yang tetap melayani probe. |
 
 Penulisan laporan probe diperbaiki dengan file sementara, penggantian atomik, dan retry. Error penulisan sementara tidak lagi menghentikan pengambilan sampel; kegagalan pelaporan dicatat terpisah. Bukti insiden disimpan sebagai segmen gagal dan tidak dihapus dari hasil akhir.
 
@@ -87,13 +88,15 @@ Perbaikan source `e51da8a` menurunkan `web_release` menjadi `max_fails=1 fail_ti
 
 Source lanjutan kini menggunakan IP container hasil inspeksi sebagai upstream Nginx dan memeriksa rute same-origin ke backend pada kedua kandidat sebelum cutover. **Perubahan ini belum di-deploy atau diukur.** Tahap 1.000 user tetap gagal sampai uji terbaru membuktikan sebaliknya.
 
+CI run 28 berhasil pada pemeriksaan aplikasi, build, dan Trivy, tetapi deployment gagal sebelum cutover karena batas PID 500 saat menyalakan keempat container kandidat. Revisi source berikutnya menyiapkan satu pair kandidat, cutover, menghentikan slot lama, kemudian menambah replica kedua. Run probe saat kegagalan tetap 296/296 HTTP 200; ini membuktikan recovery trap mempertahankan layanan, bukan deployment baru berhasil.
+
 Kolektor host mengambil 78 sampel: PID maksimum 446/500, CPU busy maksimum 50,9%, RAM tersedia minimum sekitar 3,09 GB, dan disk tersedia sekitar 19,6 GB. Rata-rata CPU rendah tidak membuktikan tidak ada bottleneck satu thread atau batas container.
 
 Ada side traffic kecil: satu backup terenkripsi selesai sekitar 11:28:19 UTC, dua panggilan AI operator, dan audit browser/monitoring. Tidak ada backup atau scan berikutnya saat load. Pengulangan final harus dipisahkan dari pekerjaan deployment/backup/scan agar hasil dapat dibandingkan.
 
 ## Pekerjaan verifikasi berikutnya
 
-1. Deploy upstream statis berbasis IP container, konfirmasi tag aktif, dan ulangi probe cutover tanpa kegagalan.
+1. Deploy dengan warm-up satu pair kandidat, konfirmasi tag aktif, dan ulangi probe cutover tanpa kegagalan.
 2. Ulangi audit guard/body deadline/header dan autentikasi yang berubah.
 3. Ulangi tahap 1.000 user, lalu spike dan soak. **Spike dan soak belum dijalankan** setelah tahap 1.000 gagal.
 4. Ukur Core Web Vitals melalui browser/perangkat yang mendukung trace; ulangi audit media pada revisi runtime public yang baru.
