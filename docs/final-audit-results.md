@@ -1,6 +1,6 @@
 # Hasil audit deployment dan kapasitas
 
-Status 4 Oktober 2026: audit load live revisi `86cc6ef` selesai sebagian. Smoke dan tahap sampai 500 virtual user lulus. **Tahap 1.000 virtual user gagal karena HTTP 502**; perbaikan dan pengujian ulang masih diperlukan. Revisi `e51da8a` sudah terpasang di slot blue dan sehat, tetapi probe saat cutover menemukan satu HTTP 504. Dokumen ini tidak menyatakan seluruh arsitektur atau kapasitas akhir lulus.
+Status 4 Oktober 2026: audit final demo dilaksanakan pada image `sha-d166a85ee4087fb213604d2d71ebe3044d9b2944` di slot `blue`. Ramp 1.000 pengguna bertahap, soak 100 pengguna selama 10 menit, probe ketersediaan, dan audit HTTP live lulus ambang agregatnya. **Burst serentak 1.000 pengguna gagal ambang latency (p95 hingga 10,16 detik) walau tidak menghasilkan HTTP error.** Host memiliki batas 500 PID/thread dan terukur mencapai 499/500 saat soak. Jadi sistem tetap melayani workload bertahap yang diuji, tetapi tidak dapat diklaim tahan spike mendadak ekstrem atau aman terhadap batas host; promosi ke domain utama belum disetujui.
 
 ## Target dan revisi
 
@@ -94,12 +94,29 @@ Kolektor host mengambil 78 sampel: PID maksimum 446/500, CPU busy maksimum 50,9%
 
 Ada side traffic kecil: satu backup terenkripsi selesai sekitar 11:28:19 UTC, dua panggilan AI operator, dan audit browser/monitoring. Tidak ada backup atau scan berikutnya saat load. Pengulangan final harus dipisahkan dari pekerjaan deployment/backup/scan agar hasil dapat dibandingkan.
 
-## Pekerjaan verifikasi berikutnya
+## Hasil final revisi d166a85
 
-1. Deploy dengan warm-up satu pair kandidat, konfirmasi tag aktif, dan ulangi probe cutover tanpa kegagalan.
-2. Ulangi audit guard/body deadline/header dan autentikasi yang berubah.
-3. Ulangi tahap 1.000 user, lalu spike dan soak. **Spike dan soak belum dijalankan** setelah tahap 1.000 gagal.
-4. Ukur Core Web Vitals melalui browser/perangkat yang mendukung trace; ulangi audit media pada revisi runtime public yang baru.
-5. Jalankan probe CD baru tanpa intervensi manual, dengan batas PID overlap yang benar.
+CI run 30 (`37202343921`) sukses: backend tests/vet, frontend lint/typecheck/build, renderer regression tests, Trivy scans, publikasi image, dan deployment VPS. Image aktif diverifikasi sebagai `sha-d166a85ee4087fb213604d2d71ebe3044d9b2944` pada slot blue. Empat container aplikasi dan komponen observability/Redis sehat setelah deploy. Probe availability pasca-deploy lulus 298/298; monitor saat spike lulus 179/179. Hasil tidak mewakili uptime di luar jendela tes.
 
-Model, ambang, cara menjalankan alat, dan pembatasan workload tercantum di [rencana audit](final-audit-plan.md). Kelulusan pengujian yang terukur tidak menjamin bebas bug atau tahan seluruh jenis serangan dan beban.
+Audit live anonim terbaru mencatat **47/47 pass** di `artifacts/final-live-audit-d166a85.json`, termasuk halaman publik, denial endpoint privat tanpa sesi, JWT palsu, Origin yang tidak sah/hilang, identitas Grafana palsu, batas body, dan pengujian deterministik AI guard. Ini bukan audit penetrasi menyeluruh atau bukti AI kebal jailbreak. Pengujian autentikasi/role/CRUD yang lebih lengkap sebelumnya tercatat pada artefak revisi 86cc6ef; revisi d166a85 tidak mengubah kode auth/admin.
+
+Ramp bertahap 5→50→100→250→500→1.000 VU lulus: 29.010 request, 0 error. Pada 1.000 VU terdapat 23.624 request dalam tahap, sekitar 119,93 RPS; p95 frontend 595 ms, API langsung 424 ms, proxy API 461 ms. Modelnya 1.000 sesi baca berpacing (halaman + satu API, lalu think-time 15 detik), bukan 1.000 RPS atau 1.000 request serentak. Rincian: `artifacts/load-stress-d166a85.json`.
+
+Soak 100 VU selama 614 detik lulus: 7.866/7.866 HTTP 200, 0 error, 12,81 RPS; p95 frontend 237 ms, API langsung 335 ms, proxy 329 ms. Terdapat beberapa window 10 detik dengan p95 API sementara melewati ambang, diselingi window pulih; agregat akhir masih lulus. Probe layanan publik sepanjang sekitar 10 menit lulus 595/595. Lihat `artifacts/load-soak-d166a85.json` dan `artifacts/deploy-availability-soak-d166a85.json`.
+
+Burst mendadak dari 5 langsung ke 1.000 VU dalam 100 ms **gagal ambang latency** dan dihentikan setelah dua window berurutan melewati ambang: frontend p95 10.155 ms, direct API 6.934 ms, proxy API 3.465 ms. Semua 2.016 request yang terkirim tetap HTTP 200; availability probe lulus 179/179, tanpa error Nginx 502/504. Kolektor Windows mencatat event-loop lag p95 sekitar 724 ms, sehingga sebagian latency dapat berasal dari generator yang kewalahan; tetap, pengalaman ujung-ke-ujung pada burst ini tidak memenuhi SLO. Artefak: `artifacts/load-spike-d166a85.json` dan `artifacts/deploy-availability-spike-d166a85.json`. Belum diuji burst ramp 5 detik atau lebih lambat.
+
+Telemetry VPS sepanjang soak: **maksimum 499/500 PID/thread**, memori tersedia minimum sekitar 2,88 GiB dari 4 GiB, CPU busy maksimum 17,64%, disk tersedia sekitar 19,45 GB. Ini menunjukkan batas PID host jauh lebih dekat daripada batas RAM/CPU. CPU agregat tidak menyingkirkan bottleneck satu core/proses. Jangan tambah proses/container atau jalankan tes lebih agresif di VPS sebelum kapasitas PID host ditinjau. Data pada `artifacts/host-resources-d166a85.json`, `artifacts/host-resources-soak-d166a85.json`, dan `artifacts/host-resources-spike-d166a85.json`.
+
+Pemeriksaan TCP dari luar VPS menunjukkan 80/443, 2002–2005, 52500, dan 58300 dapat dijangkau; 3306, 6379, 22, serta 30000 langsung tidak merespons dari jalur ini. Port 52500 sesuai konfigurasi port-forward yang pernah ditunjukkan untuk proyek personal dan ada Node host yang listen di 127.0.0.1:30000. Tidak diubah atau dihentikan karena di luar aplikasi sekolah. Tinjau apakah Webuzo 2002–2005 dan port-forward 52500 memang perlu terbuka; batasi melalui panel/provider jika tidak dipakai. Tes TCP tidak mengidentifikasi aplikasi/TLS di setiap port.
+
+## Batas audit yang tersisa
+
+- Core Web Vitals LCP/CLS/INP, Lighthouse, keyboard lengkap, perangkat fisik Android/iOS, dan jaringan/CPU lambat belum terukur. Viewport desktop sebelumnya tidak menggantikan perangkat nyata.
+- Tidak dilakukan high-rate 1.000 RPS, login storm, pendaftaran massal, upload/media transform bersamaan, CRUD/write load, pen-test destruktif, atau beban provider AI sungguhan.
+- Tidak dapat menjamin aplikasi bebas bug, lolos seluruh jenis serangan, atau tidak pernah down. Dua replica pada satu VPS tetap satu domain kegagalan; ini bukan high availability lintas-host.
+- Snapshot `deploy/images/` berisi kandidat image/config yang tidak dipakai untuk release; tidak dikomit dan tidak di-deploy.
+- Kredensial root, akun `demo`, dan database yang sempat dibagikan melalui chat perlu dirotasi. Nilainya tidak disalin ke artefak/repo ini.
+- Domain utama tetap memerlukan keputusan dan approval promosi tersendiri.
+
+Model, ambang, cara menjalankan alat, dan pembatasan workload tercantum di [rencana audit](final-audit-plan.md). Artefak JSON menyimpan hasil terukur tanpa merekam body privat/kredensial.

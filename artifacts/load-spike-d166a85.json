@@ -1,0 +1,751 @@
+{
+  "started_at_utc": "2026-10-04T12:47:41.746507+00:00",
+  "revision": "sha-d166a85ee4087fb213604d2d71ebe3044d9b2944",
+  "target_frontend": "https://linear.smktelkom-sidoarjo.my.id",
+  "target_api": "https://api-linear.smktelkom-sidoarjo.my.id/api",
+  "profile": "spike",
+  "think_seconds": 15.0,
+  "limits": {
+    "error_rate_below": 0.01,
+    "frontend_p95_below_ms": 2000,
+    "api_p95_below_ms": 1000
+  },
+  "model": "paced read-only HTTP sessions; 2 requests/iteration; no browser JS/assets/AI/uploads/writes",
+  "stages": [
+    {
+      "vus": 5,
+      "elapsed_seconds": 60.24,
+      "requests": 30,
+      "errors": 0,
+      "error_rate": 0.0,
+      "requests_per_second": 0.5,
+      "status_counts": {
+        "200": 30
+      },
+      "per_target": {
+        "direct_api": {
+          "requests": 7,
+          "errors": 0,
+          "p50_ms": 191.64,
+          "p95_ms": 502.98,
+          "p99_ms": 502.98,
+          "max_ms": 502.98,
+          "bytes_received": 84626
+        },
+        "frontend": {
+          "requests": 15,
+          "errors": 0,
+          "p50_ms": 79.16,
+          "p95_ms": 389.09,
+          "p99_ms": 389.09,
+          "max_ms": 389.09,
+          "bytes_received": 1847226
+        },
+        "proxy_api": {
+          "requests": 8,
+          "errors": 0,
+          "p50_ms": 83.91,
+          "p95_ms": 329.61,
+          "p99_ms": 329.61,
+          "max_ms": 329.61,
+          "bytes_received": 71388
+        }
+      },
+      "per_endpoint": {
+        "/": {
+          "requests": 4,
+          "errors": 0,
+          "p95_ms": 82.8
+        },
+        "/api/backend/bkk/jobs": {
+          "requests": 3,
+          "errors": 0,
+          "p95_ms": 318.92
+        },
+        "/api/backend/ekskul": {
+          "requests": 1,
+          "errors": 0,
+          "p95_ms": 250.74
+        },
+        "/api/backend/jurusan": {
+          "requests": 1,
+          "errors": 0,
+          "p95_ms": 75.66
+        },
+        "/api/backend/teachers": {
+          "requests": 3,
+          "errors": 0,
+          "p95_ms": 329.61
+        },
+        "/api/bkk/partners": {
+          "requests": 2,
+          "errors": 0,
+          "p95_ms": 322.56
+        },
+        "/api/news?status=published&page=1&limit=10": {
+          "requests": 2,
+          "errors": 0,
+          "p95_ms": 502.98
+        },
+        "/api/prestasi": {
+          "requests": 3,
+          "errors": 0,
+          "p95_ms": 311.15
+        },
+        "/informasi/berita": {
+          "requests": 4,
+          "errors": 0,
+          "p95_ms": 389.09
+        },
+        "/program/profil-jurusan": {
+          "requests": 4,
+          "errors": 0,
+          "p95_ms": 94.82
+        },
+        "/tentang-kami/profil-sekolah": {
+          "requests": 3,
+          "errors": 0,
+          "p95_ms": 111.44
+        }
+      },
+      "violations": [],
+      "passed": true
+    },
+    {
+      "vus": 1000,
+      "elapsed_seconds": 20.68,
+      "requests": 2016,
+      "errors": 0,
+      "error_rate": 0.0,
+      "requests_per_second": 97.47,
+      "status_counts": {
+        "200": 2016
+      },
+      "per_target": {
+        "direct_api": {
+          "requests": 508,
+          "errors": 0,
+          "p50_ms": 3183.81,
+          "p95_ms": 6934.29,
+          "p99_ms": 7537.63,
+          "max_ms": 7824.63,
+          "bytes_received": 5067376
+        },
+        "frontend": {
+          "requests": 1008,
+          "errors": 0,
+          "p50_ms": 7907.45,
+          "p95_ms": 10155.3,
+          "p99_ms": 10742.84,
+          "max_ms": 11146.78,
+          "bytes_received": 122681538
+        },
+        "proxy_api": {
+          "requests": 500,
+          "errors": 0,
+          "p50_ms": 1304.18,
+          "p95_ms": 3465.27,
+          "p99_ms": 3520.09,
+          "max_ms": 3981.55,
+          "bytes_received": 4948771
+        }
+      },
+      "per_endpoint": {
+        "/": {
+          "requests": 250,
+          "errors": 0,
+          "p95_ms": 10148.31
+        },
+        "/api/alumni?page=1&limit=10": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 7537.63
+        },
+        "/api/backend/alumni?page=1&limit=10": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 2847.91
+        },
+        "/api/backend/bkk/jobs": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 3303.08
+        },
+        "/api/backend/bkk/partners": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 3507.69
+        },
+        "/api/backend/documents": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 3471.25
+        },
+        "/api/backend/dtp": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 3479.95
+        },
+        "/api/backend/ekskul": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 3477.43
+        },
+        "/api/backend/fasilitas": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 3310.57
+        },
+        "/api/backend/jurusan": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 3438.29
+        },
+        "/api/backend/news?status=published&page=1&limit=10": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 3504.71
+        },
+        "/api/backend/prestasi": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 3469.56
+        },
+        "/api/backend/teachers": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 3295.78
+        },
+        "/api/bkk/jobs": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 5953.2
+        },
+        "/api/bkk/partners": {
+          "requests": 49,
+          "errors": 0,
+          "p95_ms": 6433.42
+        },
+        "/api/documents": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 6895.55
+        },
+        "/api/dtp": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 6920.42
+        },
+        "/api/ekskul": {
+          "requests": 45,
+          "errors": 0,
+          "p95_ms": 6952.83
+        },
+        "/api/fasilitas": {
+          "requests": 47,
+          "errors": 0,
+          "p95_ms": 6761.02
+        },
+        "/api/jurusan": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 7490.14
+        },
+        "/api/news?status=published&page=1&limit=10": {
+          "requests": 47,
+          "errors": 0,
+          "p95_ms": 5554.31
+        },
+        "/api/prestasi": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 5587.47
+        },
+        "/api/teachers": {
+          "requests": 46,
+          "errors": 0,
+          "p95_ms": 7492.51
+        },
+        "/informasi/berita": {
+          "requests": 250,
+          "errors": 0,
+          "p95_ms": 10157.21
+        },
+        "/program/profil-jurusan": {
+          "requests": 253,
+          "errors": 0,
+          "p95_ms": 10229.01
+        },
+        "/tentang-kami/profil-sekolah": {
+          "requests": 255,
+          "errors": 0,
+          "p95_ms": 10146.48
+        }
+      },
+      "violations": [
+        "direct_api_p95",
+        "frontend_p95",
+        "proxy_api_p95"
+      ],
+      "passed": false
+    }
+  ],
+  "passed": false,
+  "finished_at_utc": "2026-10-04T12:49:03.755371+00:00",
+  "aggregate": {
+    "requests": 2046,
+    "errors": 0,
+    "error_rate": 0.0,
+    "requests_per_second": 24.95,
+    "status_counts": {
+      "200": 2046
+    },
+    "per_target": {
+      "direct_api": {
+        "requests": 515,
+        "errors": 0,
+        "p50_ms": 3162.69,
+        "p95_ms": 6934.29,
+        "p99_ms": 7537.63,
+        "max_ms": 7824.63,
+        "bytes_received": 5152002
+      },
+      "frontend": {
+        "requests": 1023,
+        "errors": 0,
+        "p50_ms": 7904.0,
+        "p95_ms": 10154.7,
+        "p99_ms": 10742.84,
+        "max_ms": 11146.78,
+        "bytes_received": 124528764
+      },
+      "proxy_api": {
+        "requests": 508,
+        "errors": 0,
+        "p50_ms": 1290.89,
+        "p95_ms": 3465.27,
+        "p99_ms": 3520.09,
+        "max_ms": 3981.55,
+        "bytes_received": 5020159
+      }
+    },
+    "per_endpoint": {
+      "/": {
+        "requests": 254,
+        "errors": 0,
+        "p95_ms": 10148.31
+      },
+      "/api/alumni?page=1&limit=10": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 7537.63
+      },
+      "/api/backend/alumni?page=1&limit=10": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 2847.91
+      },
+      "/api/backend/bkk/jobs": {
+        "requests": 49,
+        "errors": 0,
+        "p95_ms": 3303.08
+      },
+      "/api/backend/bkk/partners": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 3507.69
+      },
+      "/api/backend/documents": {
+        "requests": 46,
+        "errors": 0,
+        "p95_ms": 3471.25
+      },
+      "/api/backend/dtp": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 3479.95
+      },
+      "/api/backend/ekskul": {
+        "requests": 47,
+        "errors": 0,
+        "p95_ms": 3477.43
+      },
+      "/api/backend/fasilitas": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 3310.57
+      },
+      "/api/backend/jurusan": {
+        "requests": 47,
+        "errors": 0,
+        "p95_ms": 3438.29
+      },
+      "/api/backend/news?status=published&page=1&limit=10": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 3504.71
+      },
+      "/api/backend/prestasi": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 3469.56
+      },
+      "/api/backend/teachers": {
+        "requests": 49,
+        "errors": 0,
+        "p95_ms": 3295.78
+      },
+      "/api/bkk/jobs": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 5953.2
+      },
+      "/api/bkk/partners": {
+        "requests": 51,
+        "errors": 0,
+        "p95_ms": 6433.42
+      },
+      "/api/documents": {
+        "requests": 46,
+        "errors": 0,
+        "p95_ms": 6895.55
+      },
+      "/api/dtp": {
+        "requests": 46,
+        "errors": 0,
+        "p95_ms": 6920.42
+      },
+      "/api/ekskul": {
+        "requests": 45,
+        "errors": 0,
+        "p95_ms": 6952.83
+      },
+      "/api/fasilitas": {
+        "requests": 47,
+        "errors": 0,
+        "p95_ms": 6761.02
+      },
+      "/api/jurusan": {
+        "requests": 46,
+        "errors": 0,
+        "p95_ms": 7490.14
+      },
+      "/api/news?status=published&page=1&limit=10": {
+        "requests": 49,
+        "errors": 0,
+        "p95_ms": 5554.31
+      },
+      "/api/prestasi": {
+        "requests": 49,
+        "errors": 0,
+        "p95_ms": 5587.47
+      },
+      "/api/teachers": {
+        "requests": 46,
+        "errors": 0,
+        "p95_ms": 7492.51
+      },
+      "/informasi/berita": {
+        "requests": 254,
+        "errors": 0,
+        "p95_ms": 10157.21
+      },
+      "/program/profil-jurusan": {
+        "requests": 257,
+        "errors": 0,
+        "p95_ms": 10229.01
+      },
+      "/tentang-kami/profil-sekolah": {
+        "requests": 258,
+        "errors": 0,
+        "p95_ms": 10146.48
+      }
+    }
+  },
+  "peak_inflight_requests": 995,
+  "generator_loop_lag_p95_ms": 723.94,
+  "ten_second_windows": [
+    {
+      "observed_at_utc": "2026-10-04T12:47:52.286640+00:00",
+      "requests": 8,
+      "rps": 0.8,
+      "error_rate": 0.0,
+      "status_counts": {
+        "200": 8
+      },
+      "inflight": 0,
+      "per_target": {
+        "direct_api": {
+          "requests": 2,
+          "errors": 0,
+          "p50_ms": 311.15,
+          "p95_ms": 502.98,
+          "p99_ms": 502.98,
+          "max_ms": 502.98,
+          "bytes_received": 21289
+        },
+        "frontend": {
+          "requests": 4,
+          "errors": 0,
+          "p50_ms": 79.25,
+          "p95_ms": 389.09,
+          "p99_ms": 389.09,
+          "max_ms": 389.09,
+          "bytes_received": 487373
+        },
+        "proxy_api": {
+          "requests": 2,
+          "errors": 0,
+          "p50_ms": 318.92,
+          "p95_ms": 329.61,
+          "p99_ms": 329.61,
+          "max_ms": 329.61,
+          "bytes_received": 21561
+        }
+      },
+      "violations": []
+    },
+    {
+      "observed_at_utc": "2026-10-04T12:48:02.298295+00:00",
+      "requests": 4,
+      "rps": 0.4,
+      "error_rate": 0.0,
+      "status_counts": {
+        "200": 4
+      },
+      "inflight": 0,
+      "per_target": {
+        "frontend": {
+          "requests": 2,
+          "errors": 0,
+          "p50_ms": 72.75,
+          "p95_ms": 82.8,
+          "p99_ms": 82.8,
+          "max_ms": 82.8,
+          "bytes_received": 276121
+        },
+        "proxy_api": {
+          "requests": 2,
+          "errors": 0,
+          "p50_ms": 75.66,
+          "p95_ms": 83.91,
+          "p99_ms": 83.91,
+          "max_ms": 83.91,
+          "bytes_received": 18705
+        }
+      },
+      "violations": []
+    },
+    {
+      "observed_at_utc": "2026-10-04T12:48:12.304769+00:00",
+      "requests": 8,
+      "rps": 0.8,
+      "error_rate": 0.0,
+      "status_counts": {
+        "200": 8
+      },
+      "inflight": 0,
+      "per_target": {
+        "direct_api": {
+          "requests": 3,
+          "errors": 0,
+          "p50_ms": 191.64,
+          "p95_ms": 322.56,
+          "p99_ms": 322.56,
+          "max_ms": 322.56,
+          "bytes_received": 37435
+        },
+        "frontend": {
+          "requests": 4,
+          "errors": 0,
+          "p50_ms": 76.35,
+          "p95_ms": 111.44,
+          "p99_ms": 111.44,
+          "max_ms": 111.44,
+          "bytes_received": 483947
+        },
+        "proxy_api": {
+          "requests": 1,
+          "errors": 0,
+          "p50_ms": 64.45,
+          "p95_ms": 64.45,
+          "p99_ms": 64.45,
+          "max_ms": 64.45,
+          "bytes_received": 4029
+        }
+      },
+      "violations": []
+    },
+    {
+      "observed_at_utc": "2026-10-04T12:48:22.310796+00:00",
+      "requests": 6,
+      "rps": 0.6,
+      "error_rate": 0.0,
+      "status_counts": {
+        "200": 6
+      },
+      "inflight": 0,
+      "per_target": {
+        "direct_api": {
+          "requests": 2,
+          "errors": 0,
+          "p50_ms": 57.7,
+          "p95_ms": 61.86,
+          "p99_ms": 61.86,
+          "max_ms": 61.86,
+          "bytes_received": 25902
+        },
+        "frontend": {
+          "requests": 3,
+          "errors": 0,
+          "p50_ms": 74.02,
+          "p95_ms": 76.58,
+          "p99_ms": 76.58,
+          "max_ms": 76.58,
+          "bytes_received": 374961
+        },
+        "proxy_api": {
+          "requests": 1,
+          "errors": 0,
+          "p50_ms": 56.65,
+          "p95_ms": 56.65,
+          "p99_ms": 56.65,
+          "max_ms": 56.65,
+          "bytes_received": 4029
+        }
+      },
+      "violations": []
+    },
+    {
+      "observed_at_utc": "2026-10-04T12:48:32.312523+00:00",
+      "requests": 4,
+      "rps": 0.4,
+      "error_rate": 0.0,
+      "status_counts": {
+        "200": 4
+      },
+      "inflight": 0,
+      "per_target": {
+        "frontend": {
+          "requests": 2,
+          "errors": 0,
+          "p50_ms": 79.16,
+          "p95_ms": 264.17,
+          "p99_ms": 264.17,
+          "max_ms": 264.17,
+          "bytes_received": 224824
+        },
+        "proxy_api": {
+          "requests": 2,
+          "errors": 0,
+          "p50_ms": 231.74,
+          "p95_ms": 250.74,
+          "p99_ms": 250.74,
+          "max_ms": 250.74,
+          "bytes_received": 23064
+        }
+      },
+      "violations": []
+    },
+    {
+      "observed_at_utc": "2026-10-04T12:48:42.327934+00:00",
+      "requests": 0,
+      "rps": 0.0,
+      "error_rate": 0.0,
+      "status_counts": {},
+      "inflight": 0,
+      "per_target": {},
+      "violations": []
+    },
+    {
+      "observed_at_utc": "2026-10-04T12:48:53.052952+00:00",
+      "requests": 1494,
+      "rps": 149.4,
+      "error_rate": 0.0,
+      "status_counts": {
+        "200": 1494
+      },
+      "inflight": 482,
+      "per_target": {
+        "direct_api": {
+          "requests": 109,
+          "errors": 0,
+          "p50_ms": 3087.23,
+          "p95_ms": 6607.5,
+          "p99_ms": 7816.29,
+          "max_ms": 7824.63,
+          "bytes_received": 1199910
+        },
+        "frontend": {
+          "requests": 978,
+          "errors": 0,
+          "p50_ms": 7905.98,
+          "p95_ms": 10141.79,
+          "p99_ms": 10236.82,
+          "max_ms": 10330.23,
+          "bytes_received": 119047962
+        },
+        "proxy_api": {
+          "requests": 407,
+          "errors": 0,
+          "p50_ms": 1647.76,
+          "p95_ms": 3471.25,
+          "p99_ms": 3516.49,
+          "max_ms": 3981.55,
+          "bytes_received": 4043637
+        }
+      },
+      "violations": [
+        "direct_api_p95",
+        "frontend_p95",
+        "proxy_api_p95"
+      ]
+    },
+    {
+      "observed_at_utc": "2026-10-04T12:49:03.061331+00:00",
+      "requests": 521,
+      "rps": 52.1,
+      "error_rate": 0.0,
+      "status_counts": {
+        "200": 521
+      },
+      "inflight": 1,
+      "per_target": {
+        "direct_api": {
+          "requests": 398,
+          "errors": 0,
+          "p50_ms": 3205.44,
+          "p95_ms": 6942.08,
+          "p99_ms": 7535.91,
+          "max_ms": 7549.32,
+          "bytes_received": 3849934
+        },
+        "frontend": {
+          "requests": 30,
+          "errors": 0,
+          "p50_ms": 10394.89,
+          "p95_ms": 11142.74,
+          "p99_ms": 11146.78,
+          "max_ms": 11146.78,
+          "bytes_received": 3633576
+        },
+        "proxy_api": {
+          "requests": 93,
+          "errors": 0,
+          "p50_ms": 512.52,
+          "p95_ms": 3302.03,
+          "p99_ms": 3948.03,
+          "max_ms": 3948.03,
+          "bytes_received": 905134
+        }
+      },
+      "violations": [
+        "direct_api_p95",
+        "frontend_p95",
+        "proxy_api_p95"
+      ]
+    }
+  ],
+  "first_failure_samples": [],
+  "abort_reason": "two consecutive 10-second windows exceeded thresholds: direct_api_p95, frontend_p95, proxy_api_p95"
+}
