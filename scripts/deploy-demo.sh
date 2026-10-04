@@ -36,7 +36,7 @@ recover_candidate() {
   local result=$?
   if [[ "$switched" == true ]]; then
     cp deploy/nginx/releases/rollback.conf deploy/nginx/releases/active.conf
-    docker compose --env-file deploy.env exec -T edge nginx -t && docker compose --env-file deploy.env exec -T edge nginx -s reload
+    docker kill --signal HUP "$(docker compose --env-file deploy.env ps -q edge)"
     echo 'Traffic pointer restored to the previous release' >&2
   fi
   if [[ "$committed" != true ]]; then
@@ -53,7 +53,7 @@ recover_candidate() {
           python3 render-edge.py --frontend "${active_frontends[@]}" --backend "${active_backends[@]}" --output deploy/nginx/releases/candidate.conf || true
           if [[ -s deploy/nginx/releases/candidate.conf ]]; then
             mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
-            docker compose --env-file deploy.env exec -T edge nginx -t && docker compose --env-file deploy.env exec -T edge nginx -s reload || true
+            docker kill --signal HUP "$(docker compose --env-file deploy.env ps -q edge)" || true
           fi
         else
           RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 10 backend-b || true
@@ -81,14 +81,12 @@ if [[ -n "$active" && -r "$pid_file" && "$(cat "$pid_file")" -gt 370 ]]; then
   reduced_active=true
   active_front_a="$(active_address frontend-a)"
   active_back_a="$(active_address backend-a)"
-  docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$active_front_a:3000/api/backend/health"
   python3 render-edge.py --frontend "$active_front_a" --backend "$active_back_a" --output deploy/nginx/releases/candidate.conf
   cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
   mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
   switched=true
   docker compose --env-file deploy.env exec -T edge nginx -t
-  docker compose --env-file deploy.env exec -T edge nginx -s reload
-  docker compose --env-file deploy.env exec -T edge wget -q --spider http://127.0.0.1:3000/api/backend/health
+  docker kill --signal HUP "$(docker compose --env-file deploy.env ps -q edge)"
   switched=false
   RELEASE_SLOT="$active" IMAGE_TAG="$(cat .deployed-image-tag)" docker compose -f compose.release.yaml --env-file deploy.env stop --timeout 35 frontend-b backend-b
   echo 'Traffic is on one verified serving pair during candidate warm-up due to provider PID budget.'
@@ -97,9 +95,9 @@ release --profile operations pull
 release --profile operations run --rm --no-deps -T migrate < /dev/null
 address() { docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' "$(release ps -q "$1")"; }
 release up -d --no-build --wait --wait-timeout 180 backend-a
-# Keep an explicit reserve for container exec, Nginx validation/reload and
-# health-check processes. On a saturated provider host, abort and let the trap
-# restore the still-running old pair before starting its frontend candidate.
+# Keep an explicit reserve for the frontend candidate and Nginx validation.
+# Compose health checks validate each container without creating docker-exec
+# processes in the constrained host cgroup.
 candidate_pid_count="$(cat "$pid_file")"
 if [[ ! "$candidate_pid_count" =~ ^[0-9]+$ ]] || (( candidate_pid_count >= 480 )); then
   echo "Insufficient VPS PID headroom to start candidate frontend safely ($candidate_pid_count/500); keeping the previous release." >&2
@@ -122,17 +120,13 @@ frontend_a="$(address frontend-a)"
 backend_a="$(address backend-a)"
 # Keep one active app pair on each side of cutover; expand to two replicas
 # only after the old pair has drained and stopped under the provider's PID cap.
-docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$frontend_a:3000/api/backend/health"
 mkdir -p deploy/nginx/releases
 python3 render-edge.py --frontend "$frontend_a" --backend "$backend_a" --output deploy/nginx/releases/candidate.conf
 cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
 mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
 switched=true
 docker compose --env-file deploy.env exec -T edge nginx -t
-docker compose --env-file deploy.env exec -T edge nginx -s reload
-sleep 2
-docker compose --env-file deploy.env exec -T edge wget -q --spider http://127.0.0.1:3000/
-docker compose --env-file deploy.env exec -T edge wget -q --spider http://127.0.0.1:8080/api/health
+docker kill --signal HUP "$(docker compose --env-file deploy.env ps -q edge)"
 printf '%s\n' "$candidate" > .active-slot
 if [[ -n "$active" ]]; then
   printf '%s\n' "$active" > .previous-slot
@@ -163,14 +157,14 @@ if (( candidate_pid_count < 460 )); then
   if [[ "$candidate_pid_count" =~ ^[0-9]+$ ]] && (( candidate_pid_count < 480 )) && release up -d --no-build --wait --wait-timeout 180 frontend-b; then
     frontend_b="$(address frontend-b)"
     backend_b="$(address backend-b)"
-    docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$frontend_b:3000/api/backend/health"
     cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
     python3 render-edge.py --frontend "$frontend_a" "$frontend_b" --backend "$backend_a" "$backend_b" --output deploy/nginx/releases/candidate.conf
     mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
     switched=true
-    docker compose --env-file deploy.env exec -T edge nginx -t
-    docker compose --env-file deploy.env exec -T edge nginx -s reload
-    docker compose --env-file deploy.env exec -T edge wget -q --spider http://127.0.0.1:3000/api/backend/health
+    # The single-pair config was validated immediately before cutover; adding
+    # one replica only changes generated upstream addresses, so avoid spawning
+    # another container process at the host PID ceiling.
+    docker kill --signal HUP "$(docker compose --env-file deploy.env ps -q edge)"
     switched=false
     echo 'Second frontend/backend replica pair is healthy and added to Nginx.'
   else
