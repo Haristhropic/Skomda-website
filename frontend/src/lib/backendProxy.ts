@@ -101,6 +101,20 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
     if (value) responseHeaders.set(name, value);
   }
   for (const cookie of upstream.headers.getSetCookie()) {
+    // The admin cookie must also reach page requests such as /admin, not only
+    // requests beneath the login endpoint's default path.
+    if (/^skomda_admin_token=/i.test(cookie)) {
+      const attributes = cookie.split(";");
+      const pathIndex = attributes.findIndex((attribute) => /^\s*path\s*=/i.test(attribute));
+      if (pathIndex === -1) {
+        attributes.push(" Path=/");
+      } else {
+        attributes[pathIndex] = " Path=/";
+      }
+      responseHeaders.append("set-cookie", attributes.join(";"));
+      continue;
+    }
+
     responseHeaders.append("set-cookie", cookie);
   }
 
