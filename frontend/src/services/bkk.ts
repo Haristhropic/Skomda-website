@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface BKKJobItem {
   id?: number | string;
@@ -30,16 +31,10 @@ export interface BKKPartnerItem {
   orderIndex?: number;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getBKKJobs(status?: string): Promise<BKKJobItem[]> {
   try {
-    const url = new URL(`${API_BASE_URL}/bkk/jobs`);
-    if (status && status !== "semua") {
-      url.searchParams.set("status", status);
-    }
-    const res = await fetch(url.toString(), { cache: "no-store" });
+    const url = buildApiUrl("bkk/jobs", { status });
+    const res = await fetch(url, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return json.data || [];
@@ -127,7 +122,7 @@ export async function submitPublicBKKJob(
   data: Partial<BKKJobItem>
 ): Promise<{ success: boolean; data?: BKKJobItem; error?: string; message?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/jobs/submit`, {
+    const res = await fetch(buildApiUrl("bkk/jobs/submit"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -164,7 +159,7 @@ export async function updateBKKJobStatus(
 
 export async function getBKKPartners(): Promise<BKKPartnerItem[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/bkk/partners`, { cache: "no-store" });
+    const res = await fetch(buildApiUrl("bkk/partners"), { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return json.data || [];

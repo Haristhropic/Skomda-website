@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface PrestasiItem {
   id?: number | string;
@@ -25,22 +26,13 @@ export const PRESTASI_CATEGORIES = [
   "Kepemimpinan",
 ] as const;
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getPrestasiList(
   category?: string,
   year?: string
 ): Promise<PrestasiItem[]> {
   try {
-    const url = new URL(`${API_BASE_URL}/prestasi`);
-    if (category && category !== "Semua") {
-      url.searchParams.set("category", category);
-    }
-    if (year && year !== "Semua") {
-      url.searchParams.set("year", year);
-    }
-    const res = await fetch(url.toString(), { cache: "no-store" });
+    const url = buildApiUrl("prestasi", { category, year });
+    const res = await fetch(url, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return json.data || [];

@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface FasilitasItem {
   id?: number | string;
@@ -11,12 +12,9 @@ export interface FasilitasItem {
   orderIndex?: number;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getFasilitasList(): Promise<FasilitasItem[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/fasilitas`, { cache: "no-store" });
+    const res = await fetch(buildApiUrl("fasilitas"), { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return json.data || [];

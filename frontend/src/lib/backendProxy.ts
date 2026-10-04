@@ -49,8 +49,12 @@ async function readBodyLimited(request: NextRequest): Promise<ArrayBuffer | null
 export async function proxyToBackend(request: NextRequest, path: string[]) {
   if (MUTATING_METHODS.has(request.method)) {
     const configuredOrigin = process.env.FRONTEND_ORIGIN?.replace(/\/+$/, "");
-    const allowedOrigin = configuredOrigin || request.nextUrl.origin;
-    if (request.headers.get("origin") !== allowedOrigin) {
+    const requestOrigin = request.headers.get("origin");
+    if (
+      requestOrigin &&
+      requestOrigin !== configuredOrigin &&
+      requestOrigin !== request.nextUrl.origin
+    ) {
       return NextResponse.json({ error: "Origin permintaan tidak diizinkan" }, { status: 403 });
     }
   }

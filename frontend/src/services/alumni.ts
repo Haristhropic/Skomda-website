@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface AlumniItem {
   id?: number;
@@ -25,9 +26,6 @@ export const ALUMNI_CATEGORIES = [
   "Alumni",
 ] as const;
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getAlumniList(params?: {
   category?: string;
   q?: string;
@@ -35,21 +33,14 @@ export async function getAlumniList(params?: {
   offset?: number;
 }): Promise<{ data: AlumniItem[]; total: number }> {
   try {
-    const url = new URL(`${API_BASE_URL}/alumni`);
-    if (params?.category && params.category !== "Semua") {
-      url.searchParams.set("category", params.category);
-    }
-    if (params?.q) {
-      url.searchParams.set("q", params.q);
-    }
-    if (params?.limit) {
-      url.searchParams.set("limit", String(params.limit));
-    }
-    if (params?.offset) {
-      url.searchParams.set("offset", String(params.offset));
-    }
+    const url = buildApiUrl("alumni", {
+      category: params?.category,
+      q: params?.q,
+      limit: params?.limit,
+      offset: params?.offset,
+    });
 
-    const res = await fetch(url.toString(), { cache: "no-store" });
+    const res = await fetch(url, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return { data: Array.isArray(json.data) ? json.data : [], total: json.total || 0 };

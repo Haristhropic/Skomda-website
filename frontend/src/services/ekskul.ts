@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface EkskulItem {
   id?: number | string;
@@ -13,12 +14,9 @@ export interface EkskulItem {
   orderIndex?: number;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getEkskulList(): Promise<EkskulItem[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/ekskul`, { cache: "no-store" });
+    const res = await fetch(buildApiUrl("ekskul"), { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return json.data || [];

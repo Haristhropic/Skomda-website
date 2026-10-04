@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface DocumentItem {
   id?: number | string;
@@ -13,16 +14,10 @@ export interface DocumentItem {
   orderIndex?: number;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getDocumentList(category?: string): Promise<DocumentItem[]> {
   try {
-    const url = new URL(`${API_BASE_URL}/documents`);
-    if (category && category !== "Semua") {
-      url.searchParams.set("category", category);
-    }
-    const res = await fetch(url.toString(), { cache: "no-store" });
+    const url = buildApiUrl("documents", { category });
+    const res = await fetch(url, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return json.data || [];
@@ -34,9 +29,8 @@ export async function getDocumentList(category?: string): Promise<DocumentItem[]
 }
 
 export async function getAdminDocumentList(category?: string): Promise<DocumentItem[]> {
-  const url = new URL(adminApiUrl("admin/documents"), window.location.origin);
-  if (category && category !== "Semua") url.searchParams.set("category", category);
-  const res = await fetch(url.toString(), { credentials: "include", cache: "no-store" });
+  const url = buildApiUrl("admin/documents", { category });
+  const res = await fetch(url, { credentials: "include", cache: "no-store" });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error || "Gagal memuat dokumen admin");
   return Array.isArray(json.data) ? json.data : [];
@@ -97,7 +91,7 @@ export async function deleteDocument(
 
 export async function getActiveBrochure(): Promise<DocumentItem | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/documents/active-brochure`, { cache: "no-store" });
+    const res = await fetch(buildApiUrl("documents/active-brochure"), { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return json.data || null;

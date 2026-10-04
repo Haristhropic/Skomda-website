@@ -23,7 +23,7 @@ export interface CloudinaryTransformOptions {
 
 import manifestData from "./cloudinary-manifest.json";
 
-const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "";
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "pyrugvo3";
 const CLOUDINARY_BASE = "https://res.cloudinary.com";
 
 const manifest = manifestData as Record<
@@ -33,8 +33,7 @@ const manifest = manifestData as Record<
 
 /**
  * Membentuk URL Cloudinary teroptimasi dari path atau public_id gambar.
- * Jika CLOUD_NAME belum disetel di .env atau gambar berupa file SVG,
- * fungsi akan otomatis mengembalikan path lokal tanpa membebani kuota transformasi.
+ * Jika gambar berupa file SVG atau URL eksternal, dikembalikan langsung.
  */
 export function getCloudinaryUrl(
   imagePath: string,
@@ -47,15 +46,31 @@ export function getCloudinaryUrl(
     return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   }
 
-  // 2. Jika URL absolut eksternal non-Cloudinary, kembalikan langsung
+  // 2. Jika URL absolut (http/https):
   if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    // Jika bukan Cloudinary, kembalikan langsung
     if (!imagePath.includes("res.cloudinary.com")) {
+      return imagePath;
+    }
+    // Jika sudah Cloudinary dan tidak membutuhkan transformasi khusus, kembalikan langsung URL asli
+    const hasTransformOptions =
+      options.width ||
+      options.height ||
+      options.crop ||
+      options.gravity ||
+      options.aspectRatio ||
+      options.blur ||
+      options.dpr;
+    if (!hasTransformOptions) {
       return imagePath;
     }
   }
 
   // 3. Fallback jika CLOUD_NAME belum dikonfigurasi
   if (!CLOUD_NAME) {
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      return imagePath;
+    }
     return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   }
 
@@ -68,7 +83,7 @@ export function getCloudinaryUrl(
     targetPublicId = manifestItem.public_id;
   } else if (imagePath.includes("res.cloudinary.com")) {
     // Jika sudah berupa URL Cloudinary (misal dari database admin)
-    const match = imagePath.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z]+)?$/);
+    const match = imagePath.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z0-9]+)?$/);
     if (match && match[1]) {
       targetPublicId = match[1];
     } else {
@@ -76,6 +91,9 @@ export function getCloudinaryUrl(
     }
   } else {
     // Fallback: Jika tidak ada di manifest dan belum di cloud, gunakan path lokal agar tidak 404
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      return imagePath;
+    }
     return imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
   }
 

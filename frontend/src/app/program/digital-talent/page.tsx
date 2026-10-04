@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function DigitalTalentPage() {
   return (
     <div className="min-h-screen bg-[#f3f4f6] text-[#101828] overflow-x-hidden flex flex-col justify-between">

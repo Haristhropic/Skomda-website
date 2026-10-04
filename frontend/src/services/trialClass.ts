@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface TrialClassParticipant {
   id: number;
@@ -16,21 +17,19 @@ export interface TrialClassParticipant {
 
 export type TrialClassTicketVerification = Pick<TrialClassParticipant, "ticketCode" | "major">;
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getTrialClassParticipants(params?: {
   q?: string;
   major?: string;
   status?: string;
 }): Promise<{ data: TrialClassParticipant[]; total: number }> {
   try {
-    const url = new URL(adminApiUrl("trial-class"), window.location.origin);
-    if (params?.q) url.searchParams.set("q", params.q);
-    if (params?.major && params.major !== "Semua") url.searchParams.set("major", params.major);
-    if (params?.status && params.status !== "Semua") url.searchParams.set("status", params.status);
+    const url = buildApiUrl("admin/trial-class", {
+      q: params?.q,
+      major: params?.major,
+      status: params?.status,
+    });
 
-    const res = await fetch(url.toString(), {
+    const res = await fetch(url, {
       credentials: "include",
       cache: "no-store",
     });
@@ -57,7 +56,7 @@ export async function registerTrialClass(data: {
   major: string;
 }): Promise<{ success: boolean; data?: Pick<TrialClassParticipant, "ticketCode">; error?: string }> {
   try {
-    const res = await fetch(`${API_BASE_URL}/trial-class/register`, {
+    const res = await fetch(buildApiUrl("trial-class/register"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -78,7 +77,7 @@ export async function checkTrialClassTicket(
 ): Promise<{ success: boolean; data?: TrialClassTicketVerification; error?: string }> {
   try {
     const res = await fetch(
-      `${API_BASE_URL}/trial-class/check-ticket`,
+      buildApiUrl("trial-class/check-ticket"),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -171,7 +170,7 @@ export const DEFAULT_TRIAL_CLASS_EVENT: TrialClassEvent = {
 
 export async function getUpcomingTrialClassEvent(): Promise<TrialClassEvent> {
   try {
-    const res = await fetch(`${API_BASE_URL}/trial-class/event`, {
+    const res = await fetch(buildApiUrl("trial-class/event"), {
       cache: "no-store",
     });
     if (res.ok) {

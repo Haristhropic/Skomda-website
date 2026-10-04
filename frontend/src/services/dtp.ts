@@ -1,6 +1,6 @@
 import { INITIAL_DTP_ITEMS } from "@/data/initialDtp";
-
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface DtpItem {
   id?: number | string;
@@ -21,9 +21,6 @@ export interface DtpItem {
 }
 
 const LOCAL_STORAGE_KEY = "skomda_dtp_custom_data";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 function getLocalStoredDtp(): DtpItem[] {
   if (typeof window === "undefined") return INITIAL_DTP_ITEMS;
@@ -53,14 +50,13 @@ function saveLocalStoredDtp(items: DtpItem[]) {
 export async function getDtpList(params?: { category?: string; q?: string }): Promise<DtpItem[]> {
   let result: DtpItem[] = [];
 
-  // 1. Coba ambil dari backend API
+  // 1. Ambil dari backend API (otomatis memakai internal proxy /api/backend di browser atau direct backend di SSR)
   try {
-    const query = new URLSearchParams();
-    if (params?.category && params.category !== "Semua") query.set("category", params.category);
-    if (params?.q) query.set("q", params.q);
-
-    const qs = query.toString() ? `?${query.toString()}` : "";
-    const res = await fetch(`${API_BASE_URL}/dtp${qs}`, { cache: "no-store" });
+    const url = buildApiUrl("dtp", {
+      category: params?.category,
+      q: params?.q,
+    });
+    const res = await fetch(url, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       if (Array.isArray(json.data) && json.data.length > 0) {
@@ -100,7 +96,8 @@ export async function getDtpList(params?: { category?: string; q?: string }): Pr
 
 export async function getDtpById(idOrSlug: string | number): Promise<DtpItem | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/dtp/${idOrSlug}`, { cache: "no-store" });
+    const url = buildApiUrl(`dtp/${idOrSlug}`);
+    const res = await fetch(url, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       if (json.data) return json.data;
@@ -119,75 +116,32 @@ export async function getDtpById(idOrSlug: string | number): Promise<DtpItem | n
 export async function createDtp(
   data: Partial<DtpItem>
 ): Promise<{ success: boolean; data?: DtpItem; error?: string }> {
-  // Update local storage agar perubahan admin langsung terlihat seketika
-  const currentList = getLocalStoredDtp();
-  const nextId =
-    currentList.length > 0
-      ? Math.max(...currentList.map((i) => (typeof i.id === "number" ? i.id : 0))) + 1
-      : 1;
-
-  const newItem: DtpItem = {
-    id: nextId,
-    slug: data.slug || data.title?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || `dtp-${nextId}`,
-    number: data.number || String(nextId).padStart(2, "0"),
-    title: data.title || "Spesialisasi Baru",
-    category: data.category || "Software & AI",
-    image: data.image || "/images/tentang-kami/fasilitas/fasilitas-lab-komputer-1.png",
-    shortDesc: data.shortDesc || "",
-    fullDesc: data.fullDesc || "",
-    coreSkills: data.coreSkills || "",
-    supportingSkills: data.supportingSkills || "",
-    careerProspects: data.careerProspects || "",
-    tools: data.tools || "",
-    badgeText: data.badgeText || "Track Baru",
-    orderIndex: data.orderIndex || currentList.length + 1,
-    isActive: data.isActive !== undefined ? data.isActive : true,
-  };
-
-  const updatedList = [...currentList, newItem];
-  saveLocalStoredDtp(updatedList);
-
-  // Coba sinkronkan ke backend API jika online
   try {
     const res = await fetch(adminApiUrl("dtp"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify(newItem),
+      body: JSON.stringify(data),
     });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.data) {
-        return { success: true, data: json.data };
-      }
-    }
-  } catch {
-    // Backend offline, tetap sukses menyimpan di local persistence
-  }
 
-  return { success: true, data: newItem };
+    const json = await res.json();
+    if (!res.ok) {
+      return { success: false, error: json.error || "Gagal menambahkan program DTP ke database" };
+    }
+
+    const savedItem: DtpItem = json.data || data;
+    const currentList = getLocalStoredDtp();
+    saveLocalStoredDtp([...currentList, savedItem]);
+    return { success: true, data: savedItem };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal terhubung ke server backend" };
+  }
 }
 
 export async function updateDtp(
   id: number | string,
   data: Partial<DtpItem>
 ): Promise<{ success: boolean; data?: DtpItem; error?: string }> {
-  const currentList = getLocalStoredDtp();
-  let updatedItem: DtpItem | undefined;
-
-  const updatedList = currentList.map((item) => {
-    if (String(item.id) === String(id) || item.slug === String(id)) {
-      updatedItem = { ...item, ...data };
-      return updatedItem;
-    }
-    return item;
-  });
-
-  if (updatedItem) {
-    saveLocalStoredDtp(updatedList);
-  }
-
-  // Coba sinkronkan ke backend API jika online
   try {
     const res = await fetch(adminApiUrl(`dtp/${id}`), {
       method: "PUT",
@@ -195,37 +149,47 @@ export async function updateDtp(
       credentials: "include",
       body: JSON.stringify(data),
     });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.data) {
-        return { success: true, data: json.data };
-      }
-    }
-  } catch {
-    // Backend offline, tetap sukses dengan local persistence
-  }
 
-  return { success: true, data: updatedItem };
+    const json = await res.json();
+    if (!res.ok) {
+      return { success: false, error: json.error || "Gagal memperbarui program DTP di database" };
+    }
+
+    const updatedItem: DtpItem = json.data || { ...data, id };
+    const currentList = getLocalStoredDtp();
+    const updatedList = currentList.map((item) =>
+      String(item.id) === String(id) || item.slug === String(id)
+        ? { ...item, ...updatedItem }
+        : item
+    );
+    saveLocalStoredDtp(updatedList);
+    return { success: true, data: updatedItem };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal terhubung ke server backend" };
+  }
 }
 
 export async function deleteDtp(
   id: number | string
 ): Promise<{ success: boolean; error?: string }> {
-  const currentList = getLocalStoredDtp();
-  const updatedList = currentList.filter(
-    (item) => String(item.id) !== String(id) && item.slug !== String(id)
-  );
-  saveLocalStoredDtp(updatedList);
-
-  // Coba sinkronkan ke backend API jika online
   try {
-    await fetch(adminApiUrl(`dtp/${id}`), {
+    const res = await fetch(adminApiUrl(`dtp/${id}`), {
       method: "DELETE",
       credentials: "include",
     });
-  } catch {
-    // Backend offline
-  }
 
-  return { success: true };
+    const json = await res.json();
+    if (!res.ok) {
+      return { success: false, error: json.error || "Gagal menghapus program DTP dari database" };
+    }
+
+    const currentList = getLocalStoredDtp();
+    const updatedList = currentList.filter(
+      (item) => String(item.id) !== String(id) && item.slug !== String(id)
+    );
+    saveLocalStoredDtp(updatedList);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Gagal terhubung ke server backend" };
+  }
 }

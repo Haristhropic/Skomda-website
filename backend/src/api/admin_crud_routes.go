@@ -53,13 +53,13 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	teacherGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.Teacher
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data guru tidak ditemukan"})
-		}
+		config.DB.First(&existing, uint(id))
 		if err := c.BodyParser(&existing); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
-		existing.ID = uint(id)
+		if id > 0 {
+			existing.ID = uint(id)
+		}
 		config.DB.Save(&existing)
 		recordAudit(c, "UPDATE", "teacher", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui profil guru: %s", existing.Name))
 		return c.JSON(fiber.Map{"message": "Data guru berhasil diperbarui", "data": existing})
@@ -116,13 +116,13 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	prestasiGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
 		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
 		var existing models.Prestasi
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Data prestasi tidak ditemukan"})
-		}
+		config.DB.First(&existing, uint(id))
 		if err := c.BodyParser(&existing); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
-		existing.ID = uint(id)
+		if id > 0 {
+			existing.ID = uint(id)
+		}
 		config.DB.Save(&existing)
 		recordAudit(c, "UPDATE", "prestasi", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui prestasi: %s", existing.Title))
 		return c.JSON(fiber.Map{"message": "Data prestasi berhasil diperbarui", "data": existing})
@@ -782,17 +782,39 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 	})
 
 	dtpGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
-		id, _ := strconv.ParseUint(c.Params("id"), 10, 32)
+		param := strings.TrimSpace(c.Params("id"))
 		var existing models.DigitalTalent
-		if err := config.DB.First(&existing, uint(id)).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Program Digital Talent tidak ditemukan"})
+		var found bool
+
+		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
+			if err := config.DB.First(&existing, uint(id)).Error; err == nil {
+				found = true
+			}
 		}
+		if !found {
+			if err := config.DB.Where("LOWER(slug) = ?", strings.ToLower(param)).First(&existing).Error; err == nil {
+				found = true
+			}
+		}
+
 		if err := c.BodyParser(&existing); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
 		}
-		existing.ID = uint(id)
+
+		if !found {
+			if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
+				existing.ID = uint(id)
+			}
+			if strings.TrimSpace(existing.Slug) == "" {
+				existing.Slug = param
+			}
+		}
+
 		if strings.TrimSpace(existing.Slug) == "" {
 			existing.Slug = slugify(existing.Title)
+		}
+		if strings.TrimSpace(existing.Category) == "" {
+			existing.Category = "Software & AI"
 		}
 		config.DB.Save(&existing)
 		recordAudit(c, "UPDATE", "dtp", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui spesialisasi DTP: %s", existing.Title))

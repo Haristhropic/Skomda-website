@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface TeacherItem {
   id?: number | string;
@@ -25,16 +26,10 @@ export const TEACHER_CATEGORIES = [
   "Staf",
 ] as const;
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
-
 export async function getTeachers(category?: string): Promise<TeacherItem[]> {
   try {
-    const url = new URL(`${API_BASE_URL}/teachers`);
-    if (category && category !== "Semua") {
-      url.searchParams.set("category", category);
-    }
-    const res = await fetch(url.toString(), { cache: "no-store" });
+    const url = buildApiUrl("teachers", { category });
+    const res = await fetch(url, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       if (Array.isArray(json.data) && json.data.length > 0) {

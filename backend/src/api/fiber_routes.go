@@ -46,8 +46,13 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	app.Use(logger.New())
 
 	allowedOrigins := "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:4321,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:4321,http://127.0.0.1:5173"
-	if cfg.AllowedOrigin != "" && !strings.Contains(allowedOrigins, cfg.AllowedOrigin) {
-		allowedOrigins = allowedOrigins + "," + strings.TrimSpace(cfg.AllowedOrigin)
+	if cfg.AllowedOrigin != "" {
+		for _, o := range strings.Split(cfg.AllowedOrigin, ",") {
+			trimmed := strings.TrimRight(strings.TrimSpace(o), "/")
+			if trimmed != "" && !strings.Contains(allowedOrigins, trimmed) {
+				allowedOrigins = allowedOrigins + "," + trimmed
+			}
+		}
 	}
 
 	app.Use(cors.New(cors.Config{
@@ -56,6 +61,9 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowCredentials: true,
 	}))
+
+	_ = os.MkdirAll("./uploads", 0755)
+	app.Static("/uploads", "./uploads")
 
 	cldClient, _ := cloudinary.NewClient(cfg.CloudinaryURL)
 

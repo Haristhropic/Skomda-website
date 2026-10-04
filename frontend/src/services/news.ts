@@ -1,4 +1,5 @@
 import { adminApiUrl } from "@/services/adminApi";
+import { buildApiUrl } from "@/lib/api";
 
 export interface NewsItem {
   id?: number | string;
@@ -30,9 +31,6 @@ export const NEWS_CATEGORIES = [
 ] as const;
 
 export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
 export function normalizeNewsImage(img?: string): string {
   if (!img) return "/images/berita/news-thumb-1.png";
@@ -271,22 +269,12 @@ export async function getNewsList(params?: {
   page?: number;
   limit?: number;
 }): Promise<NewsItem[]> {
-  const queryParams = new URLSearchParams();
-  if (params?.category && params.category !== "Semua") {
-    queryParams.set("category", params.category);
-  }
-  if (params?.search && params.search.trim() !== "") {
-    queryParams.set("search", params.search.trim());
-  }
-  if (params?.page) {
-    queryParams.set("page", String(params.page));
-  }
-  if (params?.limit) {
-    queryParams.set("limit", String(params.limit));
-  }
-
-  const queryString = queryParams.toString();
-  const url = `${API_BASE_URL}/news${queryString ? `?${queryString}` : ""}`;
+  const url = buildApiUrl("news", {
+    category: params?.category,
+    search: params?.search?.trim(),
+    page: params?.page,
+    limit: params?.limit,
+  });
 
   // Retry helper: coba fetch, jika gagal tunggu lalu retry 1x
   const attemptFetch = async (retries = 1): Promise<Response | null> => {
@@ -365,7 +353,7 @@ export async function getAdminNewsList(params?: {
  */
 export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
   const cleanSlug = slug.toLowerCase().trim();
-  const url = `${API_BASE_URL}/news/${encodeURIComponent(cleanSlug)}`;
+  const url = buildApiUrl(`news/${encodeURIComponent(cleanSlug)}`);
 
   const attemptFetch = async (retries = 1): Promise<Response | null> => {
     try {
