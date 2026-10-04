@@ -36,10 +36,12 @@ address() {
   cid=$(RELEASE_SLOT="$1" IMAGE_TAG="$2" docker compose -f compose.release.yaml --env-file deploy.env ps -q "$3")
   docker inspect --format '{{(index .NetworkSettings.Networks "skomda-runtime").IPAddress}}' "$cid"
 }
-python3 render-edge.py \
-  --frontend "$old_slot-frontend-a" "$old_slot-frontend-b" \
-  --backend "$old_slot-backend-a" "$old_slot-backend-b" \
-  --output deploy/nginx/releases/candidate.conf
+frontends=("$(address "$old_slot" "$old_tag" frontend-a)" "$(address "$old_slot" "$old_tag" frontend-b)")
+backends=("$(address "$old_slot" "$old_tag" backend-a)" "$(address "$old_slot" "$old_tag" backend-b)")
+for frontend_ip in "${frontends[@]}"; do
+  docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$frontend_ip:3000/api/backend/health"
+done
+python3 render-edge.py --frontend "${frontends[@]}" --backend "${backends[@]}" --output deploy/nginx/releases/candidate.conf
 cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
 mv deploy/nginx/releases/candidate.conf deploy/nginx/releases/active.conf
 switched=true

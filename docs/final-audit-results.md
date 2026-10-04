@@ -1,6 +1,6 @@
 # Hasil audit deployment dan kapasitas
 
-Status 4 Oktober 2026: audit live revisi `86cc6ef` selesai sebagian. Smoke dan tahap sampai 500 virtual user lulus. **Tahap 1.000 virtual user gagal karena HTTP 502**; perbaikan dan pengujian ulang masih diperlukan. Dokumen ini tidak menyatakan seluruh arsitektur atau kapasitas akhir lulus.
+Status 4 Oktober 2026: audit load live revisi `86cc6ef` selesai sebagian. Smoke dan tahap sampai 500 virtual user lulus. **Tahap 1.000 virtual user gagal karena HTTP 502**; perbaikan dan pengujian ulang masih diperlukan. Revisi `e51da8a` sudah terpasang di slot blue dan sehat, tetapi probe saat cutover menemukan satu HTTP 504. Dokumen ini tidak menyatakan seluruh arsitektur atau kapasitas akhir lulus.
 
 ## Target dan revisi
 
@@ -28,6 +28,8 @@ Probe menjalankan maksimal satu GET per detik, bergantian HTML frontend, daftar 
 | `artifacts/deploy-availability-followup.json` | 195 sampel; 87 gagal dengan HTTP 530, lalu kembali HTTP 200 | Kegagalan diamati mulai 11:06:22 UTC; pemulihan pertama pada 11:07:50 UTC. Karena ada gap pengukuran, waktu mulai outage tidak dapat ditentukan dari probe ini. |
 | `artifacts/deploy-availability-final-cd.json` | 60 sampel berhasil setelah pemulihan | Baseline sehat sebelum CI release berikutnya; belum merupakan bukti cutover. |
 | `artifacts/deploy-availability-86cc6ef.json` | 827/827 sampel HTTP 200, sekitar 11:10:43–11:25:22 UTC | Mencakup percobaan CD pertama, rerun, cutover, dan sesudah cutover. p95 frontend 260,53 ms, API langsung 319,73 ms, proxy 285,25 ms. |
+| `artifacts/deploy-availability-e51da8a.json` | 298/298 sampel HTTP 200 | Probe sebelum cutover revisi `e51da8a`; baseline sehat saja. |
+| `artifacts/deploy-availability-cutover-e51da8a.json` | 236/237 HTTP 200; 1 HTTP 504 | Satu proxy API timeout saat cutover ke frontend kandidat; lihat log dan tindak lanjut pada bagian stress test. |
 
 Penulisan laporan probe diperbaiki dengan file sementara, penggantian atomik, dan retry. Error penulisan sementara tidak lagi menghentikan pengambilan sampel; kegagalan pelaporan dicatat terpisah. Bukti insiden disimpan sebagai segmen gagal dan tidak dihapus dari hasil akhir.
 
@@ -81,7 +83,9 @@ Total 20.846 request, 455 HTTP 502 (2,183%). Pada tahap 1.000, frontend mengalam
 
 Menurut inspeksi operator, Nginx mencatat hanya **4 connect error dan 9 upstream timeout**, tetapi kemudian menandai peer frontend tidak tersedia selama 5 detik. Ini kemungkinan memperluas gangguan singkat menjadi 455 respons 502. Fallback `web_previous` juga masih menunjuk slot lama yang sudah dihentikan. Ini diagnosis dari log operator, bukan hasil reproduksi akar masalah yang sudah tuntas.
 
-Perbaikan source sudah tersedia pada `scripts/render-edge.py`: `web_release` memakai `max_fails=1 fail_timeout=1s`, dan fallback ke slot yang sudah dihentikan dihapus. **Belum diverifikasi melalui redeploy dan stress ulang**; hasil 1.000 user tetap gagal sampai ada bukti baru.
+Perbaikan source `e51da8a` menurunkan `web_release` menjadi `max_fails=1 fail_timeout=1s` dan menghapus fallback ke slot yang sudah dihentikan. Probe sebelum cutover lulus 298/298; probe lintas-cutover mendapat satu 504 dari 237 request pada `/api/backend/jurusan`, lalu pulih. Log Nginx menunjukkan timeout 3 detik saat menghubungkan ke satu frontend kandidat, bersamaan dengan alias Docker slot yang sesaat tidak ter-resolve. Ini mempersempit temuan dari revisi lama, tetapi tidak membuktikan perbaikan selesai.
+
+Source lanjutan kini menggunakan IP container hasil inspeksi sebagai upstream Nginx dan memeriksa rute same-origin ke backend pada kedua kandidat sebelum cutover. **Perubahan ini belum di-deploy atau diukur.** Tahap 1.000 user tetap gagal sampai uji terbaru membuktikan sebaliknya.
 
 Kolektor host mengambil 78 sampel: PID maksimum 446/500, CPU busy maksimum 50,9%, RAM tersedia minimum sekitar 3,09 GB, dan disk tersedia sekitar 19,6 GB. Rata-rata CPU rendah tidak membuktikan tidak ada bottleneck satu thread atau batas container.
 
@@ -89,7 +93,7 @@ Ada side traffic kecil: satu backup terenkripsi selesai sekitar 11:28:19 UTC, du
 
 ## Pekerjaan verifikasi berikutnya
 
-1. Pasang perbaikan peer/fallback frontend, konfirmasi tag aktif, dan reproduksi ulang beban sebelumnya.
+1. Deploy upstream statis berbasis IP container, konfirmasi tag aktif, dan ulangi probe cutover tanpa kegagalan.
 2. Ulangi audit guard/body deadline/header dan autentikasi yang berubah.
 3. Ulangi tahap 1.000 user, lalu spike dan soak. **Spike dan soak belum dijalankan** setelah tahap 1.000 gagal.
 4. Ukur Core Web Vitals melalui browser/perangkat yang mendukung trace; ulangi audit media pada revisi runtime public yang baru.

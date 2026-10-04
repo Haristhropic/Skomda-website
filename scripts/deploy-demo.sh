@@ -68,8 +68,15 @@ if docker inspect skomda-demo-frontend-1 >/dev/null 2>&1; then
 fi
 find deploy/nginx/releases/static -type d -exec chmod 755 {} +
 find deploy/nginx/releases/static -type f -exec chmod 644 {} +
-frontends=("$candidate-frontend-a" "$candidate-frontend-b")
-backends=("$candidate-backend-a" "$candidate-backend-b")
+# Pin this release's live container addresses into Nginx. Docker DNS aliases can
+# briefly return NXDOMAIN while blue/green services are being replaced; a stale
+# DNS answer during cutover caused one observed 3-second frontend proxy 504.
+frontends=("$(address frontend-a)" "$(address frontend-b)")
+backends=("$(address backend-a)" "$(address backend-b)")
+# Exercise each candidate's same-origin backend route before moving traffic.
+for frontend_ip in "${frontends[@]}"; do
+  docker compose --env-file deploy.env exec -T edge wget -q --spider "http://$frontend_ip:3000/api/backend/health"
+done
 mkdir -p deploy/nginx/releases
 python3 render-edge.py --frontend "${frontends[@]}" --backend "${backends[@]}" --output deploy/nginx/releases/candidate.conf
 cp deploy/nginx/releases/active.conf deploy/nginx/releases/rollback.conf
