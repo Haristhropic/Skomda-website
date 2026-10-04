@@ -78,15 +78,32 @@ jobs:
   ops-checks:
     name: Deployment and edge checks
     runs-on: ubuntu-latest
+    outputs:
+      release-changed: ${{ steps.release-paths.outputs.changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Detect release-affecting changes
+        id: release-paths
+        shell: bash
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" != push ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event.before }}" =~ ^0+$ ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --quiet "${{ github.event.before }}" "$GITHUB_SHA" -- \
+            backend/ frontend/ compose.yaml compose.release.yaml deploy/ \
+            scripts/deploy-demo.sh scripts/render-edge.py scripts/rollback-demo.sh scripts/vps-status.py scripts/forward-safe-logs.py; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Check generated edge routing and public cache isolation
         run: python3 scripts/test-render-edge.py
 
   container-images:
     name: Build and scan demo images
-    if: github.event_name == 'push' && github.ref == 'refs/heads/deploy'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/deploy' && needs.ops-checks.outputs.release-changed == 'true'
     needs: [backend-checks, frontend-checks, ops-checks]
     runs-on: ubuntu-latest
     permissions:
