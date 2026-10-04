@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import { isAnalyticsExcludedPath } from "@/lib/analyticsRoutes";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { MOCK_NEWS, NewsItem, getNewsList } from "@/services/news";
@@ -870,6 +871,15 @@ export default function NavbarSearch({ isOpen, onClose }: NavbarSearchProps) {
             return;
           }
         }
+      }
+
+      const targetUrl = new URL(href, window.location.href);
+      if (
+        targetUrl.origin === window.location.origin &&
+        isAnalyticsExcludedPath(targetUrl.pathname)
+      ) {
+        window.location.assign(targetUrl.href);
+        return;
       }
 
       router.push(href);

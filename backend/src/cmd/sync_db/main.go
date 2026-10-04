@@ -36,10 +36,10 @@ func main() {
 		log.Fatalf("Gagal membuka SQLite: %v", err)
 	}
 
-	log.Printf("Connecting to Postgres target: %s", pgDSN)
+	log.Println("Connecting to Postgres target")
 	pgDB, err := gorm.Open(postgres.Open(pgDSN), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Gagal membuka Postgres: %v", err)
+		log.Fatal("Gagal membuka Postgres target; periksa konfigurasi secara lokal tanpa membagikan DATABASE_URL")
 	}
 
 	// 2. AutoMigrate Postgres target
@@ -61,7 +61,7 @@ func main() {
 		&models.Alumni{},
 		&models.DigitalTalent{},
 	); err != nil {
-		log.Fatalf("AutoMigrate error: %v", err)
+		log.Fatal("AutoMigrate gagal; periksa log PostgreSQL dan skema secara lokal")
 	}
 
 	// Seed data Digital Talent Program jika tabel masih kosong di Postgres
@@ -72,7 +72,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&teachers)
 	if len(teachers) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(teachers, 50).Error; err != nil {
-			log.Printf("Error syncing teachers: %v", err)
+			log.Println("Error syncing teachers")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Guru & Staf ke Postgres", len(teachers))
 		}
@@ -83,7 +83,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&partners)
 	if len(partners) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(partners, 50).Error; err != nil {
-			log.Printf("Error syncing bkk partners: %v", err)
+			log.Println("Error syncing BKK partners")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Mitra BKK ke Postgres", len(partners))
 		}
@@ -94,7 +94,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&jobs)
 	if len(jobs) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(jobs, 50).Error; err != nil {
-			log.Printf("Error syncing bkk jobs: %v", err)
+			log.Println("Error syncing BKK jobs")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Lowongan BKK ke Postgres", len(jobs))
 		}
@@ -105,7 +105,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&bkkAlumni)
 	if len(bkkAlumni) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(bkkAlumni, 50).Error; err != nil {
-			log.Printf("Error syncing bkk alumni: %v", err)
+			log.Println("Error syncing BKK alumni")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Testimoni Alumni BKK ke Postgres", len(bkkAlumni))
 		}
@@ -116,7 +116,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&fasilitas)
 	if len(fasilitas) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(fasilitas, 50).Error; err != nil {
-			log.Printf("Error syncing fasilitas: %v", err)
+			log.Println("Error syncing fasilitas")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Fasilitas ke Postgres", len(fasilitas))
 		}
@@ -127,7 +127,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&ekskul)
 	if len(ekskul) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(ekskul, 50).Error; err != nil {
-			log.Printf("Error syncing ekskul: %v", err)
+			log.Println("Error syncing ekstrakurikuler")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Ekstrakurikuler ke Postgres", len(ekskul))
 		}
@@ -138,7 +138,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&prestasi)
 	if len(prestasi) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(prestasi, 50).Error; err != nil {
-			log.Printf("Error syncing prestasi: %v", err)
+			log.Println("Error syncing prestasi")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Prestasi ke Postgres", len(prestasi))
 		}
@@ -149,7 +149,7 @@ func main() {
 	sqliteDB.Unscoped().Find(&docs)
 	if len(docs) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(docs, 50).Error; err != nil {
-			log.Printf("Error syncing documents: %v", err)
+			log.Println("Error syncing documents")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Dokumen ke Postgres", len(docs))
 		}
@@ -160,7 +160,7 @@ func main() {
 	sqliteDB.Find(&settings)
 	if len(settings) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(settings, 50).Error; err != nil {
-			log.Printf("Error syncing site settings: %v", err)
+			log.Println("Error syncing site settings")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Site Settings ke Postgres", len(settings))
 		}
@@ -171,7 +171,7 @@ func main() {
 	sqliteDB.Find(&logs)
 	if len(logs) > 0 {
 		if err := pgDB.Clauses(clause.OnConflict{UpdateAll: true}).CreateInBatches(logs, 50).Error; err != nil {
-			log.Printf("Error syncing audit logs: %v", err)
+			log.Println("Error syncing audit logs")
 		} else {
 			log.Printf("✓ Berhasil sinkronisasi %d data Audit Logs ke Postgres", len(logs))
 		}
@@ -210,7 +210,7 @@ func main() {
 	for _, tbl := range tablesWithSerial {
 		sql := fmt.Sprintf("SELECT setval(pg_get_serial_sequence('%s', 'id'), COALESCE(MAX(id), 1)) FROM %s;", tbl, tbl)
 		if err := pgDB.Exec(sql).Error; err != nil {
-			log.Printf("Catatan sequence update %s: %v", tbl, err)
+			log.Printf("Catatan: sequence update gagal untuk tabel %s", tbl)
 		} else {
 			log.Printf("✓ Sequence auto-increment Postgres untuk tabel %s berhasil diperbarui", tbl)
 		}

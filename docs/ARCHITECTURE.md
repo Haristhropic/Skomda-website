@@ -2,6 +2,8 @@
 
 Dokumen arsitektur ini menyajikan gambaran komprehensif mengenai struktur teknis, stack teknologi, alur data, skema database, integrasi eksternal, dan standar rekayasa sistem website resmi **SMK Telkom Sidoarjo (SKOMDA)**.
 
+> **Rujukan deployment dan status operasional:** gunakan [`production-architecture-design.md`](production-architecture-design.md) sebagai sumber utama keputusan target demo/production, kontrol keamanan, backup, analytics, dan tahap pengerjaan. Dokumen ini adalah referensi struktur komponen dan skema; beberapa bagian historisnya belum sepenuhnya mencerminkan deployment saat ini. Demo memakai Cloudflare Tunnel pada `linear` dan `api-linear`; domain utama tetap di luar pipeline sampai ada persetujuan rilis.
+
 ---
 
 ## Daftar Isi
@@ -125,6 +127,8 @@ Skomda-website/
 | Kategori | Teknologi | Keterangan |
 |---|---|---|
 | Container | **Docker** | Dockerfile backend Go |
+| Shared Cache / Rate Limit Store | **Belum digunakan (Redis belum dipasang)** | Baru diperlukan jika cache server-side atau state rate limiter harus dibagi antar-replica |
+| Application Load Balancer | **Belum digunakan** | Demo berjalan satu replica frontend/backend di satu VPS; Cloudflare Tunnel hanya merutekan hostname, bukan load balancer aplikasi |
 | Media CDN | **Cloudinary** | Upload, transformasi, delivery |
 | AI Gateway | **NexusRouter** (fahlyce.vercel.app) | Proxy ke LLM untuk chatbot |
 | Maps Embed | **Google Maps** | Iframe lokasi kampus |
@@ -309,7 +313,7 @@ Login hanya via `/gate-internal-skomda` (tidak ada link publik).
 Request masuk
   v  recover.New()   - Panic recovery, HTTP 500
   v  logger.New()    - Request logging ke stdout
-  v  cors.New()      - CORS allowlist (localhost:3000/3001/4321/5173)
+  v  cors.New()      - Origin konfigurasi; localhost/private-network hanya pada non-production
   |
   +- [/api/auth/login]
   |    v  limiter.New() - Rate limit: 5 req / 1 menit per IP
@@ -581,12 +585,12 @@ CreatedAt time.Time index
 
 | Seeder | Kondisi Aktif | Yang Dilakukan |
 |---|---|---|
-| `SeedDefaultAdminIfEmpty` | Selalu, jika tabel users kosong | Buat `admin@smktelkom-sda.sch.id`, role `super_admin` |
-| `SeedAlumniIfEmpty` | Selalu, jika tabel alumnis kosong | Import 255 alumni dari `alumni-angkatan-6.json` |
-| `SeedJurusanIfEmpty` | Hanya development | Seed SIJA & TJAT resmi |
-| `SeedNewsIfEmpty` | Hanya development | Seed 12 artikel berita resmi |
+| `SeedDefaultAdminIfEmpty` | Development/test saat init; production hanya dengan `migrate --seed-initial` | Buat akun awal `admin@smktelkom-sda.sch.id` sebagai `super_admin` jika tabel users kosong |
+| `SeedAlumniIfEmpty` | Development/test saat init; production hanya dengan `migrate --seed-initial` | Import data awal alumni jika tabel alumnis kosong |
+| `SeedDtpIfEmpty`, `SeedTrialClassEventIfEmpty` | Development/test saat init; production hanya dengan `migrate --seed-initial` | Isi data awal DTP dan event Trial Class jika tabel masing-masing kosong |
+| `SeedJurusanIfEmpty`, `SeedNewsIfEmpty` | Dipanggil oleh test/dev tooling tertentu | Seed data contoh; tidak dijalankan server production |
 
-> **Catatan**: Seeder konten (Jurusan, Berita, Guru, Prestasi, Ekskul, Fasilitas, BKK, Dokumen) **dinonaktifkan permanen di production**. Seluruh data dikelola via Panel Admin.
+> **Catatan**: HTTP server production tidak mengubah skema atau melakukan seed saat startup. Deployment menjalankan migrator satu kali. Untuk database production baru dan kosong, operator dapat menjalankan `docker compose --profile operations --env-file deploy.env run --rm --no-deps migrate --seed-initial` setelah memastikan project database dan backup yang benar. Konten website selanjutnya dikelola melalui CMS.
 
 ---
 
@@ -649,7 +653,8 @@ Endpoint bertanda tangan `/api/cloudinary/sign` masih tersedia dan kini membutuh
 5. Jika valid: sign JWT (HS256, expiry 24 jam)
 6. Backend mengirim Set-Cookie; proxy meneruskannya agar browser menyimpan cookie HttpOnly pada host linear
 7. /admin/* request: Middleware memeriksa keberadaan cookie untuk menyembunyikan halaman; backend tetap otoritatif
-8. /api/backend/* request: proxy meneruskan cookie ke Go API di network privat; AuthMiddleware memverifikasi JWT_SECRET
+8. /api/backend/* request: proxy meneruskan cookie ke Go API di network privat; AuthMiddleware memverifikasi JWT dan membaca role/keberadaan akun terbaru dari database
+9. MFA belum aktif pada baseline demo; penambahan MFA masuk tahap hardening berikutnya
 ```
 
 ### 8.2. Mekanisme Keamanan
@@ -660,10 +665,10 @@ Endpoint bertanda tangan `/api/cloudinary/sign` masih tersedia dan kini membutuh
 | JWT Bearer Token | golang-jwt/jwt v5, HS256, 24h | Autentikasi stateless admin |
 | Password Hashing | bcrypt, cost 12 | Password aman di database |
 | Rate Limiting Login | Fiber limiter (5 req/mnt/IP) | Cegah brute-force |
-| CORS Allowlist | Fiber cors middleware | Hanya origin frontend diizinkan |
+| CORS | Fiber/Gin memakai exact origin konfigurasi di production | Production mewajibkan `ALLOWED_ORIGIN` berupa origin HTTPS tanpa path. Origin development tidak ikut terbawa ke production; verifikasi nilainya pada environment VPS setelah deploy. |
 | httpOnly Cookie | Set-Cookie response header | JWT tidak bisa diakses JS (anti XSS) |
 | Credential Isolation | Semua secret di backend .env | Tidak ada secret di bundel browser |
-| PostgreSQL RLS | Direncanakan; belum boleh diklaim efektif sebelum audit | Pembatasan di level database |
+| PostgreSQL RLS | Aktif pada beberapa tabel, efektivitas belum diaudit | Backend memakai koneksi PostgreSQL langsung; cek role koneksi, owner/superuser, grants, dan policies sebelum mengandalkan RLS sebagai batas keamanan. |
 | Audit Log | models.AuditLog, dicatat di setiap mutasi | Jejak CREATE/UPDATE/DELETE/LOGIN/LOGOUT |
 
 ---
@@ -692,6 +697,8 @@ Endpoint bertanda tangan `/api/cloudinary/sign` masih tersedia dan kini membutuh
 | `LLM_API_KEY` | `sk-ant-xxxxx` | Ya | API key NexusRouter AI |
 | `JWT_SECRET` | `min-32-char-random-string` | Ya | Secret sign & verify JWT (HS256) |
 | `ALLOWED_ORIGIN` | `http://localhost:3001` | Ya | CORS origin yang diizinkan |
+
+Pada production, `ALLOWED_ORIGIN` wajib diisi dengan origin frontend HTTPS yang tepat (contoh `https://linear.smktelkom-sidoarjo.my.id`); backend menolak startup bila nilainya kosong atau mengandung path/query.
 | `SERVER_ENGINE` | `fiber` | Ya | HTTP engine: `fiber` atau `gin` |
 | `NEXUS_ROUTER_URL` | `https://fahlyce.vercel.app` | Ya | Base URL AI gateway |
 

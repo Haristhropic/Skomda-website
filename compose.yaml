@@ -1,9 +1,37 @@
 name: skomda-demo
 
 services:
+  migrate:
+    profiles: [operations]
+    image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER in deploy.env}/skomda-backend:${IMAGE_TAG:-demo-latest}
+    entrypoint: ["/app/migrate"]
+    restart: "no"
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges:true"
+    env_file:
+      - ./backend/migrate.env
+    environment:
+      ENV: production
+      DATABASE_DRIVER: postgres
+    mem_limit: ${MIGRATION_MEMORY_LIMIT:-512m}
+    cpus: ${MIGRATION_CPU_LIMIT:-0.75}
+    logging:
+      driver: local
+      options:
+        max-size: 10m
+        max-file: "3"
+    networks:
+      - app
+
   backend:
     image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER in deploy.env}/skomda-backend:${IMAGE_TAG:-demo-latest}
     restart: unless-stopped
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges:true"
     env_file:
       - ./backend/.env
     environment:
@@ -33,6 +61,10 @@ services:
   frontend:
     image: ghcr.io/${GHCR_OWNER:?Set GHCR_OWNER in deploy.env}/skomda-frontend:${IMAGE_TAG:-demo-latest}
     restart: unless-stopped
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges:true"
     environment:
       NODE_ENV: production
       PORT: "3000"

@@ -4,8 +4,11 @@ package main
 
 import (
 	"log"
+	"net"
 	"net/http"
+	"net/url"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -15,6 +18,7 @@ import (
 	"github.com/haristhropic/skomda-website/backend/src/api/jurusan"
 	"github.com/haristhropic/skomda-website/backend/src/api/news"
 	"github.com/haristhropic/skomda-website/backend/src/config"
+	"github.com/haristhropic/skomda-website/backend/src/observability"
 )
 
 func main() {
@@ -35,9 +39,25 @@ func main() {
 
 	// Default: Gunakan engine GIN
 	log.Printf("🚀 Memulai backend dengan engine: GIN (port %s)", cfg.Port)
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Recovery())
+	router.Use(func(c *gin.Context) {
+		requestID := observability.RequestID(c.GetHeader("X-Request-ID"))
+		c.Set("request_id", requestID)
+		c.Header("X-Request-ID", requestID)
+
+		startedAt := time.Now()
+		c.Next()
+
+		route := c.FullPath()
+		if route == "" {
+			route = "unmatched"
+		}
+		log.Printf("request_id=%s method=%s route=%q status=%d duration_ms=%d",
+			requestID, c.Request.Method, route, c.Writer.Status(), time.Since(startedAt).Milliseconds())
+	})
 	_ = router.SetTrustedProxies(nil)
-	router.Use(corsMiddleware(cfg.AllowedOrigin))
+	router.Use(corsMiddleware(cfg.AllowedOrigin, cfg.Env))
 
 	apiGroup := router.Group("/api")
 	health.RegisterRoutes(apiGroup)
@@ -51,31 +71,31 @@ func main() {
 	}
 }
 
-// corsMiddleware mengizinkan request dari origin frontend Next.js dan local dev ports.
-func corsMiddleware(allowedOrigin string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		origin := c.GetHeader("Origin")
+// corsMiddleware hanya mengirim header CORS untuk origin konfigurasi.
+// Origin localhost dan jaringan privat hanya dipercaya pada development.
+func corsMiddleware(allowedOrigin, env string) gin.HandlerFunc {
+	configuredOrigins := make(map[string]struct{})
+	for _, value := range strings.Split(allowedOrigin, ",") {
+		origin := strings.TrimRight(strings.TrimSpace(value), "/")
 		if origin != "" {
-			if allowedOrigin == "*" || allowedOrigin == "" || origin == allowedOrigin ||
-				strings.HasPrefix(origin, "http://localhost:") ||
-				strings.HasPrefix(origin, "http://127.0.0.1:") ||
-				strings.HasPrefix(origin, "http://10.") ||
-				strings.HasPrefix(origin, "http://192.168.") ||
-				strings.HasPrefix(origin, "http://172.") {
-				c.Header("Access-Control-Allow-Origin", origin)
-			} else {
-				c.Header("Access-Control-Allow-Origin", allowedOrigin)
-			}
-		} else if allowedOrigin != "" {
-			c.Header("Access-Control-Allow-Origin", allowedOrigin)
-		} else {
-			c.Header("Access-Control-Allow-Origin", "*")
+			configuredOrigins[origin] = struct{}{}
 		}
+	}
+	production := strings.EqualFold(env, "production")
 
-		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Requested-With")
-		c.Header("Access-Control-Allow-Credentials", "true")
-		c.Header("Access-Control-Max-Age", "86400")
+	return func(c *gin.Context) {
+		origin := strings.TrimRight(strings.TrimSpace(c.GetHeader("Origin")), "/")
+		_, allowed := configuredOrigins[origin]
+		allowed = allowed || (!production && isDevelopmentOrigin(origin))
+		if origin != "" && allowed {
+			c.Header("Access-Control-Allow-Origin", origin)
+			c.Header("Vary", "Origin")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, X-Requested-With, X-Request-ID")
+			c.Header("Access-Control-Expose-Headers", "X-Request-ID")
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Header("Access-Control-Max-Age", "86400")
+		}
 
 		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent)
@@ -83,4 +103,17 @@ func corsMiddleware(allowedOrigin string) gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+func isDevelopmentOrigin(origin string) bool {
+	parsed, err := url.Parse(origin)
+	if err != nil || parsed.Scheme != "http" || parsed.Host == "" || parsed.User != nil || (parsed.Path != "" && parsed.Path != "/") || parsed.RawQuery != "" || parsed.Fragment != "" {
+		return false
+	}
+	host := strings.ToLower(parsed.Hostname())
+	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
+		return true
+	}
+	ip := net.ParseIP(host)
+	return ip != nil && (ip.IsLoopback() || ip.IsPrivate())
 }

@@ -12,6 +12,7 @@ import (
 // RegisterRoutes mendaftarkan route health check ke router Gin.
 func RegisterRoutes(r *gin.RouterGroup) {
 	r.GET("/health", func(c *gin.Context) {
+		c.Header("Cache-Control", "no-store")
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
 			"service": "smktelkom-web-backend",

@@ -24,6 +24,7 @@ Ini temuan dari inspeksi kode dan konfigurasi; belum merupakan hasil pengukuran 
 
 - Compose menjalankan satu instance frontend dengan batas 1 CPU/768 MiB dan satu backend dengan batas 0,75 CPU/512 MiB. Cloudflare Tunnel tidak menambah replica aplikasi atau failover VPS.
 - Pool koneksi backend dibatasi 25 koneksi terbuka. Batas efektif juga bergantung pada paket dan mode koneksi Supabase.
+- Upload image/dokumen hanya untuk admin terautentikasi, dengan ukuran maksimum 10/15 MB dan tanpa rate limit khusus per endpoint. Proxy Next.js dan helper Cloudinary membentuk salinan isi file di memori; backend dibatasi 512 MiB. Uji upload harus menjadi skenario terpisah berkonkurensi rendah dengan Cloudinary sandbox/persetujuan kuota, sambil memantau RSS/memori container dan biaya provider. Jangan campurkan upload file besar ke tes 1.000 VU halaman publik.
 - `/api/health` melakukan ping PostgreSQL sehingga script hanya memanggilnya saat preflight.
 - Perubahan lokal membatasi daftar/detail berita publik ke status `published`; endpoint `/api/admin/news` memerlukan sesi autentikasi untuk membaca semua status. Perubahan ini belum diuji atau dipasang di VPS.
 - Perubahan lokal membatasi lowongan publik ke status `active`; daftar semua status dipindahkan ke `/api/admin/bkk/jobs` yang memerlukan sesi autentikasi. Perubahan ini belum diuji atau dipasang di VPS.

@@ -4,7 +4,9 @@
 package config
 
 import (
+	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 
@@ -27,25 +29,46 @@ type Config struct {
 
 // Load membaca .env (kalau ada, biasanya cuma di local dev) lalu env var asli.
 func Load() Config {
+	return load(true)
+}
+
+// LoadForMigration hanya memvalidasi konfigurasi yang diperlukan migrator.
+// Command migrasi tidak perlu menerima JWT secret atau origin web.
+func LoadForMigration() Config {
+	return load(false)
+}
+
+func load(validateRuntimeConfig bool) Config {
 	if err := godotenv.Load(); err != nil {
 		log.Println("info: tidak menemukan file .env, lanjut pakai env var sistem")
 	}
 
+	env := strings.ToLower(strings.TrimSpace(getEnv("ENV", getEnv("APP_ENV", "development"))))
+	allowedOriginDefault := "http://localhost:3000"
+	if env == "production" {
+		allowedOriginDefault = ""
+	}
+
 	cfg := Config{
-		Env:            strings.ToLower(strings.TrimSpace(getEnv("ENV", getEnv("APP_ENV", "development")))),
+		Env:            env,
 		Port:           getEnv("PORT", "8080"),
 		DatabaseDriver: strings.ToLower(getEnv("DATABASE_DRIVER", "postgres")),
 		DatabaseURL:    getEnv("DATABASE_URL", ""),
 		CloudinaryURL:  getEnv("CLOUDINARY_URL", ""),
 		LLMAPIKey:      getEnv("LLM_API_KEY", ""),
 		JWTSecret:      getEnv("JWT_SECRET", ""),
-		AllowedOrigin:  getEnv("ALLOWED_ORIGIN", "http://localhost:3000"),
+		AllowedOrigin:  getEnv("ALLOWED_ORIGIN", allowedOriginDefault),
 		NexusRouterURL: getEnv("NEXUS_ROUTER_URL", "https://fahlyce.vercel.app"),
 		ServerEngine:   strings.ToLower(getEnv("SERVER_ENGINE", "fiber")),
 		ChatbotModel:   getEnv("CHATBOT_MODEL", "llama-3.3-70b-versatile"),
 	}
+	if validateRuntimeConfig && strings.EqualFold(cfg.Env, "production") {
+		if err := validateProductionOrigins(cfg.AllowedOrigin); err != nil {
+			log.Fatalf("[FATAL SECURITY] konfigurasi ALLOWED_ORIGIN production tidak valid: %v", err)
+		}
+	}
 
-	if len(strings.TrimSpace(cfg.JWTSecret)) < 16 {
+	if validateRuntimeConfig && len(strings.TrimSpace(cfg.JWTSecret)) < 16 {
 		if strings.EqualFold(cfg.Env, "production") {
 			log.Fatal("[FATAL SECURITY] JWT_SECRET wajib dikonfigurasi dengan aman (minimal 16 karakter) pada environment production!")
 		} else {
@@ -54,6 +77,21 @@ func Load() Config {
 	}
 
 	return cfg
+}
+
+func validateProductionOrigins(raw string) error {
+	origins := strings.Split(raw, ",")
+	if strings.TrimSpace(raw) == "" {
+		return fmt.Errorf("ALLOWED_ORIGIN wajib diisi dengan origin frontend HTTPS")
+	}
+	for _, value := range origins {
+		origin := strings.TrimRight(strings.TrimSpace(value), "/")
+		parsed, err := url.Parse(origin)
+		if err != nil || parsed.Scheme != "https" || parsed.Host == "" || parsed.User != nil || parsed.Path != "" || parsed.RawQuery != "" || parsed.Fragment != "" {
+			return fmt.Errorf("%q harus berupa origin HTTPS tanpa path, query, atau fragment", value)
+		}
+	}
+	return nil
 }
 
 func getEnv(key, fallback string) string {

@@ -9,7 +9,8 @@ RUN go mod download
 
 COPY . .
 RUN mkdir -p /out \
-    && CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/server ./src/cmd/server
+    && CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/server ./src/cmd/server \
+    && CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/migrate ./src/cmd/migrate
 
 FROM alpine:3.22
 
@@ -21,6 +22,7 @@ RUN apk add --no-cache ca-certificates tzdata \
 
 WORKDIR /app
 COPY --from=build --chown=app:app /out/server /app/server
+COPY --from=build --chown=app:app /out/migrate /app/migrate
 
 ENV PORT=8080
 EXPOSE 8080

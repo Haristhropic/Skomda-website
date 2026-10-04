@@ -2,6 +2,8 @@
 
 Panduan ini menjelaskan deployment demo pada VPS dan konfigurasi yang dilakukan pemilik. Targetnya hanya subdomain demo; domain utama tetap di luar pipeline.
 
+Prosedur salinan database/media dan pemulihan ada di [backup-and-recovery-runbook.md](backup-and-recovery-runbook.md). Backup dan uji restore belum dikonfigurasi; sebelum migrasi berisiko, pemilik perlu memastikan ada titik pemulihan yang dapat dipakai.
+
 ## Bentuk deployment
 
 ```text
@@ -23,10 +25,11 @@ Repo Next.js juga memiliki route aplikasi lain di bawah `/api`. Karena itu backe
 2. Buat user deployment non-root khusus. Gunakan SSH key saja dan batasi akses SSH. Akses ke Docker setara akses root, jadi jangan gunakan akun admin pribadi untuk pipeline.
 3. Buat folder deployment, misalnya `/opt/skomda-demo`, dan letakkan `compose.yaml`, `deploy.env.example` yang disalin sebagai `deploy.env`, serta `scripts/deploy-demo.sh` di checkout `deploy` yang dipercaya.
 4. Isi `deploy.env` dengan owner/repository GitHub yang huruf kecil, URL frontend/API demo, dan batas resource yang sesuai. Jangan menaruh secret di file ini.
-5. Buat `/opt/skomda-demo/backend/.env` dengan permission `600`, milik user deploy. Isi sekurangnya `ENV=production`, `DATABASE_DRIVER=postgres`, `DATABASE_URL`, `JWT_SECRET` acak kuat, `ADMIN_DEFAULT_PASSWORD` acak minimal 16 karakter, dan `ALLOWED_ORIGIN=https://linear.smktelkom-sidoarjo.my.id`; tambahkan secret layanan lain yang memang digunakan aplikasi. Jangan salin nilai `.env` ke chat atau repo. Seeder akan membuat akun awal hanya jika tabel users kosong; ganti password awal setelah login pertama.
-6. Sebelum startup pertama, pastikan URL mengarah ke project Supabase yang benar dan pemilik database menyetujui pemakaian project tersebut. Backend menjalankan GORM `AutoMigrate` dan beberapa seeder ketika start; ambil/konfirmasi backup dan tinjau data/schema yang sudah ada sebelum menghubungkannya. Hak role database harus cukup untuk operasi migrasi yang memang diaktifkan aplikasi.
-7. Jika GHCR package private, lakukan `docker login ghcr.io` sebagai user deploy memakai token GitHub dengan scope minimum `read:packages`. Jika package public, login tidak diperlukan. Simpan Docker credential dengan permission terbatas.
-8. Pastikan host port `3000` dan `8080` hanya bind ke loopback seperti Compose. Tunnel membuat koneksi keluar dari VPS, jadi port aplikasi tidak perlu dibuka ke internet; pertahankan aturan SSH dan panel Webuzo sesuai kebutuhan.
+5. Buat `/opt/skomda-demo/backend/.env` dengan permission `600`, milik user deploy. Isi sekurangnya `ENV=production`, `DATABASE_DRIVER=postgres`, `DATABASE_URL`, `JWT_SECRET` acak kuat, dan `ALLOWED_ORIGIN=https://linear.smktelkom-sidoarjo.my.id`; tambahkan secret layanan lain yang memang digunakan aplikasi. `ADMIN_DEFAULT_PASSWORD` tidak dibutuhkan oleh backend runtime; hanya diperlukan pada `migrate.env` jika seed awal sengaja dijalankan. Jangan salin nilai `.env` ke chat atau repo.
+6. Buat `/opt/skomda-demo/backend/migrate.env` dengan permission `600`, milik user deploy. Mulai dari `backend/.env.migrate.example` dan isi `ENV=production`, `DATABASE_DRIVER=postgres`, serta `DATABASE_URL`. File ini hanya dipasang ke migrator; gunakan role migrasi khusus bila tersedia. Saat ini bisa memakai koneksi database yang sama dengan aplikasi sampai role runtime terpisah disiapkan. Pastikan URL mengarah ke project Supabase yang benar dan backup tersedia sebelum migrasi pertama.
+7. Migrasi dijalankan sebagai service satu kali sebelum aplikasi diganti; backend production sendiri tidak menjalankan migrasi atau seeder saat start. Untuk database production yang benar-benar baru dan kosong, seed awal hanya boleh dijalankan manual setelah target dan backup diperiksa. Isi `ADMIN_DEFAULT_PASSWORD` di `migrate.env`, lalu dari folder deployment jalankan `docker compose --profile operations --env-file deploy.env run --rm --no-deps migrate --seed-initial`. Perintah ini membuat akun Super Admin awal serta data awal terbatas; jangan jalankan pada database yang sudah berisi data.
+8. Jika GHCR package private, lakukan `docker login ghcr.io` sebagai user deploy memakai token GitHub dengan scope minimum `read:packages`. Jika package public, login tidak diperlukan. Simpan Docker credential dengan permission terbatas.
+9. Pastikan host port `3000` dan `8080` hanya bind ke loopback seperti Compose. Tunnel membuat koneksi keluar dari VPS, jadi port aplikasi tidak perlu dibuka ke internet; pertahankan aturan SSH dan panel Webuzo sesuai kebutuhan.
 
 ## Cloudflare Tunnel, DNS, dan Webuzo
 
@@ -51,7 +54,7 @@ Jika `Resolve-DnsName <hostname> -Server 1.1.1.1` berhasil tetapi query tanpa op
    - `VPS_KNOWN_HOSTS`: host key SSH yang fingerprint-nya sudah diverifikasi secara terpisah. Untuk port nonstandar, entri known_hosts biasanya berbentuk `[HOST]:PORT`.
 3. Tambahkan environment variables `VPS_DEPLOY_PATH=/opt/skomda-demo` dan `VPS_SSH_PORT=58300`. Port `22` digunakan bila `VPS_SSH_PORT` tidak diatur.
 4. Tambahkan **repository Actions variable** `DEMO_DEPLOY_ENABLED=true` hanya setelah seluruh preflight server selesai. Variable ini harus berada di level repository karena kondisi `if` job deploy dievaluasi sebelum job memasuki environment `demo`; variable level environment belum tersedia untuk kondisi tersebut.
-5. Opsional: set repository variable `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`. `NEXT_PUBLIC_API_URL` tetap dipakai untuk request API publik yang browser kirim ke `api-linear`; request admin menggunakan same-origin `/api/backend/*`, yang diteruskan Next.js lewat `BACKEND_API_URL=http://backend:8080/api` dari Compose. Docker Scout bisa diaktifkan dengan repository variable `DOCKER_SCOUT_ENABLED=true`; siapkan `DOCKER_SCOUT_HUB_USER` sebagai variable dan `DOCKER_SCOUT_HUB_PASSWORD` sebagai secret bila ingin menggunakannya.
+5. Opsional: set repository variable `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`. `NEXT_PUBLIC_API_URL` tetap dipakai untuk request API publik yang browser kirim ke `api-linear`; request admin menggunakan same-origin `/api/backend/*`, yang diteruskan Next.js lewat `BACKEND_API_URL=http://backend:8080/api` dari Compose. CI memindai image GHCR dengan Trivy dan menghentikan alur sebelum deploy bila ada CVE High/Critical yang sudah memiliki perbaikan. Docker Scout dapat ditambahkan sebagai scan opsional dengan `DOCKER_SCOUT_ENABLED=true`; siapkan `DOCKER_SCOUT_HUB_USER` sebagai variable dan `DOCKER_SCOUT_HUB_PASSWORD` sebagai secret bila ingin menggunakannya.
 
 GitHub Actions membangun dan mem-push image dengan tag SHA commit. VPS menarik tag immutable itu. `demo-latest` hanya tag kenyamanan untuk inspeksi dan bukan identitas deployment yang dipakai rollback.
 
@@ -85,12 +88,16 @@ Paste seluruh isi private key—termasuk baris `BEGIN OPENSSH PRIVATE KEY` dan `
 
 - Cek `docker compose --env-file deploy.env config` di folder deployment; jangan menampilkan hasil yang mengandung environment secrets.
 - Pastikan file `backend/.env` ada, permission-nya `600`, dan `DATABASE_DRIVER=postgres`.
+- Pastikan `backend/migrate.env` dibuat dari contoh, permission `600`, dan URL database migrasi mengarah ke project yang sudah dicadangkan. Workflow deployment sekarang membutuhkan file ini sebelum menjalankan backend baru.
+- Backend membatasi SQL pool ke maksimum 25 koneksi terbuka dan 5 idle. Sebelum stress test, pemilik project Supabase perlu mencocokkan nilai ini dengan compute/connection limit dan konfigurasi pooler; jangan menaikkan maksimum hanya berdasarkan jumlah pengguna bersamaan.
 - Pastikan kedua hostname memiliki route Tunnel yang tepat, connector aktif, dan container `cloudflared` tersambung ke network aplikasi.
 - Jalankan workflow CI/build dahulu. Aktifkan deploy hanya setelah siap menerima deployment pertama.
 - Setelah deploy, cek `docker compose --env-file deploy.env ps`, `docker compose --env-file deploy.env logs --tail=100 backend frontend`, lalu buka homepage demo dan endpoint health API `https://api-linear.smktelkom-sidoarjo.my.id/api/health`. Periksa log connector dengan `docker logs --tail=50 skomda-cloudflared` bila salah satu route gagal.
 - Periksa flow baca data publik, login admin, satu operasi tulis yang aman, dan upload media sebelum mengundang pengguna demo.
 
 ## Rollback
+
+Diagnosis operasional dan setup monitor eksternal tersedia di [`monitoring-and-incidents.md`](monitoring-and-incidents.md). Pipeline juga menyalin `vps-status.py` lewat SCP ke direktori deployment; user `deploy` dapat menjalankannya dengan `python3 ./vps-status.py --public` setelah rilis. Ini memerlukan Python 3 pada VPS dan akses SFTP pada SSH server.
 
 Workflow deploy menyimpan tag image aktif di `.deployed-image-tag`. Jika update menjadi unhealthy, skrip mencoba menarik dan menjalankan tag sebelumnya. Untuk pemulihan manual, gunakan nilai tag sebelumnya yang diketahui baik:
 
@@ -100,7 +107,7 @@ IMAGE_TAG=<tag-sha-sebelumnya> docker compose --env-file deploy.env up -d --no-b
 docker compose --env-file deploy.env ps
 ```
 
-Deployment pertama belum memiliki tag sebelumnya untuk rollback otomatis. Perintah rollback image tidak membatalkan perubahan skema atau isi database; karena itu backup dan tinjauan migrasi diperlukan sebelum data penting atau domain utama dipakai.
+Deployment pertama belum memiliki tag sebelumnya untuk rollback otomatis. Skrip deployment menjalankan migrator satu kali sebelum mengganti aplikasi; jika migrasi gagal, aplikasi lama tetap berjalan. Perintah rollback image tidak membatalkan perubahan skema atau isi database. Pertahankan migrasi yang kompatibel dengan versi aplikasi sebelumnya dan siapkan backup sebelum perubahan skema berisiko.
 
 ## Batas tanggung jawab
 

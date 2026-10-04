@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -16,8 +17,8 @@ import (
 
 var DB *gorm.DB
 
-// InitDB menginisialisasi koneksi database GORM, melakukan migrasi otomatis, dan seeder data awal.
-func InitDB(cfg Config) *gorm.DB {
+// OpenDB membuka koneksi database tanpa mengubah skema atau isi database.
+func OpenDB(cfg Config) *gorm.DB {
 	var err error
 	switch strings.ToLower(strings.TrimSpace(cfg.DatabaseDriver)) {
 	case "postgres":
@@ -40,7 +41,6 @@ func InitDB(cfg Config) *gorm.DB {
 		log.Fatalf("fatal: gagal inisialisasi database %s: %v", cfg.DatabaseDriver, err)
 	}
 
-	// Pastikan koneksi benar-benar tersedia sebelum migrasi atau seeding berjalan.
 	sqlDB, err := DB.DB()
 	if err != nil {
 		log.Fatalf("fatal: gagal mendapatkan database connection pool: %v", err)
@@ -50,11 +50,18 @@ func InitDB(cfg Config) *gorm.DB {
 	sqlDB.SetConnMaxLifetime(15 * time.Minute)
 	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
 	if err := sqlDB.Ping(); err != nil {
-		log.Fatalf("fatal: database %s tidak dapat dijangkau; backend tidak akan berjalan: %v", cfg.DatabaseDriver, err)
+		log.Fatalf("fatal: database %s tidak dapat dijangkau: %v", cfg.DatabaseDriver, err)
 	}
+	return DB
+}
 
-	// Migration tabel
-	if err := DB.AutoMigrate(
+// MigrateDB menerapkan skema dan mengaktifkan RLS pada tabel yang ditetapkan.
+// Fungsi ini hanya dipanggil oleh perintah migrasi eksplisit pada production.
+func MigrateDB(db *gorm.DB) error {
+	if db == nil {
+		return fmt.Errorf("database belum dibuka")
+	}
+	if err := db.AutoMigrate(
 		&models.Jurusan{},
 		&models.News{},
 		&models.User{},
@@ -73,34 +80,40 @@ func InitDB(cfg Config) *gorm.DB {
 		&models.TrialClassRegistration{},
 		&models.TrialClassEvent{},
 	); err != nil {
-		log.Fatalf("fatal: gagal auto migrate database: %v", err)
+		return fmt.Errorf("gagal auto migrate database: %w", err)
 	}
 
-	// Mengaktifkan Row Level Security (RLS) jika menggunakan Postgres
-	if DB.Dialector.Name() == "postgres" {
-		DB.Exec("ALTER TABLE IF EXISTS public.jurusans ENABLE ROW LEVEL SECURITY;")
-		DB.Exec("ALTER TABLE IF EXISTS public.news ENABLE ROW LEVEL SECURITY;")
-		DB.Exec("ALTER TABLE IF EXISTS public.users ENABLE ROW LEVEL SECURITY;")
-		DB.Exec("ALTER TABLE IF EXISTS public.audit_logs ENABLE ROW LEVEL SECURITY;")
-		DB.Exec("ALTER TABLE IF EXISTS public.alumnis ENABLE ROW LEVEL SECURITY;")
-		DB.Exec("ALTER TABLE IF EXISTS public.digital_talents ENABLE ROW LEVEL SECURITY;")
-		DB.Exec("ALTER TABLE IF EXISTS public.trial_class_events ENABLE ROW LEVEL SECURITY;")
+	if db.Dialector.Name() == "postgres" {
+		for _, table := range []string{"jurusans", "news", "users", "audit_logs", "alumnis", "digital_talents", "trial_class_events"} {
+			if err := db.Exec("ALTER TABLE IF EXISTS public." + table + " ENABLE ROW LEVEL SECURITY").Error; err != nil {
+				return fmt.Errorf("gagal mengaktifkan RLS pada %s: %w", table, err)
+			}
+		}
 	}
+	return nil
+}
 
-	// Inisialisasi akun Super Admin default hanya jika tabel users kosong (0 user)
-	SeedDefaultAdminIfEmpty(DB)
+// SeedInitialData hanya boleh dijalankan eksplisit saat menyiapkan database kosong.
+func SeedInitialData(db *gorm.DB) {
+	SeedDefaultAdminIfEmpty(db)
+	SeedAlumniIfEmpty(db)
+	SeedDtpIfEmpty(db)
+	SeedTrialClassEventIfEmpty(db)
+}
 
-	// Inisialisasi data alumni kelulusan jika tabel alumnis kosong
-	SeedAlumniIfEmpty(DB)
-	DB.Model(&models.Alumni{}).Where("status_aktivitas = ?", "Lulus Resmi").Update("status_aktivitas", "")
-
-	// Inisialisasi spesialisasi Digital Talent Program jika tabel masih kosong
-	SeedDtpIfEmpty(DB)
-
-	// Inisialisasi event terdekat Trial Class jika masih kosong
-	SeedTrialClassEventIfEmpty(DB)
-
-	return DB
+// InitDB mempertahankan auto-migrate dan seed untuk development/test saja.
+// Production hanya membuka koneksi; perubahan data/skema dilakukan lewat CLI terpisah.
+func InitDB(cfg Config) *gorm.DB {
+	db := OpenDB(cfg)
+	if strings.EqualFold(cfg.Env, "production") {
+		return db
+	}
+	if err := MigrateDB(db); err != nil {
+		log.Fatalf("fatal: gagal migrasi database development: %v", err)
+	}
+	SeedInitialData(db)
+	db.Model(&models.Alumni{}).Where("status_aktivitas = ?", "Lulus Resmi").Update("status_aktivitas", "")
+	return db
 }
 
 // SeedJurusanIfEmpty memasukkan data jurusan resmi (SIJA & TJAT) jika database kosong atau masih berisi data draft lama.
@@ -343,7 +356,7 @@ func SeedNewsIfEmpty(db *gorm.DB, env string) {
 
 	for _, n := range initialNews {
 		if err := db.Create(&n).Error; err != nil {
-			log.Printf("peringatan: gagal seed berita '%s': %v", n.Title, err)
+			log.Println("peringatan: gagal seed berita")
 		}
 	}
 	log.Println("berhasil seed 12 data awal berita resmi ke database.")
@@ -387,11 +400,11 @@ func SeedDefaultAdminIfEmpty(db *gorm.DB) {
 	}
 
 	if err := db.Create(&admin).Error; err != nil {
-		log.Printf("peringatan: gagal seed akun admin default: %v", err)
+		log.Println("peringatan: gagal seed akun admin default")
 		return
 	}
 
-	log.Println("berhasil seed akun default Super Admin (admin@smktelkom-sda.sch.id) ke database.")
+	log.Println("berhasil seed akun default Super Admin ke database.")
 }
 
 // SeedAlumniIfEmpty mengimpor 255 data alumni awal dari alumni-angkatan-6.json jika tabel alumnis kosong.
@@ -440,7 +453,7 @@ func SeedAlumniIfEmpty(db *gorm.DB) {
 
 	var items []jsonAlumni
 	if err := json.Unmarshal(data, &items); err != nil {
-		log.Printf("peringatan: gagal parse alumni-angkatan-6.json: %v", err)
+		log.Println("peringatan: gagal parse alumni-angkatan-6.json")
 		return
 	}
 
@@ -463,7 +476,7 @@ func SeedAlumniIfEmpty(db *gorm.DB) {
 
 	if len(records) > 0 {
 		if err := db.CreateInBatches(records, 100).Error; err != nil {
-			log.Printf("peringatan: gagal batch insert alumni: %v", err)
+			log.Println("peringatan: gagal batch insert alumni")
 			return
 		}
 		log.Printf("berhasil seed %d data alumni ke database.", len(records))
@@ -496,7 +509,7 @@ func SeedTrialClassEventIfEmpty(db *gorm.DB) {
 	}
 
 	if err := db.Create(&initialEvent).Error; err != nil {
-		log.Printf("peringatan: gagal seed event trial class default: %v", err)
+		log.Println("peringatan: gagal seed event trial class default")
 	} else {
 		log.Println("berhasil menginisialisasi jadwal default Event Terdekat Trial Class.")
 	}

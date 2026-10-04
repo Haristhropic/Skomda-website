@@ -49,11 +49,16 @@ func ValidateToken(tokenStr, secret string) (*JWTClaims, error) {
 	}
 
 	token, err := jwt.ParseWithClaims(tokenStr, &JWTClaims{}, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 			return nil, errors.New("metode penandatanganan token tidak valid")
 		}
 		return []byte(secret), nil
-	})
+	},
+		jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}),
+		jwt.WithIssuer("skomda-backend"),
+		jwt.WithExpirationRequired(),
+		jwt.WithIssuedAt(),
+	)
 
 	if err != nil {
 		return nil, err

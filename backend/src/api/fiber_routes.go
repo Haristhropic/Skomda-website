@@ -22,7 +22,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"gorm.io/gorm"
 
@@ -31,10 +30,12 @@ import (
 	"github.com/haristhropic/skomda-website/backend/src/client/cloudinary"
 	"github.com/haristhropic/skomda-website/backend/src/config"
 	"github.com/haristhropic/skomda-website/backend/src/models"
+	"github.com/haristhropic/skomda-website/backend/src/observability"
 )
 
 // NewFiberApp menginisialisasi router Fiber beserta middleware dan seluruh route domain.
 func NewFiberApp(cfg config.Config) *fiber.App {
+	production := strings.EqualFold(cfg.Env, "production")
 	app := fiber.New(fiber.Config{
 		AppName:      "SMK Telkom Sidoarjo API (Fiber Edition)",
 		ServerHeader: "Fiber",
@@ -43,23 +44,60 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 	// Middleware
 	app.Use(recover.New())
-	app.Use(logger.New())
+	app.Use(func(c *fiber.Ctx) error {
+		requestID := observability.RequestID(c.Get("X-Request-ID"))
+		c.Locals("request_id", requestID)
+		c.Set("X-Request-ID", requestID)
 
-	allowedOrigins := "http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:4321,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:4321,http://127.0.0.1:5173"
-	if cfg.AllowedOrigin != "" {
-		for _, o := range strings.Split(cfg.AllowedOrigin, ",") {
-			trimmed := strings.TrimRight(strings.TrimSpace(o), "/")
-			if trimmed != "" && !strings.Contains(allowedOrigins, trimmed) {
-				allowedOrigins = allowedOrigins + "," + trimmed
+		startedAt := time.Now()
+		err := c.Next()
+
+		route := "unmatched"
+		if matched := c.Route(); matched != nil && matched.Path != "" {
+			route = matched.Path
+		}
+		status := c.Response().StatusCode()
+		if err != nil {
+			status = fiber.StatusInternalServerError
+			if fiberErr, ok := err.(*fiber.Error); ok {
+				status = fiberErr.Code
 			}
+		}
+		log.Printf("request_id=%s method=%s route=%q status=%d duration_ms=%d",
+			requestID, c.Method(), route, status, time.Since(startedAt).Milliseconds())
+		return err
+	})
+
+	allowedOrigins := make([]string, 0, 10)
+	if !strings.EqualFold(cfg.Env, "production") {
+		allowedOrigins = append(allowedOrigins,
+			"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:4321", "http://localhost:5173",
+			"http://127.0.0.1:3000", "http://127.0.0.1:3001", "http://127.0.0.1:3002", "http://127.0.0.1:4321", "http://127.0.0.1:5173",
+		)
+	}
+	for _, value := range strings.Split(cfg.AllowedOrigin, ",") {
+		origin := strings.TrimRight(strings.TrimSpace(value), "/")
+		if origin == "" {
+			continue
+		}
+		alreadyAllowed := false
+		for _, allowed := range allowedOrigins {
+			if allowed == origin {
+				alreadyAllowed = true
+				break
+			}
+		}
+		if !alreadyAllowed {
+			allowedOrigins = append(allowedOrigins, origin)
 		}
 	}
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     allowedOrigins,
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With",
+		AllowOrigins:     strings.Join(allowedOrigins, ","),
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With, X-Request-ID",
 		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
 		AllowCredentials: true,
+		ExposeHeaders:    "X-Request-ID",
 	}))
 
 	_ = os.MkdirAll("./uploads", 0755)
@@ -71,6 +109,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 	// 1. Health check
 	api.Get("/health", func(c *fiber.Ctx) error {
+		c.Set("Cache-Control", "no-store")
 		if config.DB == nil {
 			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
 				"status":   "unavailable",
@@ -485,7 +524,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				Action:    "CREATE",
 				Entity:    "news",
 				EntityID:  fmt.Sprint(news.ID),
-				Details:   fmt.Sprintf("Membuat berita: %s (%s)", news.Title, news.Status),
+				Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
 				IPAddress: ip,
 				CreatedAt: time.Now(),
 			})
@@ -562,7 +601,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				Action:    "UPDATE",
 				Entity:    "news",
 				EntityID:  fmt.Sprint(existing.ID),
-				Details:   fmt.Sprintf("Memperbarui berita: %s (%s)", existing.Title, existing.Status),
+				Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
 				IPAddress: ip,
 				CreatedAt: time.Now(),
 			})
@@ -605,7 +644,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				Action:    "DELETE",
 				Entity:    "news",
 				EntityID:  fmt.Sprint(existing.ID),
-				Details:   fmt.Sprintf("Menghapus berita: %s", existing.Title),
+				Details:   "Aktivitas tercatat; detail objek tidak disimpan.",
 				IPAddress: ip,
 				CreatedAt: time.Now(),
 			})
@@ -632,7 +671,6 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		return c.JSON(fiber.Map{
 			"status": "ready",
 			"engine": "fiber",
-			"target": cfg.NexusRouterURL,
 		})
 	})
 	cbGroup.Post("/message", chatbotLimiter, func(c *fiber.Ctx) error {
@@ -840,10 +878,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 
 		resp, err := client.Do(httpReq)
 		if err != nil || (resp != nil && resp.StatusCode != fiber.StatusOK) {
+			requestID := c.Locals("request_id")
 			if err != nil {
-				log.Printf("[Fiber Chatbot] Gagal menghubungi NexusRouter di %s: %v", targetURL, err)
+				log.Printf("[Fiber Chatbot] upstream tidak tersedia request_id=%v", requestID)
 			} else {
-				log.Printf("[Fiber Chatbot] NexusRouter status error: %d", resp.StatusCode)
+				log.Printf("[Fiber Chatbot] upstream mengembalikan status=%d request_id=%v", resp.StatusCode, requestID)
+				_ = resp.Body.Close()
 			}
 
 			// Fallback cerdas jika gateway offline
@@ -866,6 +906,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 				})
 			}
 
+			// Fallback digunakan saat upstream tidak tersedia atau mengembalikan error.
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{
 				"response": "Mohon maaf, layanan asisten virtual sedang dalam pemeliharaan berkala.\n\nUntuk pertanyaan seputar PPDB 2026/2027 atau konsultasi jurusan SIJA & TJAT, silakan hubungi WhatsApp Humas resmi SMK Telkom Sidoarjo di 0811-3021-919 atau unduh brosur resmi di menu [Unduh Informasi](/unduh-informasi).",
 				"sources": []fiber.Map{
@@ -969,6 +1010,13 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 
+		if production && !cloudinaryConfigured(cldClient) {
+			log.Printf("upload image ditolak: Cloudinary belum siap request_id=%v", c.Locals("request_id"))
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"error": "Penyimpanan media sementara tidak tersedia. Silakan coba kembali nanti.",
+			})
+		}
+
 		file, err := fileHeader.Open()
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -978,7 +1026,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		defer file.Close()
 
 		folder := c.FormValue("folder", "skomda/admin-uploads")
-		if cldClient != nil && cldClient.CloudName != "" && cldClient.APIKey != "" {
+		if cloudinaryConfigured(cldClient) {
 			uploadRes, err := cldClient.UploadImage(c.Context(), file, fileHeader.Filename, folder)
 			if err == nil && uploadRes != nil && uploadRes.SecureURL != "" {
 				return c.JSON(fiber.Map{
@@ -988,7 +1036,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 					"format":    uploadRes.Format,
 				})
 			}
-			log.Printf("peringatan: upload langsung Cloudinary gagal: %v, beralih ke penyimpanan lokal...", err)
+			log.Printf("upload image ke Cloudinary gagal request_id=%v", c.Locals("request_id"))
+			if production {
+				return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+					"error": "Penyimpanan media sementara tidak tersedia. Silakan coba kembali nanti.",
+				})
+			}
 		}
 
 		// Fallback simpan lokal jika koneksi Cloudinary offline
@@ -1053,6 +1106,13 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			})
 		}
 
+		if production && !cloudinaryConfigured(cldClient) {
+			log.Printf("upload dokumen ditolak: Cloudinary belum siap request_id=%v", c.Locals("request_id"))
+			return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+				"error": "Penyimpanan dokumen sementara tidak tersedia. Silakan coba kembali nanti.",
+			})
+		}
+
 		fileType := strings.ToUpper(strings.TrimPrefix(ext, "."))
 		var fileSize string
 		bytes := fileHeader.Size
@@ -1073,7 +1133,7 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		defer file.Close()
 
 		folder := c.FormValue("folder", "skomda/documents")
-		if cldClient != nil && cldClient.CloudName != "" && cldClient.APIKey != "" {
+		if cloudinaryConfigured(cldClient) {
 			uploadRes, err := cldClient.UploadRaw(c.Context(), file, fileHeader.Filename, folder)
 			if err == nil && uploadRes != nil && uploadRes.SecureURL != "" {
 				return c.JSON(fiber.Map{
@@ -1085,7 +1145,12 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 					"originalName": fileHeader.Filename,
 				})
 			}
-			log.Printf("peringatan: upload dokumen Cloudinary gagal: %v, beralih ke penyimpanan lokal...", err)
+			log.Printf("upload dokumen ke Cloudinary gagal request_id=%v", c.Locals("request_id"))
+			if production {
+				return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+					"error": "Penyimpanan dokumen sementara tidak tersedia. Silakan coba kembali nanti.",
+				})
+			}
 		}
 
 		// Fallback simpan lokal di folder frontend/public/documents
@@ -1123,6 +1188,10 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	registerCrudRoutes(api, cfg)
 
 	return app
+}
+
+func cloudinaryConfigured(client *cloudinary.Client) bool {
+	return client != nil && client.CloudName != "" && client.APIKey != "" && client.APISecret != ""
 }
 
 func slugify(s string) string {

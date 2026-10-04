@@ -35,6 +35,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
 import ScrollToTop from "@/components/common/ScrollToTop";
 import SkomdaChatWidget from "@/components/chatbot/SkomdaChatWidget";
+import AnalyticsConsent from "@/components/analytics/AnalyticsConsent";
 
 export default function RootLayout({
   children,
@@ -57,6 +58,7 @@ export default function RootLayout({
           <AdminAuthProvider>
             <ScrollToTop />
             {children}
+            <AnalyticsConsent />
             {/* Floating AI Chatbot Widget (Loaded on client without blocking initial paint) */}
             <SkomdaChatWidget />
           </AdminAuthProvider>

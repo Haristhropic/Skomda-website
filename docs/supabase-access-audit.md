@@ -103,7 +103,7 @@ Jangan menampilkan connection string saat menjalankan pemeriksaan. Jika koneksi 
 
 ## 5. Konteks aplikasi SKOMDA
 
-Backend Go terhubung langsung ke PostgreSQL dengan `DATABASE_URL`; browser tidak memakai Supabase Data API untuk query tabel pada alur yang ditemukan di repository. Startup memakai GORM `AutoMigrate`. Kode saat ini hanya mencoba mengaktifkan RLS untuk `jurusans`, `news`, `users`, `audit_logs`, `alumnis`, `digital_talents`, dan `trial_class_events`. Model lain yang dimigrasikan—termasuk `trial_class_registrations`, `bkk_jobs`, `bkk_partners`, dan `documents`—tidak tampak menerima perintah enable RLS dari kode startup ini. Hasil `Exec` untuk perintah enable RLS juga tidak diperiksa. Karena itu status aktual harus dibaca dari katalog database.
+Backend Go terhubung langsung ke PostgreSQL dengan `DATABASE_URL`; browser tidak memakai Supabase Data API untuk query tabel pada alur yang ditemukan di repository. Skema sekarang dimigrasikan melalui command eksplisit `/app/migrate`, bukan saat HTTP server production startup. Migrator mengaktifkan RLS dan memeriksa error untuk `jurusans`, `news`, `users`, `audit_logs`, `alumnis`, `digital_talents`, dan `trial_class_events`. Model lain yang dimigrasikan—termasuk `trial_class_registrations`, `bkk_jobs`, `bkk_partners`, dan `documents`—tidak menerima perintah enable RLS dari migrator saat ini. Karena itu status aktual tetap harus dibaca dari katalog database dan role koneksi.
 
 Karena koneksi direct Postgres mungkin menggunakan role owner, jangan menganggap aktivasi RLS tersebut otomatis melindungi query backend. Beberapa log startup sebelumnya menampilkan user `postgres`; verifikasi role lewat koneksi yang memakai URL aplikasi saat ini sebelum menarik kesimpulan.
 
@@ -114,6 +114,55 @@ Sebelum mengubah grants, role, atau policies:
 3. Siapkan migration SQL yang dapat ditinjau dan rollback yang jelas.
 4. Uji dengan role aplikasi dan role `anon`/`authenticated` yang relevan, termasuk kasus yang harus ditolak.
 5. Jangan menjalankan `ALTER`, `CREATE POLICY`, `GRANT`, atau `REVOKE` dari audit baca-saja ini.
+
+## 6. Hasil audit yang sudah dikonfirmasi
+
+Catatan ini merangkum output audit pemilik database (4 Oktober 2026). Output katalog hanya memuat metadata hak akses; tidak ada credential atau isi data aplikasi.
+
+- Data API Supabase dilaporkan sudah dinonaktifkan dan disimpan. Pemilik juga melaporkan health check backend, proxy same-origin, dan homepage merespons HTTP 200 setelah perubahan tersebut.
+- Audit sebelumnya menunjukkan seluruh 17 tabel `public` memberi `anon`, `authenticated`, dan `service_role` hak efektif `SELECT`, `INSERT`, `UPDATE`, dan `DELETE`; 10 tabel tidak mengaktifkan RLS. Tujuh tabel yang mengaktifkan RLS belum tentu aman untuk koneksi backend karena koneksi aplikasi terverifikasi sebagai `postgres`, dengan `rolbypassrls = true`.
+- Grant katalog yang dibagikan juga menunjukkan hak tabel yang luas dan default privileges untuk tabel/sequence yang mencakup `anon` serta `authenticated`. Default ACL perlu diperhatikan agar objek yang dibuat kemudian tidak mewarisi akses yang tidak diinginkan.
+- Output sequence yang dibagikan terpotong pada `fasilitas_id_seq`. Pada sequence yang terlihat, `anon`, `authenticated`, dan `service_role` masing-masing memiliki `SELECT`, `UPDATE`, dan `USAGE`. Jangan menganggap daftar itu lengkap sampai output utuh tersedia; pola yang terlihat tetap menunjukkan grants yang perlu ditinjau.
+
+> **Kesimpulan sementara:** Data API yang mati mengurangi permukaan akses HTTP Supabase, tetapi tidak menghapus grants katalog maupun menyelesaikan penggunaan role `postgres` oleh backend. Jangan mengaktifkan Data API kembali sebelum grants, policies, dan role aplikasi dirancang ulang dan diuji.
+
+### Arah remediasi (belum dijalankan)
+
+1. Pertahankan `DATABASE_URL` migrasi khusus untuk command migrasi dan gunakan role runtime terpisah dengan `LOGIN`, `NOBYPASSRLS`, tanpa hak DDL, dan grants DML yang dibatasi sesuai pemakaian backend.
+2. Inventarisasi tabel, operasi, foreign key/sequence, dan tabel yang memakai RLS sebelum menetapkan grants. Tabel RLS tanpa policy untuk role runtime akan menolak query; jangan menambahkan policy `USING (true)` secara otomatis.
+3. Tinjau penghapusan grant `anon` dan `authenticated` pada tabel/sequence `public`, serta default ACL untuk objek yang dibuat role migrasi. Keputusan untuk `service_role` dan role terkelola Supabase perlu mempertimbangkan apakah Supabase Auth/Storage atau API akan dipakai kembali.
+4. Buat SQL perubahan yang eksplisit, dapat diulang, dan memiliki langkah pemulihan; tinjau dahulu sebelum pemilik database menjalankannya.
+5. Verifikasi akses dengan role runtime baru, pastikan role publik yang tidak digunakan gagal mengakses tabel, lalu jalankan smoke test aplikasi. Baru setelah itu pertimbangkan apakah Data API tetap mati atau perlu diaktifkan dengan grants minimum.
+
+Belum ada perubahan grants, role, policy, schema, atau data yang dijalankan sebagai bagian dari audit ini. Kredensial database tidak diperlukan untuk menyusun rencana; jangan membagikannya lewat chat.
+
+### Matriks operasi runtime dari handler saat ini
+
+Matriks ini diturunkan dari handler Fiber/GORM yang ada di repository. Ini menunjukkan operasi SQL yang perlu didukung oleh satu role runtime, bukan izin yang harus diberikan kepada `anon` atau browser.
+
+| Tabel | Operasi runtime teramati | Jalur/fungsi utama | Catatan |
+| --- | --- | --- | --- |
+| `jurusans` | SELECT | daftar/detail jurusan | Endpoint baca publik. |
+| `news` | SELECT, INSERT, UPDATE, DELETE | feed publik dan pengelolaan berita | Audit berita ditulis terpisah ke `audit_logs`. |
+| `users` | SELECT, INSERT, UPDATE | login, daftar admin, ganti role, statistik | Tidak ditemukan operasi hapus user di handler saat ini. |
+| `audit_logs` | SELECT, INSERT | login, perubahan berita, halaman audit admin | Tidak ditemukan UPDATE/DELETE runtime. |
+| `teachers` | SELECT, INSERT, UPDATE, DELETE | daftar dan pengelolaan guru | DELETE dibatasi middleware ke super admin. |
+| `prestasis` | SELECT, INSERT, UPDATE, DELETE | daftar dan pengelolaan prestasi | DELETE dibatasi middleware ke super admin. |
+| `bkk_jobs` | SELECT, INSERT, UPDATE, DELETE | daftar, pengajuan lowongan, pengelolaan BKK | Endpoint publik mengirim INSERT; perubahan status admin. |
+| `bkk_partners` | SELECT, INSERT, UPDATE, DELETE | daftar dan pengelolaan mitra BKK | DELETE dibatasi middleware ke super admin. |
+| `bkk_alumnis` | belum ditemukan di handler API | seeder/migrator | Jangan beri grant runtime sebelum memastikan fitur memakai tabel ini. |
+| `ekstrakurikulers` | SELECT, INSERT, UPDATE, DELETE | daftar dan pengelolaan ekstrakurikuler | DELETE dibatasi middleware ke super admin. |
+| `fasilitas` | SELECT, INSERT, UPDATE, DELETE | daftar dan pengelolaan fasilitas | DELETE dibatasi middleware ke super admin. |
+| `documents` | SELECT, INSERT, UPDATE, DELETE | dokumen publik/admin dan brosur aktif | Operasi settings brosur juga memakai `site_settings`. |
+| `site_settings` | SELECT, INSERT, UPDATE | pengaturan admin dan brosur aktif | Tidak ditemukan operasi DELETE runtime. |
+| `alumnis` | SELECT, INSERT, UPDATE, DELETE | daftar/detail dan pengelolaan alumni | Detail sensitif admin memakai middleware; ada juga baca daftar publik. |
+| `digital_talents` | SELECT, INSERT, UPDATE, DELETE | daftar/detail dan pengelolaan digital talent | DELETE dibatasi middleware ke super admin. |
+| `trial_class_registrations` | SELECT, INSERT, UPDATE, DELETE | daftar, pendaftaran, pengecekan tiket, pengelolaan admin | Data pendaftar bersifat pribadi; jangan pernah beri akses langsung ke browser. |
+| `trial_class_events` | SELECT, INSERT, UPDATE | baca event aktif dan pengelolaan event | Tidak ditemukan operasi DELETE runtime. |
+
+**Implikasi untuk desain grant:** beri browser tanpa koneksi database; role runtime mendapatkan hanya operasi yang tercatat per tabel dan `USAGE` sequence yang benar-benar dipakai insert. Jangan berikan `UPDATE` pada sequence jika insert cukup dengan `USAGE`. `bkk_alumnis` perlu konfirmasi pemakaian sebelum diberi privilege.
+
+**Batas RLS saat ini:** backend memakai satu role database untuk request publik dan admin. Memberi policy akses semua baris kepada role runtime hanya menjaga tabel dari role lain; itu tidak menciptakan isolasi per pengguna dan tidak menggantikan middleware JWT/role admin. Agar RLS memisahkan baris per admin, aplikasi harus mengikat identitas JWT yang sudah diverifikasi ke konteks transaksi database secara aman. Itu perubahan desain terpisah dan tidak termasuk remediasi grants awal.
 
 ## Referensi
 

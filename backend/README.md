@@ -14,7 +14,7 @@ Service REST API backend untuk website resmi **SMK Telkom Sidoarjo**, dibangun m
   - Terhubung ke **PostgreSQL** melalui `DATABASE_URL` (Supabase untuk staging dan produksi).
   - PostgreSQL wajib untuk staging dan production; backend mengecek koneksi saat startup dan berhenti jika database tidak tersedia.
   - SQLite lokal hanya bisa dipilih eksplisit dengan `DATABASE_DRIVER=sqlite` di luar production. Kegagalan koneksi Postgres tidak pernah memicu fallback otomatis.
-  - Auto-seeding otomatis untuk data resmi Program Keahlian (**SIJA 4 Tahun** & **TJAT 3 Tahun**), akun Super Admin awal, artikel berita, data DTP, dan fasilitas.
+  - Development/test melakukan migrasi dan inisialisasi data saat startup. Production hanya membuka koneksi saat startup; migrasi dijalankan terpisah lewat image command `/app/migrate`, dan seed awal hanya bila operator memberikan `--seed-initial` secara eksplisit.
 - **Autentikasi JWT & Otorisasi Role-Based**:
   - Proteksi rute admin menggunakan token JWT (`golang-jwt/jwt/v5`).
   - Verifikasi identitas user, enkripsi password via `bcrypt`, dan audit logging aktivitas.
@@ -58,7 +58,8 @@ backend/
 │   │   └── server/               # Unified entrypoint: main.go (mendukung switch Fiber & Gin)
 │   ├── config/
 │   │   ├── config.go             # Environment variable loader via godotenv
-│   │   └── db.go                 # Inisialisasi GORM, koneksi PostgreSQL/SQLite lokal, & data seeders
+│   │   └── db.go                 # Koneksi DB, migrasi eksplisit, & seeders
+│   ├── src/cmd/migrate/          # CLI migrasi production; seed opsional eksplisit
 │   └── models/                   # Definisi skema GORM
 │       ├── alumni.go             # Skema data alumni & tracer study
 │       ├── audit_log.go          # Skema jejak audit aktivitas admin
@@ -103,7 +104,7 @@ DATABASE_URL=postgres://user:password@localhost:5432/smktelkom
 CLOUDINARY_URL=cloudinary://<key>:<secret>@<cloud_name>
 LLM_API_KEY=
 JWT_SECRET=                         # Isi random secret kuat; wajib minimal 16 karakter di production
-ADMIN_DEFAULT_PASSWORD=             # Isi password acak minimal 16 karakter sebelum startup production pertama
+ADMIN_DEFAULT_PASSWORD=             # Diperlukan bila bootstrap production dijalankan dengan --seed-initial
 ALLOWED_ORIGIN=http://localhost:3001
 NEXUS_ROUTER_URL=https://fahlyce.vercel.app
 CHATBOT_MODEL=llama-3.3-70b-versatile    # Model chatbot cepat (Groq Llama 3.3 70B)
@@ -184,6 +185,12 @@ Semua endpoint berada di bawah prefix `/api`:
 | `GET, POST` | `/api/admin/graduation` | Kelola database kelulusan siswa |
 | `GET, PUT` | `/api/admin/settings` | Kelola konfigurasi dan kontak website |
 | `GET` | `/api/admin/audit-logs` | Lihat riwayat audit trail aktivitas admin |
+
+### Request ID dan access log
+
+Backend mengembalikan header `X-Request-ID` pada setiap response dan mencatat ID, method, route template, status HTTP, serta durasi ke stdout. Next.js membuat UUID baru untuk request same-origin yang diproxy ke backend, lalu meneruskan ID respons ke browser. Penolakan lokal proxy juga dicatat dengan ID, status, dan alasan umum di log frontend. Request langsung ke API mendapat ID dari backend. Log sengaja tidak memuat query string, request/response body, IP, cookie, atau kredensial. Cari ID di log frontend untuk error proxy yang terjadi sebelum backend; selain itu cari ID yang sama di log backend.
+
+Pada `ENV=production`, endpoint `/api/upload/image` dan `/api/upload/document` mensyaratkan Cloudinary tersedia. Jika konfigurasi Cloudinary tidak lengkap atau upload gagal, endpoint membalas `503` dan tidak menyimpan file ke filesystem container. Fallback filesystem hanya berlaku pada development dan tidak tahan terhadap penggantian container.
 
 ---
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 
 const BODY_LIMIT_BYTES = 15 * 1024 * 1024;
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
@@ -9,7 +10,6 @@ const FORWARDED_REQUEST_HEADERS = [
   "cookie",
   "origin",
   "cf-connecting-ip",
-  "x-request-id",
 ];
 const FORWARDED_RESPONSE_HEADERS = [
   "cache-control",
@@ -17,7 +17,21 @@ const FORWARDED_RESPONSE_HEADERS = [
   "location",
   "retry-after",
   "vary",
+  "x-request-id",
 ];
+
+function requestError(message: string, status: number, requestId: string) {
+  console.warn(JSON.stringify({
+    event: "backend_proxy_error",
+    request_id: requestId,
+    status,
+    reason: message,
+  }));
+  return NextResponse.json(
+    { error: message },
+    { status, headers: { "x-request-id": requestId } },
+  );
+}
 
 async function readBodyLimited(request: NextRequest): Promise<ArrayBuffer | null> {
   if (!request.body || !MUTATING_METHODS.has(request.method)) return null;
@@ -47,6 +61,8 @@ async function readBodyLimited(request: NextRequest): Promise<ArrayBuffer | null
 }
 
 export async function proxyToBackend(request: NextRequest, path: string[]) {
+  const requestId = randomUUID();
+
   if (MUTATING_METHODS.has(request.method)) {
     const configuredOrigin = process.env.FRONTEND_ORIGIN?.replace(/\/+$/, "");
     const requestOrigin = request.headers.get("origin");
@@ -55,13 +71,13 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
       requestOrigin !== configuredOrigin &&
       requestOrigin !== request.nextUrl.origin
     ) {
-      return NextResponse.json({ error: "Origin permintaan tidak diizinkan" }, { status: 403 });
+      return requestError("Origin permintaan tidak diizinkan", 403, requestId);
     }
   }
 
   const contentLength = Number(request.headers.get("content-length") || 0);
   if (contentLength > BODY_LIMIT_BYTES) {
-    return NextResponse.json({ error: "Ukuran permintaan melebihi batas 15 MB" }, { status: 413 });
+    return requestError("Ukuran permintaan melebihi batas 15 MB", 413, requestId);
   }
 
   const backendBaseUrl = (process.env.BACKEND_API_URL || "http://localhost:8080/api").replace(/\/+$/, "");
@@ -73,15 +89,17 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
     const value = request.headers.get(name);
     if (value) headers.set(name, value);
   }
+  // Replace any caller-supplied value with an ID generated at this proxy.
+  headers.set("x-request-id", requestId);
 
   let body: ArrayBuffer | null;
   try {
     body = await readBodyLimited(request);
   } catch (error) {
     if (error instanceof Error && error.message === "body-too-large") {
-      return NextResponse.json({ error: "Ukuran permintaan melebihi batas 15 MB" }, { status: 413 });
+      return requestError("Ukuran permintaan melebihi batas 15 MB", 413, requestId);
     }
-    return NextResponse.json({ error: "Gagal membaca isi permintaan" }, { status: 400 });
+    return requestError("Gagal membaca isi permintaan", 400, requestId);
   }
 
   let upstream: Response;
@@ -96,7 +114,7 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
     if (body !== null) upstreamRequest.body = body;
     upstream = await fetch(backendUrl, upstreamRequest);
   } catch {
-    return NextResponse.json({ error: "Layanan backend tidak dapat dijangkau" }, { status: 502 });
+    return requestError("Layanan backend tidak dapat dijangkau", 502, requestId);
   }
 
   const responseHeaders = new Headers();

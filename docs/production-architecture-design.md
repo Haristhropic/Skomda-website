@@ -1,8 +1,8 @@
 # Rancangan Arsitektur Production SKOMDA
 
-**Status:** Baseline disetujui; implementasi bertahap
+**Status:** Baseline demo disepakati; finalisasi arsitektur dan hardening operasi berjalan
 
-**Tanggal:** 3 Oktober 2026
+**Tanggal:** 4 Oktober 2026
 
 **Target awal:** Demo terkontrol pada subdomain `linear.smktelkom-sidoarjo.my.id`
 
@@ -11,6 +11,12 @@ Panduan konfigurasi manual VPS dan GitHub ada di [`demo-vps-runbook.md`](demo-vp
 Prosedur load test baca-saja untuk subdomain demo ada di [`stress-testing.md`](stress-testing.md).
 
 Audit baca-saja Supabase untuk pemilik proyek tersedia di [`supabase-access-audit.md`](supabase-access-audit.md).
+
+Prosedur backup dan recovery serta status prasyaratnya ada di [`backup-and-recovery-runbook.md`](backup-and-recovery-runbook.md).
+
+Konfigurasi persetujuan dan ID analytics ada di [`analytics-consent.md`](analytics-consent.md).
+
+Snapshot operasional, rancangan alert, dan diagnosis insiden ada di [`monitoring-and-incidents.md`](monitoring-and-incidents.md).
 
 Dokumen ini menjadikan daftar kebutuhan infrastruktur sebagai cakupan arsitektur proyek. Status membedakan kemampuan yang sudah tampak di repo dari rancangan yang masih memerlukan implementasi atau konfigurasi akun/server.
 
@@ -48,64 +54,73 @@ Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compo
 |---|---|---|
 | Frontend | Next.js App Router untuk website publik dan CMS yang tersedia | Next.js sudah ada; Dockerfile dan standalone output disiapkan. Framework UI tidak digabung ke backend Go. |
 | APIs & Backend Logic | Go API, Fiber sebagai engine production; Gin tetap alternatif yang diuji | Kedua entrypoint tersedia. Production menjalankan satu engine saja. API tetap menjadi jalur mutasi dan akses data. |
-| Database & Storage | Supabase PostgreSQL untuk staging/production; Cloudinary untuk gambar/dokumen media | Backend mewajibkan Postgres di Compose production. SQLite dipilih eksplisit via `DATABASE_DRIVER=sqlite` hanya pada `development` atau `test`; tidak ada fallback koneksi. |
-| Auth & Permissions | JWT backend, password bcrypt, role checks API, cookie httpOnly untuk admin | JWT berlaku 24 jam dan dikeluarkan lewat cookie `HttpOnly` pada host frontend melalui proxy same-origin `/api/backend/*`. Proxy meneruskan cookie ke Go API lewat network privat Docker; backend tetap memvalidasi JWT dan izin setiap request. Login admin berada di `/gate-internal-skomda`, tetapi nama URL tersembunyi bukan kontrol keamanan. Role checks hanya tampak pada route tertentu; pemeriksaan status/revokasi user pada setiap request belum terverifikasi. |
+| Database & Storage | Supabase PostgreSQL untuk staging/production; Cloudinary untuk gambar/dokumen media | Backend mewajibkan Postgres di Compose production. SQLite dipilih eksplisit via `DATABASE_DRIVER=sqlite` hanya pada `development` atau `test`; tidak ada fallback koneksi. Production server hanya membuka dan ping database; migrasi dan seed tidak berjalan saat HTTP server start. Pool SQL backend dibatasi 25 koneksi terbuka, 5 idle, usia maksimum 15 menit, idle maksimum 5 menit; nilai ini perlu dibandingkan dengan limit Supabase sebelum stress test. Endpoint upload production gagal dengan `503` jika Cloudinary belum siap/gagal; penyimpanan lokal hanya fallback development. |
+| Auth & Permissions | JWT backend, password bcrypt, role checks API, cookie HttpOnly untuk admin | JWT HS256 berlaku 24 jam dan diverifikasi dengan pembatasan algoritma serta issuer/expiry; cookie memakai `HttpOnly`, `Secure` di production, dan `SameSite=Lax`. Backend memeriksa ulang keberadaan dan role akun dari database pada setiap request. Role Editor/Super Admin sudah digunakan; endpoint sensitif dibatasi ke Super Admin. Login berada di `/gate-internal-skomda`, tetapi URL tersembunyi bukan kontrol keamanan. MFA sengaja ditunda ke tahap hardening berikutnya. |
 | Hosting & Deployment | Ubuntu VPS + Docker Compose + Cloudflare Tunnel; `linear` frontend demo | Published route `linear` mengarah ke frontend. Next.js meneruskan request admin ke backend melalui `http://backend:8080/api` di network Docker. `api-linear` dapat tetap dipakai oleh endpoint publik dan health check. Panel Webuzo tetap pada hostname `server`. |
-| Cloud & Compute | VPS saat ini; Supabase dan Cloudinary sebagai layanan terkelola | Kapasitas awal cukup untuk satu replica per aplikasi menurut spesifikasi VPS yang diberikan. Batasi CPU/RAM container dan pantau pemakaian. |
-| CI/CD & Version Control | GitHub Actions untuk pemeriksaan, build, image GHCR immutable SHA, deploy demo opsional | Workflow disiapkan di branch `deploy`; deploy memakai secrets dan variables pada environment `demo`, sedangkan sakelar job `DEMO_DEPLOY_ENABLED` harus berupa repository variable. Pipeline demo tidak mengubah domain utama. |
-| Security & RLS | Secret di VPS/GitHub Secrets; TLS; CORS allowlist; JWT; least privilege; kebijakan RLS yang terverifikasi | CORS/JWT tersedia dan beberapa tabel mengaktifkan RLS dari startup code. RLS belum boleh dianggap perlindungan efektif sebelum policy, grants, dan role koneksi diverifikasi. |
-| Rate Limiting | Batas khusus endpoint sensitif; Cloudflare edge rules ditambahkan untuk abuse umum | Perubahan lokal memakai IP pengunjung Cloudflare: login 5/menit, chatbot 60/menit plus 16 request aktif/proses, pengajuan BKK 5/10 menit, pendaftaran Trial Class 10/10 menit, dan cek tiket 30/menit. Counter masih in-memory dan tidak berbagi antar replica; perubahan ini belum diuji atau dideploy. |
-| Caching & CDN | Cloudflare untuk aset publik yang aman; Cloudinary untuk media; cache API/Next ditentukan per route | Cloudinary sudah digunakan. Jangan cache respons admin, auth, personal data, atau API mutasi. Mulai dengan cache statis dan aturan eksplisit untuk GET publik. |
-| Load Balancing & Scaling | Satu VPS dan satu replica pada fase demo; tambah replica/host hanya bila metrik menuntut | Belum ada load balancer aplikasi. Jika scale horizontal kelak, pindahkan limiter/sesi yang perlu berbagi state ke storage bersama dan uji batas koneksi Supabase. |
-| Error Tracking & Logs | stdout/stderr container dengan rotasi; request ID; agregasi/error tracker setelah demo dasar stabil | Compose sudah mengatur log rotation lokal. Belum ada error tracker terpusat atau alert; hindari memasukkan token, password, dan data pendaftar ke log. |
-| Availability & Recovery | Health checks yang memeriksa DB, restart policy, rollback image, backup PostgreSQL offsite, prosedur restore | Compose mengecek API health; Fiber health route kini menguji konektivitas database. Rollback demo disiapkan. Backup terjadwal, retensi, alert, serta uji restore masih perlu disepakati dan dikonfigurasi. |
-| Google Analytics | GA4 untuk trafik, sumber kunjungan, dan event konversi publik | Belum ditemukan integrasi analytics. Butuh Measurement ID dari pemilik properti GA4. Jangan mengirim PII atau merekam panel admin. |
-| UI/UX Analytics | Microsoft Clarity untuk heatmap/session replay terbatas dan temuan usability | Belum ditemukan integrasi. Butuh Project ID; matikan pada admin dan permukaan yang memasukkan data pribadi, serta mask input sensitif. |
+| Cloud & Compute | VPS saat ini; Supabase dan Cloudinary sebagai layanan terkelola | Kapasitas awal cukup untuk satu replica per aplikasi menurut spesifikasi VPS yang diberikan. Container frontend/backend/migrator berjalan non-root, tanpa Linux capabilities, dan dengan `no-new-privileges`; batas CPU/RAM tetap diterapkan dan pemakaian perlu dipantau. |
+| CI/CD & Version Control | GitHub Actions untuk pemeriksaan, build, image GHCR immutable SHA, scan image, deploy demo opsional | Workflow berada di branch `deploy`; deploy hanya berjalan pada push ke branch itu setelah pemeriksaan backend/frontend, build image, dan scan Trivy sukses, lalu memerlukan secrets/variables environment `demo` serta repository variable `DEMO_DEPLOY_ENABLED=true`. Scan memblokir CVE High/Critical yang sudah memiliki perbaikan sebelum deploy VPS. Di VPS, skrip memeriksa keberadaan dan mode `600` untuk file environment serta memvalidasi konfigurasi Compose secara senyap sebelum pull image atau menjalankan migrasi. Pipeline demo tidak mengubah domain utama. |
+| Security & RLS | Secret di VPS/GitHub Secrets; TLS; CORS allowlist; JWT; least privilege; audit kebijakan RLS | Secret production berada di environment VPS, bukan browser/repo. CORS Fiber dan Gin kini memakai origin konfigurasi saja di production; startup production gagal bila `ALLOWED_ORIGIN` kosong atau bukan origin HTTPS. Backend Go tersambung langsung ke PostgreSQL. Container tidak mendapat Linux capabilities dan proses dilarang memperoleh hak tambahan. Role endpoint telah diperiksa secara statis; detail audit baru tidak lagi menyalin data dari record. Policy/grants dan role koneksi database masih perlu diaudit. Lihat [`security-authorization-audit.md`](security-authorization-audit.md). |
+| Rate Limiting | Batas khusus endpoint sensitif; Cloudflare edge rules untuk abuse umum | Implementasi repo memakai IP dari `CF-Connecting-IP` (fallback ke peer IP): login 5/menit, chatbot 60/menit serta maksimum 16 proses serentak, submit lowongan 5/10 menit, pendaftaran Trial Class 10/10 menit, dan cek tiket 30/menit. Endpoint upload memerlukan JWT admin tetapi belum memiliki rate/concurrency limit khusus. Counter in-memory hanya berlaku per proses/satu replica. Konfigurasi live Cloudflare dan efektivitas limit masih perlu diverifikasi saat pengujian VPS. |
+| Caching & CDN | Cloudflare untuk aset publik yang aman; Cloudinary untuk media; cache API/Next ditentukan per route | Redis belum menjadi bagian baseline. Aset publik disalurkan melalui Cloudflare/Cloudinary; kebijakan cache API belum ditetapkan per endpoint. Redis baru ditambahkan bila pengukuran menunjukkan kebutuhan cache server-side atau state bersama lintas replica. Jangan cache auth, admin, data pribadi, atau mutasi. |
+| Load Balancing & Scaling | Satu VPS, satu frontend, satu backend pada fase demo; tambah replica/host bila metrik menuntut | Belum ada load balancer aplikasi. Cloudflare Tunnel merutekan hostname ke service, bukan membagi beban ke beberapa app replica. Proxy/load balancer dalam satu VPS hanya membantu membagi proses dan tetap memiliki single point of failure. Load balancing lintas host baru memberi redundansi jika ada lebih dari satu host/origin. Jika backend direplikasi, rate limiter harus memakai storage bersama seperti Redis dan koneksi Supabase harus dibatasi. |
+| Error Tracking & Logs | stdout/stderr container dengan rotasi dan request ID; agregasi/error tracker setelah demo dasar stabil | Next.js proxy membuat `X-Request-ID` UUID baru dan meneruskannya ke Go; backend juga membuat UUID bila menerima request langsung/tanpa ID. Log frontend mencatat penolakan proxy dengan ID/status/alasan umum; log backend berisi ID, method, route template, status, dan durasi—tanpa body, query, IP, atau kredensial. Compose membatasi ukuran/jumlah file log. Skrip snapshot VPS dan panduan monitor/insiden tersedia; agregasi, error tracker, collector resource dan alert eksternal belum aktif. |
+| Availability & Recovery | Health checks DB-aware, restart policy, rollback image, backup independen, prosedur restore | API health memeriksa koneksi database dan mengirim `Cache-Control: no-store`; Compose mengatur restart dan readiness dependency. Skrip snapshot VPS dan runbook monitor/insiden tersedia. Workflow mendukung rollback image, tetapi rollback tidak membatalkan migrasi database. Backup independen, retensi, konfigurasi alert eksternal serta uji restore belum disiapkan. Satu VPS tetap single point of failure. |
+| Google Analytics | GA4 untuk trafik dan sumber kunjungan publik | Consent-gated page view sudah dibuat; event konversi belum ditambahkan. Butuh Measurement ID dari pemilik properti GA4. Jangan mengirim PII atau merekam panel admin. |
+| UI/UX Analytics | Microsoft Clarity untuk heatmap/session replay terbatas dan temuan usability | Consent banner, consent-gated loading, pengecualian route sensitif, dan masking `<form>` sudah dibuat. GA4 Measurement ID dan Clarity Project ID belum diatur, jadi integrasi tetap nonaktif. Belum ada event konversi khusus. |
 
 ## Keamanan data dan observabilitas
 
-1. Browser tidak pernah menerima `DATABASE_URL`, Cloudinary API secret, JWT signing secret, password seed admin, atau SSH key. Production gagal startup bila `ADMIN_DEFAULT_PASSWORD` tidak diatur kuat.
+1. Browser tidak pernah menerima `DATABASE_URL`, Cloudinary API secret, JWT signing secret, password seed admin, atau SSH key. Jika operator meminta `--seed-initial` di production, `ADMIN_DEFAULT_PASSWORD` wajib kuat; server runtime tidak memakai password seed.
 2. Daftar dokumen publik dibatasi ke `is_public=true`; daftar admin menggunakan `/admin/documents`. Endpoint publik alumni hanya mengirim kolom yang layak diumumkan; NISN dan data lengkap hanya lewat `/admin/alumni` dengan JWT. Data alumni privat tidak lagi dikirim sebagai fallback statis frontend.
-3. Route admin Go memvalidasi JWT; role checks hanya terpasang pada sebagian route, dan status user/revokasi token belum dicek ulang pada setiap request. Login melalui `/api/backend/auth/login` mengeluarkan cookie `HttpOnly` untuk host frontend. Proxy Next.js meneruskan cookie itu ke backend melalui network Docker privat dan memeriksa `Origin` untuk request mutasi. Route halaman Next.js bukan batas keamanan; backend tetap harus memvalidasi setiap akses.
+3. Route admin Go memvalidasi JWT dan mengambil role/keberadaan akun terbaru dari database pada setiap request. Login melalui `/api/backend/auth/login` mengeluarkan cookie `HttpOnly` untuk host frontend. Proxy Next.js meneruskan cookie ke backend di network Docker privat dan memeriksa `Origin` pada mutasi. Route halaman Next.js hanya menyembunyikan UI; backend tetap menjadi batas otorisasi. MFA belum termasuk tahap ini.
 4. Production fail-closed: jika PostgreSQL kosong/tidak terjangkau, backend tidak start dan health check gagal. Tidak ada penulisan ke SQLite sebagai fallback.
-5. RLS, grants, dan role koneksi database harus diuji dari sudut pandang role yang dipakai aplikasi dan role `anon`/`authenticated`; status `ENABLE ROW LEVEL SECURITY` saja belum membuktikan akses aman.
-6. Rate limiter in-memory cukup untuk satu replica demo, tetapi bukan kontrol lintas replica. Untuk chatbot, backend membaca `CF-Connecting-IP` karena akses publik masuk melalui Cloudflare Tunnel dan port backend hanya bind ke loopback VPS. Terapkan edge rules Cloudflare dan pantau false positive sebelum memperketat batas publik.
+5. Backend memakai koneksi PostgreSQL langsung, bukan Supabase Data API untuk query aplikasi. Karena itu, audit harus mencakup role koneksi Go, grants, owner/superuser, policies, dan akses `anon`/`authenticated`. `ENABLE ROW LEVEL SECURITY` sendiri tidak membuktikan tabel terlindungi jika role aplikasi dapat melewati RLS atau grants masih terlalu luas. Rekomendasi target: role runtime khusus dengan hak minimum dan proses migrasi terpisah.
+6. Rate limiter in-memory cukup untuk satu replica demo, tetapi bukan kontrol lintas replica. Redis belum dipasang karena saat ini tidak ada kebutuhan shared state/cache yang terukur. Jika backend direplikasi, pindahkan limiter ke Redis atau layanan storage bersama; untuk chatbot, backend membaca `CF-Connecting-IP` karena akses publik masuk melalui Cloudflare Tunnel dan port backend hanya bind ke loopback VPS. Terapkan edge rules Cloudflare dan pantau false positive sebelum memperketat batas publik.
 7. Request logs hanya memuat metadata operasional yang diperlukan. Hapus atau redaksi Authorization, cookie, password, JWT, connection string, dan data calon siswa.
-8. Analytics dipasang hanya di area publik dan mengikuti persetujuan/pengaturan privasi sekolah. Event conversion berbentuk kategori/aksi (mis. klik CTA atau unduh brosur), tanpa nama, email, nomor telepon, NISN, atau isi form. Clarity menyamarkan input dan tidak merekam halaman admin.
+8. Analytics hanya aktif di area publik setelah persetujuan eksplisit dan mengikuti pengaturan privasi sekolah. Banner memberi pilihan Terima/Tolak dan pilihan dapat diubah kapan saja. GA4 hanya menerima pathname page view; event konversi belum ditambahkan karena perlu disepakati. Halaman admin/login, pendaftaran, permintaan layanan, pencarian hasil kelulusan dikecualikan. Clarity menerima halaman publik yang diizinkan; semua form diberi masking sebelum script dimuat.
 
 ## Tahapan implementasi
 
-### Tahap A — Demo aman di subdomain
+### Tahap A — Demo aman di subdomain (baseline berjalan)
 
 - Pertahankan driver lokal yang eksplisit; production tetap PostgreSQL-only dan pastikan `.env` VPS menggunakan `DATABASE_DRIVER=postgres`.
 - Bereskan kontrak konfigurasi Compose/API/frontend, validasi health check, dan dokumentasikan setup Cloudflare Tunnel untuk `linear` dan `api-linear`.
 - Jalankan CI build/test, publish image bertag commit ke GHCR, lalu aktifkan deploy demo hanya setelah pemilik mengisi secrets/variables VPS.
-- Uji smoke test frontend, API, auth admin, penyimpanan data, dan rollback image.
+- Pemilik sudah menjalankan deployment demo dan mengonfirmasi API health `200` serta database `ok`. Pemeriksaan live yang lebih luas dan stress test VPS tetap dijadwalkan di tahap akhir; status repo saja bukan bukti semua jalur live sehat.
 
-### Tahap B — Hardening data dan operasi
+### Tahap B — Hardening data dan operasi (pekerjaan berikutnya)
 
-- Audit role/grants/policies RLS dan permission setiap endpoint; jangan membuka tabel ke Data API tanpa alasan.
-- Terapkan/konfirmasi proteksi login, chatbot, upload dan endpoint pendaftaran; catat limit dan cara memperoleh IP client di belakang Cloudflare.
-- Tambahkan backup Postgres terenkripsi di lokasi terpisah, kebijakan retensi, runbook restore, dan satu uji restore yang disetujui pemilik database.
-- Tambahkan request ID, log terstruktur yang bebas secret/PII, serta alert uptime dan kapasitas VPS.
+- Pastikan kepemilikan/akses pemulihan project Supabase dan lingkungan demo vs production. Jangan menjadikan project milik pihak lain satu-satunya data produksi tanpa kesepakatan akses, backup, dan pemulihan.
+- Audit role/grants/policies RLS dan izin setiap endpoint. Pisahkan role runtime berhak minimum dari role migrasi; jangan membuka tabel ke Data API tanpa alasan.
+- Audit kode awal menemukan detail audit log sebelumnya dapat menyimpan PII; branch ini meminimalkan detail untuk log baru. Baris historis tetap perlu keputusan pemilik tentang retensi/pembersihan. Verifikasi role endpoint di demo; lihat [`security-authorization-audit.md`](security-authorization-audit.md).
+- Migrasi sudah dipisahkan ke command `/app/migrate` yang dijalankan sebagai service satu kali sebelum aplikasi diperbarui; seed awal hanya melalui flag operator `--seed-initial`. Migrator memakai `backend/migrate.env`, terpisah dari secret runtime; role PostgreSQL-nya belum tentu terpisah. Sebelum domain utama, ganti `AutoMigrate` dengan migrasi SQL berversi yang direview dan pisahkan hak database runtime dari hak migrator.
+- Upload production sekarang fail-closed ke Cloudinary; konfirmasi proteksi efektif login, chatbot, dan endpoint pendaftaran serta limit Cloudflare saat pengujian VPS.
+- Pool koneksi SQL saat ini dibatasi 25 terbuka/5 idle pada satu backend. Cocokkan dengan paket/connection pool Supabase dan jumlah replica sebelum menentukan concurrency stress test atau mengubah batas.
+- Implementasikan backup Postgres terenkripsi di lokasi terpisah, retensi dan alert, lalu lakukan uji restore yang disetujui pemilik database. Runbook sudah tersedia; backup otomatis dan latihan restore belum ada. Backup provider tidak menggantikan salinan independen dan latihan restore.
+- Sasaran awal yang diusulkan: RPO 24 jam dan RTO 4 jam; nilainya belum teruji/terjamin. Prosedur dan prasyarat ada di [`backup-and-recovery-runbook.md`](backup-and-recovery-runbook.md). Database dan media Cloudinary harus dipulihkan terpisah.
+- Request ID UUID dan access log backend sudah ditambahkan di branch ini; perubahan baru terlihat pada demo setelah image berisi commit tersebut dideploy. Berikutnya lengkapi agregasi/error tracking, alert uptime dan kapasitas VPS.
+- Skrip `vps-status.py` memeriksa container, OOM, disk/RAM dan probe website/API/proxy tanpa menampilkan secret. Pipeline menyalin skrip ke VPS sebelum deploy aplikasi; operator menjalankannya sendiri. Health API menambahkan `Cache-Control: no-store`. Panduan tiga monitor eksternal dan penanganan insiden tersedia di [`monitoring-and-incidents.md`](monitoring-and-incidents.md); konfigurasi alert dan pemeriksaan live tetap diperlukan.
 
 ### Tahap C — Analitik dan optimasi pengalaman
 
-- Pasang GA4 untuk page view dan event konversi yang disepakati.
-- Pasang Clarity hanya setelah masking dan pengecualian area sensitif diuji.
+- Consent-gated integration GA4/Clarity, pilihan Terima/Tolak, masking form, dan daftar route sensitif sudah ada di branch ini. Tracking tetap nonaktif sampai pemilik membuat Repository variables untuk kedua ID.
+- Sebelum memasukkan ID: lengkapi disclosure kebijakan privasi sekolah dan konfigurasi GA4 agar pageview browser-history otomatis dimatikan; pastikan Clarity tidak membuka masking.
+- Event conversion belum dikirim. Sepakati event yang aman (misalnya kategori klik CTA/unduh brosur) sebelum menambahkannya.
 - Evaluasi cache route publik, Core Web Vitals, aksesibilitas, dan temuan heatmap/session replay; prioritaskan perbaikan UI/UX berdasarkan bukti.
 
 ### Tahap D — Promosi domain utama dan scaling
 
 - Alihkan domain utama hanya setelah checklist demo, backup/restore, keamanan, pemantauan, dan rollback lulus serta pemilik memberi persetujuan.
-- Tambah load balancer atau replica hanya bila beban aktual atau availability target membutuhkannya. Untuk satu VPS, load balancer lokal menambah kompleksitas tanpa memberi redundansi host.
+- Tambah Redis saat diperlukan shared cache/rate-limit state, dan tambah load balancer/replica hanya bila hasil pengukuran atau target availability membutuhkannya. Untuk satu VPS, load balancer lokal tidak memberi redundansi host; HA memerlukan lebih dari satu host/origin dan mekanisme failover.
 
 ## Keputusan dan prasyarat yang masih diperlukan
 
 - Pemilik Supabase perlu memastikan proyek/akun memiliki akses operasional dan memberi izin untuk backup/restore serta konfigurasi role; kredensial tidak dikirim lewat chat.
 - Pemilik perlu menambahkan SSH deploy secrets ke GitHub Environment `demo` dan mengatur variabel path VPS sebelum auto-deploy demo diaktifkan.
-- GA4 Measurement ID dan Clarity Project ID baru diperlukan pada Tahap C; bukan penghalang untuk build/deploy demo.
+- Docker Scout tambahan tetap opsional dan membutuhkan konfigurasi Docker Hub bila diaktifkan. Trivy menjadi gate wajib untuk image GHCR; hasilnya perlu ditinjau bila temuan baru memblokir build, bukan diabaikan atau ditekan tanpa analisis.
+- GA4 Measurement ID dan Clarity Project ID adalah GitHub Repository variables yang diperlukan untuk mengaktifkan tracking pada image build berikutnya; jika kosong, frontend tidak memuat script analytics.
 - Retensi backup dan lokasi salinan independen perlu diputuskan bersama sebelum mengaktifkan backup otomatis.
+- Pemilik Cloudinary perlu memastikan akses pemulihan akun dan menyetujui apakah file asli harus disalin ke lokasi independen; manifest aset saja bukan backup.
 - `smktelkom-sidoarjo.my.id` tetap di luar pipeline demo sampai persetujuan promosi domain utama.
 
 ## Risiko/hal yang perlu diselesaikan
@@ -113,4 +128,7 @@ Demo menjalankan satu frontend Next.js dan satu Go API container di Docker Compo
 - Repo dan dokumentasi lama memiliki beberapa pernyataan yang tidak konsisten soal SQLite, RLS, rate limit, dan status fitur. Dokumen ini adalah target rancangan, bukan bukti semua kontrol telah terpasang.
 - Proyek Supabase dimiliki teman. Ketergantungan akun dan akses pemulihan perlu disepakati agar operasional tidak bergantung pada satu orang.
 - Satu VPS adalah single point of failure; health check dan restart membantu pemulihan proses, tetapi tidak melindungi dari kegagalan host atau jaringan.
-- Container Compose backend menjalankan migrasi dan seed saat startup. Sebelum traffic production/domain utama, migrasi dan seed perlu ditinjau agar deployment tidak mengubah data tak terduga.
+- Migrator terpisah masih memakai `AutoMigrate`; file secret koneksinya sudah terpisah, tetapi role PostgreSQL mungkin masih sama dengan aplikasi. Sebelum domain utama, migrasi harus berversi/reviewed, kredensial runtime perlu hak minimum, dan role migrator perlu hak DDL terbatas khusus.
+- Fallback upload ke disk lokal sekarang hanya aktif di development; di production kegagalan Cloudinary menghasilkan `503` agar aplikasi tidak menyimpan URL file sementara sebagai sukses. Filesystem container tetap bukan storage durable dan Cloudinary membutuhkan akses pemulihan akun/offsite media sesuai target RPO.
+- CORS bukan pengganti autentikasi atau otorisasi. Pastikan `ALLOWED_ORIGIN` pada VPS berisi origin frontend production yang tepat (tanpa path), lalu verifikasi setelah deploy.
+- Dokumen ini menggambarkan arsitektur target dan status yang terbaca di branch `deploy`, bukan hasil verifikasi konfigurasi live. Validasi deploy, stress test, backup/restore, dan pemantauan tetap dijalankan pada tahap operasional.

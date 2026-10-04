@@ -69,6 +69,8 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: https://api-linear.smktelkom-sidoarjo.my.id/api
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ""
+          NEXT_PUBLIC_CLARITY_PROJECT_ID: ""
 
   container-images:
     name: Build and publish demo images
@@ -127,8 +129,35 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=https://api-linear.smktelkom-sidoarjo.my.id/api
             NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
+            NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+            NEXT_PUBLIC_CLARITY_PROJECT_ID=${{ vars.NEXT_PUBLIC_CLARITY_PROJECT_ID }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
+
+      # These scans run after publication to GHCR but before the dependent
+      # deploy job, so an image with actionable High/Critical CVEs is not
+      # rolled out to the demo VPS.
+      - name: Scan backend image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ghcr.io/${{ steps.owner.outputs.value }}/skomda-backend:${{ steps.tag.outputs.value }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Scan frontend image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ghcr.io/${{ steps.owner.outputs.value }}/skomda-frontend:${{ steps.tag.outputs.value }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Scan backend image with Docker Scout
         if: vars.DOCKER_SCOUT_ENABLED == 'true'
@@ -163,7 +192,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: demo
     steps:
-      - name: Checkout deployment script
+      - name: Checkout deployment scripts
         uses: actions/checkout@v4
 
       - name: Deploy immutable image tag over SSH
@@ -198,6 +227,16 @@ jobs:
             exit 1
           fi
           deploy_path_b64="$(printf '%s' "$VPS_DEPLOY_PATH" | base64 -w 0)"
+
+          # Install the read-only operations checker; it is not executed by CI.
+          scp -i "$HOME/.ssh/deploy_key" \
+            -P "$VPS_SSH_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            scripts/vps-status.py \
+            "$VPS_USER@$VPS_HOST:$VPS_DEPLOY_PATH/vps-status.py"
 
           ssh -i "$HOME/.ssh/deploy_key" \
             -p "$VPS_SSH_PORT" \

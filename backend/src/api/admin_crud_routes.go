@@ -1125,6 +1125,10 @@ func recordAudit(c *fiber.Ctx, action, entity, entityID, details string) {
 	userName, _ := c.Locals("user_name").(string)
 	userID, _ := c.Locals("user_id").(uint)
 	ip := c.IP()
+	// Callers may pass names, email addresses, student identifiers, ticket codes,
+	// or setting values. Keep the parameter for call-site compatibility, but do
+	// not persist free-form details in the audit log.
+	safeDetails := "Aktivitas tercatat; detail objek tidak disimpan."
 
 	go func() {
 		config.DB.Create(&models.AuditLog{
@@ -1133,7 +1137,7 @@ func recordAudit(c *fiber.Ctx, action, entity, entityID, details string) {
 			Action:    action,
 			Entity:    entity,
 			EntityID:  entityID,
-			Details:   details,
+			Details:   safeDetails,
 			IPAddress: ip,
 			CreatedAt: time.Now(),
 		})

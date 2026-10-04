@@ -77,7 +77,6 @@ func RegisterRoutes(r *gin.RouterGroup, cfg config.Config) {
 		cbGroup.GET("/health", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"status": "ready",
-				"target": cfg.NexusRouterURL,
 			})
 		})
 	}
@@ -284,10 +283,12 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 
 	resp, err := client.Do(httpReq)
 	if err != nil || (resp != nil && resp.StatusCode != http.StatusOK) {
+		requestID, _ := c.Get("request_id")
 		if err != nil {
-			log.Printf("[Chatbot] Gagal menghubungi NexusRouter di %s: %v", nexusURL, err)
+			log.Printf("[Chatbot] upstream tidak tersedia request_id=%v", requestID)
 		} else {
-			log.Printf("[Chatbot] NexusRouter status error: %d", resp.StatusCode)
+			log.Printf("[Chatbot] upstream mengembalikan status=%d request_id=%v", resp.StatusCode, requestID)
+			_ = resp.Body.Close()
 		}
 
 		// Fallback cerdas jika gateway offline
@@ -311,6 +312,7 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 			return
 		}
 
+		// Fallback ramah jika NexusRouter offline atau mengembalikan error.
 		c.JSON(http.StatusOK, gin.H{
 			"response": "Mohon maaf, asisten virtual SMK Telkom Sidoarjo sedang dalam pemeliharaan berkala.\n\nUntuk informasi pendaftaran PPDB 2026/2027, jurusan, atau konsultasi sekolah, silakan hubungi WhatsApp resmi kami di **0811-3021-919** atau unduh brosur resmi di menu [Unduh Informasi](/unduh-informasi).",
 			"sources": []gin.H{
@@ -343,7 +345,8 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 			}
 			if readErr != nil {
 				if readErr != io.EOF {
-					log.Printf("[Chatbot] Streaming read error: %v", readErr)
+					requestID, _ := c.Get("request_id")
+					log.Printf("[Chatbot] streaming upstream terputus request_id=%v", requestID)
 				}
 				break
 			}
@@ -543,4 +546,3 @@ Siswa DTP dipersiapkan untuk meraih sertifikasi keahlian berstandar global yang 
 
 Pelajari silabus lengkap, portofolio karya, dan prospek karir di halaman resmi [Digital Talent Program](/program/digital-talent).`
 }
-
