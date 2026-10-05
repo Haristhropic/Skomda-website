@@ -32,13 +32,13 @@ export default function FasilitasClient() {
               );
 
               return {
-                id: String(f.id),
+                id: matchedLocal?.id || String(f.id),
                 name: f.name,
                 category: (f.category || matchedLocal?.category || "Sarana Umum & Olahraga") as any,
                 description: f.description || matchedLocal?.description || "",
                 specs: f.features ? f.features.split(",").map((s) => s.trim()) : (matchedLocal?.specs || []),
                 image: matchedLocal?.image || f.image || "/images/tentang-kami/fasilitas/fasilitas-gedung-smk.png",
-                badge: f.capacity || matchedLocal?.badge || "Kampus Modern",
+                badge: f.capacity || matchedLocal?.badge || "Gedung Sekolah",
               };
             })
           );
@@ -88,7 +88,7 @@ export default function FasilitasClient() {
         showAccentBar={true}
         description={t(
           "fasilitas.heroDesc",
-          "Didukung infrastruktur modern bersertifikasi ISO 21001:2018, kami menyediakan laboratorium jaringan berkecepatan tinggi, studio pengembangan software, perpustakaan digital, serta ruang kelas interaktif."
+          "Didukung sarana pembelajaran yang memadai, kami menyediakan ruang kelas ber-AC, laboratorium kejuruan, perpustakaan, serta area praktik untuk mendukung kegiatan belajar mengajar siswa."
         )}
         studentImage="/images/tentang-kami/fasilitas/hero-fasilitas-terpadu.png"
         studentAlt={`${t("fasilitas.breadcrumb", "Fasilitas")} SMK Telkom Sidoarjo`}
@@ -105,11 +105,11 @@ export default function FasilitasClient() {
           {/* Section Header */}
           <div className="text-center max-w-2xl mx-auto mb-12">
             <h2 className="font-jakarta font-bold text-2xl sm:text-3xl lg:text-4xl text-[#101828]">
-              {t("fasilitas.sectionTitle", "Laboratorium & Sarana Prasarana Terpadu")}
+              {t("fasilitas.sectionTitle", "Laboratorium & Sarana Prasarana Sekolah")}
             </h2>
             <div className="section-title-line" />
             <p className="font-jakarta text-base text-[#4a5565] leading-relaxed">
-              {t("fasilitas.sectionDesc", "Mulai dari laboratorium kejuruan tingkat lanjut hingga lingkungan belajar luar ruang yang asri, seluruh sarana dirancang demi kenyamanan dan kesiapan kerja siswa.")}
+              {t("fasilitas.sectionDesc", "Fasilitas belajar dan ruang praktik yang mendukung kegiatan teori, praktikum kejuruan, hingga kegiatan olahraga dan ekstrakurikuler siswa.")}
             </p>
           </div>
 

@@ -109,11 +109,6 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 		c.JSON(200, gin.H{"response": SafetyReply, "sources": []gin.H{}, "fallback": true})
 		return
 	}
-	if reply, source := LocalFAQ(trimmedMessage); reply != "" {
-		c.JSON(200, gin.H{"response": reply, "sources": []gin.H{{"title": "Informasi resmi sekolah", "url": source}}, "model": "Skomda Verified FAQ"})
-		return
-	}
-	req.Model = cfg.ChatbotModel
 	// Cek apakah query DTP memiliki intensi spesifik (magang/karir, sertifikasi, daftar 9 spesialisasi, atau overview)
 	if isDtpQuery(trimmedMessage) {
 		lower := strings.ToLower(trimmedMessage)
@@ -218,6 +213,12 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 			return
 		}
 	}
+
+	if reply, source := LocalFAQ(trimmedMessage); reply != "" {
+		c.JSON(200, gin.H{"response": reply, "sources": []gin.H{{"title": "Informasi resmi sekolah", "url": source}}, "model": "Skomda Verified FAQ"})
+		return
+	}
+	req.Model = cfg.ChatbotModel
 
 	// Siapkan query cerdas dengan injeksi konteks DTP/SKOMDA terkini bila relevan agar AI menjawab akurat dan dinamis
 	processedMessage := trimmedMessage
@@ -368,6 +369,15 @@ func handleChatMessage(c *gin.Context, cfg config.Config) {
 			"error": "Gagal membaca balasan dari gateway AI.",
 		})
 		return
+	}
+
+	var jsonMap map[string]interface{}
+	if err := json.Unmarshal(body, &jsonMap); err == nil {
+		if respText, ok := jsonMap["response"].(string); ok {
+			jsonMap["response"] = SanitizeAssistantOutput(respText)
+			c.JSON(resp.StatusCode, jsonMap)
+			return
+		}
 	}
 
 	c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)

@@ -585,6 +585,7 @@ export default function ChatWindow({ isOpen, onClose }: ChatWindowProps) {
                 ) : (() => {
                   const clean = msg.content
                     .replace(/<think>[\s\S]*?(<\/think>|$)/gi, "")
+                    .replace(/```[a-zA-Z0-9_]*\s*[\r\n]+[\s\S]*?```/gi, "\n*(Catatan: Asisten virtual resmi hanya melayani informasi sekolah dan tidak menyediakan potongan kode pemrograman teknis. Silakan pelajari kurikulum di [Profil Jurusan](/program/profil-jurusan).)*\n")
                     .replace(/—/g, " - ")
                     .trim();
                   if (!clean && msg.isStreaming) {
@@ -786,6 +787,7 @@ interface MarkdownRendererProps {
 function MarkdownRenderer({ content, isStreaming, onClose }: MarkdownRendererProps) {
   const cleanContent = content
     .replace(/<think>[\s\S]*?(<\/think>|$)/gi, "")
+    .replace(/```[a-zA-Z0-9_]*\s*[\r\n]+[\s\S]*?```/gi, "\n*(Catatan: Asisten virtual resmi hanya melayani informasi sekolah dan tidak menyediakan potongan kode pemrograman teknis. Silakan pelajari kurikulum di [Profil Jurusan](/program/profil-jurusan).)*\n")
     .replace(/—/g, " - ")
     .trim();
 

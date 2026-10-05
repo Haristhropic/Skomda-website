@@ -732,9 +732,6 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 		if chatbot.Suspicious(trimmed) || chatbot.UnsafeHistory(req.History) {
 			return c.JSON(fiber.Map{"response": chatbot.SafetyReply, "sources": []fiber.Map{}, "fallback": true})
 		}
-		if reply, source := chatbot.LocalFAQ(trimmed); reply != "" {
-			return c.JSON(fiber.Map{"response": reply, "sources": []fiber.Map{{"title": "Informasi resmi sekolah", "url": source}}, "model": "Skomda Verified FAQ"})
-		}
 		req.Model = cfg.ChatbotModel
 		leaseID := observability.RequestID("")
 		leaseCtx, leaseCancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
@@ -858,6 +855,10 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 					"model":    "Skomda Knowledge Engine (DTP Curated)",
 				})
 			}
+		}
+
+		if reply, source := chatbot.LocalFAQ(trimmed); reply != "" {
+			return c.JSON(fiber.Map{"response": reply, "sources": []fiber.Map{{"title": "Informasi resmi sekolah", "url": source}}, "model": "Skomda Verified FAQ"})
 		}
 
 		// Siapkan query cerdas dengan injeksi konteks DTP/SKOMDA terkini bila relevan agar AI menjawab akurat dan dinamis
@@ -1012,6 +1013,14 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Gagal membaca respons dari gateway AI.",
 			})
+		}
+
+		var jsonMap map[string]interface{}
+		if err := json.Unmarshal(body, &jsonMap); err == nil {
+			if respText, ok := jsonMap["response"].(string); ok {
+				jsonMap["response"] = chatbot.SanitizeAssistantOutput(respText)
+				return c.Status(resp.StatusCode).JSON(jsonMap)
+			}
 		}
 
 		c.Status(resp.StatusCode)
