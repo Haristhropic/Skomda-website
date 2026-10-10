@@ -15,7 +15,7 @@ export interface TrialClassParticipant {
   updatedAt: string;
 }
 
-export type TrialClassTicketVerification = Pick<TrialClassParticipant, "ticketCode" | "major">;
+export type TrialClassTicketVerification = Pick<TrialClassParticipant, "ticketCode" | "major" | "fullName">;
 
 export async function getTrialClassParticipants(params?: {
   q?: string;

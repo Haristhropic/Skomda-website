@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import AdminSelect from "@/components/admin/AdminSelect";
+import VirtualClassManager from "@/components/admin/VirtualClassManager";
 import {
   TrialClassParticipant,
   TrialClassEvent,
@@ -196,7 +197,7 @@ function RowStatusSelect({
 }
 
 export default function AdminTrialClassPage() {
-  const [activeTab, setActiveTab] = useState<"participants" | "event">("participants");
+  const [activeTab, setActiveTab] = useState<"participants" | "event" | "virtual_class">("participants");
   const [participants, setParticipants] = useState<TrialClassParticipant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -547,6 +548,19 @@ export default function AdminTrialClassPage() {
             {eventData.status === "open" && (
               <span className="size-2 rounded-full bg-emerald-400" />
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("virtual_class")}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === "virtual_class"
+                ? "bg-slate-900 text-white shadow-sm"
+                : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+            }`}
+          >
+            <Sparkles className="size-4 text-amber-500" />
+            <span>Materi Video & Kuis Virtual Class</span>
           </button>
         </div>
 
@@ -1246,6 +1260,11 @@ export default function AdminTrialClassPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── TAB 3: KELOLA VIRTUAL CLASS & KUIS INTERAKTIF ── */}
+      {activeTab === "virtual_class" && (
+        <VirtualClassManager onShowToast={showToast} />
       )}
       </div>
 

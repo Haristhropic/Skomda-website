@@ -46,8 +46,8 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	app := fiber.New(fiber.Config{
 		AppName:      "SMK Telkom Sidoarjo API (Fiber Edition)",
 		ServerHeader: "Fiber",
-		ReadTimeout:  10 * time.Second, WriteTimeout: 40 * time.Second, IdleTimeout: 60 * time.Second,
-		BodyLimit: 11 * 1024 * 1024, // File 10 MiB plus multipart overhead.
+		ReadTimeout:  120 * time.Second, WriteTimeout: 120 * time.Second, IdleTimeout: 120 * time.Second,
+		BodyLimit: 105 * 1024 * 1024, // File video hingga 100 MiB plus multipart overhead.
 	})
 
 	// Middleware
@@ -92,8 +92,8 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 	})
 
 	app.Use(func(c *fiber.Ctx) error {
-		// Direct API requests obey the same cap as the same-origin proxy.
-		if c.Path() != "/api/upload/image" && c.Path() != "/api/upload/document" && len(c.Body()) > 1024*1024 {
+		// Direct API requests obey the same cap as the same-origin proxy, except for large file uploads.
+		if c.Path() != "/api/upload/image" && c.Path() != "/api/upload/document" && c.Path() != "/api/upload/video" && len(c.Body()) > 1024*1024 {
 			return c.Status(fiber.StatusRequestEntityTooLarge).JSON(fiber.Map{"error": "Permintaan maksimal 1 MiB"})
 		}
 		return c.Next()
@@ -1263,6 +1263,87 @@ func NewFiberApp(cfg config.Config) *fiber.App {
 			"format":       fileType,
 			"fileSize":     fileSize,
 			"originalName": fileHeader.Filename,
+		})
+	})
+
+	// 5c. Upload Berkas Video Pembelajaran Virtual Class
+	api.Post("/upload/video", middleware.AuthMiddleware(cfg.JWTSecret), middleware.SharedRateLimit("uploads", 20, 10*time.Minute), middleware.UploadConcurrency, func(c *fiber.Ctx) error {
+		fileHeader, err := c.FormFile("file")
+		if err != nil {
+			fileHeader, err = c.FormFile("video")
+		}
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Berkas video tidak ditemukan. Silakan pilih berkas video.",
+			})
+		}
+
+		ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
+		allowedExts := map[string]bool{
+			".mp4":  true,
+			".webm": true,
+			".ogg":  true,
+			".mov":  true,
+			".m4v":  true,
+		}
+		if !allowedExts[ext] {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Format berkas video tidak didukung. Format yang diizinkan: MP4, WebM, OGG, MOV, M4V.",
+			})
+		}
+
+		if fileHeader.Size <= 0 || fileHeader.Size > 100*1024*1024 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Ukuran berkas video tidak valid atau melebihi batas maksimum 100 MiB.",
+			})
+		}
+
+		cleanBase := slugify(strings.TrimSuffix(fileHeader.Filename, ext))
+		if cleanBase == "" {
+			cleanBase = "virtual-class"
+		}
+		folder := c.FormValue("folder", "skomda/virtual-class/videos")
+
+		// 1. Coba upload langsung ke Cloudinary untuk streaming instan via CDN global
+		if cloudinaryConfigured(cldClient) {
+			file, err := fileHeader.Open()
+			if err == nil {
+				defer file.Close()
+				uploadRes, err := cldClient.UploadVideo(c.Context(), file, fileHeader.Filename, folder)
+				if err == nil && uploadRes != nil && uploadRes.SecureURL != "" {
+					return c.JSON(fiber.Map{
+						"success":   true,
+						"url":       uploadRes.SecureURL,
+						"public_id": uploadRes.PublicID,
+					})
+				}
+				log.Printf("upload video ke Cloudinary gagal request_id=%v err=%v, fallback ke penyimpanan lokal", c.Locals("request_id"), err)
+			}
+		}
+
+		// 2. Fallback simpan lokal jika Cloudinary tidak tersedia
+		uniqueName := fmt.Sprintf("%s-%d%s", cleanBase, time.Now().Unix(), ext)
+		localDir := os.Getenv("UPLOAD_DIR")
+		if localDir == "" {
+			if _, err := os.Stat("../frontend/public"); err == nil {
+				localDir = "../frontend/public/uploads/videos"
+			} else {
+				localDir = "./uploads/videos"
+			}
+		} else {
+			localDir = filepath.Join(localDir, "videos")
+		}
+		_ = os.MkdirAll(localDir, 0755)
+		destPath := filepath.Join(localDir, uniqueName)
+		if err := c.SaveFile(fileHeader, destPath); err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Gagal menyimpan berkas video ke server.",
+			})
+		}
+
+		return c.JSON(fiber.Map{
+			"success": true,
+			"url":     "/uploads/videos/" + uniqueName,
 		})
 	})
 

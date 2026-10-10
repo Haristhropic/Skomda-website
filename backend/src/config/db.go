@@ -95,12 +95,14 @@ func MigrateDB(db *gorm.DB) error {
 		&models.DigitalTalent{},
 		&models.TrialClassRegistration{},
 		&models.TrialClassEvent{},
+		&models.VirtualClassModule{},
+		&models.VirtualClassQuiz{},
 	); err != nil {
 		return fmt.Errorf("gagal auto migrate database: %w", err)
 	}
 
 	if db.Dialector.Name() == "postgres" {
-		for _, table := range []string{"jurusans", "news", "users", "audit_logs", "alumnis", "digital_talents", "trial_class_events"} {
+		for _, table := range []string{"jurusans", "news", "users", "audit_logs", "alumnis", "digital_talents", "trial_class_events", "virtual_class_modules", "virtual_class_quizzes"} {
 			if err := db.Exec("ALTER TABLE IF EXISTS public." + table + " ENABLE ROW LEVEL SECURITY").Error; err != nil {
 				return fmt.Errorf("gagal mengaktifkan RLS pada %s: %w", table, err)
 			}
@@ -115,6 +117,7 @@ func SeedInitialData(db *gorm.DB) {
 	SeedAlumniIfEmpty(db)
 	SeedDtpIfEmpty(db)
 	SeedTrialClassEventIfEmpty(db)
+	SeedVirtualClassIfEmpty(db)
 }
 
 // InitDB mempertahankan auto-migrate dan seed untuk development/test saja.

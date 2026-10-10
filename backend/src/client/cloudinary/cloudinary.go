@@ -231,3 +231,62 @@ func (c *Client) UploadRaw(ctx context.Context, fileReader io.Reader, filename, 
 
 	return &res, nil
 }
+
+// UploadVideo mengunggah stream/byte video ke Cloudinary (resource_type: video).
+func (c *Client) UploadVideo(ctx context.Context, fileReader io.Reader, filename, folder string) (*UploadResult, error) {
+	if c.CloudName == "" || c.APIKey == "" || c.APISecret == "" {
+		return nil, fmt.Errorf("kredensial Cloudinary belum lengkap di backend .env")
+	}
+
+	uploadURL := fmt.Sprintf("https://api.cloudinary.com/v1_1/%s/video/upload", c.CloudName)
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	part, err := writer.CreateFormFile("file", filename)
+	if err != nil {
+		return nil, fmt.Errorf("gagal membuat form file: %w", err)
+	}
+	if _, err := io.Copy(part, fileReader); err != nil {
+		return nil, fmt.Errorf("gagal menyalin stream file: %w", err)
+	}
+
+	timestamp := fmt.Sprintf("%d", time.Now().Unix())
+	paramsToSign := map[string]string{
+		"timestamp": timestamp,
+		"folder":    folder,
+	}
+	signature := c.GenerateSignature(paramsToSign)
+
+	_ = writer.WriteField("api_key", c.APIKey)
+	_ = writer.WriteField("timestamp", timestamp)
+	_ = writer.WriteField("signature", signature)
+	_ = writer.WriteField("folder", folder)
+	_ = writer.Close()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, uploadURL, body)
+	if err != nil {
+		return nil, fmt.Errorf("gagal membuat http request ke Cloudinary: %w", err)
+	}
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	httpClient := &http.Client{Timeout: 180 * time.Second}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("gagal menghubungi Cloudinary: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("cloudinary video upload error (%d): %s", resp.StatusCode, string(respBody))
+	}
+
+	var res UploadResult
+	if err := json.Unmarshal(respBody, &res); err != nil {
+		return nil, fmt.Errorf("gagal decode response Cloudinary: %w", err)
+	}
+
+	return &res, nil
+}
+

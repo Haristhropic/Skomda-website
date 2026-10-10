@@ -47,10 +47,10 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: "Akademik & Siswa",
     items: [
-      { title: "Pendaftar Trial Class", href: "/admin/trial-class", icon: Ticket },
-      { title: "Digital Talent (DTP)", href: "/admin/dtp", icon: Sparkles },
+      { title: "Trial Class", href: "/admin/trial-class", icon: Ticket },
+      { title: "Digital Talent Program", href: "/admin/dtp", icon: Sparkles },
       { title: "Kelulusan & Alumni", href: "/admin/kelulusan", icon: GraduationCap },
-      { title: "Guru & Tenaga Kependidikan", href: "/admin/guru", icon: Users },
+      { title: "Guru & Tenaga Pendidik", href: "/admin/guru", icon: Users },
       { title: "Prestasi Siswa", href: "/admin/prestasi", icon: Trophy },
       { title: "Bursa Kerja & BKK", href: "/admin/bkk", icon: Briefcase },
     ],

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import TrialClassHero from "./TrialClassHero";
 import TrialClassFeelingsSection from "./TrialClassFeelingsSection";
 import TrialClassStepsSection from "./TrialClassStepsSection";
@@ -13,6 +14,7 @@ const TrialClassRegistrationModal = dynamic(
 
 export default function TrialClassClient() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <div className="w-full">
@@ -23,6 +25,9 @@ export default function TrialClassClient() {
       <TrialClassRegistrationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={() => {
+          router.push("/trial-class/virtual-class");
+        }}
       />
     </div>
   );

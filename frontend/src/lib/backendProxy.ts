@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { readBoundedRequestBody, RequestBodyError } from "./boundedRequestBody";
 
+const VIDEO_UPLOAD_BODY_LIMIT_BYTES = 105 * 1024 * 1024;
 const UPLOAD_BODY_LIMIT_BYTES = 11 * 1024 * 1024;
 const JSON_BODY_LIMIT_BYTES = 1024 * 1024;
 // Each frontend replica buffers at most two authenticated file uploads.
@@ -58,7 +59,9 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
     return requestError("Jalur permintaan tidak valid", 400, requestId);
   }
 
-  const isUpload = request.method === "POST" && path.length === 2 && path[0] === "upload" && ["image", "document"].includes(path[1]);
+  const isVideoUpload = request.method === "POST" && path.length === 2 && path[0] === "upload" && path[1] === "video";
+  const isStandardUpload = request.method === "POST" && path.length === 2 && path[0] === "upload" && ["image", "document"].includes(path[1]);
+  const isUpload = isVideoUpload || isStandardUpload;
   const backendBaseUrl = (process.env.BACKEND_API_URL || "http://localhost:8080/api").replace(/\/+$/, "");
   if (isUpload) {
     let identity: { user?: { role?: string } };
@@ -81,14 +84,25 @@ export async function proxyToBackend(request: NextRequest, path: string[]) {
     uploadState.active++;
   }
   try {
-    return await forwardToBackend(request, path, requestId, isUpload, backendBaseUrl);
+    return await forwardToBackend(request, path, requestId, isUpload, isVideoUpload, backendBaseUrl);
   } finally {
     if (isUpload) uploadState.active--;
   }
 }
 
-async function forwardToBackend(request: NextRequest, path: string[], requestId: string, isUpload: boolean, backendBaseUrl: string) {
-  const bodyLimit = isUpload ? UPLOAD_BODY_LIMIT_BYTES : JSON_BODY_LIMIT_BYTES;
+async function forwardToBackend(
+  request: NextRequest,
+  path: string[],
+  requestId: string,
+  isUpload: boolean,
+  isVideoUpload: boolean,
+  backendBaseUrl: string
+) {
+  const bodyLimit = isVideoUpload
+    ? VIDEO_UPLOAD_BODY_LIMIT_BYTES
+    : isUpload
+    ? UPLOAD_BODY_LIMIT_BYTES
+    : JSON_BODY_LIMIT_BYTES;
   const backendPath = path.map((part) => encodeURIComponent(part)).join("/");
   const backendUrl = `${backendBaseUrl}/${backendPath}${request.nextUrl.search}`;
   const headers = new Headers();
@@ -105,7 +119,8 @@ async function forwardToBackend(request: NextRequest, path: string[], requestId:
     body = await readBoundedRequestBody(request, bodyLimit);
   } catch (error) {
     if (error instanceof RequestBodyError && error.status === 413) {
-      return requestError(`Ukuran permintaan melebihi batas ${isUpload ? 11 : 1} MiB`, 413, requestId);
+      const limitInMib = isVideoUpload ? 105 : isUpload ? 11 : 1;
+      return requestError(`Ukuran permintaan melebihi batas ${limitInMib} MiB`, 413, requestId);
     }
     return requestError("Gagal membaca isi permintaan", 400, requestId);
   }
@@ -117,7 +132,7 @@ async function forwardToBackend(request: NextRequest, path: string[], requestId:
       headers,
       cache: "no-store",
       redirect: "manual",
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(isVideoUpload ? 300_000 : 30_000),
     };
     if (body !== null) upstreamRequest.body = body;
     upstream = await fetch(backendUrl, upstreamRequest);

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { VIRTUAL_CLASS_DATA } from "@/data/virtualClassData";
 
-const VIDEO_IDS = new Set(VIRTUAL_CLASS_DATA.map((item) => item.driveVideoId));
+const VIDEO_IDS = new Set(VIRTUAL_CLASS_DATA.map((item) => item.driveVideoId).filter(Boolean));
 
 function videoStream(body: ReadableStream<Uint8Array>, abort: AbortController) {
   const reader = body.getReader();

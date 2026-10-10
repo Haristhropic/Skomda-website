@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ArrowRight, ChevronRight, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { VIRTUAL_CLASS_DATA, VirtualClassDtpItem, getLocalizedVirtualClassItem } from "@/data/virtualClassData";
+import { getVirtualClassModules } from "@/services/virtualClass";
 import VirtualClassDetailPanel from "./VirtualClassDetailPanel";
 
 interface VirtualClassDtpGridProps {
@@ -25,8 +26,26 @@ export default function VirtualClassDtpGrid({
 }: VirtualClassDtpGridProps) {
   const { t, isEn } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
+  const [classList, setClassList] = useState<VirtualClassDtpItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const rawActiveItem = VIRTUAL_CLASS_DATA.find((x) => x.id === selectedClassId) || null;
+  const fetchCloudModules = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getVirtualClassModules();
+      setClassList(data || []);
+    } catch {
+      setClassList([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCloudModules();
+  }, []);
+
+  const rawActiveItem = classList.find((x) => x.id === selectedClassId) || null;
   const activeItem = rawActiveItem ? getLocalizedVirtualClassItem(rawActiveItem, isEn) : null;
 
   const handleSelect = (item: VirtualClassDtpItem) => {
@@ -39,10 +58,10 @@ export default function VirtualClassDtpGrid({
   };
 
   const handleNextClass = () => {
-    if (!activeItem) return;
-    const currentIndex = VIRTUAL_CLASS_DATA.findIndex((x) => x.id === activeItem.id);
-    const nextIndex = (currentIndex + 1) % VIRTUAL_CLASS_DATA.length;
-    handleSelect(VIRTUAL_CLASS_DATA[nextIndex]);
+    if (!activeItem || classList.length === 0) return;
+    const currentIndex = classList.findIndex((x) => x.id === activeItem.id);
+    const nextIndex = (currentIndex + 1) % classList.length;
+    handleSelect(classList[nextIndex]);
   };
 
   return (
@@ -68,59 +87,104 @@ export default function VirtualClassDtpGrid({
 
         {/* ─── Animated Container: Grid (initial) or Split View (when selected) ─── */}
         <AnimatePresence mode="wait">
-          {!activeItem ? (
-            /* ─── 3x3 Full Grid State ─── */
+          {isLoading ? (
+            /* ─── Cloud Loading Skeleton (Pure Dynamic) ─── */
             <motion.div
-              key="grid-view"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
+              key="loading-skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
             >
-              {VIRTUAL_CLASS_DATA.map((rawItem, idx) => {
-                const item = getLocalizedVirtualClassItem(rawItem, isEn);
-                return (
-                <motion.div
-                  key={item.id}
-                  layoutId={`dtp-card-${item.id}`}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: idx * 0.03 }}
-                  onClick={() => handleSelect(item)}
-                  className="group relative neu-card-interactive rounded-[20px] p-4 sm:p-5 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.99]"
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                <div
+                  key={n}
+                  className="rounded-[20px] p-4 sm:p-5 border border-gray-200/70 bg-white/60 animate-pulse flex items-center justify-between gap-3 shadow-xs"
                 >
-                  {/* Left: Icon & Text Info */}
                   <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div className="relative size-11 sm:size-12 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-                      <Image
-                        src={item.icon}
-                        alt={item.title}
-                        width={48}
-                        height={48}
-                        className="object-contain"
-                        unoptimized
-                      />
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-jakarta font-bold text-sm sm:text-base text-[#101828] group-hover:text-[#bc0c11] transition-colors truncate">
-                        {item.title}
-                      </h3>
-                      <p className="font-jakarta text-xs text-[#6a7282] mt-0.5 line-clamp-2 leading-relaxed">
-                        {item.desc}
-                      </p>
+                    <div className="size-11 sm:size-12 rounded-xl bg-gray-200 shrink-0" />
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded-md w-3/4" />
+                      <div className="h-3 bg-gray-100 rounded-md w-full" />
                     </div>
                   </div>
-
-                  {/* Right: Action Arrow */}
-                  <div className="size-7 rounded-full border border-gray-200 group-hover:border-gray-300 text-[#6a7282] group-hover:text-[#bc0c11] flex items-center justify-center shrink-0 transition-all duration-200">
-                    <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-                  </div>
-                </motion.div>
-              );
-              })}
+                  <div className="size-7 rounded-full bg-gray-200 shrink-0" />
+                </div>
+              ))}
             </motion.div>
+          ) : !activeItem ? (
+            /* ─── 3x3 Full Grid State ─── */
+            classList.length === 0 ? (
+              <div className="py-16 text-center bg-white rounded-2xl border border-gray-200 p-6 max-w-md mx-auto">
+                <p className="text-sm font-bold text-gray-800">
+                  {isEn ? "No Virtual Class modules found" : "Materi Virtual Class belum tersedia"}
+                </p>
+                <p className="text-xs text-gray-500 mt-1 mb-4">
+                  {isEn
+                    ? "Check your connection or refresh to reload data from cloud."
+                    : "Pastikan koneksi terhubung dan coba muat ulang data dari server cloud."}
+                </p>
+                <button
+                  type="button"
+                  onClick={fetchCloudModules}
+                  className="px-4 py-2 rounded-xl bg-[#bc0c11] text-white text-xs font-bold hover:bg-[#a00a0e] transition-colors cursor-pointer"
+                >
+                  {isEn ? "Reload Cloud Data" : "Muat Ulang Data Online"}
+                </button>
+              </div>
+            ) : (
+              <motion.div
+                key="grid-view"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+              >
+                {classList.map((rawItem, idx) => {
+                  const item = getLocalizedVirtualClassItem(rawItem, isEn);
+                  return (
+                  <motion.div
+                    key={item.id}
+                    layoutId={`dtp-card-${item.id}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: idx * 0.03 }}
+                    onClick={() => handleSelect(item)}
+                    className="group relative neu-card-interactive rounded-[20px] p-4 sm:p-5 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.99]"
+                  >
+                    {/* Left: Icon & Text Info */}
+                    <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <div className="relative size-11 sm:size-12 shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                        <Image
+                          src={item.icon}
+                          alt={item.title}
+                          width={48}
+                          height={48}
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-jakarta font-bold text-sm sm:text-base text-[#101828] group-hover:text-[#bc0c11] transition-colors truncate">
+                          {item.title}
+                        </h3>
+                        <p className="font-jakarta text-xs text-[#6a7282] mt-0.5 line-clamp-2 leading-relaxed">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right: Action Arrow */}
+                    <div className="size-7 rounded-full border border-gray-200 group-hover:border-gray-300 text-[#6a7282] group-hover:text-[#bc0c11] flex items-center justify-center shrink-0 transition-all duration-200">
+                      <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                    </div>
+                  </motion.div>
+                );
+                })}
+              </motion.div>
+            )
           ) : (
             /* ─── Split View Layout (Figma Node 525:684) ─── */
             <motion.div
@@ -131,7 +195,7 @@ export default function VirtualClassDtpGrid({
               transition={{ duration: 0.3 }}
               className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8 w-full"
             >
-              {/* Left Column: 9 Cards Stacked Vertically (Desktop only, hidden on mobile for direct video view) */}
+              {/* Left Column: Cards Stacked Vertically */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -140,7 +204,7 @@ export default function VirtualClassDtpGrid({
               >
                 <div className="flex items-center justify-between pb-1 px-1">
                   <span className="font-jakarta font-semibold text-xs text-gray-500 uppercase tracking-wider">
-                    {isEn ? "DTP Choices" : "Pilihan DTP"} ({VIRTUAL_CLASS_DATA.length})
+                    {isEn ? "DTP Choices" : "Pilihan DTP"} ({classList.length})
                   </span>
                   <button
                     type="button"
@@ -151,7 +215,7 @@ export default function VirtualClassDtpGrid({
                   </button>
                 </div>
 
-                {VIRTUAL_CLASS_DATA.map((rawItem) => {
+                {classList.map((rawItem) => {
                   const item = getLocalizedVirtualClassItem(rawItem, isEn);
                   const isActive = item.id === activeItem.id;
                   return (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Lock, Ticket, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Lock, Ticket, ArrowRight, CheckCircle2, AlertCircle, KeyRound } from "lucide-react";
 import VirtualClassHero from "./VirtualClassHero";
 import VirtualClassDtpGrid from "./VirtualClassDtpGrid";
 import VirtualClassCtaBanner from "./VirtualClassCtaBanner";
@@ -23,6 +23,7 @@ export default function VirtualClassPageClient() {
   const [ticketCode, setTicketCode] = useState<string | undefined>(undefined);
   const [userName, setUserName] = useState<string | undefined>(undefined);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [registerModalTab, setRegisterModalTab] = useState<"register" | "verify">("register");
 
   // Ticket code manual input for returning registered students
   const [inputTicket, setInputTicket] = useState("");
@@ -49,10 +50,11 @@ export default function VirtualClassPageClient() {
       .then((res) => {
         if (!active) return;
         if (res.success && res.data) {
+          const studentName = res.data.fullName || "Peserta Terdaftar";
           setTicketCode(res.data.ticketCode);
-          setUserName("Peserta Terdaftar");
+          setUserName(studentName);
           sessionStorage.setItem("trial_pass_code", res.data.ticketCode);
-          sessionStorage.setItem("trial_pass_name", "Peserta Terdaftar");
+          sessionStorage.setItem("trial_pass_name", studentName);
           sessionStorage.setItem("trial_pass_major", res.data.major);
         } else {
           if (res.error?.includes("Tiket tidak ditemukan")) {
@@ -71,6 +73,26 @@ export default function VirtualClassPageClient() {
       active = false;
     };
   }, [searchParams]);
+
+  // Listen to external or modal pass code updates
+  useEffect(() => {
+    const handlePassUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail?.ticketCode) {
+        setTicketCode(customEvent.detail.ticketCode);
+        setUserName(customEvent.detail.fullName || "Peserta Terdaftar");
+      } else {
+        const storedTicket = sessionStorage.getItem("trial_pass_code");
+        const storedName = sessionStorage.getItem("trial_pass_name");
+        if (storedTicket) {
+          setTicketCode(storedTicket);
+          setUserName(storedName || "Peserta Terdaftar");
+        }
+      }
+    };
+    window.addEventListener("trial_pass_updated", handlePassUpdate);
+    return () => window.removeEventListener("trial_pass_updated", handlePassUpdate);
+  }, []);
 
   // Handle class selection: gate if unregistered
   const handleSelectClass = (item: VirtualClassDtpItem) => {
@@ -93,13 +115,22 @@ export default function VirtualClassPageClient() {
     try {
       const res = await checkTrialClassTicket(cleanCode);
       if (res.success && res.data) {
+        const studentName = res.data.fullName || "Peserta Terdaftar";
         setTicketCode(res.data.ticketCode);
-        setUserName("Peserta Terdaftar");
+        setUserName(studentName);
         if (typeof window !== "undefined") {
           sessionStorage.setItem("trial_pass_code", res.data.ticketCode);
-          sessionStorage.setItem("trial_pass_name", "Peserta Terdaftar");
+          sessionStorage.setItem("trial_pass_name", studentName);
           sessionStorage.setItem("trial_pass_major", res.data.major);
         }
+        setInputTicket("");
+        setTimeout(() => {
+          const target = document.getElementById("pilih-dtp");
+          if (target) {
+            const topOffset = target.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top: topOffset, behavior: "smooth" });
+          }
+        }, 100);
       } else {
         setVerifyError(res.error || (isEn
           ? "Ticket code not found. Please register first."
@@ -114,7 +145,14 @@ export default function VirtualClassPageClient() {
 
   const handleRegistrationSuccess = (newTicket: string, newName: string) => {
     setTicketCode(newTicket);
-    setUserName(newName);
+    setUserName(newName || "Peserta Terdaftar");
+    setTimeout(() => {
+      const target = document.getElementById("pilih-dtp");
+      if (target) {
+        const topOffset = target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: topOffset, behavior: "smooth" });
+      }
+    }, 150);
   };
 
   return (
@@ -154,24 +192,39 @@ export default function VirtualClassPageClient() {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
                 <button
                   type="button"
-                  onClick={() => setIsRegisterModalOpen(true)}
-                  className="btn-primary !h-[48px] !px-7 text-sm font-semibold cursor-pointer whitespace-nowrap"
+                  onClick={() => {
+                    setRegisterModalTab("register");
+                    setIsRegisterModalOpen(true);
+                  }}
+                  className="btn-primary !h-[48px] !px-6 text-sm font-semibold cursor-pointer whitespace-nowrap"
                 >
-                  <span>{isEn ? "Register Trial Class" : "Daftar Trial Class Sekarang"}</span>
+                  <span>{isEn ? "Register Trial Class" : "Daftar Baru"}</span>
                   <ArrowRight className="size-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRegisterModalTab("verify");
+                    setIsRegisterModalOpen(true);
+                  }}
+                  className="inline-flex items-center justify-center gap-2 !h-[48px] px-5 rounded-full border border-gray-300 bg-white hover:bg-gray-50 text-[#101828] text-sm font-semibold transition-all cursor-pointer whitespace-nowrap shadow-2xs"
+                >
+                  <KeyRound className="size-4 text-[#bc0c11]" />
+                  <span>{isEn ? "I Have a Pass Code" : "Sudah Punya Kode"}</span>
                 </button>
 
                 {/* Inline Ticket Code Input for Returning Students */}
                 <form
                   onSubmit={handleVerifyTicket}
-                  className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5"
+                  className="hidden xl:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5"
                 >
                   <input
                     type="text"
                     value={inputTicket}
                     onChange={(e) => setInputTicket(e.target.value)}
-                    placeholder="Kode Tiket (TC-...)"
-                    className="bg-transparent text-xs font-mono font-bold text-[#101828] placeholder:text-gray-400 placeholder:font-sans focus:outline-none w-44 sm:w-52 uppercase"
+                    placeholder="TC-XXXX-XXXX"
+                    className="bg-transparent text-xs font-mono font-bold text-[#101828] placeholder:text-gray-400 placeholder:font-sans focus:outline-none w-36 uppercase"
                   />
                   <button
                     type="submit"
@@ -206,9 +259,10 @@ export default function VirtualClassPageClient() {
       {/* CTA Banner only shown when no class is selected to avoid cluttering */}
       {!selectedClassId && <VirtualClassCtaBanner />}
 
-      {/* Registration Modal triggered when student registers */}
+      {/* Registration Modal triggered when student registers or enters pass code */}
       <TrialClassRegistrationModal
         isOpen={isRegisterModalOpen}
+        initialTab={registerModalTab}
         onClose={() => setIsRegisterModalOpen(false)}
         onSuccess={handleRegistrationSuccess}
       />

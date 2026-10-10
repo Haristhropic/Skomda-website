@@ -1057,10 +1057,14 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Kode tiket wajib disertakan"})
 		}
 		var item models.TrialClassRegistration
-		if err := requestDB(c).Select("ticket_code", "major").Where("ticket_code = ?", code).First(&item).Error; err != nil {
+		if err := requestDB(c).Select("ticket_code", "major", "full_name").Where("LOWER(ticket_code) = ?", strings.ToLower(code)).First(&item).Error; err != nil {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Tiket tidak ditemukan"})
 		}
-		return c.JSON(fiber.Map{"data": fiber.Map{"ticketCode": item.TicketCode, "major": item.Major}})
+		return c.JSON(fiber.Map{"data": fiber.Map{
+			"ticketCode": item.TicketCode,
+			"major":      item.Major,
+			"fullName":   item.FullName,
+		}})
 	})
 
 	// Admin: List all registrations
@@ -1251,10 +1255,249 @@ func registerCrudRoutes(api fiber.Router, cfg config.Config) {
 		recordAudit(c, "DELETE", "trial_class", fmt.Sprint(id), fmt.Sprintf("Menghapus pendaftar trial class: %s (%s)", existing.FullName, existing.TicketCode))
 		return c.JSON(fiber.Map{"message": "Pendaftar berhasil dihapus"})
 	})
+
+	// ==================== 12. VIRTUAL CLASS MODULES & QUIZZES ====================
+	vcGroup := api.Group("/virtual-class")
+
+	// Public: List all active virtual class modules with quizzes
+	vcGroup.Get("", func(c *fiber.Ctx) error {
+		var list []models.VirtualClassModule
+		query := requestDB(c).Preload("Quizzes", func(db *gorm.DB) *gorm.DB {
+			return db.Order("trigger_seconds ASC, id ASC")
+		}).Where("is_active = ?", true).Order("order_index ASC, id ASC")
+
+		if err := query.Find(&list).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memuat modul virtual class"})
+		}
+		return c.JSON(fiber.Map{"data": list, "total": len(list)})
+	})
+
+	// Public: Get single module by slug or id
+	vcGroup.Get("/item/:idOrSlug", func(c *fiber.Ctx) error {
+		param := strings.TrimSpace(c.Params("idOrSlug"))
+		var item models.VirtualClassModule
+		query := requestDB(c).Preload("Quizzes", func(db *gorm.DB) *gorm.DB {
+			return db.Order("trigger_seconds ASC, id ASC")
+		})
+
+		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
+			if err := query.First(&item, uint(id)).Error; err == nil {
+				return c.JSON(fiber.Map{"data": item})
+			}
+		}
+
+		if err := query.Where("LOWER(slug) = ?", strings.ToLower(param)).First(&item).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Modul tidak ditemukan"})
+		}
+		return c.JSON(fiber.Map{"data": item})
+	})
+
+	// Admin: List all modules (including inactive)
+	vcGroup.Get("/admin/all", authGuard, func(c *fiber.Ctx) error {
+		var list []models.VirtualClassModule
+		query := requestDB(c).Preload("Quizzes", func(db *gorm.DB) *gorm.DB {
+			return db.Order("trigger_seconds ASC, id ASC")
+		}).Order("order_index ASC, id ASC")
+
+		if err := query.Find(&list).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memuat data modul"})
+		}
+		return c.JSON(fiber.Map{"data": list, "total": len(list)})
+	})
+
+	// Admin: Create module
+	vcGroup.Post("", authGuard, func(c *fiber.Ctx) error {
+		var item models.VirtualClassModule
+		if err := parseContentBody(c, &item); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		if strings.TrimSpace(item.Title) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Judul modul wajib diisi"})
+		}
+		if strings.TrimSpace(item.Slug) == "" {
+			item.Slug = slugify(item.Title)
+		}
+		if item.OrderIndex <= 0 {
+			var count int64
+			requestDB(c).Model(&models.VirtualClassModule{}).Count(&count)
+			item.OrderIndex = int(count) + 1
+		}
+		item.IsActive = true
+		if err := requestDB(c).Create(&item).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan modul virtual class"})
+		}
+		recordAudit(c, "CREATE", "virtual_class_module", fmt.Sprint(item.ID), fmt.Sprintf("Menambahkan modul virtual class: %s", item.Title))
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Modul berhasil dibuat", "data": item})
+	})
+
+	// Admin: Update module
+	vcGroup.Put("/:id", authGuard, func(c *fiber.Ctx) error {
+		param := strings.TrimSpace(c.Params("id"))
+		var existing models.VirtualClassModule
+		var found bool
+
+		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
+			if err := requestDB(c).First(&existing, uint(id)).Error; err == nil {
+				found = true
+			}
+		}
+		if !found {
+			if err := requestDB(c).Where("LOWER(slug) = ?", strings.ToLower(param)).First(&existing).Error; err == nil {
+				found = true
+			}
+		}
+		if !found {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Modul tidak ditemukan"})
+		}
+
+		var input models.VirtualClassModule
+		if err := parseContentBody(c, &input); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+
+		existing.Title = input.Title
+		if strings.TrimSpace(input.Slug) != "" {
+			existing.Slug = input.Slug
+		}
+		existing.Description = input.Description
+		existing.Icon = input.Icon
+		existing.Duration = input.Duration
+		existing.DriveVideoID = input.DriveVideoID
+		existing.VideoURL = input.VideoURL
+		existing.LessonTitle = input.LessonTitle
+		existing.LessonDesc = input.LessonDesc
+		existing.Mentor = input.Mentor
+		existing.Topics = input.Topics
+		if input.OrderIndex > 0 {
+			existing.OrderIndex = input.OrderIndex
+		}
+		existing.IsActive = input.IsActive
+		existing.UpdatedAt = time.Now()
+
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menyimpan perubahan modul"})
+		}
+		recordAudit(c, "UPDATE", "virtual_class_module", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui modul virtual class: %s", existing.Title))
+		return c.JSON(fiber.Map{"message": "Modul berhasil diperbarui", "data": existing})
+	})
+
+	// Admin: Delete module
+	vcGroup.Delete("/:id", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		param := strings.TrimSpace(c.Params("id"))
+		var existing models.VirtualClassModule
+		var found bool
+
+		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
+			if err := requestDB(c).First(&existing, uint(id)).Error; err == nil {
+				found = true
+			}
+		}
+		if !found {
+			if err := requestDB(c).Where("LOWER(slug) = ?", strings.ToLower(param)).First(&existing).Error; err == nil {
+				found = true
+			}
+		}
+		if !found {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Modul tidak ditemukan"})
+		}
+
+		if err := requestDB(c).Delete(&existing).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghapus modul"})
+		}
+		recordAudit(c, "DELETE", "virtual_class_module", fmt.Sprint(existing.ID), fmt.Sprintf("Menghapus modul virtual class: %s", existing.Title))
+		return c.JSON(fiber.Map{"message": "Modul berhasil dihapus"})
+	})
+
+	// Admin: Add quiz to module
+	vcGroup.Post("/:id/quizzes", authGuard, func(c *fiber.Ctx) error {
+		param := strings.TrimSpace(c.Params("id"))
+		var module models.VirtualClassModule
+		var found bool
+
+		if id, err := strconv.ParseUint(param, 10, 32); err == nil && id > 0 {
+			if err := requestDB(c).First(&module, uint(id)).Error; err == nil {
+				found = true
+			}
+		}
+		if !found {
+			if err := requestDB(c).Where("LOWER(slug) = ?", strings.ToLower(param)).First(&module).Error; err == nil {
+				found = true
+			}
+		}
+		if !found {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Modul tidak ditemukan"})
+		}
+
+		var quiz models.VirtualClassQuiz
+		if err := parseContentBody(c, &quiz); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		if strings.TrimSpace(quiz.Question) == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Pertanyaan kuis wajib diisi"})
+		}
+		if len(quiz.Options) < 2 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Pilihan jawaban minimal 2 opsi"})
+		}
+		quiz.ModuleID = module.ID
+		quiz.CreatedAt = time.Now()
+		quiz.UpdatedAt = time.Now()
+
+		if err := requestDB(c).Create(&quiz).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal membuat kuis"})
+		}
+		recordAudit(c, "CREATE", "virtual_class_quiz", fmt.Sprint(quiz.ID), fmt.Sprintf("Menambahkan kuis di modul %s pada detik %d", module.Title, quiz.TriggerSeconds))
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Kuis berhasil dibuat", "data": quiz})
+	})
+
+	// Admin: Update quiz
+	vcGroup.Put("/quizzes/:quizId", authGuard, func(c *fiber.Ctx) error {
+		quizId, err := strconv.ParseUint(c.Params("quizId"), 10, 32)
+		if err != nil || quizId == 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "ID kuis tidak valid"})
+		}
+		var existing models.VirtualClassQuiz
+		if err := requestDB(c).First(&existing, uint(quizId)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Kuis tidak ditemukan"})
+		}
+
+		var input models.VirtualClassQuiz
+		if err := parseContentBody(c, &input); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Payload tidak valid"})
+		}
+		existing.TriggerSeconds = input.TriggerSeconds
+		existing.Question = input.Question
+		existing.Options = input.Options
+		existing.CorrectIndex = input.CorrectIndex
+		existing.Explanation = input.Explanation
+		existing.UpdatedAt = time.Now()
+
+		if err := requestDB(c).Save(&existing).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal memperbarui kuis"})
+		}
+		recordAudit(c, "UPDATE", "virtual_class_quiz", fmt.Sprint(existing.ID), fmt.Sprintf("Memperbarui kuis pada detik %d", existing.TriggerSeconds))
+		return c.JSON(fiber.Map{"message": "Kuis berhasil diperbarui", "data": existing})
+	})
+
+	// Admin: Delete quiz
+	vcGroup.Delete("/quizzes/:quizId", authGuard, middleware.RequireRole("editor"), func(c *fiber.Ctx) error {
+		quizId, err := strconv.ParseUint(c.Params("quizId"), 10, 32)
+		if err != nil || quizId == 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "ID kuis tidak valid"})
+		}
+		var existing models.VirtualClassQuiz
+		if err := requestDB(c).First(&existing, uint(quizId)).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Kuis tidak ditemukan"})
+		}
+		if err := requestDB(c).Delete(&existing).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Gagal menghapus kuis"})
+		}
+		recordAudit(c, "DELETE", "virtual_class_quiz", fmt.Sprint(quizId), "Menghapus kuis")
+		return c.JSON(fiber.Map{"message": "Kuis berhasil dihapus"})
+	})
 }
 
 // recordAudit mencatat log aktivitas admin ke database
-func recordAudit(c *fiber.Ctx, action, entity, entityID, details string) {
+func recordAudit(c *fiber.Ctx, action, entity, entityID, _ string) {
 	userName, _ := c.Locals("user_name").(string)
 	userID, _ := c.Locals("user_id").(uint)
 	// Callers may pass names, email addresses, student identifiers, ticket codes,

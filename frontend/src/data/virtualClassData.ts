@@ -1,4 +1,6 @@
 export interface QuizItem {
+  id?: string | number;
+  triggerSeconds?: number;
   question: string;
   options: string[];
   correctIndex: number;
@@ -11,12 +13,16 @@ export interface VirtualClassDtpItem {
   desc: string;
   icon: string;
   duration: string;
-  driveVideoId: string;
+  driveVideoId?: string;
+  videoUrl?: string;
   lessonTitle: string;
   lessonDesc: string;
   mentor: string;
   topics: string[];
   quiz: QuizItem;
+  quizzes?: QuizItem[];
+  isActive?: boolean;
+  orderIndex?: number;
 }
 
 export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
@@ -37,6 +43,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Simulasi Praktik Defense Cyber Attack",
     ],
     quiz: {
+      id: "cs-q1",
+      triggerSeconds: 50,
       question: "Apa tujuan utama dari proses vulnerability scanning dalam keamanan siber?",
       options: [
         "Menghapus seluruh file dan sistem yang ada di server",
@@ -48,6 +56,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Vulnerability scanning berfungsi untuk mendeteksi celah dan kelemahan pada sistem secara proaktif sebelum dapat diserang oleh peretas.",
     },
+    quizzes: [
+      {
+        id: "cs-q1",
+        triggerSeconds: 50,
+        question: "Apa tujuan utama dari proses vulnerability scanning dalam keamanan siber?",
+        options: [
+          "Menghapus seluruh file dan sistem yang ada di server",
+          "Mengidentifikasi celah atau kelemahan keamanan sebelum dieksploitasi pihak jahat",
+          "Meningkatkan kecepatan koneksi internet pengguna",
+          "Membuat akun sosial media otomatis untuk pengujian",
+        ],
+        correctIndex: 1,
+        explanation:
+          "Vulnerability scanning berfungsi untuk mendeteksi celah dan kelemahan pada sistem secara proaktif sebelum dapat diserang oleh peretas.",
+      },
+      {
+        id: "cs-q2",
+        triggerSeconds: 110,
+        question: "Dalam prinsip CIA Triad keamanan informasi, apa yang dimaksud dengan 'Integrity'?",
+        options: [
+          "Menjamin keutuhan, keaslian, dan data tidak dimanipulasi oleh pihak tanpa izin",
+          "Memastikan data dapat diakses oleh publik tanpa kata sandi",
+          "Menghapus data cadangan setiap akhir pekan",
+          "Membatasi waktu penggunaan komputer maksimal 1 jam per hari",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Integrity menjamin bahwa data tetap akurat, konsisten, dan terpercaya tanpa adanya modifikasi ilegal.",
+      },
+    ],
   },
   {
     id: "artificial-intelligence",
@@ -66,6 +104,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Live Demo Computer Vision & Image Recognition",
     ],
     quiz: {
+      id: "ai-q1",
+      triggerSeconds: 50,
       question: "Manakah di bawah ini yang merupakan contoh penerapan Machine Learning dalam kehidupan sehari-hari?",
       options: [
         "Sistem rekomendasi tontonan di YouTube atau Netflix",
@@ -77,6 +117,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Algoritma rekomendasi mempelajari pola kebiasaan tontonan pengguna menggunakan model Machine Learning.",
     },
+    quizzes: [
+      {
+        id: "ai-q1",
+        triggerSeconds: 50,
+        question: "Manakah di bawah ini yang merupakan contoh penerapan Machine Learning dalam kehidupan sehari-hari?",
+        options: [
+          "Sistem rekomendasi tontonan di YouTube atau Netflix",
+          "Kabel charger ponsel yang mengalirkan arus listrik",
+          "Papan ketik mekanikal pada laptop",
+          "Layar monitor beresolusi tinggi",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Algoritma rekomendasi mempelajari pola kebiasaan tontonan pengguna menggunakan model Machine Learning.",
+      },
+      {
+        id: "ai-q2",
+        triggerSeconds: 110,
+        question: "Apa fungsi dari 'Dataset' dalam proses pelatihan model Machine Learning?",
+        options: [
+          "Kumpulan contoh data yang dipelajari model untuk mengenali pola dan mengambil keputusan",
+          "Program antivirus untuk membersihkan harddisk",
+          "Kabel konektor display port ke proyektor",
+          "Baterai cadangan untuk laptop server",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Dataset menjadi bahan belajar utama algoritma kecerdasan buatan untuk mengidentifikasi pola data yang akurat.",
+      },
+    ],
   },
   {
     id: "iot",
@@ -95,6 +165,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Studi Kasus Smart School & Home Automation",
     ],
     quiz: {
+      id: "iot-q1",
+      triggerSeconds: 50,
       question: "Komponen apa yang berfungsi mendeteksi kondisi fisik seperti suhu atau cahaya dalam sistem IoT?",
       options: [
         "Sensor",
@@ -106,6 +178,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Sensor bertugas mengubah besaran fisik (suhu, kelembapan, intensitas cahaya) menjadi sinyal listrik yang dapat dibaca mikrokontroler.",
     },
+    quizzes: [
+      {
+        id: "iot-q1",
+        triggerSeconds: 50,
+        question: "Komponen apa yang berfungsi mendeteksi kondisi fisik seperti suhu atau cahaya dalam sistem IoT?",
+        options: [
+          "Sensor",
+          "Printer 3D",
+          "Speaker eksternal",
+          "Kabel HDMI",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Sensor bertugas mengubah besaran fisik (suhu, kelembapan, intensitas cahaya) menjadi sinyal listrik yang dapat dibaca mikrokontroler.",
+      },
+      {
+        id: "iot-q2",
+        triggerSeconds: 110,
+        question: "Protokol komunikasi berbobot ringan yang sangat lazim digunakan untuk transmisi data sensor IoT ke server cloud adalah:",
+        options: [
+          "MQTT (Message Queuing Telemetry Transport)",
+          "FTP",
+          "POP3",
+          "SMTP",
+        ],
+        correctIndex: 0,
+        explanation:
+          "MQTT dirancang hemat bandwidth dan efisien daya, sangat ideal untuk mikrokontroler dan perangkat sensor IoT.",
+      },
+    ],
   },
   {
     id: "software-developer",
@@ -124,6 +226,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Hands-on Mini Project Pembuatan Web Interaktif",
     ],
     quiz: {
+      id: "sd-q1",
+      triggerSeconds: 50,
       question: "Apa fungsi dari tag <html> dalam struktur HTML?",
       options: [
         "Untuk membuat judul halaman web",
@@ -135,6 +239,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Tag <html> adalah elemen akar (root) yang membungkus seluruh konten dan hierarki dokumen dalam sebuah halaman web.",
     },
+    quizzes: [
+      {
+        id: "sd-q1",
+        triggerSeconds: 50,
+        question: "Apa fungsi dari tag <html> dalam struktur HTML?",
+        options: [
+          "Untuk membuat judul halaman web",
+          "Untuk menampilkan gambar pada web",
+          "Untuk mendefinisikan seluruh dokumen HTML",
+          "Untuk membuat daftar pada halaman web",
+        ],
+        correctIndex: 2,
+        explanation:
+          "Tag <html> adalah elemen akar (root) yang membungkus seluruh konten dan hierarki dokumen dalam sebuah halaman web.",
+      },
+      {
+        id: "sd-q2",
+        triggerSeconds: 110,
+        question: "Dalam pembuatan website modern, CSS berfungsi untuk apa?",
+        options: [
+          "Mengatur tampilan visual, warna, tata letak (layout), dan responsivitas web",
+          "Mengelola tabel database MySQL",
+          "Menyimpan file dokumen ke Google Drive",
+          "Menghubungkan kabel LAN ke switch",
+        ],
+        correctIndex: 0,
+        explanation:
+          "CSS (Cascading Style Sheets) bertanggung jawab atas desain grafis, tata letak, warna, dan pengalaman visual pengguna di web.",
+      },
+    ],
   },
   {
     id: "cloud-engineer",
@@ -153,6 +287,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Manajemen Skalabilitas & Keandalan Cloud",
     ],
     quiz: {
+      id: "ce-q1",
+      triggerSeconds: 50,
       question: "Apa keunggulan utama menggunakan layanan Cloud Computing dibandingkan server fisik mandiri?",
       options: [
         "Mudah ditingkatkan kapasitasnya (scalable) dan biaya sesuai pemakaian",
@@ -164,6 +300,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Cloud computing menawarkan elastisitas dan skalabilitas instan tanpa harus berinvestasi membeli perangkat keras fisik terlebih dahulu.",
     },
+    quizzes: [
+      {
+        id: "ce-q1",
+        triggerSeconds: 50,
+        question: "Apa keunggulan utama menggunakan layanan Cloud Computing dibandingkan server fisik mandiri?",
+        options: [
+          "Mudah ditingkatkan kapasitasnya (scalable) dan biaya sesuai pemakaian",
+          "Memerlukan ruangan pendingin server khusus di rumah",
+          "Tidak membutuhkan koneksi internet sama sekali",
+          "Hanya bisa diakses dari satu komputer tertentu",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Cloud computing menawarkan elastisitas dan skalabilitas instan tanpa harus berinvestasi membeli perangkat keras fisik terlebih dahulu.",
+      },
+      {
+        id: "ce-q2",
+        triggerSeconds: 110,
+        question: "Model layanan cloud IaaS (Infrastructure as a Service) menyediakan sumber daya berupa apa?",
+        options: [
+          "Infrastruktur dasar komputasi seperti virtual machine, storage, dan virtual network",
+          "Layanan email web jadi seperti Gmail",
+          "Aplikasi pengolah kata berbasis browser",
+          "Meja kantor dan perangkat komputer desktop",
+        ],
+        correctIndex: 0,
+        explanation:
+          "IaaS memberikan kontrol penuh pada infrastruktur virtual seperti VM, penyimpanan blok, dan subnet jaringan cloud.",
+      },
+    ],
   },
   {
     id: "network-system-admin",
@@ -182,6 +348,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Monitoring Kinerja Server & Troubleshooting Jaringan",
     ],
     quiz: {
+      id: "nsa-q1",
+      triggerSeconds: 50,
       question: "Perintah terminal Linux apa yang sering digunakan untuk melihat daftar file dan folder dalam sebuah direktori?",
       options: [
         "ls",
@@ -193,6 +361,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Perintah ls (list) menampilkan daftar file dan subfolder yang terdapat di dalam direktori kerja saat ini.",
     },
+    quizzes: [
+      {
+        id: "nsa-q1",
+        triggerSeconds: 50,
+        question: "Perintah terminal Linux apa yang sering digunakan untuk melihat daftar file dan folder dalam sebuah direktori?",
+        options: [
+          "ls",
+          "delete",
+          "shutdown",
+          "exit",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Perintah ls (list) menampilkan daftar file dan subfolder yang terdapat di dalam direktori kerja saat ini.",
+      },
+      {
+        id: "nsa-q2",
+        triggerSeconds: 110,
+        question: "Protokol jaringan apa yang bertugas memberikan alamat IP otomatis kepada perangkat komputer klien?",
+        options: [
+          "DHCP (Dynamic Host Configuration Protocol)",
+          "HTTP",
+          "SMTP",
+          "SSH",
+        ],
+        correctIndex: 0,
+        explanation:
+          "DHCP mendistribusikan konfigurasi IP, subnet mask, dan gateway secara otomatis kepada setiap perangkat di jaringan.",
+      },
+    ],
   },
   {
     id: "visual-designer",
@@ -211,6 +409,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Praktik Desain Konten Digital & Poster Interaktif",
     ],
     quiz: {
+      id: "vd-q1",
+      triggerSeconds: 50,
       question: "Apa fungsi utama hierarki tipografi dalam sebuah desain tampilan?",
       options: [
         "Mengarahkan mata audiens membaca informasi terpenting terlebih dahulu",
@@ -222,6 +422,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Hierarki tipografi memandu mata audiens untuk mencerna judul, subjudul, dan teks isi dengan urutan prioritas yang nyaman dibaca.",
     },
+    quizzes: [
+      {
+        id: "vd-q1",
+        triggerSeconds: 50,
+        question: "Apa fungsi utama hierarki tipografi dalam sebuah desain tampilan?",
+        options: [
+          "Mengarahkan mata audiens membaca informasi terpenting terlebih dahulu",
+          "Menghabiskan ruang kosong pada kanvas desain",
+          "Membuat semua tulisan memiliki ukuran yang persis sama",
+          "Mengubah warna teks secara acak",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Hierarki tipografi memandu mata audiens untuk mencerna judul, subjudul, dan teks isi dengan urutan prioritas yang nyaman dibaca.",
+      },
+      {
+        id: "vd-q2",
+        triggerSeconds: 110,
+        question: "Dalam desain antarmuka, apa yang dimaksud dengan 'White Space' (Ruang Negatif)?",
+        options: [
+          "Ruang kosong di sekitar elemen untuk memberikan kejelasan visual dan kenyamanan fokus mata",
+          "Bagian gambar yang gagal dimuat oleh browser",
+          "Warna background yang wajib selalu putih bersih",
+          "Tanda bahwa aplikasi mengalami kesalahan grafis",
+        ],
+        correctIndex: 0,
+        explanation:
+          "White space memberikan ruang bernapas pada layout sehingga antarmuka tidak terasa sesak dan lebih mudah dipahami.",
+      },
+    ],
   },
   {
     id: "network-infrastructure",
@@ -240,6 +470,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Dasar Transmisi Fiber Optic & Splicing Cable",
     ],
     quiz: {
+      id: "ni-q1",
+      triggerSeconds: 50,
       question: "Media apakah yang digunakan oleh kabel Fiber Optic untuk mentransmisikan data?",
       options: [
         "Sinyal cahaya",
@@ -251,6 +483,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Kabel Fiber Optic mentransmisikan data dalam bentuk pulsa cahaya melalui inti serat kaca murni dengan kecepatan luar biasa tinggi.",
     },
+    quizzes: [
+      {
+        id: "ni-q1",
+        triggerSeconds: 50,
+        question: "Media apakah yang digunakan oleh kabel Fiber Optic untuk mentransmisikan data?",
+        options: [
+          "Sinyal cahaya",
+          "Gelombang suara akustik",
+          "Arus listrik tegangan tinggi",
+          "Cairan magnetik",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Kabel Fiber Optic mentransmisikan data dalam bentuk pulsa cahaya melalui inti serat kaca murni dengan kecepatan luar biasa tinggi.",
+      },
+      {
+        id: "ni-q2",
+        triggerSeconds: 110,
+        question: "Alat presisi apa yang digunakan teknisi jaringan untuk menyambung dua ujung serat optik secara permanen?",
+        options: [
+          "Fusion Splicer",
+          "Crimping Tool RJ45",
+          "Tang potong kawat",
+          "Obeng minus",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Fusion Splicer menyambungkan dua ujung inti serat kaca menggunakan busur listrik mikro dengan peredaman (loss) yang sangat minim.",
+      },
+    ],
   },
   {
     id: "digital-marketing",
@@ -269,6 +531,8 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       "Analisis Funnel Konversi & Brand Positioning",
     ],
     quiz: {
+      id: "dm-q1",
+      triggerSeconds: 50,
       question: "Dalam pemasaran digital, apa yang dimaksud dengan istilah 'Target Audience'?",
       options: [
         "Kelompok konsumen spesifik yang paling berpotensi tertarik dengan produk atau layananmu",
@@ -280,6 +544,36 @@ export const VIRTUAL_CLASS_DATA: VirtualClassDtpItem[] = [
       explanation:
         "Target audience adalah kelompok spesifik pengguna yang memiliki kebutuhan atau minat paling relevan dengan produk yang ditawarkan.",
     },
+    quizzes: [
+      {
+        id: "dm-q1",
+        triggerSeconds: 50,
+        question: "Dalam pemasaran digital, apa yang dimaksud dengan istilah 'Target Audience'?",
+        options: [
+          "Kelompok konsumen spesifik yang paling berpotensi tertarik dengan produk atau layananmu",
+          "Komputer server yang digunakan untuk mengirim email promosi",
+          "Pesaing bisnis yang menjual produk serupa di pasar",
+          "Jumlah total seluruh pengguna internet tanpa memandang minat",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Target audience adalah kelompok spesifik pengguna yang memiliki kebutuhan atau minat paling relevan dengan produk yang ditawarkan.",
+      },
+      {
+        id: "dm-q2",
+        triggerSeconds: 110,
+        question: "Metrik pemasaran digital apa yang menghitung persentase pengunjung yang berhasil melakukan pembelian atau pendaftaran?",
+        options: [
+          "Conversion Rate (Tingkat Konversi)",
+          "Refresh Rate",
+          "Latency Ping",
+          "Clock Speed",
+        ],
+        correctIndex: 0,
+        explanation:
+          "Conversion Rate mengukur efektivitas kampanye promosi dalam mengubah audiens menjadi pengguna atau pelanggan aktif.",
+      },
+    ],
   },
 ];
 
@@ -310,6 +604,7 @@ export const VIRTUAL_CLASS_DATA_EN: Record<
       "Cyber Defense Practical Simulation",
     ],
     quizEn: {
+      triggerSeconds: 50,
       question: "What is the primary purpose of vulnerability scanning in cybersecurity?",
       options: [
         "Delete all files and operating systems on the server",
@@ -324,45 +619,47 @@ export const VIRTUAL_CLASS_DATA_EN: Record<
   },
   "artificial-intelligence": {
     titleEn: "Artificial Intelligence",
-    descEn: "Explore core concepts and practical applications of AI",
+    descEn: "Learn foundational concepts and industrial AI applications",
     durationEn: "3 mins",
     lessonTitleEn: "Introduction to Artificial Intelligence & Machine Learning",
     lessonDescEn:
-      "Understand how artificial intelligence models are trained with datasets, how generative AI works, and how it automates modern industries.",
+      "Understand how AI models learn from training datasets, how generative models function, and their automation applications in modern industry.",
     mentorEn: "SKOMDA AI & Data Science Instructor",
     topicsEn: [
-      "Introduction to Machine Learning & Deep Learning",
+      "Fundamentals of Machine Learning & Deep Learning",
       "Prompt Engineering & Generative AI Applications",
-      "Live Demo: Computer Vision & Image Recognition",
+      "Computer Vision & Pattern Recognition Showcase",
     ],
     quizEn: {
-      question: "Which of the following is an example of Machine Learning in daily life?",
+      triggerSeconds: 50,
+      question: "Which of the following is a real-world example of Machine Learning in daily life?",
       options: [
-        "Content recommendation systems on YouTube or Netflix",
-        "A phone charging cable conducting electrical current",
-        "A mechanical keyboard on a laptop",
-        "A high-resolution monitor display",
+        "Video recommendation algorithms on YouTube or Netflix",
+        "A power cable supplying electricity to a phone",
+        "A mechanical keyboard connected to a computer",
+        "A high-resolution display monitor",
       ],
       correctIndex: 0,
       explanation:
-        "Recommendation algorithms learn viewing habits and user patterns using Machine Learning models.",
+        "Recommendation systems analyze historical viewing habits using Machine Learning models to predict relevant content.",
     },
   },
   iot: {
     titleEn: "Internet of Things",
-    descEn: "Discover smart devices and connected IoT telemetry",
+    descEn: "Discover smart device hardware and cloud connectivity",
     durationEn: "3 mins",
     lessonTitleEn: "Introduction to Internet of Things & Smart Devices",
     lessonDescEn:
-      "Learn IoT architecture, interfacing ESP32 microcontrollers with various environmental sensors, and streaming telemetry to real-time cloud dashboards.",
-    mentorEn: "IoT & Embedded Systems Lab Team",
+      "Study IoT system architecture, ESP32 microcontroller sensor integration, and real-time telemetry streaming to cloud dashboards.",
+    mentorEn: "IoT & Embedded Systems Lab Faculty",
     topicsEn: [
-      "Introduction to Sensors & ESP32 Microcontrollers",
-      "MQTT Protocols & Realtime Cloud Dashboards",
-      "Case Studies: Smart School & Home Automation",
+      "Sensors & ESP32 Microcontroller Integration",
+      "MQTT Protocol & Real-time Cloud Telemetry",
+      "Smart Campus & Home Automation Case Studies",
     ],
     quizEn: {
-      question: "Which component detects physical environmental conditions such as temperature or light in an IoT system?",
+      triggerSeconds: 50,
+      question: "Which component detects physical environmental factors like temperature or light in an IoT device?",
       options: [
         "Sensor",
         "3D Printer",
@@ -371,76 +668,79 @@ export const VIRTUAL_CLASS_DATA_EN: Record<
       ],
       correctIndex: 0,
       explanation:
-        "Sensors convert physical variables (temperature, humidity, light intensity) into electrical signals readable by microcontrollers.",
+        "Sensors convert physical variables into measurable electrical signals that a microcontroller can process.",
     },
   },
   "software-developer": {
     titleEn: "Software Developer",
-    descEn: "Learn to build modern web and mobile applications",
+    descEn: "Learn to build interactive web and mobile applications",
     durationEn: "3 mins",
     lessonTitleEn: "Introduction to Modern Web Development",
     lessonDescEn:
-      "Learn the fundamentals of building websites, from HTML semantics and CSS styling to interactive JavaScript logic.",
-    mentorEn: "Senior Software Engineer / SKOMDA Software Faculty",
+      "Master web development foundations: semantic HTML structuring, modern CSS styling, and client-side interactivity with JavaScript.",
+    mentorEn: "Senior Software Engineer & RPL Faculty",
     topicsEn: [
-      "Modern Web Architecture Using Next.js & Tailwind CSS",
-      "Algorithmic Problem Solving & RESTful APIs",
-      "Hands-on Mini Project: Interactive Web Application",
+      "Modern Web Architecture with Next.js & Tailwind CSS",
+      "Core Programming Logic & RESTful API Consumption",
+      "Hands-on Interactive Web Application Project",
     ],
     quizEn: {
-      question: "What is the purpose of the <html> tag in an HTML document?",
+      triggerSeconds: 50,
+      question: "What is the primary purpose of the <html> tag in web documents?",
       options: [
-        "To create the title of the webpage",
-        "To display images on the webpage",
-        "To define and wrap the entire HTML document",
-        "To create a numbered list on the webpage",
+        "To define the web page header title",
+        "To embed images on the page",
+        "To wrap and represent the entire root HTML document",
+        "To create a numbered list",
       ],
       correctIndex: 2,
       explanation:
-        "The <html> tag serves as the root element enclosing all content and document hierarchy on a webpage.",
+        "The <html> element acts as the root container holding all other nested elements of the webpage.",
     },
   },
   "cloud-engineer": {
     titleEn: "Cloud Engineer",
-    descEn: "Understand cloud architecture and scalable services",
+    descEn: "Understand cloud computing models and infrastructure",
     durationEn: "3 mins",
-    lessonTitleEn: "Fundamentals of Cloud Computing & Virtualization",
+    lessonTitleEn: "Cloud Computing Fundamentals & Virtualization",
     lessonDescEn:
-      "Understand cloud infrastructure architectures, IaaS/PaaS/SaaS models, and how virtual servers are provisioned to run high-availability applications.",
-    mentorEn: "Cloud Computing Instructor (AWS/GCP Certified)",
+      "Understand cloud virtualization architectures, IaaS/PaaS/SaaS delivery models, and managing scalable virtual machines for production systems.",
+    mentorEn: "AWS / Google Cloud Certified Faculty",
     topicsEn: [
-      "Introduction to Cloud Infrastructure & Virtualization",
-      "Deploying Virtual Servers, Storage, & Networking",
-      "Managing Cloud Scalability & Reliability",
+      "Cloud Infrastructure & Virtualization Principles",
+      "Deploying Virtual Machines, Object Storage & Networks",
+      "Reliability, High Availability & Auto-scaling",
     ],
     quizEn: {
-      question: "What is a primary advantage of Cloud Computing over on-premise physical servers?",
+      triggerSeconds: 50,
+      question: "What is a key benefit of Cloud Computing over traditional on-premise hardware?",
       options: [
-        "Instant scalability and pay-as-you-go cost structure",
-        "Requires a dedicated air-conditioned server room at home",
-        "Requires no internet connectivity whatsoever",
-        "Can only be accessed from one specific designated computer",
+        "Elastic scalability and pay-as-you-go pricing model",
+        "Requires building a custom dedicated server room at home",
+        "Works without any internet connection",
+        "Can only be accessed from one single physical PC",
       ],
       correctIndex: 0,
       explanation:
-        "Cloud computing delivers instant elasticity and scale without upfront physical hardware investments.",
+        "Cloud computing provides on-demand resource provisioning and pay-as-you-go flexibility without upfront hardware costs.",
     },
   },
   "network-system-admin": {
     titleEn: "Network System Administrator",
-    descEn: "Master enterprise system administration and network operations",
+    descEn: "Learn server operations and enterprise systems management",
     durationEn: "3 mins",
-    lessonTitleEn: "Network Systems Administration & Linux Server",
+    lessonTitleEn: "Network Systems Administration & Linux Servers",
     lessonDescEn:
-      "Learn Linux terminal navigation, user privilege controls, DNS & DHCP service configuration, and centralized systems maintenance.",
-    mentorEn: "SKOMDA TJAT Systems & Server Instructor",
+      "Learn essential Linux terminal commands, user access privilege configuration, core network services (DNS/DHCP), and proactive system maintenance.",
+    mentorEn: "SKOMDA TJAT Enterprise Systems Instructor",
     topicsEn: [
-      "Linux Server Administration & Terminal Commands",
-      "User Management, Permissions, & Server Hardening",
-      "Server Performance Monitoring & Network Troubleshooting",
+      "Linux Server Administration & Command Line Interface",
+      "User Management, Permissions & Server Hardening",
+      "System Performance Monitoring & Network Troubleshooting",
     ],
     quizEn: {
-      question: "Which Linux terminal command lists files and folders in a directory?",
+      triggerSeconds: 50,
+      question: "Which Linux terminal command is used to display files and folders in the current working directory?",
       options: [
         "ls",
         "delete",
@@ -449,50 +749,52 @@ export const VIRTUAL_CLASS_DATA_EN: Record<
       ],
       correctIndex: 0,
       explanation:
-        "The 'ls' (list) command outputs the files and subfolders located in the current working directory.",
+        "The ls command lists the contents of a directory in Unix and Linux operating systems.",
     },
   },
   "visual-designer": {
     titleEn: "Visual Communication Designer",
-    descEn: "Craft impactful visual communication and UI assets",
+    descEn: "Create impactful, clear visual communications and UI assets",
     durationEn: "3 mins",
     lessonTitleEn: "Principles of Visual Communication & UI Design",
     lessonDescEn:
-      "Study visual hierarchy, color contrast, grid layouts, and typographic harmony to deliver engaging and communicative visual experiences.",
-    mentorEn: "SKOMDA Creative Design Lead",
+      "Learn visual hierarchy, color theory, grid systems, and typography harmony so every creative asset delivers its intended message clearly and engagingly.",
+    mentorEn: "Creative Design Lead SKOMDA",
     topicsEn: [
-      "Fundamentals of UI/UX, Layouts, & Visual Composition",
-      "Color Harmony, Typographic Hierarchy, & Grid Systems",
-      "Hands-on Practice: Digital Content & Interactive Posters",
+      "UI/UX Fundamentals, Layout Composition & Grids",
+      "Color Harmony, Typography Hierarchy & Scale",
+      "Interactive Digital Posters & Promotional Media",
     ],
     quizEn: {
-      question: "What is the primary function of typographic hierarchy in interface design?",
+      triggerSeconds: 50,
+      question: "What is the primary role of typographic hierarchy in interface design?",
       options: [
-        "Guiding the viewer's eyes to absorb key information first",
-        "Filling up empty space on the design canvas",
-        "Making all text elements the exact same font size",
-        "Randomizing text colors across sections",
+        "To guide the viewer's eyes to the most important information first",
+        "To fill up all empty spaces on the layout canvas",
+        "To make all text elements have identical sizing",
+        "To randomize font colors across the page",
       ],
       correctIndex: 0,
       explanation:
-        "Typographic hierarchy directs the reader's eye through headlines, subheadings, and body copy in a clear order of importance.",
+        "Typographic hierarchy provides a clear structure that helps readers prioritize headings, body text, and call-to-actions effortlessly.",
     },
   },
   "network-infrastructure": {
     titleEn: "Network Infrastructure Engineer",
-    descEn: "Explore physical networking infrastructure and fiber optics",
+    descEn: "Build enterprise network cabling and routing infrastructure",
     durationEn: "3 mins",
-    lessonTitleEn: "Network Infrastructure & Fiber Optics",
+    lessonTitleEn: "Enterprise Networking & Fiber Optic Fundamentals",
     lessonDescEn:
-      "Examine fiber optic cabling media, enterprise switches and routers, and routing protocol setups connecting campus facilities.",
+      "Explore fiber optic cable transmission physics, enterprise routers and switches, and routing configurations connecting campus network backbones.",
     mentorEn: "SKOMDA Fiber Optic & Routing Specialist",
     topicsEn: [
-      "Enterprise & Campus Network Topology Design",
-      "Routing Configuration on MikroTik & Cisco Hardware",
-      "Fiber Optic Transmission Fundamentals & Cable Splicing",
+      "Campus Network Topology & Cabling Architecture",
+      "Enterprise Routing & Managed Switch Configuration",
+      "Fiber Optic Theory & High-Precision Splicing",
     ],
     quizEn: {
-      question: "What medium is used by Fiber Optic cables to transmit data?",
+      triggerSeconds: 50,
+      question: "What medium is used by Fiber Optic cables to transmit data signals?",
       options: [
         "Light pulses",
         "Acoustic sound waves",
@@ -518,6 +820,7 @@ export const VIRTUAL_CLASS_DATA_EN: Record<
       "Conversion Funnel Analysis & Brand Positioning",
     ],
     quizEn: {
+      triggerSeconds: 50,
       question: "In digital marketing, what does 'Target Audience' refer to?",
       options: [
         "The specific group of consumers most likely to be interested in your product or service",
@@ -536,9 +839,26 @@ export function getLocalizedVirtualClassItem(
   item: VirtualClassDtpItem,
   isEn: boolean
 ): VirtualClassDtpItem {
-  if (!isEn) return item;
+  const effectiveQuizzes: QuizItem[] =
+    item.quizzes && item.quizzes.length > 0
+      ? item.quizzes
+      : [{ ...item.quiz, triggerSeconds: item.quiz?.triggerSeconds || 50 }];
+
+  if (!isEn) {
+    return {
+      ...item,
+      quizzes: effectiveQuizzes,
+      quiz: effectiveQuizzes[0],
+    };
+  }
   const trans = VIRTUAL_CLASS_DATA_EN[item.id];
-  if (!trans) return item;
+  if (!trans) {
+    return {
+      ...item,
+      quizzes: effectiveQuizzes,
+      quiz: effectiveQuizzes[0],
+    };
+  }
   return {
     ...item,
     title: trans.titleEn || item.title,
@@ -548,6 +868,15 @@ export function getLocalizedVirtualClassItem(
     lessonDesc: trans.lessonDescEn || item.lessonDesc,
     mentor: trans.mentorEn || item.mentor,
     topics: trans.topicsEn || item.topics,
-    quiz: trans.quizEn || item.quiz,
+    quiz: trans.quizEn ? { ...trans.quizEn, triggerSeconds: effectiveQuizzes[0]?.triggerSeconds || 50 } : effectiveQuizzes[0],
+    quizzes: effectiveQuizzes.map((q, idx) => {
+      if (idx === 0 && trans.quizEn) {
+        return {
+          ...trans.quizEn,
+          triggerSeconds: q.triggerSeconds || 50,
+        };
+      }
+      return q;
+    }),
   };
 }
