@@ -50,7 +50,7 @@ if (!process.argv.includes("--check")) {
   await fs.cp(publicDir, outputDir, { recursive: true });
   // Source originals stay intact; only verified CDN files in the staging copy
   // are omitted. Redirects preserve favicon, CSS and raw image URL references.
-  for (const source of omittedPaths) await fs.rm(path.resolve(outputDir, `.${source}`));
+  for (const source of omittedPaths) await fs.rm(path.resolve(outputDir, `.${source}`), { force: true });
   await fs.writeFile(path.join(root, ".runtime-public-assets.json"), JSON.stringify({ cloud, redirects, localAssets }));
 }
 console.log(JSON.stringify({ mappedClouds: [...new Set(Object.values(manifest).map((entry) => new URL(entry.secure_url).pathname.split("/")[1]))], configuredCloud: cloud || null, allVerified: reachable, verifiedUrls: redirects.length, excludedFiles: omittedPaths.length, omittedBytes, failures }, null, 2));

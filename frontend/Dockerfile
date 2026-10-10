@@ -13,7 +13,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # NEXT_PUBLIC_* values are embedded into the browser bundle at build time.
-ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_API_URL=https://api-linear.smktelkom-sidoarjo.my.id/api
 ARG NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
 ARG NEXT_PUBLIC_CLARITY_PROJECT_ID
@@ -22,7 +22,10 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NEXT_PUBLIC_GA_MEASUREMENT_ID=${NEXT_PUBLIC_GA_MEASUREMENT_ID} \
     NEXT_PUBLIC_CLARITY_PROJECT_ID=${NEXT_PUBLIC_CLARITY_PROJECT_ID}
 
-RUN test -n "$NEXT_PUBLIC_API_URL" \
+RUN if [ -z "$NEXT_PUBLIC_API_URL" ]; then \
+        echo "ERROR: NEXT_PUBLIC_API_URL build argument is required but was not provided." >&2; \
+        exit 1; \
+    fi \
     && node scripts/prepare-runtime-public.mjs \
     && npm run build
 
